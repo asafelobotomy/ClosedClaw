@@ -5,7 +5,7 @@ import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { ResolvedMemorySearchConfig } from "../agents/memory-search.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { ClosedClawConfig } from "../config/config.js";
 import { resolveAgentDir, resolveAgentWorkspaceDir } from "../agents/agent-scope.js";
 import { resolveMemorySearchConfig } from "../agents/memory-search.js";
 import { resolveSessionTranscriptsDirForAgent } from "../config/sessions/paths.js";
@@ -116,7 +116,7 @@ const vectorToBlob = (embedding: number[]): Buffer =>
 
 export class MemoryIndexManager {
   private readonly cacheKey: string;
-  private readonly cfg: OpenClawConfig;
+  private readonly cfg: ClosedClawConfig;
   private readonly agentId: string;
   private readonly workspaceDir: string;
   private readonly settings: ResolvedMemorySearchConfig;
@@ -172,7 +172,7 @@ export class MemoryIndexManager {
   private syncing: Promise<void> | null = null;
 
   static async get(params: {
-    cfg: OpenClawConfig;
+    cfg: ClosedClawConfig;
     agentId: string;
   }): Promise<MemoryIndexManager | null> {
     const { cfg, agentId } = params;
@@ -209,7 +209,7 @@ export class MemoryIndexManager {
 
   private constructor(params: {
     cacheKey: string;
-    cfg: OpenClawConfig;
+    cfg: ClosedClawConfig;
     agentId: string;
     workspaceDir: string;
     settings: ResolvedMemorySearchConfig;

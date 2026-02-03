@@ -1,15 +1,15 @@
 {
-  "name": "@openclaw/memory-core",
+  "name": "@ClosedClaw/memory-core",
   "version": "2026.2.1",
-  "description": "OpenClaw core memory search plugin",
+  "description": "ClosedClaw core memory search plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "ClosedClaw": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.1.26"
+    "ClosedClaw": ">=2026.1.26"
   },
-  "openclaw": {
+  "ClosedClaw": {
     "extensions": [
       "./index.ts"
     ]

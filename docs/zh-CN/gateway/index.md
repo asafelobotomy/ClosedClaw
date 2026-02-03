@@ -19,22 +19,22 @@ x-i18n:
 ## 简介
 
 - 始终运行的进程，拥有唯一的 Baileys/Telegram 连接以及控制/事件平面。
-- 替代旧版 `gateway` 命令。CLI 入口：`openclaw gateway`。
+- 替代旧版 `gateway` 命令。CLI 入口：`ClosedClaw gateway`。
 - 持续运行直到被停止；遇到致命错误时以非零状态退出，以便 supervisor 重启。
 
 ## 如何运行（本地）
 
 ```bash
-openclaw gateway --port 18789
+ClosedClaw gateway --port 18789
 # 在标准输出中获取完整的调试/跟踪日志：
-openclaw gateway --port 18789 --verbose
+ClosedClaw gateway --port 18789 --verbose
 # 如果端口被占用，先终止监听进程再启动：
-openclaw gateway --force
+ClosedClaw gateway --force
 # 开发循环（TS 文件变更时自动重载）：
 pnpm gateway:watch
 ```
 
-- 配置热重载会监视 `~/.openclaw/openclaw.json`（或 `OPENCLAW_CONFIG_PATH`）。
+- 配置热重载会监视 `~/.ClosedClaw/ClosedClaw.json`（或 `ClosedClaw_CONFIG_PATH`）。
   - 默认模式：`gateway.reload.mode="hybrid"`（安全变更热应用，关键变更则重启）。
   - 热重载在需要时通过 **SIGUSR1** 进行进程内重启。
   - 通过 `gateway.reload.mode="off"` 禁用。
@@ -43,15 +43,15 @@ pnpm gateway:watch
   - OpenAI Chat Completions (HTTP)：[`/v1/chat/completions`](/gateway/openai-http-api)。
   - OpenResponses (HTTP)：[`/v1/responses`](/gateway/openresponses-http-api)。
   - Tools Invoke (HTTP)：[`/tools/invoke`](/gateway/tools-invoke-http-api)。
-- 默认在 `canvasHost.port`（默认 `18793`）启动 Canvas 文件服务器，从 `~/.openclaw/workspace/canvas` 提供 `http://<gateway-host>:18793/__openclaw__/canvas/` 服务。通过 `canvasHost.enabled=false` 或 `OPENCLAW_SKIP_CANVAS_HOST=1` 禁用。
+- 默认在 `canvasHost.port`（默认 `18793`）启动 Canvas 文件服务器，从 `~/.ClosedClaw/workspace/canvas` 提供 `http://<gateway-host>:18793/__ClosedClaw__/canvas/` 服务。通过 `canvasHost.enabled=false` 或 `ClosedClaw_SKIP_CANVAS_HOST=1` 禁用。
 - 日志输出到标准输出；使用 launchd/systemd 保持进程存活并轮转日志。
 - 传入 `--verbose` 可在故障排除时将调试日志（握手、请求/响应、事件）从日志文件镜像到标准输出。
 - `--force` 使用 `lsof` 查找所选端口上的监听进程，发送 SIGTERM，记录被终止的进程，然后启动 Gateway网关（如果缺少 `lsof` 则快速失败）。
 - 如果在 supervisor（launchd/systemd/mac app 子进程模式）下运行，停止/重启通常发送 **SIGTERM**；旧版本可能将其显示为 `pnpm` `ELIFECYCLE` 退出码 **143**（SIGTERM），这是正常关闭，不是崩溃。
 - **SIGUSR1** 在授权时触发进程内重启（Gateway网关工具/配置应用/更新，或启用 `commands.restart` 以进行手动重启）。
-- 默认需要 Gateway网关认证：设置 `gateway.auth.token`（或 `OPENCLAW_GATEWAY_TOKEN`）或 `gateway.auth.password`。客户端必须发送 `connect.params.auth.token/password`，除非使用 Tailscale Serve 身份。
+- 默认需要 Gateway网关认证：设置 `gateway.auth.token`（或 `ClosedClaw_GATEWAY_TOKEN`）或 `gateway.auth.password`。客户端必须发送 `connect.params.auth.token/password`，除非使用 Tailscale Serve 身份。
 - 向导现在默认生成令牌，即使在 local loopback 上也是如此。
-- 端口优先级：`--port` > `OPENCLAW_GATEWAY_PORT` > `gateway.port` > 默认 `18789`。
+- 端口优先级：`--port` > `ClosedClaw_GATEWAY_PORT` > `gateway.port` > 默认 `18789`。
 
 ## 远程访问
 
@@ -70,15 +70,15 @@ pnpm gateway:watch
 
 服务名称是配置文件感知的：
 
-- macOS：`bot.molt.<profile>`（旧版 `com.openclaw.*` 可能仍然存在）
-- Linux：`openclaw-gateway-<profile>.service`
-- Windows：`OpenClaw Gateway网关 (<profile>)`
+- macOS：`bot.molt.<profile>`（旧版 `com.ClosedClaw.*` 可能仍然存在）
+- Linux：`ClosedClaw-gateway-<profile>.service`
+- Windows：`ClosedClaw Gateway网关 (<profile>)`
 
 安装元数据嵌入在服务配置中：
 
-- `OPENCLAW_SERVICE_MARKER=openclaw`
-- `OPENCLAW_SERVICE_KIND=gateway`
-- `OPENCLAW_SERVICE_VERSION=<version>`
+- `ClosedClaw_SERVICE_MARKER=ClosedClaw`
+- `ClosedClaw_SERVICE_KIND=gateway`
+- `ClosedClaw_SERVICE_VERSION=<version>`
 
 救援机器人模式：保持第二个 Gateway网关隔离，使用独立的配置文件、状态目录、工作区和基础端口间距。完整指南：[救援机器人指南](/gateway/multiple-gateways#rescue-bot-guide)。
 
@@ -87,49 +87,49 @@ pnpm gateway:watch
 快速路径：运行完全隔离的开发实例（配置/状态/工作区），不影响主要设置。
 
 ```bash
-openclaw --dev setup
-openclaw --dev gateway --allow-unconfigured
+ClosedClaw --dev setup
+ClosedClaw --dev gateway --allow-unconfigured
 # 然后指向开发实例：
-openclaw --dev status
-openclaw --dev health
+ClosedClaw --dev status
+ClosedClaw --dev health
 ```
 
 默认值（可通过环境变量/标志/配置覆盖）：
 
-- `OPENCLAW_STATE_DIR=~/.openclaw-dev`
-- `OPENCLAW_CONFIG_PATH=~/.openclaw-dev/openclaw.json`
-- `OPENCLAW_GATEWAY_PORT=19001`（Gateway网关 WS + HTTP）
+- `ClosedClaw_STATE_DIR=~/.ClosedClaw-dev`
+- `ClosedClaw_CONFIG_PATH=~/.ClosedClaw-dev/ClosedClaw.json`
+- `ClosedClaw_GATEWAY_PORT=19001`（Gateway网关 WS + HTTP）
 - 浏览器控制服务端口 = `19003`（派生：`gateway.port+2`，仅 local loopback）
 - `canvasHost.port=19005`（派生：`gateway.port+4`）
-- 在 `--dev` 下运行 `setup`/`onboard` 时，`agents.defaults.workspace` 默认变为 `~/.openclaw/workspace-dev`。
+- 在 `--dev` 下运行 `setup`/`onboard` 时，`agents.defaults.workspace` 默认变为 `~/.ClosedClaw/workspace-dev`。
 
 派生端口（经验规则）：
 
-- 基础端口 = `gateway.port`（或 `OPENCLAW_GATEWAY_PORT` / `--port`）
+- 基础端口 = `gateway.port`（或 `ClosedClaw_GATEWAY_PORT` / `--port`）
 - 浏览器控制服务端口 = 基础端口 + 2（仅 local loopback）
-- `canvasHost.port = 基础端口 + 4`（或 `OPENCLAW_CANVAS_HOST_PORT` / 配置覆盖）
+- `canvasHost.port = 基础端口 + 4`（或 `ClosedClaw_CANVAS_HOST_PORT` / 配置覆盖）
 - 浏览器配置文件 CDP 端口从 `browser.controlPort + 9 .. + 108` 自动分配（按配置文件持久化）。
 
 每个实例的检查清单：
 
 - 唯一的 `gateway.port`
-- 唯一的 `OPENCLAW_CONFIG_PATH`
-- 唯一的 `OPENCLAW_STATE_DIR`
+- 唯一的 `ClosedClaw_CONFIG_PATH`
+- 唯一的 `ClosedClaw_STATE_DIR`
 - 唯一的 `agents.defaults.workspace`
 - 独立的 WhatsApp 号码（如果使用 WA）
 
 按配置文件安装服务：
 
 ```bash
-openclaw --profile main gateway install
-openclaw --profile rescue gateway install
+ClosedClaw --profile main gateway install
+ClosedClaw --profile rescue gateway install
 ```
 
 示例：
 
 ```bash
-OPENCLAW_CONFIG_PATH=~/.openclaw/a.json OPENCLAW_STATE_DIR=~/.openclaw-a openclaw gateway --port 19001
-OPENCLAW_CONFIG_PATH=~/.openclaw/b.json OPENCLAW_STATE_DIR=~/.openclaw-b openclaw gateway --port 19002
+ClosedClaw_CONFIG_PATH=~/.ClosedClaw/a.json ClosedClaw_STATE_DIR=~/.ClosedClaw-a ClosedClaw gateway --port 19001
+ClosedClaw_CONFIG_PATH=~/.ClosedClaw/b.json ClosedClaw_STATE_DIR=~/.ClosedClaw-b ClosedClaw gateway --port 19002
 ```
 
 ## 协议（运维视角）
@@ -145,7 +145,7 @@ OPENCLAW_CONFIG_PATH=~/.openclaw/b.json OPENCLAW_STATE_DIR=~/.openclaw-b opencla
 
 ## 方法（初始集合）
 
-- `health` — 完整健康快照（与 `openclaw health --json` 形状相同）。
+- `health` — 完整健康快照（与 `ClosedClaw health --json` 形状相同）。
 - `status` — 简短摘要。
 - `system-presence` — 当前在线状态列表。
 - `system-event` — 发布在线状态/系统通知（结构化）。
@@ -205,26 +205,26 @@ OPENCLAW_CONFIG_PATH=~/.openclaw/b.json OPENCLAW_STATE_DIR=~/.openclaw-b opencla
 ## 进程监管（macOS 示例）
 
 - 使用 launchd 保持服务存活：
-  - Program：`openclaw` 的路径
+  - Program：`ClosedClaw` 的路径
   - Arguments：`gateway`
   - KeepAlive：true
   - StandardOut/Err：文件路径或 `syslog`
 - 失败时 launchd 会重启；致命的配置错误应持续退出，以便运维人员注意到。
 - LaunchAgents 是按用户的，需要已登录的会话；对于无头设置，请使用自定义 LaunchDaemon（未随附）。
-  - `openclaw gateway install` 写入 `~/Library/LaunchAgents/bot.molt.gateway.plist`
-    （或 `bot.molt.<profile>.plist`；旧版 `com.openclaw.*` 会被清理）。
-  - `openclaw doctor` 审计 LaunchAgent 配置，并可将其更新为当前推荐的默认值。
+  - `ClosedClaw gateway install` 写入 `~/Library/LaunchAgents/bot.molt.gateway.plist`
+    （或 `bot.molt.<profile>.plist`；旧版 `com.ClosedClaw.*` 会被清理）。
+  - `ClosedClaw doctor` 审计 LaunchAgent 配置，并可将其更新为当前推荐的默认值。
 
 ## Gateway网关服务管理（CLI）
 
 使用 Gateway网关 CLI 进行安装/启动/停止/重启/状态查询：
 
 ```bash
-openclaw gateway status
-openclaw gateway install
-openclaw gateway stop
-openclaw gateway restart
-openclaw logs --follow
+ClosedClaw gateway status
+ClosedClaw gateway install
+ClosedClaw gateway stop
+ClosedClaw gateway restart
+ClosedClaw logs --follow
 ```
 
 注意事项：
@@ -237,39 +237,39 @@ openclaw logs --follow
 - `gateway status` 打印配置路径 + 探测目标，以避免"localhost vs LAN 绑定"混淆和配置文件不匹配。
 - `gateway status` 在服务看起来正在运行但端口已关闭时包含最后一条 Gateway网关错误行。
 - `logs` 通过 RPC 跟踪 Gateway网关文件日志（无需手动 `tail`/`grep`）。
-- 如果检测到其他类似 Gateway网关的服务，CLI 会发出警告，除非它们是 OpenClaw 配置文件服务。
+- 如果检测到其他类似 Gateway网关的服务，CLI 会发出警告，除非它们是 ClosedClaw 配置文件服务。
   我们仍建议大多数场景下**每台机器一个 Gateway网关**；使用隔离的配置文件/端口实现冗余或救援机器人。参见 [多 Gateway网关](/gateway/multiple-gateways)。
-  - 清理：`openclaw gateway uninstall`（当前服务）和 `openclaw doctor`（旧版迁移）。
-- `gateway install` 在已安装时为空操作；使用 `openclaw gateway install --force` 重新安装（配置文件/环境/路径变更）。
+  - 清理：`ClosedClaw gateway uninstall`（当前服务）和 `ClosedClaw doctor`（旧版迁移）。
+- `gateway install` 在已安装时为空操作；使用 `ClosedClaw gateway install --force` 重新安装（配置文件/环境/路径变更）。
 
 捆绑的 Mac 应用：
 
-- OpenClaw.app 可以捆绑一个基于 Node 的 Gateway网关中继，并安装按用户的 LaunchAgent，标签为
-  `bot.molt.gateway`（或 `bot.molt.<profile>`；旧版 `com.openclaw.*` 标签仍可正常卸载）。
-- 要正常停止，使用 `openclaw gateway stop`（或 `launchctl bootout gui/$UID/bot.molt.gateway`）。
-- 要重启，使用 `openclaw gateway restart`（或 `launchctl kickstart -k gui/$UID/bot.molt.gateway`）。
-  - `launchctl` 仅在 LaunchAgent 已安装时有效；否则先使用 `openclaw gateway install`。
+- ClosedClaw.app 可以捆绑一个基于 Node 的 Gateway网关中继，并安装按用户的 LaunchAgent，标签为
+  `bot.molt.gateway`（或 `bot.molt.<profile>`；旧版 `com.ClosedClaw.*` 标签仍可正常卸载）。
+- 要正常停止，使用 `ClosedClaw gateway stop`（或 `launchctl bootout gui/$UID/bot.molt.gateway`）。
+- 要重启，使用 `ClosedClaw gateway restart`（或 `launchctl kickstart -k gui/$UID/bot.molt.gateway`）。
+  - `launchctl` 仅在 LaunchAgent 已安装时有效；否则先使用 `ClosedClaw gateway install`。
   - 运行命名配置文件时，将标签替换为 `bot.molt.<profile>`。
 
 ## 进程监管（systemd 用户单元）
 
-OpenClaw 在 Linux/WSL2 上默认安装 **systemd 用户服务**。我们推荐单用户机器使用用户服务（更简单的环境，按用户配置）。对于多用户或始终在线的服务器，使用**系统服务**（无需 lingering，共享监管）。
+ClosedClaw 在 Linux/WSL2 上默认安装 **systemd 用户服务**。我们推荐单用户机器使用用户服务（更简单的环境，按用户配置）。对于多用户或始终在线的服务器，使用**系统服务**（无需 lingering，共享监管）。
 
-`openclaw gateway install` 写入用户单元。`openclaw doctor` 审计该单元，并可将其更新为当前推荐的默认值。
+`ClosedClaw gateway install` 写入用户单元。`ClosedClaw doctor` 审计该单元，并可将其更新为当前推荐的默认值。
 
-创建 `~/.config/systemd/user/openclaw-gateway[-<profile>].service`：
+创建 `~/.config/systemd/user/ClosedClaw-gateway[-<profile>].service`：
 
 ```
 [Unit]
-Description=OpenClaw Gateway网关 (profile: <profile>, v<version>)
+Description=ClosedClaw Gateway网关 (profile: <profile>, v<version>)
 After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr/local/bin/openclaw gateway --port 18789
+ExecStart=/usr/local/bin/ClosedClaw gateway --port 18789
 Restart=always
 RestartSec=5
-Environment=OPENCLAW_GATEWAY_TOKEN=
+Environment=ClosedClaw_GATEWAY_TOKEN=
 WorkingDirectory=/home/youruser
 
 [Install]
@@ -286,14 +286,14 @@ sudo loginctl enable-linger youruser
 然后启用服务：
 
 ```
-systemctl --user enable --now openclaw-gateway[-<profile>].service
+systemctl --user enable --now ClosedClaw-gateway[-<profile>].service
 ```
 
-**替代方案（系统服务）** - 对于始终在线或多用户服务器，可以安装 systemd **系统**单元而非用户单元（无需 lingering）。创建 `/etc/systemd/system/openclaw-gateway[-<profile>].service`（复制上述单元，将 `WantedBy=multi-user.target`，设置 `User=` + `WorkingDirectory=`），然后：
+**替代方案（系统服务）** - 对于始终在线或多用户服务器，可以安装 systemd **系统**单元而非用户单元（无需 lingering）。创建 `/etc/systemd/system/ClosedClaw-gateway[-<profile>].service`（复制上述单元，将 `WantedBy=multi-user.target`，设置 `User=` + `WorkingDirectory=`），然后：
 
 ```
 sudo systemctl daemon-reload
-sudo systemctl enable --now openclaw-gateway[-<profile>].service
+sudo systemctl enable --now ClosedClaw-gateway[-<profile>].service
 ```
 
 ## Windows (WSL2)
@@ -315,14 +315,14 @@ Windows 安装应使用 **WSL2** 并遵循上述 Linux systemd 部分。
 
 ## CLI 辅助工具
 
-- `openclaw gateway health|status` — 通过 Gateway网关 WS 请求健康/状态信息。
-- `openclaw message send --target <num> --message "hi" [--media ...]` — 通过 Gateway网关发送（对 WhatsApp 具有幂等性）。
-- `openclaw agent --message "hi" --to <num>` — 运行智能体回合（默认等待最终结果）。
-- `openclaw gateway call <method> --params '{"k":"v"}'` — 用于调试的原始方法调用器。
-- `openclaw gateway stop|restart` — 停止/重启受监管的 Gateway网关服务（launchd/systemd）。
+- `ClosedClaw gateway health|status` — 通过 Gateway网关 WS 请求健康/状态信息。
+- `ClosedClaw message send --target <num> --message "hi" [--media ...]` — 通过 Gateway网关发送（对 WhatsApp 具有幂等性）。
+- `ClosedClaw agent --message "hi" --to <num>` — 运行智能体回合（默认等待最终结果）。
+- `ClosedClaw gateway call <method> --params '{"k":"v"}'` — 用于调试的原始方法调用器。
+- `ClosedClaw gateway stop|restart` — 停止/重启受监管的 Gateway网关服务（launchd/systemd）。
 - Gateway网关辅助子命令假设 Gateway网关已在 `--url` 上运行；它们不再自动启动 Gateway网关。
 
 ## 迁移指南
 
-- 弃用 `openclaw gateway` 和旧版 TCP 控制端口的用法。
+- 弃用 `ClosedClaw gateway` 和旧版 TCP 控制端口的用法。
 - 更新客户端以使用带有强制 connect 和结构化在线状态的 WS 协议。

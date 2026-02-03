@@ -1,10 +1,10 @@
 ---
 read_when:
-  - 你希望 OpenClaw 在云端 VPS（而非笔记本电脑）上全天候运行
+  - 你希望 ClosedClaw 在云端 VPS（而非笔记本电脑）上全天候运行
   - 你需要在自己的 VPS 上部署一个生产级、始终在线的 Gateway网关
   - 你希望完全掌控持久化、二进制文件和重启行为
-  - 你正在 Hetzner 或类似提供商上通过 Docker 运行 OpenClaw
-summary: 在廉价的 Hetzner VPS 上通过 Docker 全天候运行 OpenClaw Gateway网关，支持持久化状态和内置二进制文件
+  - 你正在 Hetzner 或类似提供商上通过 Docker 运行 ClosedClaw
+summary: 在廉价的 Hetzner VPS 上通过 Docker 全天候运行 ClosedClaw Gateway网关，支持持久化状态和内置二进制文件
 title: Hetzner
 x-i18n:
   generated_at: "2026-02-01T21:32:45Z"
@@ -15,21 +15,21 @@ x-i18n:
   workflow: 15
 ---
 
-# 在 Hetzner 上部署 OpenClaw（Docker 生产环境 VPS 指南）
+# 在 Hetzner 上部署 ClosedClaw（Docker 生产环境 VPS 指南）
 
 ## 目标
 
-使用 Docker 在 Hetzner VPS 上运行持久化的 OpenClaw Gateway网关，支持持久化状态、内置二进制文件和安全的重启行为。
+使用 Docker 在 Hetzner VPS 上运行持久化的 ClosedClaw Gateway网关，支持持久化状态、内置二进制文件和安全的重启行为。
 
-如果你想要"每月约 $5 实现 OpenClaw 全天候运行"，这是最简单可靠的方案。
+如果你想要"每月约 $5 实现 ClosedClaw 全天候运行"，这是最简单可靠的方案。
 Hetzner 定价会变动；选择最小的 Debian/Ubuntu VPS，如果遇到内存不足（OOM）再扩容。
 
 ## 我们要做什么（简单说明）？
 
 - 租一台小型 Linux 服务器（Hetzner VPS）
 - 安装 Docker（隔离的应用运行时）
-- 在 Docker 中启动 OpenClaw Gateway网关
-- 将 `~/.openclaw` + `~/.openclaw/workspace` 持久化到宿主机（重启/重建后数据不丢失）
+- 在 Docker 中启动 ClosedClaw Gateway网关
+- 将 `~/.ClosedClaw` + `~/.ClosedClaw/workspace` 持久化到宿主机（重启/重建后数据不丢失）
 - 通过 SSH 隧道从笔记本电脑访问控制界面
 
 Gateway网关可通过以下方式访问：
@@ -47,7 +47,7 @@ Gateway网关可通过以下方式访问：
 
 1. 创建 Hetzner VPS
 2. 安装 Docker
-3. 克隆 OpenClaw 仓库
+3. 克隆 ClosedClaw 仓库
 4. 创建持久化宿主机目录
 5. 配置 `.env` 和 `docker-compose.yml`
 6. 将所需二进制文件内置到镜像中
@@ -103,11 +103,11 @@ docker compose version
 
 ---
 
-## 3) 克隆 OpenClaw 仓库
+## 3) 克隆 ClosedClaw 仓库
 
 ```bash
-git clone https://github.com/openclaw/openclaw.git
-cd openclaw
+git clone https://github.com/ClosedClaw/ClosedClaw.git
+cd ClosedClaw
 ```
 
 本指南假设你将构建自定义镜像以确保二进制文件的持久化。
@@ -120,12 +120,12 @@ Docker 容器是临时性的。
 所有长期状态必须存放在宿主机上。
 
 ```bash
-mkdir -p /root/.openclaw
-mkdir -p /root/.openclaw/workspace
+mkdir -p /root/.ClosedClaw
+mkdir -p /root/.ClosedClaw/workspace
 
 # 将所有权设置为容器用户（uid 1000）：
-chown -R 1000:1000 /root/.openclaw
-chown -R 1000:1000 /root/.openclaw/workspace
+chown -R 1000:1000 /root/.ClosedClaw
+chown -R 1000:1000 /root/.ClosedClaw/workspace
 ```
 
 ---
@@ -135,16 +135,16 @@ chown -R 1000:1000 /root/.openclaw/workspace
 在仓库根目录创建 `.env` 文件。
 
 ```bash
-OPENCLAW_IMAGE=openclaw:latest
-OPENCLAW_GATEWAY_TOKEN=change-me-now
-OPENCLAW_GATEWAY_BIND=lan
-OPENCLAW_GATEWAY_PORT=18789
+ClosedClaw_IMAGE=ClosedClaw:latest
+ClosedClaw_GATEWAY_TOKEN=change-me-now
+ClosedClaw_GATEWAY_BIND=lan
+ClosedClaw_GATEWAY_PORT=18789
 
-OPENCLAW_CONFIG_DIR=/root/.openclaw
-OPENCLAW_WORKSPACE_DIR=/root/.openclaw/workspace
+ClosedClaw_CONFIG_DIR=/root/.ClosedClaw
+ClosedClaw_WORKSPACE_DIR=/root/.ClosedClaw/workspace
 
 GOG_KEYRING_PASSWORD=change-me-now
-XDG_CONFIG_HOME=/home/node/.openclaw
+XDG_CONFIG_HOME=/home/node/.ClosedClaw
 ```
 
 生成强密钥：
@@ -163,8 +163,8 @@ openssl rand -hex 32
 
 ```yaml
 services:
-  openclaw-gateway:
-    image: ${OPENCLAW_IMAGE}
+  ClosedClaw-gateway:
+    image: ${ClosedClaw_IMAGE}
     build: .
     restart: unless-stopped
     env_file:
@@ -173,19 +173,19 @@ services:
       - HOME=/home/node
       - NODE_ENV=production
       - TERM=xterm-256color
-      - OPENCLAW_GATEWAY_BIND=${OPENCLAW_GATEWAY_BIND}
-      - OPENCLAW_GATEWAY_PORT=${OPENCLAW_GATEWAY_PORT}
-      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
+      - ClosedClaw_GATEWAY_BIND=${ClosedClaw_GATEWAY_BIND}
+      - ClosedClaw_GATEWAY_PORT=${ClosedClaw_GATEWAY_PORT}
+      - ClosedClaw_GATEWAY_TOKEN=${ClosedClaw_GATEWAY_TOKEN}
       - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD}
       - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
       - PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     volumes:
-      - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
-      - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
+      - ${ClosedClaw_CONFIG_DIR}:/home/node/.ClosedClaw
+      - ${ClosedClaw_WORKSPACE_DIR}:/home/node/.ClosedClaw/workspace
     ports:
       # 推荐：在 VPS 上仅绑定 local loopback；通过 SSH 隧道访问。
       # 如需公开暴露，移除 `127.0.0.1:` 前缀并相应配置防火墙。
-      - "127.0.0.1:${OPENCLAW_GATEWAY_PORT}:18789"
+      - "127.0.0.1:${ClosedClaw_GATEWAY_PORT}:18789"
 
       # 可选：仅在你需要将 iOS/Android 节点连接到此 VPS 且需要 Canvas 主机时使用。
       # 如果公开暴露此端口，请阅读 /gateway/security 并相应配置防火墙。
@@ -196,9 +196,9 @@ services:
         "dist/index.js",
         "gateway",
         "--bind",
-        "${OPENCLAW_GATEWAY_BIND}",
+        "${ClosedClaw_GATEWAY_BIND}",
         "--port",
-        "${OPENCLAW_GATEWAY_PORT}",
+        "${ClosedClaw_GATEWAY_PORT}",
       ]
 ```
 
@@ -271,15 +271,15 @@ CMD ["node","dist/index.js"]
 
 ```bash
 docker compose build
-docker compose up -d openclaw-gateway
+docker compose up -d ClosedClaw-gateway
 ```
 
 验证二进制文件：
 
 ```bash
-docker compose exec openclaw-gateway which gog
-docker compose exec openclaw-gateway which goplaces
-docker compose exec openclaw-gateway which wacli
+docker compose exec ClosedClaw-gateway which gog
+docker compose exec ClosedClaw-gateway which goplaces
+docker compose exec ClosedClaw-gateway which wacli
 ```
 
 预期输出：
@@ -295,7 +295,7 @@ docker compose exec openclaw-gateway which wacli
 ## 9) 验证 Gateway网关
 
 ```bash
-docker compose logs -f openclaw-gateway
+docker compose logs -f ClosedClaw-gateway
 ```
 
 成功标志：
@@ -320,17 +320,17 @@ ssh -N -L 18789:127.0.0.1:18789 root@YOUR_VPS_IP
 
 ## 持久化位置说明（数据源）
 
-OpenClaw 在 Docker 中运行，但 Docker 不是数据源。
+ClosedClaw 在 Docker 中运行，但 Docker 不是数据源。
 所有长期状态必须能在重启、重建和重启后保留。
 
 | 组件            | 位置                              | 持久化机制      | 备注                        |
 | --------------- | --------------------------------- | --------------- | --------------------------- |
-| Gateway网关配置 | `/home/node/.openclaw/`           | 宿主机卷挂载    | 包含 `openclaw.json`、令牌  |
-| 模型认证配置    | `/home/node/.openclaw/`           | 宿主机卷挂载    | OAuth 令牌、API 密钥        |
-| Skills配置      | `/home/node/.openclaw/skills/`    | 宿主机卷挂载    | Skills 级别状态             |
-| 智能体工作区    | `/home/node/.openclaw/workspace/` | 宿主机卷挂载    | 代码和智能体产物            |
-| WhatsApp 会话   | `/home/node/.openclaw/`           | 宿主机卷挂载    | 保留二维码登录状态          |
-| Gmail 密钥环    | `/home/node/.openclaw/`           | 宿主机卷 + 密码 | 需要 `GOG_KEYRING_PASSWORD` |
+| Gateway网关配置 | `/home/node/.ClosedClaw/`           | 宿主机卷挂载    | 包含 `ClosedClaw.json`、令牌  |
+| 模型认证配置    | `/home/node/.ClosedClaw/`           | 宿主机卷挂载    | OAuth 令牌、API 密钥        |
+| Skills配置      | `/home/node/.ClosedClaw/skills/`    | 宿主机卷挂载    | Skills 级别状态             |
+| 智能体工作区    | `/home/node/.ClosedClaw/workspace/` | 宿主机卷挂载    | 代码和智能体产物            |
+| WhatsApp 会话   | `/home/node/.ClosedClaw/`           | 宿主机卷挂载    | 保留二维码登录状态          |
+| Gmail 密钥环    | `/home/node/.ClosedClaw/`           | 宿主机卷 + 密码 | 需要 `GOG_KEYRING_PASSWORD` |
 | 外部二进制文件  | `/usr/local/bin/`                 | Docker 镜像     | 必须在构建时内置            |
 | Node 运行时     | 容器文件系统                      | Docker 镜像     | 每次构建镜像时重建          |
 | 操作系统软件包  | 容器文件系统                      | Docker 镜像     | 不要在运行时安装            |

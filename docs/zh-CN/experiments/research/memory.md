@@ -1,7 +1,7 @@
 ---
 read_when:
-  - 设计超越每日 Markdown 日志的工作区记忆（~/.openclaw/workspace）
-  - 决策：独立 CLI 还是深度集成 OpenClaw
+  - 设计超越每日 Markdown 日志的工作区记忆（~/.ClosedClaw/workspace）
+  - 决策：独立 CLI 还是深度集成 ClosedClaw
   - 添加离线召回 + 反思（retain/recall/reflect）
 summary: 研究笔记：Clawd 工作区离线记忆系统（Markdown 作为事实来源 + 派生索引）
 title: 工作区记忆研究
@@ -16,7 +16,7 @@ x-i18n:
 
 # 工作区记忆 v2（离线）：研究笔记
 
-目标：Clawd 风格的工作区（`agents.defaults.workspace`，默认 `~/.openclaw/workspace`），其中"记忆"以每日一个 Markdown 文件（`memory/YYYY-MM-DD.md`）加上一小组稳定文件（如 `memory.md`、`SOUL.md`）的形式存储。
+目标：Clawd 风格的工作区（`agents.defaults.workspace`，默认 `~/.ClosedClaw/workspace`），其中"记忆"以每日一个 Markdown 文件（`memory/YYYY-MM-DD.md`）加上一小组稳定文件（如 `memory.md`、`SOUL.md`）的形式存储。
 
 本文档提出一种**离线优先**的记忆架构，保持 Markdown 作为规范的、可审查的事实来源，同时通过派生索引添加**结构化召回**（搜索、实体摘要、置信度更新）。
 
@@ -65,12 +65,12 @@ x-i18n:
 
 ### 规范存储（git 友好）
 
-保持 `~/.openclaw/workspace` 作为规范的人类可读记忆。
+保持 `~/.ClosedClaw/workspace` 作为规范的人类可读记忆。
 
 建议的工作区布局：
 
 ```
-~/.openclaw/workspace/
+~/.ClosedClaw/workspace/
   memory.md                    # 小型：持久事实 + 偏好（核心级别）
   memory/
     YYYY-MM-DD.md              # 每日日志（追加；叙事性）
@@ -96,7 +96,7 @@ x-i18n:
 在工作区下添加派生索引（不一定纳入 git 追踪）：
 
 ```
-~/.openclaw/workspace/.memory/index.sqlite
+~/.ClosedClaw/workspace/.memory/index.sqlite
 ```
 
 底层支持：
@@ -175,17 +175,17 @@ Hindsight 在此处的关键洞察：存储**叙事性的、自包含的事实**
 
 ## CLI 集成：独立 vs 深度集成
 
-建议：**深度集成到 OpenClaw**，但保持核心库可分离。
+建议：**深度集成到 ClosedClaw**，但保持核心库可分离。
 
-### 为什么集成到 OpenClaw？
+### 为什么集成到 ClosedClaw？
 
-- OpenClaw 已经知道：
+- ClosedClaw 已经知道：
   - 工作区路径（`agents.defaults.workspace`）
   - 会话模型 + 心跳
   - 日志 + 故障排除模式
 - 你希望智能体自身调用这些工具：
-  - `openclaw memory recall "…" --k 25 --since 30d`
-  - `openclaw memory reflect --since 7d`
+  - `ClosedClaw memory recall "…" --k 25 --since 30d`
+  - `ClosedClaw memory reflect --since 7d`
 
 ### 为什么仍然拆分为库？
 
@@ -199,7 +199,7 @@ Hindsight 在此处的关键洞察：存储**叙事性的、自包含的事实**
 
 如果"S-Collide"指的是 **SuCo（Subspace Collision）**：这是一种近似最近邻检索方法，通过在子空间中使用学习/结构化碰撞来实现强召回率/延迟权衡（论文：arXiv 2411.14754, 2024）。
 
-对于 `~/.openclaw/workspace` 的务实建议：
+对于 `~/.ClosedClaw/workspace` 的务实建议：
 
 - **不要从** SuCo 开始。
 - 从 SQLite FTS +（可选的）简单嵌入开始；你将立即获得大部分用户体验收益。

@@ -19,7 +19,7 @@ x-i18n:
 
 1. 创建一个 Slack 应用并启用 **Socket Mode**。
 2. 创建一个 **App Token**（`xapp-...`）和 **Bot Token**（`xoxb-...`）。
-3. 为 OpenClaw 设置 token 并启动 Gateway网关。
+3. 为 ClosedClaw 设置 token 并启动 Gateway网关。
 
 最小配置：
 
@@ -49,14 +49,14 @@ x-i18n:
    - `channel_rename`
    - `pin_added`、`pin_removed`
 6. 邀请机器人加入你希望它读取的频道。
-7. Slash Commands → 如果你使用 `channels.slack.slashCommand`，创建 `/openclaw`。如果你启用原生命令，为每个内置命令添加一个斜杠命令（名称与 `/help` 列表相同）。Slack 的原生命令默认关闭，除非你设置 `channels.slack.commands.native: true`（全局 `commands.native` 为 `"auto"`，Slack 下默认关闭）。
+7. Slash Commands → 如果你使用 `channels.slack.slashCommand`，创建 `/ClosedClaw`。如果你启用原生命令，为每个内置命令添加一个斜杠命令（名称与 `/help` 列表相同）。Slack 的原生命令默认关闭，除非你设置 `channels.slack.commands.native: true`（全局 `commands.native` 为 `"auto"`，Slack 下默认关闭）。
 8. App Home → 启用 **Messages Tab** 以便用户可以给机器人发私信。
 
 使用下方清单以保持范围和事件同步。
 
 多账户支持：使用 `channels.slack.accounts`，每个账户配置独立 token 和可选的 `name`。共享模式请参阅 [`gateway/configuration`](/gateway/configuration#telegramaccounts--discordaccounts--slackaccounts--signalaccounts--imessageaccounts)。
 
-### OpenClaw 配置（最小）
+### ClosedClaw 配置（最小）
 
 通过环境变量设置 token（推荐）：
 
@@ -79,7 +79,7 @@ x-i18n:
 
 ### 用户 token（可选）
 
-OpenClaw 可以使用 Slack 用户 token（`xoxp-...`）进行读取操作（历史记录、置顶、回应、表情、成员信息）。默认保持只读：有用户 token 时读取操作优先使用它，写入仍使用 bot token，除非你明确选择。即使设置了 `userTokenReadOnly: false`，当 bot token 可用时写入操作仍优先使用它。
+ClosedClaw 可以使用 Slack 用户 token（`xoxp-...`）进行读取操作（历史记录、置顶、回应、表情、成员信息）。默认保持只读：有用户 token 时读取操作优先使用它，写入仍使用 bot token，除非你明确选择。即使设置了 `userTokenReadOnly: false`，当 bot token 可用时写入操作仍优先使用它。
 
 用户 token 在配置文件中设置（不支持环境变量）。多账户时设置 `channels.slack.accounts.<id>.userToken`。
 
@@ -117,7 +117,7 @@ OpenClaw 可以使用 Slack 用户 token（`xoxp-...`）进行读取操作（历
 #### Token 使用
 
 - 读取操作（历史记录、回应列表、置顶列表、表情列表、成员信息、搜索）在配置了用户 token 时优先使用，否则使用 bot token。
-- 写入操作（发送/编辑/删除消息、添加/移除回应、置顶/取消置顶、文件上传）默认使用 bot token。如果 `userTokenReadOnly: false` 且没有 bot token 可用，OpenClaw 回退到用户 token。
+- 写入操作（发送/编辑/删除消息、添加/移除回应、置顶/取消置顶、文件上传）默认使用 bot token。如果 `userTokenReadOnly: false` 且没有 bot token 可用，ClosedClaw 回退到用户 token。
 
 ### 历史上下文
 
@@ -140,7 +140,7 @@ OpenClaw 可以使用 Slack 用户 token（`xoxp-...`）进行读取操作（历
 示例请求 URL：
 `https://gateway-host/slack/events`
 
-### OpenClaw 配置（最小）
+### ClosedClaw 配置（最小）
 
 ```json5
 {
@@ -165,12 +165,12 @@ OpenClaw 可以使用 Slack 用户 token（`xoxp-...`）进行读取操作（历
 ```json
 {
   "display_information": {
-    "name": "OpenClaw",
-    "description": "Slack connector for OpenClaw"
+    "name": "ClosedClaw",
+    "description": "Slack connector for ClosedClaw"
   },
   "features": {
     "bot_user": {
-      "display_name": "OpenClaw",
+      "display_name": "ClosedClaw",
       "always_online": false
     },
     "app_home": {
@@ -179,8 +179,8 @@ OpenClaw 可以使用 Slack 用户 token（`xoxp-...`）进行读取操作（历
     },
     "slash_commands": [
       {
-        "command": "/openclaw",
-        "description": "Send a message to OpenClaw",
+        "command": "/ClosedClaw",
+        "description": "Send a message to ClosedClaw",
         "should_escape": false
       }
     ]
@@ -342,7 +342,7 @@ Slack 仅使用 Socket Mode（无 HTTP webhook 服务器）。提供两个 token
     },
     "slashCommand": {
       "enabled": true,
-      "name": "openclaw",
+      "name": "ClosedClaw",
       "sessionPrefix": "slack:slash",
       "ephemeral": true
     },
@@ -367,7 +367,7 @@ Token 也可以通过环境变量提供：
 
 ## 回复线程
 
-默认情况下，OpenClaw 在主频道中回复。使用 `channels.slack.replyToMode` 控制自动线程行为：
+默认情况下，ClosedClaw 在主频道中回复。使用 `channels.slack.replyToMode` 控制自动线程行为：
 
 | 模式    | 行为                                                                                             |
 | ------- | ------------------------------------------------------------------------------------------------ |
@@ -462,14 +462,14 @@ Token 也可以通过环境变量提供：
 - 私信共享 `main` 会话（与 WhatsApp/Telegram 类似）。
 - 频道映射到 `agent:<agentId>:slack:channel:<channelId>` 会话。
 - 斜杠命令使用 `agent:<agentId>:slack:slash:<userId>` 会话（前缀可通过 `channels.slack.slashCommand.sessionPrefix` 配置）。
-- 如果 Slack 不提供 `channel_type`，OpenClaw 从频道 ID 前缀（`D`、`C`、`G`）推断并默认为 `channel` 以保持会话键稳定。
+- 如果 Slack 不提供 `channel_type`，ClosedClaw 从频道 ID 前缀（`D`、`C`、`G`）推断并默认为 `channel` 以保持会话键稳定。
 - 原生命令注册使用 `commands.native`（全局默认 `"auto"` → Slack 关闭），可通过 `channels.slack.commands.native` 按工作区覆盖。文本命令需要独立的 `/...` 消息，可通过 `commands.text: false` 禁用。Slack 斜杠命令在 Slack 应用中管理，不会自动移除。使用 `commands.useAccessGroups: false` 可绕过命令的访问组检查。
 - 完整命令列表 + 配置：[斜杠命令](/tools/slash-commands)
 
 ## 私信安全（配对）
 
 - 默认：`channels.slack.dm.policy="pairing"` — 未知私信发送者会收到配对码（1 小时后过期）。
-- 通过 `openclaw pairing approve slack <code>` 批准。
+- 通过 `ClosedClaw pairing approve slack <code>` 批准。
 - 要允许任何人：设置 `channels.slack.dm.policy="open"` 和 `channels.slack.dm.allowFrom=["*"]`。
 - `channels.slack.dm.allowFrom` 接受用户 ID、@用户名或邮箱（启动时当 token 允许时解析）。向导在设置期间当 token 允许时接受用户名并将其解析为 ID。
 
@@ -479,7 +479,7 @@ Token 也可以通过环境变量提供：
 - `allowlist` 需要频道列在 `channels.slack.channels` 中。
 - 如果你只设置了 `SLACK_BOT_TOKEN`/`SLACK_APP_TOKEN` 且从未创建 `channels.slack` 部分，运行时默认将 `groupPolicy` 设为 `open`。添加 `channels.slack.groupPolicy`、`channels.defaults.groupPolicy` 或频道允许列表来锁定它。
 - 配置向导接受 `#channel` 名称并在可能时将其解析为 ID（公共 + 私有）；如果存在多个匹配，优先选择活跃频道。
-- 启动时，OpenClaw 将允许列表中的频道/用户名称解析为 ID（当 token 允许时）并记录映射；未解析的条目保持原样。
+- 启动时，ClosedClaw 将允许列表中的频道/用户名称解析为 ID（当 token 允许时）并记录映射；未解析的条目保持原样。
 - 要**不允许任何频道**，设置 `channels.slack.groupPolicy: "disabled"`（或保持空的允许列表）。
 
 频道选项（`channels.slack.channels.<id>` 或 `channels.slack.channels.<name>`）：

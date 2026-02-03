@@ -16,7 +16,7 @@ x-i18n:
 
 # 网页工具
 
-OpenClaw 内置两个轻量级网页工具：
+ClosedClaw 内置两个轻量级网页工具：
 
 - `web_search` — 通过 Brave Search API（默认）或 Perplexity Sonar（直连或通过 OpenRouter）搜索网页。
 - `web_fetch` — HTTP 抓取 + 可读内容提取（HTML → markdown/文本）。
@@ -80,18 +80,18 @@ OpenClaw 内置两个轻量级网页工具：
 
 1. 在 https://brave.com/search/api/ 创建 Brave Search API 账户
 2. 在控制面板中，选择 **Data for Search** 计划（不是 "Data for AI"）并生成 API 密钥。
-3. 运行 `openclaw configure --section web` 将密钥存储到配置中（推荐），或在环境中设置 `BRAVE_API_KEY`。
+3. 运行 `ClosedClaw configure --section web` 将密钥存储到配置中（推荐），或在环境中设置 `BRAVE_API_KEY`。
 
 Brave 提供免费额度和付费计划；请查看 Brave API 门户了解
 当前的限制和定价。
 
 ### 密钥设置位置（推荐）
 
-**推荐：**运行 `openclaw configure --section web`。它会将密钥存储在
-`~/.openclaw/openclaw.json` 的 `tools.web.search.apiKey` 下。
+**推荐：**运行 `ClosedClaw configure --section web`。它会将密钥存储在
+`~/.ClosedClaw/ClosedClaw.json` 的 `tools.web.search.apiKey` 下。
 
-**环境变量替代方案：**在 Gateway网关进程环境中设置 `BRAVE_API_KEY`。对于 Gateway网关安装，将其放入 `~/.openclaw/.env`（或你的
-服务环境）。参见[环境变量](/help/faq#how-does-openclaw-load-environment-variables)。
+**环境变量替代方案：**在 Gateway网关进程环境中设置 `BRAVE_API_KEY`。对于 Gateway网关安装，将其放入 `~/.ClosedClaw/.env`（或你的
+服务环境）。参见[环境变量](/help/faq#how-does-ClosedClaw-load-environment-variables)。
 
 ## 使用 Perplexity（直连或通过 OpenRouter）
 
@@ -128,9 +128,9 @@ Perplexity Sonar 模型内置网页搜索功能，并返回带有引用来源的
 }
 ```
 
-**环境变量替代方案：**在 Gateway网关环境中设置 `OPENROUTER_API_KEY` 或 `PERPLEXITY_API_KEY`。对于 Gateway网关安装，将其放入 `~/.openclaw/.env`。
+**环境变量替代方案：**在 Gateway网关环境中设置 `OPENROUTER_API_KEY` 或 `PERPLEXITY_API_KEY`。对于 Gateway网关安装，将其放入 `~/.ClosedClaw/.env`。
 
-如果未设置基础 URL，OpenClaw 会根据 API 密钥来源选择默认值：
+如果未设置基础 URL，ClosedClaw 会根据 API 密钥来源选择默认值：
 
 - `PERPLEXITY_API_KEY` 或 `pplx-...` → `https://api.perplexity.ai`
 - `OPENROUTER_API_KEY` 或 `sk-or-...` → `https://openrouter.ai/api/v1`

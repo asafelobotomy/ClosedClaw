@@ -1,5 +1,5 @@
 ---
-summary: "Hubs that link to every OpenClaw doc"
+summary: "Hubs that link to every ClosedClaw doc"
 read_when:
   - You want a complete map of the documentation
 title: "Docs Hubs"
@@ -20,7 +20,7 @@ Use these hubs to discover every page, including deep dives and reference docs t
 - [Help](/help)
 - [Configuration](/gateway/configuration)
 - [Configuration examples](/gateway/configuration-examples)
-- [OpenClaw assistant](/start/openclaw)
+- [ClosedClaw assistant](/start/ClosedClaw)
 - [Showcase](/start/showcase)
 - [Lore](/start/lore)
 

@@ -1,7 +1,7 @@
 ---
 read_when:
   - 你想从脚本中运行一次智能体轮次（可选择投递回复）
-summary: "`openclaw agent` 的 CLI 参考（通过 Gateway网关发送一次智能体轮次）"
+summary: "`ClosedClaw agent` 的 CLI 参考（通过 Gateway网关发送一次智能体轮次）"
 title: agent
 x-i18n:
   generated_at: "2026-02-01T19:58:31Z"
@@ -12,7 +12,7 @@ x-i18n:
   workflow: 14
 ---
 
-# `openclaw agent`
+# `ClosedClaw agent`
 
 通过 Gateway网关运行一次智能体轮次（使用 `--local` 进行嵌入式运行）。
 使用 `--agent <id>` 直接指定一个已配置的智能体。
@@ -24,8 +24,8 @@ x-i18n:
 ## 示例
 
 ```bash
-openclaw agent --to +15555550123 --message "status update" --deliver
-openclaw agent --agent ops --message "Summarize logs"
-openclaw agent --session-id 1234 --message "Summarize inbox" --thinking medium
-openclaw agent --agent ops --message "Generate report" --deliver --reply-channel slack --reply-to "#reports"
+ClosedClaw agent --to +15555550123 --message "status update" --deliver
+ClosedClaw agent --agent ops --message "Summarize logs"
+ClosedClaw agent --session-id 1234 --message "Summarize inbox" --thinking medium
+ClosedClaw agent --agent ops --message "Generate report" --deliver --reply-channel slack --reply-to "#reports"
 ```

@@ -1,3 +1,3 @@
-package ai.openclaw.android.gateway
+package ai.ClosedClaw.android.gateway
 
 const val GATEWAY_PROTOCOL_VERSION = 3

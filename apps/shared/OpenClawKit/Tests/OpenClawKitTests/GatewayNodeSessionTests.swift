@@ -1,7 +1,7 @@
 import Foundation
 import Testing
-@testable import OpenClawKit
-import OpenClawProtocol
+@testable import ClosedClawKit
+import ClosedClawProtocol
 
 struct GatewayNodeSessionTests {
     @Test

@@ -80,7 +80,7 @@ x-i18n:
 
 - `includeTools=false` 过滤 `role: "toolResult"` 的消息。
 - 以原始对话记录格式返回消息数组。
-- 当传入 `sessionId` 时，OpenClaw 会将其解析为对应的会话键（缺失的 ID 会报错）。
+- 当传入 `sessionId` 时，ClosedClaw 会将其解析为对应的会话键（缺失的 ID 会报错）。
 
 ## sessions_send
 
@@ -101,11 +101,11 @@ x-i18n:
 - 通知投递在主运行完成后运行，属于尽力而为；`status: "ok"` 不保证通知已成功投递。
 - 通过 Gateway网关 `agent.wait`（服务器端）等待，因此重连不会中断等待。
 - 智能体间消息上下文会注入到主运行中。
-- 主运行完成后，OpenClaw 运行**回复往返循环**：
+- 主运行完成后，ClosedClaw 运行**回复往返循环**：
   - 第 2 轮及之后在请求方和目标智能体之间交替。
   - 回复 `REPLY_SKIP` 可停止来回往返。
   - 最大轮数为 `session.agentToAgent.maxPingPongTurns`（0–5，默认 5）。
-- 循环结束后，OpenClaw 运行**智能体间通知步骤**（仅目标智能体）：
+- 循环结束后，ClosedClaw 运行**智能体间通知步骤**（仅目标智能体）：
   - 回复 `ANNOUNCE_SKIP` 可保持静默。
   - 其他任何回复都会发送到目标渠道。
   - 通知步骤包含原始请求 + 第 1 轮回复 + 最新的往返回复。
@@ -174,7 +174,7 @@ x-i18n:
 - 子智能体默认使用完整工具集**减去会话工具**（可通过 `tools.subagents.tools` 配置）。
 - 子智能体不允许调用 `sessions_spawn`（不允许子智能体生成子智能体）。
 - 始终非阻塞：立即返回 `{ status: "accepted", runId, childSessionKey }`。
-- 完成后，OpenClaw 运行子智能体**通知步骤**并将结果发布到请求方的聊天渠道。
+- 完成后，ClosedClaw 运行子智能体**通知步骤**并将结果发布到请求方的聊天渠道。
 - 在通知步骤中回复 `ANNOUNCE_SKIP` 可保持静默。
 - 通知回复规范化为 `Status`/`Result`/`Notes`；`Status` 来自运行时结果（非模型文本）。
 - 子智能体会话在 `agents.defaults.subagents.archiveAfterMinutes`（默认：60）后自动归档。

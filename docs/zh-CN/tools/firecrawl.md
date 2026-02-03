@@ -16,7 +16,7 @@ x-i18n:
 
 # Firecrawl
 
-OpenClaw 可以使用 **Firecrawl** 作为 `web_fetch` 的备用提取器。它是一个托管的内容提取服务，支持反爬虫绕过和缓存，有助于处理 JS 密集型网站或阻止普通 HTTP 请求的页面。
+ClosedClaw 可以使用 **Firecrawl** 作为 `web_fetch` 的备用提取器。它是一个托管的内容提取服务，支持反爬虫绕过和缓存，有助于处理 JS 密集型网站或阻止普通 HTTP 请求的页面。
 
 ## 获取 API 密钥
 
@@ -51,7 +51,7 @@ OpenClaw 可以使用 **Firecrawl** 作为 `web_fetch` 的备用提取器。它�
 ## 隐身/反爬虫绕过
 
 Firecrawl 提供了一个用于反爬虫绕过的**代理模式**参数（`basic`、`stealth` 或 `auto`）。
-OpenClaw 对 Firecrawl 请求始终使用 `proxy: "auto"` 加上 `storeInCache: true`。
+ClosedClaw 对 Firecrawl 请求始终使用 `proxy: "auto"` 加上 `storeInCache: true`。
 如果省略 proxy，Firecrawl 默认使用 `auto`。`auto` 模式在基本尝试失败后会使用隐身代理重试，这可能比仅使用基本模式的抓取消耗更多积分。
 
 ## `web_fetch` 如何使用 Firecrawl

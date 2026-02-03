@@ -1,8 +1,8 @@
 ---
 read_when:
-  - 你正在将 OpenClaw 迁移到新的笔记本/服务器
+  - 你正在将 ClosedClaw 迁移到新的笔记本/服务器
   - 你想保留会话、认证和渠道登录状态（WhatsApp 等）
-summary: 将 OpenClaw 安装从一台机器迁移到另一台
+summary: 将 ClosedClaw 安装从一台机器迁移到另一台
 title: 迁移指南
 x-i18n:
   generated_at: "2026-02-01T21:08:21Z"
@@ -13,14 +13,14 @@ x-i18n:
   workflow: 14
 ---
 
-# 将 OpenClaw 迁移到新机器
+# 将 ClosedClaw 迁移到新机器
 
-本指南介绍如何将 OpenClaw Gateway网关从一台机器迁移到另一台，**无需重新进行新手引导**。
+本指南介绍如何将 ClosedClaw Gateway网关从一台机器迁移到另一台，**无需重新进行新手引导**。
 
 迁移在概念上很简单：
 
-- 复制**状态目录**（`$OPENCLAW_STATE_DIR`，默认：`~/.openclaw/`）— 包含配置、认证、会话和渠道状态。
-- 复制你的**工作区**（默认 `~/.openclaw/workspace/`）— 包含你的智能体文件（记忆、提示词等）。
+- 复制**状态目录**（`$ClosedClaw_STATE_DIR`，默认：`~/.ClosedClaw/`）— 包含配置、认证、会话和渠道状态。
+- 复制你的**工作区**（默认 `~/.ClosedClaw/workspace/`）— 包含你的智能体文件（记忆、提示词等）。
 
 但在**配置文件**、**权限**和**不完整复制**方面有一些常见的坑。
 
@@ -30,26 +30,26 @@ x-i18n:
 
 大多数安装使用默认路径：
 
-- **状态目录：** `~/.openclaw/`
+- **状态目录：** `~/.ClosedClaw/`
 
 但如果你使用了以下选项，路径可能不同：
 
-- `--profile <name>`（通常变为 `~/.openclaw-<profile>/`）
-- `OPENCLAW_STATE_DIR=/some/path`
+- `--profile <name>`（通常变为 `~/.ClosedClaw-<profile>/`）
+- `ClosedClaw_STATE_DIR=/some/path`
 
 如果不确定，在**旧**机器上运行：
 
 ```bash
-openclaw status
+ClosedClaw status
 ```
 
-在输出中查找 `OPENCLAW_STATE_DIR` / profile 的相关信息。如果你运行了多个 Gateway网关，请对每个配置文件重复操作。
+在输出中查找 `ClosedClaw_STATE_DIR` / profile 的相关信息。如果你运行了多个 Gateway网关，请对每个配置文件重复操作。
 
 ### 2) 确认你的工作区
 
 常见默认路径：
 
-- `~/.openclaw/workspace/`（推荐工作区）
+- `~/.ClosedClaw/workspace/`（推荐工作区）
 - 你创建的自定义文件夹
 
 你的工作区是 `MEMORY.md`、`USER.md` 和 `memory/*.md` 等文件所在的位置。
@@ -58,7 +58,7 @@ openclaw status
 
 如果你**同时**复制状态目录和工作区，你将保留：
 
-- Gateway网关配置（`openclaw.json`）
+- Gateway网关配置（`ClosedClaw.json`）
 - 认证配置 / API 密钥 / OAuth 令牌
 - 会话历史 + 智能体状态
 - 渠道状态（例如 WhatsApp 登录/会话）
@@ -70,7 +70,7 @@ openclaw status
 - 凭据
 - 渠道登录状态
 
-这些存储在 `$OPENCLAW_STATE_DIR` 下。
+这些存储在 `$ClosedClaw_STATE_DIR` 下。
 
 ## 迁移步骤（推荐）
 
@@ -79,7 +79,7 @@ openclaw status
 在**旧**机器上，先停止 Gateway网关以确保复制过程中文件不会变动：
 
 ```bash
-openclaw gateway stop
+ClosedClaw gateway stop
 ```
 
 （可选但推荐）归档状态目录和工作区：
@@ -87,27 +87,27 @@ openclaw gateway stop
 ```bash
 # 如果使用了配置文件或自定义路径，请调整路径
 cd ~
-tar -czf openclaw-state.tgz .openclaw
+tar -czf ClosedClaw-state.tgz .ClosedClaw
 
-tar -czf openclaw-workspace.tgz .openclaw/workspace
+tar -czf ClosedClaw-workspace.tgz .ClosedClaw/workspace
 ```
 
-如果你有多个配置文件/状态目录（例如 `~/.openclaw-main`、`~/.openclaw-work`），请分别归档。
+如果你有多个配置文件/状态目录（例如 `~/.ClosedClaw-main`、`~/.ClosedClaw-work`），请分别归档。
 
-### 步骤 1 — 在新机器上安装 OpenClaw
+### 步骤 1 — 在新机器上安装 ClosedClaw
 
 在**新**机器上安装 CLI（如有需要也安装 Node）：
 
 - 参见：[安装](/install)
 
-在此阶段，新手引导创建一个全新的 `~/.openclaw/` 是没问题的 — 你将在下一步覆盖它。
+在此阶段，新手引导创建一个全新的 `~/.ClosedClaw/` 是没问题的 — 你将在下一步覆盖它。
 
 ### 步骤 2 — 将状态目录 + 工作区复制到新机器
 
 **同时**复制：
 
-- `$OPENCLAW_STATE_DIR`（默认 `~/.openclaw/`）
-- 你的工作区（默认 `~/.openclaw/workspace/`）
+- `$ClosedClaw_STATE_DIR`（默认 `~/.ClosedClaw/`）
+- 你的工作区（默认 `~/.ClosedClaw/workspace/`）
 
 常用方法：
 
@@ -117,7 +117,7 @@ tar -czf openclaw-workspace.tgz .openclaw/workspace
 
 复制后确保：
 
-- 隐藏目录已包含在内（例如 `.openclaw/`）
+- 隐藏目录已包含在内（例如 `.ClosedClaw/`）
 - 文件所有权对于运行 Gateway网关的用户是正确的
 
 ### 步骤 3 — 运行 Doctor（迁移 + 服务修复）
@@ -125,7 +125,7 @@ tar -czf openclaw-workspace.tgz .openclaw/workspace
 在**新**机器上：
 
 ```bash
-openclaw doctor
+ClosedClaw doctor
 ```
 
 Doctor 是"安全可靠"的命令。它会修复服务、应用配置迁移并警告不匹配的问题。
@@ -133,15 +133,15 @@ Doctor 是"安全可靠"的命令。它会修复服务、应用配置迁移并�
 然后：
 
 ```bash
-openclaw gateway restart
-openclaw status
+ClosedClaw gateway restart
+ClosedClaw status
 ```
 
 ## 常见的坑（及如何避免）
 
 ### 坑：配置文件 / 状态目录不匹配
 
-如果旧 Gateway网关使用了配置文件（或 `OPENCLAW_STATE_DIR`），而新 Gateway网关使用了不同的路径，你会看到以下症状：
+如果旧 Gateway网关使用了配置文件（或 `ClosedClaw_STATE_DIR`），而新 Gateway网关使用了不同的路径，你会看到以下症状：
 
 - 配置更改不生效
 - 渠道缺失 / 已登出
@@ -150,17 +150,17 @@ openclaw status
 修复：使用与迁移相同的配置文件/状态目录来运行 Gateway网关/服务，然后重新运行：
 
 ```bash
-openclaw doctor
+ClosedClaw doctor
 ```
 
-### 坑：只复制了 `openclaw.json`
+### 坑：只复制了 `ClosedClaw.json`
 
-`openclaw.json` 是不够的。许多提供商将状态存储在：
+`ClosedClaw.json` 是不够的。许多提供商将状态存储在：
 
-- `$OPENCLAW_STATE_DIR/credentials/`
-- `$OPENCLAW_STATE_DIR/agents/<agentId>/...`
+- `$ClosedClaw_STATE_DIR/credentials/`
+- `$ClosedClaw_STATE_DIR/agents/<agentId>/...`
 
-始终迁移整个 `$OPENCLAW_STATE_DIR` 文件夹。
+始终迁移整个 `$ClosedClaw_STATE_DIR` 文件夹。
 
 ### 坑：权限 / 所有权
 
@@ -177,7 +177,7 @@ openclaw doctor
 
 ### 坑：备份中的密钥
 
-`$OPENCLAW_STATE_DIR` 包含密钥（API 密钥、OAuth 令牌、WhatsApp 凭据）。请将备份视为生产密钥：
+`$ClosedClaw_STATE_DIR` 包含密钥（API 密钥、OAuth 令牌、WhatsApp 凭据）。请将备份视为生产密钥：
 
 - 加密存储
 - 避免通过不安全的渠道传输
@@ -187,7 +187,7 @@ openclaw doctor
 
 在新机器上确认：
 
-- `openclaw status` 显示 Gateway网关正在运行
+- `ClosedClaw status` 显示 Gateway网关正在运行
 - 你的渠道仍然处于连接状态（例如 WhatsApp 无需重新配对）
 - 仪表盘可以打开并显示现有会话
 - 你的工作区文件（记忆、配置）已存在
@@ -196,4 +196,4 @@ openclaw doctor
 
 - [Doctor](/gateway/doctor)
 - [Gateway网关故障排除](/gateway/troubleshooting)
-- [OpenClaw 将数据存储在哪里？](/help/faq#where-does-openclaw-store-its-data)
+- [ClosedClaw 将数据存储在哪里？](/help/faq#where-does-ClosedClaw-store-its-data)

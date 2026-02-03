@@ -14,13 +14,13 @@ x-i18n:
 
 # 智能体运行时 🤖
 
-OpenClaw 运行一个源自 **pi-mono** 的单一嵌入式智能体运行时。
+ClosedClaw 运行一个源自 **pi-mono** 的单一嵌入式智能体运行时。
 
 ## 工作区（必需）
 
-OpenClaw 使用单一智能体工作区目录（`agents.defaults.workspace`）作为智能体工具和上下文的**唯一**工作目录（`cwd`）。
+ClosedClaw 使用单一智能体工作区目录（`agents.defaults.workspace`）作为智能体工具和上下文的**唯一**工作目录（`cwd`）。
 
-建议：使用 `openclaw setup` 创建 `~/.openclaw/openclaw.json`（如果不存在）并初始化工作区文件。
+建议：使用 `ClosedClaw setup` 创建 `~/.ClosedClaw/ClosedClaw.json`（如果不存在）并初始化工作区文件。
 
 完整的工作区布局 + 备份指南：[智能体工作区](/concepts/agent-workspace)
 
@@ -28,7 +28,7 @@ OpenClaw 使用单一智能体工作区目录（`agents.defaults.workspace`）�
 
 ## 引导文件（注入）
 
-在 `agents.defaults.workspace` 内，OpenClaw 期望这些用户可编辑的文件：
+在 `agents.defaults.workspace` 内，ClosedClaw 期望这些用户可编辑的文件：
 
 - `AGENTS.md` — 操作指令 + "记忆"
 - `SOUL.md` — 角色设定、边界、语气
@@ -37,11 +37,11 @@ OpenClaw 使用单一智能体工作区目录（`agents.defaults.workspace`）�
 - `IDENTITY.md` — 智能体名称/风格/表情符号
 - `USER.md` — 用户档案 + 首选称呼
 
-在新会话的第一轮对话中，OpenClaw 会将这些文件的内容直接注入到智能体上下文中。
+在新会话的第一轮对话中，ClosedClaw 会将这些文件的内容直接注入到智能体上下文中。
 
 空白文件会被跳过。大文件会被裁剪和截断并附带标记，以保持提示词精简（阅读完整文件以获取全部内容）。
 
-如果文件缺失，OpenClaw 会注入一行"文件缺失"标记（`openclaw setup` 会创建安全的默认模板）。
+如果文件缺失，ClosedClaw 会注入一行"文件缺失"标记（`ClosedClaw setup` 会创建安全的默认模板）。
 
 `BOOTSTRAP.md` 仅在**全新工作区**（没有其他引导文件存在）时创建。如果你在完成仪式后删除了它，后续重启时不会重新创建。
 
@@ -57,17 +57,17 @@ OpenClaw 使用单一智能体工作区目录（`agents.defaults.workspace`）�
 
 ## Skills
 
-OpenClaw 从三个位置加载 Skills（名称冲突时工作区优先）：
+ClosedClaw 从三个位置加载 Skills（名称冲突时工作区优先）：
 
 - 内置（随安装包附带）
-- 托管/本地：`~/.openclaw/skills`
+- 托管/本地：`~/.ClosedClaw/skills`
 - 工作区：`<workspace>/skills`
 
 Skills 可以通过配置/环境变量进行控制（参见 [Gateway网关配置](/gateway/configuration) 中的 `skills`）。
 
 ## pi-mono 集成
 
-OpenClaw 复用了 pi-mono 代码库的部分内容（模型/工具），但**会话管理、发现和工具连接由 OpenClaw 负责**。
+ClosedClaw 复用了 pi-mono 代码库的部分内容（模型/工具），但**会话管理、发现和工具连接由 ClosedClaw 负责**。
 
 - 没有 pi-coding 智能体运行时。
 - 不会读取 `~/.pi/agent` 或 `<workspace>/.pi` 设置。
@@ -76,9 +76,9 @@ OpenClaw 复用了 pi-mono 代码库的部分内容（模型/工具），但**�
 
 会话记录以 JSONL 格式存储在：
 
-- `~/.openclaw/agents/<agentId>/sessions/<SessionId>.jsonl`
+- `~/.ClosedClaw/agents/<agentId>/sessions/<SessionId>.jsonl`
 
-会话 ID 是稳定的，由 OpenClaw 选择。
+会话 ID 是稳定的，由 ClosedClaw 选择。
 **不会**读取旧版 Pi/Tau 会话文件夹。
 
 ## 流式传输期间的引导
@@ -100,7 +100,7 @@ OpenClaw 复用了 pi-mono 代码库的部分内容（模型/工具），但**�
 
 - 配置模型时使用 `provider/model` 格式。
 - 如果模型 ID 本身包含 `/`（OpenRouter 风格），请包含提供商前缀（示例：`openrouter/moonshotai/kimi-k2`）。
-- 如果省略提供商，OpenClaw 会将输入视为别名或**默认提供商**的模型（仅在模型 ID 中没有 `/` 时有效）。
+- 如果省略提供商，ClosedClaw 会将输入视为别名或**默认提供商**的模型（仅在模型 ID 中没有 `/` 时有效）。
 
 ## 配置（最小化）
 

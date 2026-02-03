@@ -37,5 +37,5 @@ x-i18n:
 
 ## 运维说明
 
-- 如果端口被*其他*进程占用，错误信息相同；请释放该端口或使用 `openclaw gateway --port <port>` 选择另一个端口。
+- 如果端口被*其他*进程占用，错误信息相同；请释放该端口或使用 `ClosedClaw gateway --port <port>` 选择另一个端口。
 - macOS 应用在启动 Gateway网关之前仍会维护自己的轻量级 PID 守卫；运行时锁由 WebSocket 绑定强制执行。

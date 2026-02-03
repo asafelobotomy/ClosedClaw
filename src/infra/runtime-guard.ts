@@ -88,11 +88,11 @@ export function assertSupportedRuntime(
 
   runtime.error(
     [
-      "openclaw requires Node >=22.0.0.",
+      "ClosedClaw requires Node >=22.0.0.",
       `Detected: ${runtimeLabel} (exec: ${execLabel}).`,
       `PATH searched: ${details.pathEnv}`,
       "Install Node: https://nodejs.org/en/download",
-      "Upgrade Node and re-run openclaw.",
+      "Upgrade Node and re-run ClosedClaw.",
     ].join("\n"),
   );
   runtime.exit(1);

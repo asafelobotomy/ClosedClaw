@@ -50,13 +50,13 @@ x-i18n:
 ## 环境变量覆盖（一次性）
 
 ```bash
-OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload
+ClosedClaw_DIAGNOSTICS=telegram.http,telegram.payload
 ```
 
 禁用所有标志：
 
 ```bash
-OPENCLAW_DIAGNOSTICS=0
+ClosedClaw_DIAGNOSTICS=0
 ```
 
 ## 日志输出位置
@@ -64,7 +64,7 @@ OPENCLAW_DIAGNOSTICS=0
 标志会将日志输出到标准诊断日志文件中。默认路径为：
 
 ```
-/tmp/openclaw/openclaw-YYYY-MM-DD.log
+/tmp/ClosedClaw/ClosedClaw-YYYY-MM-DD.log
 ```
 
 如果你设置了 `logging.file`，则使用该路径。日志格式为 JSONL（每行一个 JSON 对象）。脱敏处理仍根据 `logging.redactSensitive` 设置生效。
@@ -74,22 +74,22 @@ OPENCLAW_DIAGNOSTICS=0
 选择最新的日志文件：
 
 ```bash
-ls -t /tmp/openclaw/openclaw-*.log | head -n 1
+ls -t /tmp/ClosedClaw/ClosedClaw-*.log | head -n 1
 ```
 
 筛选 Telegram HTTP 诊断信息：
 
 ```bash
-rg "telegram http error" /tmp/openclaw/openclaw-*.log
+rg "telegram http error" /tmp/ClosedClaw/ClosedClaw-*.log
 ```
 
 或在复现问题时实时追踪：
 
 ```bash
-tail -f /tmp/openclaw/openclaw-$(date +%F).log | rg "telegram http error"
+tail -f /tmp/ClosedClaw/ClosedClaw-$(date +%F).log | rg "telegram http error"
 ```
 
-对于远程 Gateway网关，你也可以使用 `openclaw logs --follow`（参见 [/cli/logs](/cli/logs)）。
+对于远程 Gateway网关，你也可以使用 `ClosedClaw logs --follow`（参见 [/cli/logs](/cli/logs)）。
 
 ## 注意事项
 

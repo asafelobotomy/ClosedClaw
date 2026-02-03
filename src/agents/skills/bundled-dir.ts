@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 export function resolveBundledSkillsDir(): string | undefined {
-  const override = process.env.OPENCLAW_BUNDLED_SKILLS_DIR?.trim();
+  const override = process.env.ClosedClaw_BUNDLED_SKILLS_DIR?.trim();
   if (override) {
     return override;
   }

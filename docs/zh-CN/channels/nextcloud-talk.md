@@ -23,16 +23,16 @@ Nextcloud Talk 作为插件发布，不包含在核心安装中。
 通过 CLI 安装（npm 注册表）：
 
 ```bash
-openclaw plugins install @openclaw/nextcloud-talk
+ClosedClaw plugins install @ClosedClaw/nextcloud-talk
 ```
 
 本地检出（从 git 仓库运行时）：
 
 ```bash
-openclaw plugins install ./extensions/nextcloud-talk
+ClosedClaw plugins install ./extensions/nextcloud-talk
 ```
 
-如果你在配置/新手引导期间选择了 Nextcloud Talk 并检测到 git 检出，OpenClaw 会自动提供本地安装路径。
+如果你在配置/新手引导期间选择了 Nextcloud Talk 并检测到 git 检出，ClosedClaw 会自动提供本地安装路径。
 
 详情：[插件](/plugin)
 
@@ -41,10 +41,10 @@ openclaw plugins install ./extensions/nextcloud-talk
 1. 安装 Nextcloud Talk 插件。
 2. 在你的 Nextcloud 服务器上创建一个机器人：
    ```bash
-   ./occ talk:bot:install "OpenClaw" "<shared-secret>" "<webhook-url>" --feature reaction
+   ./occ talk:bot:install "ClosedClaw" "<shared-secret>" "<webhook-url>" --feature reaction
    ```
 3. 在目标房间设置中启用该机器人。
-4. 配置 OpenClaw：
+4. 配置 ClosedClaw：
    - 配置：`channels.nextcloud-talk.baseUrl` + `channels.nextcloud-talk.botSecret`
    - 或环境变量：`NEXTCLOUD_TALK_BOT_SECRET`（仅默认账户）
 5. 重启 Gateway网关（或完成新手引导）。
@@ -75,8 +75,8 @@ openclaw plugins install ./extensions/nextcloud-talk
 
 - 默认：`channels.nextcloud-talk.dmPolicy = "pairing"`。未知发送者会收到配对码。
 - 通过以下方式批准：
-  - `openclaw pairing list nextcloud-talk`
-  - `openclaw pairing approve nextcloud-talk <CODE>`
+  - `ClosedClaw pairing list nextcloud-talk`
+  - `ClosedClaw pairing approve nextcloud-talk <CODE>`
 - 公开私信：`channels.nextcloud-talk.dmPolicy="open"` 加上 `channels.nextcloud-talk.allowFrom=["*"]`。
 
 ## 房间（群组）

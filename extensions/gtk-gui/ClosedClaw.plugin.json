@@ -1,0 +1,34 @@
+{
+  "id": "gtk-gui",
+  "name": "GTK GUI",
+  "version": "1.0.0",
+  "description": "Custom GTK GUI channel for Linux desktop - communicates via Unix socket or file-based IPC",
+  "channels": ["gtk-gui"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "socketPath": {
+        "type": "string",
+        "description": "Unix socket path for IPC communication"
+      },
+      "inboxPath": {
+        "type": "string",
+        "description": "File path for incoming messages (alternative to socket)"
+      },
+      "outboxPath": {
+        "type": "string",
+        "description": "File path for outgoing messages (alternative to socket)"
+      },
+      "userId": {
+        "type": "string",
+        "description": "Default user ID for messages"
+      },
+      "liteMode": {
+        "type": "boolean",
+        "default": false,
+        "description": "Enable lite mode for small local models (e.g., Ollama 1B/3B). Bypasses the full Pi agent system prompt for faster, simpler responses."
+      }
+    }
+  }
+}

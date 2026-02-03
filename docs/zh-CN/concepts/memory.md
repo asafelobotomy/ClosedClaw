@@ -2,7 +2,7 @@
 read_when:
   - 想了解记忆文件布局和工作流程
   - 想调整自动预压缩记忆刷写
-summary: OpenClaw 记忆的工作原理（工作区文件 + 自动记忆刷写）
+summary: ClosedClaw 记忆的工作原理（工作区文件 + 自动记忆刷写）
 title: 记忆
 x-i18n:
   generated_at: "2026-02-01T20:24:01Z"
@@ -15,7 +15,7 @@ x-i18n:
 
 # 记忆
 
-OpenClaw 的记忆是**智能体工作区中的纯 Markdown 文件**。这些文件是唯一的事实来源；模型只"记住"写入磁盘的内容。
+ClosedClaw 的记忆是**智能体工作区中的纯 Markdown 文件**。这些文件是唯一的事实来源；模型只"记住"写入磁盘的内容。
 
 记忆搜索工具由活跃的记忆插件提供（默认：`memory-core`）。通过 `plugins.slots.memory = "none"` 可禁用记忆插件。
 
@@ -30,7 +30,7 @@ OpenClaw 的记忆是**智能体工作区中的纯 Markdown 文件**。这些文
   - 精心整理的长期记忆。
   - **仅在主要的私人会话中加载**（不在群组上下文中加载）。
 
-这些文件位于工作区目录下（`agents.defaults.workspace`，默认 `~/.openclaw/workspace`）。完整布局参见[智能体工作区](/concepts/agent-workspace)。
+这些文件位于工作区目录下（`agents.defaults.workspace`，默认 `~/.ClosedClaw/workspace`）。完整布局参见[智能体工作区](/concepts/agent-workspace)。
 
 ## 何时写入记忆
 
@@ -42,7 +42,7 @@ OpenClaw 的记忆是**智能体工作区中的纯 Markdown 文件**。这些文
 
 ## 自动记忆刷写（预压缩 ping）
 
-当会话**接近自动压缩**时，OpenClaw 会触发一个**静默的智能体轮次**，提醒模型在上下文被压缩**之前**写入持久记忆。默认提示词明确表示模型*可以回复*，但通常 `NO_REPLY` 是正确的响应，这样用户不会看到这个轮次。
+当会话**接近自动压缩**时，ClosedClaw 会触发一个**静默的智能体轮次**，提醒模型在上下文被压缩**之前**写入持久记忆。默认提示词明确表示模型*可以回复*，但通常 `NO_REPLY` 是正确的响应，这样用户不会看到这个轮次。
 
 这由 `agents.defaults.compaction.memoryFlush` 控制：
 
@@ -76,13 +76,13 @@ OpenClaw 的记忆是**智能体工作区中的纯 Markdown 文件**。这些文
 
 ## 向量记忆搜索
 
-OpenClaw 可以对 `MEMORY.md` 和 `memory/*.md`（以及你选择加入的任何额外目录或文件）构建小型向量索引，这样即使措辞不同，语义查询也能找到相关笔记。
+ClosedClaw 可以对 `MEMORY.md` 和 `memory/*.md`（以及你选择加入的任何额外目录或文件）构建小型向量索引，这样即使措辞不同，语义查询也能找到相关笔记。
 
 默认设置：
 
 - 默认启用。
 - 监视记忆文件变更（带防抖）。
-- 默认使用远程嵌入。如果未设置 `memorySearch.provider`，OpenClaw 会自动选择：
+- 默认使用远程嵌入。如果未设置 `memorySearch.provider`，ClosedClaw 会自动选择：
   1. 如果配置了 `memorySearch.local.modelPath` 且文件存在，则使用 `local`。
   2. 如果可以解析到 OpenAI 密钥，则使用 `openai`。
   3. 如果可以解析到 Gemini 密钥，则使用 `gemini`。
@@ -90,7 +90,7 @@ OpenClaw 可以对 `MEMORY.md` 和 `memory/*.md`（以及你选择加入的任�
 - 本地模式使用 node-llama-cpp，可能需要运行 `pnpm approve-builds`。
 - 使用 sqlite-vec（可用时）加速 SQLite 内的向量搜索。
 
-远程嵌入**需要**嵌入提供商的 API 密钥。OpenClaw 从认证配置文件、`models.providers.*.apiKey` 或环境变量中解析密钥。Codex OAuth 仅覆盖 chat/completions，**不满足**记忆搜索的嵌入需求。对于 Gemini，使用 `GEMINI_API_KEY` 或 `models.providers.google.apiKey`。使用自定义 OpenAI 兼容端点时，设置 `memorySearch.remote.apiKey`（以及可选的 `memorySearch.remote.headers`）。
+远程嵌入**需要**嵌入提供商的 API 密钥。ClosedClaw 从认证配置文件、`models.providers.*.apiKey` 或环境变量中解析密钥。Codex OAuth 仅覆盖 chat/completions，**不满足**记忆搜索的嵌入需求。对于 Gemini，使用 `GEMINI_API_KEY` 或 `models.providers.google.apiKey`。使用自定义 OpenAI 兼容端点时，设置 `memorySearch.remote.apiKey`（以及可选的 `memorySearch.remote.headers`）。
 
 ### 额外记忆路径
 
@@ -216,18 +216,18 @@ agents: {
 ### 索引内容（及时机）
 
 - 文件类型：仅 Markdown（`MEMORY.md`、`memory/**/*.md`，以及 `memorySearch.extraPaths` 下的任何 `.md` 文件）。
-- 索引存储：每个智能体的 SQLite 位于 `~/.openclaw/memory/<agentId>.sqlite`（可通过 `agents.defaults.memorySearch.store.path` 配置，支持 `{agentId}` 占位符）。
+- 索引存储：每个智能体的 SQLite 位于 `~/.ClosedClaw/memory/<agentId>.sqlite`（可通过 `agents.defaults.memorySearch.store.path` 配置，支持 `{agentId}` 占位符）。
 - 时效性：监视 `MEMORY.md`、`memory/` 和 `memorySearch.extraPaths` 的变更并标记索引为脏（防抖 1.5 秒）。同步在会话开始时、搜索时或按间隔调度，并异步运行。会话记录使用增量阈值触发后台同步。
-- 重新索引触发条件：索引存储嵌入的**提供商/模型 + 端点指纹 + 分块参数**。如果其中任何一项发生变化，OpenClaw 会自动重置并重新索引整个存储。
+- 重新索引触发条件：索引存储嵌入的**提供商/模型 + 端点指纹 + 分块参数**。如果其中任何一项发生变化，ClosedClaw 会自动重置并重新索引整个存储。
 
 ### 混合搜索（BM25 + 向量）
 
-启用后，OpenClaw 结合以下两种方式：
+启用后，ClosedClaw 结合以下两种方式：
 
 - **向量相似度**（语义匹配，措辞可以不同）
 - **BM25 关键词相关性**（精确 token，如 ID、环境变量、代码符号）
 
-如果你的平台上全文搜索不可用，OpenClaw 会回退到纯向量搜索。
+如果你的平台上全文搜索不可用，ClosedClaw 会回退到纯向量搜索。
 
 #### 为什么用混合搜索？
 
@@ -290,7 +290,7 @@ agents: {
 
 ### 嵌入缓存
 
-OpenClaw 可以在 SQLite 中缓存**分块嵌入**，这样重新索引和频繁更新（特别是会话记录）不会重新嵌入未更改的文本。
+ClosedClaw 可以在 SQLite 中缓存**分块嵌入**，这样重新索引和频繁更新（特别是会话记录）不会重新嵌入未更改的文本。
 
 配置：
 
@@ -329,7 +329,7 @@ agents: {
 - `memory_search` 不会阻塞等待索引；在后台同步完成之前结果可能略有延迟。
 - 结果仍然只包含片段；`memory_get` 仍限于记忆文件。
 - 会话索引按智能体隔离（仅索引该智能体的会话日志）。
-- 会话日志存储在磁盘上（`~/.openclaw/agents/<agentId>/sessions/*.jsonl`）。任何拥有文件系统访问权限的进程/用户都可以读取它们，因此应将磁盘访问视为信任边界。如需更严格的隔离，请在不同的操作系统用户或主机下运行智能体。
+- 会话日志存储在磁盘上（`~/.ClosedClaw/agents/<agentId>/sessions/*.jsonl`）。任何拥有文件系统访问权限的进程/用户都可以读取它们，因此应将磁盘访问视为信任边界。如需更严格的隔离，请在不同的操作系统用户或主机下运行智能体。
 
 增量阈值（显示默认值）：
 
@@ -350,7 +350,7 @@ agents: {
 
 ### SQLite 向量加速（sqlite-vec）
 
-当 sqlite-vec 扩展可用时，OpenClaw 将嵌入存储在 SQLite 虚拟表（`vec0`）中，并在数据库内执行向量距离查询。这使搜索保持快速，无需将所有嵌入加载到 JS 中。
+当 sqlite-vec 扩展可用时，ClosedClaw 将嵌入存储在 SQLite 虚拟表（`vec0`）中，并在数据库内执行向量距离查询。这使搜索保持快速，无需将所有嵌入加载到 JS 中。
 
 配置（可选）：
 
@@ -372,7 +372,7 @@ agents: {
 注意事项：
 
 - `enabled` 默认为 true；禁用时，搜索回退到对存储嵌入进行进程内余弦相似度计算。
-- 如果 sqlite-vec 扩展缺失或加载失败，OpenClaw 会记录错误并继续使用 JS 回退（无向量表）。
+- 如果 sqlite-vec 扩展缺失或加载失败，ClosedClaw 会记录错误并继续使用 JS 回退（无向量表）。
 - `extensionPath` 覆盖捆绑的 sqlite-vec 路径（适用于自定义构建或非标准安装位置）。
 
 ### 本地嵌入自动下载

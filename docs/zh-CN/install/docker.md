@@ -2,7 +2,7 @@
 read_when:
   - 你想要容器化的 Gateway网关而非本地安装
   - 你正在验证 Docker 流程
-summary: 可选的基于 Docker 的 OpenClaw 设置和新手引导
+summary: 可选的基于 Docker 的 ClosedClaw 设置和新手引导
 title: Docker
 x-i18n:
   generated_at: "2026-02-01T21:07:14Z"
@@ -19,13 +19,13 @@ Docker 是**可选的**。仅在你需要容器化 Gateway网关或验证 Docker
 
 ## Docker 适合我吗？
 
-- **适合**：你需要一个隔离的、可随时销毁的 Gateway网关环境，或者想在无需本地安装的主机上运行 OpenClaw。
+- **适合**：你需要一个隔离的、可随时销毁的 Gateway网关环境，或者想在无需本地安装的主机上运行 ClosedClaw。
 - **不适合**：你在自己的机器上运行，只想要最快的开发循环。请改用常规安装流程。
 - **沙箱说明**：智能体沙箱也使用 Docker，但它**不需要**完整的 Gateway网关运行在 Docker 中。详见 [沙箱](/gateway/sandboxing)。
 
 本指南涵盖：
 
-- 容器化 Gateway网关（完整的 OpenClaw 运行在 Docker 中）
+- 容器化 Gateway网关（完整的 ClosedClaw 运行在 Docker 中）
 - 按会话的智能体沙箱（主机 Gateway网关 + Docker 隔离的智能体工具）
 
 沙箱详情：[沙箱](/gateway/sandboxing)
@@ -55,9 +55,9 @@ Docker 是**可选的**。仅在你需要容器化 Gateway网关或验证 Docker
 
 可选环境变量：
 
-- `OPENCLAW_DOCKER_APT_PACKAGES` — 在构建期间安装额外的 apt 软件包
-- `OPENCLAW_EXTRA_MOUNTS` — 添加额外的主机绑定挂载
-- `OPENCLAW_HOME_VOLUME` — 将 `/home/node` 持久化到命名卷
+- `ClosedClaw_DOCKER_APT_PACKAGES` — 在构建期间安装额外的 apt 软件包
+- `ClosedClaw_EXTRA_MOUNTS` — 添加额外的主机绑定挂载
+- `ClosedClaw_HOME_VOLUME` — 将 `/home/node` 持久化到命名卷
 
 完成后：
 
@@ -66,75 +66,75 @@ Docker 是**可选的**。仅在你需要容器化 Gateway网关或验证 Docker
 
 配置和工作区写入主机：
 
-- `~/.openclaw/`
-- `~/.openclaw/workspace`
+- `~/.ClosedClaw/`
+- `~/.ClosedClaw/workspace`
 
 在 VPS 上运行？参见 [Hetzner（Docker VPS）](/platforms/hetzner)。
 
 ### 手动流程（compose）
 
 ```bash
-docker build -t openclaw:local -f Dockerfile .
-docker compose run --rm openclaw-cli onboard
-docker compose up -d openclaw-gateway
+docker build -t ClosedClaw:local -f Dockerfile .
+docker compose run --rm ClosedClaw-cli onboard
+docker compose up -d ClosedClaw-gateway
 ```
 
 ### 额外挂载（可选）
 
-如果你想将额外的主机目录挂载到容器中，请在运行 `docker-setup.sh` 之前设置 `OPENCLAW_EXTRA_MOUNTS`。该变量接受逗号分隔的 Docker 绑定挂载列表，并通过生成 `docker-compose.extra.yml` 将其应用到 `openclaw-gateway` 和 `openclaw-cli`。
+如果你想将额外的主机目录挂载到容器中，请在运行 `docker-setup.sh` 之前设置 `ClosedClaw_EXTRA_MOUNTS`。该变量接受逗号分隔的 Docker 绑定挂载列表，并通过生成 `docker-compose.extra.yml` 将其应用到 `ClosedClaw-gateway` 和 `ClosedClaw-cli`。
 
 示例：
 
 ```bash
-export OPENCLAW_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
+export ClosedClaw_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
 ./docker-setup.sh
 ```
 
 注意事项：
 
 - 在 macOS/Windows 上，路径必须与 Docker Desktop 共享。
-- 如果修改了 `OPENCLAW_EXTRA_MOUNTS`，请重新运行 `docker-setup.sh` 以重新生成额外的 compose 文件。
+- 如果修改了 `ClosedClaw_EXTRA_MOUNTS`，请重新运行 `docker-setup.sh` 以重新生成额外的 compose 文件。
 - `docker-compose.extra.yml` 是自动生成的。请勿手动编辑。
 
 ### 持久化整个容器 home 目录（可选）
 
-如果你希望 `/home/node` 在容器重建后持久保留，请通过 `OPENCLAW_HOME_VOLUME` 设置命名卷。这会创建一个 Docker 卷并挂载到 `/home/node`，同时保留标准的配置/工作区绑定挂载。此处请使用命名卷（而非绑定路径）；绑定挂载请使用 `OPENCLAW_EXTRA_MOUNTS`。
+如果你希望 `/home/node` 在容器重建后持久保留，请通过 `ClosedClaw_HOME_VOLUME` 设置命名卷。这会创建一个 Docker 卷并挂载到 `/home/node`，同时保留标准的配置/工作区绑定挂载。此处请使用命名卷（而非绑定路径）；绑定挂载请使用 `ClosedClaw_EXTRA_MOUNTS`。
 
 示例：
 
 ```bash
-export OPENCLAW_HOME_VOLUME="openclaw_home"
+export ClosedClaw_HOME_VOLUME="ClosedClaw_home"
 ./docker-setup.sh
 ```
 
 可以与额外挂载组合使用：
 
 ```bash
-export OPENCLAW_HOME_VOLUME="openclaw_home"
-export OPENCLAW_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
+export ClosedClaw_HOME_VOLUME="ClosedClaw_home"
+export ClosedClaw_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro,$HOME/github:/home/node/github:rw"
 ./docker-setup.sh
 ```
 
 注意事项：
 
-- 如果修改了 `OPENCLAW_HOME_VOLUME`，请重新运行 `docker-setup.sh` 以重新生成额外的 compose 文件。
+- 如果修改了 `ClosedClaw_HOME_VOLUME`，请重新运行 `docker-setup.sh` 以重新生成额外的 compose 文件。
 - 命名卷会一直保留，直到通过 `docker volume rm <name>` 删除。
 
 ### 安装额外的 apt 软件包（可选）
 
-如果你需要在镜像中安装系统软件包（例如构建工具或媒体库），请在运行 `docker-setup.sh` 之前设置 `OPENCLAW_DOCKER_APT_PACKAGES`。这会在镜像构建期间安装软件包，因此即使容器被删除也会保留。
+如果你需要在镜像中安装系统软件包（例如构建工具或媒体库），请在运行 `docker-setup.sh` 之前设置 `ClosedClaw_DOCKER_APT_PACKAGES`。这会在镜像构建期间安装软件包，因此即使容器被删除也会保留。
 
 示例：
 
 ```bash
-export OPENCLAW_DOCKER_APT_PACKAGES="ffmpeg build-essential"
+export ClosedClaw_DOCKER_APT_PACKAGES="ffmpeg build-essential"
 ./docker-setup.sh
 ```
 
 注意事项：
 
 - 该变量接受以空格分隔的 apt 软件包名称列表。
-- 如果修改了 `OPENCLAW_DOCKER_APT_PACKAGES`，请重新运行 `docker-setup.sh` 以重建镜像。
+- 如果修改了 `ClosedClaw_DOCKER_APT_PACKAGES`，请重新运行 `docker-setup.sh` 以重建镜像。
 
 ### 加速重建（推荐）
 
@@ -175,19 +175,19 @@ CMD ["node","dist/index.js"]
 WhatsApp（二维码）：
 
 ```bash
-docker compose run --rm openclaw-cli channels login
+docker compose run --rm ClosedClaw-cli channels login
 ```
 
 Telegram（机器人令牌）：
 
 ```bash
-docker compose run --rm openclaw-cli channels add --channel telegram --token "<token>"
+docker compose run --rm ClosedClaw-cli channels add --channel telegram --token "<token>"
 ```
 
 Discord（机器人令牌）：
 
 ```bash
-docker compose run --rm openclaw-cli channels add --channel discord --token "<token>"
+docker compose run --rm ClosedClaw-cli channels add --channel discord --token "<token>"
 ```
 
 文档：[WhatsApp](/channels/whatsapp)、[Telegram](/channels/telegram)、[Discord](/channels/discord)
@@ -195,7 +195,7 @@ docker compose run --rm openclaw-cli channels add --channel discord --token "<to
 ### 健康检查
 
 ```bash
-docker compose exec openclaw-gateway node dist/index.js health --token "$OPENCLAW_GATEWAY_TOKEN"
+docker compose exec ClosedClaw-gateway node dist/index.js health --token "$ClosedClaw_GATEWAY_TOKEN"
 ```
 
 ### 端到端冒烟测试（Docker）
@@ -213,7 +213,7 @@ pnpm test:docker:qr
 ### 注意事项
 
 - Gateway网关绑定默认设为 `lan` 以适配容器使用。
-- Gateway网关容器是会话的权威来源（`~/.openclaw/agents/<agentId>/sessions/`）。
+- Gateway网关容器是会话的权威来源（`~/.ClosedClaw/agents/<agentId>/sessions/`）。
 
 ## 智能体沙箱（主机 Gateway网关 + Docker 工具）
 
@@ -244,9 +244,9 @@ pnpm test:docker:qr
 
 ### 默认行为
 
-- 镜像：`openclaw-sandbox:bookworm-slim`
+- 镜像：`ClosedClaw-sandbox:bookworm-slim`
 - 每个智能体一个容器
-- 智能体工作区访问：`workspaceAccess: "none"`（默认）使用 `~/.openclaw/sandboxes`
+- 智能体工作区访问：`workspaceAccess: "none"`（默认）使用 `~/.ClosedClaw/sandboxes`
   - `"ro"` 将沙箱工作区保留在 `/workspace`，并将智能体工作区以只读方式挂载到 `/agent`（禁用 `write`/`edit`/`apply_patch`）
   - `"rw"` 将智能体工作区以读写方式挂载到 `/workspace`
 - 自动清理：空闲超过 24 小时或创建超过 7 天
@@ -261,7 +261,7 @@ pnpm test:docker:qr
 - 默认 `docker.network` 为 `"none"`（无出站访问）。
 - `readOnlyRoot: true` 会阻止软件包安装。
 - `user` 必须是 root 才能运行 `apt-get`（省略 `user` 或设置 `user: "0:0"`）。
-  当 `setupCommand`（或 docker 配置）发生变更时，OpenClaw 会自动重建容器，除非容器**最近被使用过**（约 5 分钟内）。活跃容器会记录一条警告，包含确切的 `openclaw sandbox recreate ...` 命令。
+  当 `setupCommand`（或 docker 配置）发生变更时，ClosedClaw 会自动重建容器，除非容器**最近被使用过**（约 5 分钟内）。活跃容器会记录一条警告，包含确切的 `ClosedClaw sandbox recreate ...` 命令。
 
 ```json5
 {
@@ -271,9 +271,9 @@ pnpm test:docker:qr
         mode: "non-main", // off | non-main | all
         scope: "agent", // session | agent | shared（默认为 agent）
         workspaceAccess: "none", // none | ro | rw
-        workspaceRoot: "~/.openclaw/sandboxes",
+        workspaceRoot: "~/.ClosedClaw/sandboxes",
         docker: {
-          image: "openclaw-sandbox:bookworm-slim",
+          image: "ClosedClaw-sandbox:bookworm-slim",
           workdir: "/workspace",
           readOnlyRoot: true,
           tmpfs: ["/tmp", "/var/tmp", "/run"],
@@ -291,7 +291,7 @@ pnpm test:docker:qr
             nproc: 256,
           },
           seccompProfile: "/path/to/seccomp.json",
-          apparmorProfile: "openclaw-sandbox",
+          apparmorProfile: "ClosedClaw-sandbox",
           dns: ["1.1.1.1", "8.8.8.8"],
           extraHosts: ["internal.service:10.0.0.5"],
         },
@@ -337,7 +337,7 @@ pnpm test:docker:qr
 scripts/sandbox-setup.sh
 ```
 
-这会使用 `Dockerfile.sandbox` 构建 `openclaw-sandbox:bookworm-slim`。
+这会使用 `Dockerfile.sandbox` 构建 `ClosedClaw-sandbox:bookworm-slim`。
 
 ### 沙箱通用镜像（可选）
 
@@ -347,13 +347,13 @@ scripts/sandbox-setup.sh
 scripts/sandbox-common-setup.sh
 ```
 
-这会构建 `openclaw-sandbox-common:bookworm-slim`。使用方法：
+这会构建 `ClosedClaw-sandbox-common:bookworm-slim`。使用方法：
 
 ```json5
 {
   agents: {
     defaults: {
-      sandbox: { docker: { image: "openclaw-sandbox-common:bookworm-slim" } },
+      sandbox: { docker: { image: "ClosedClaw-sandbox-common:bookworm-slim" } },
     },
   },
 }
@@ -367,7 +367,7 @@ scripts/sandbox-common-setup.sh
 scripts/sandbox-browser-setup.sh
 ```
 
-这会使用 `Dockerfile.sandbox-browser` 构建 `openclaw-sandbox-browser:bookworm-slim`。容器运行启用了 CDP 的 Chromium，并提供可选的 noVNC 观察器（通过 Xvfb 实现有头模式）。
+这会使用 `Dockerfile.sandbox-browser` 构建 `ClosedClaw-sandbox-browser:bookworm-slim`。容器运行启用了 CDP 的 Chromium，并提供可选的 noVNC 观察器（通过 Xvfb 实现有头模式）。
 
 注意事项：
 
@@ -395,7 +395,7 @@ scripts/sandbox-browser-setup.sh
 {
   agents: {
     defaults: {
-      sandbox: { browser: { image: "my-openclaw-browser" } },
+      sandbox: { browser: { image: "my-ClosedClaw-browser" } },
     },
   },
 }
@@ -414,14 +414,14 @@ scripts/sandbox-browser-setup.sh
 构建你自己的镜像并在配置中指向它：
 
 ```bash
-docker build -t my-openclaw-sbx -f Dockerfile.sandbox .
+docker build -t my-ClosedClaw-sbx -f Dockerfile.sandbox .
 ```
 
 ```json5
 {
   agents: {
     defaults: {
-      sandbox: { docker: { image: "my-openclaw-sbx" } },
+      sandbox: { docker: { image: "my-ClosedClaw-sbx" } },
     },
   },
 }
@@ -455,7 +455,7 @@ docker build -t my-openclaw-sbx -f Dockerfile.sandbox .
 
 ## 故障排除
 
-- 镜像缺失：使用 [`scripts/sandbox-setup.sh`](https://github.com/openclaw/openclaw/blob/main/scripts/sandbox-setup.sh) 构建或设置 `agents.defaults.sandbox.docker.image`。
+- 镜像缺失：使用 [`scripts/sandbox-setup.sh`](https://github.com/ClosedClaw/ClosedClaw/blob/main/scripts/sandbox-setup.sh) 构建或设置 `agents.defaults.sandbox.docker.image`。
 - 容器未运行：它会按需在每个会话中自动创建。
 - 沙箱中的权限错误：将 `docker.user` 设置为与挂载工作区所有权匹配的 UID:GID（或对工作区文件夹执行 chown）。
-- 找不到自定义工具：OpenClaw 使用 `sh -lc`（登录 shell）运行命令，这会加载 `/etc/profile` 并可能重置 PATH。请设置 `docker.env.PATH` 以前置你的自定义工具路径（例如 `/custom/bin:/usr/local/share/npm-global/bin`），或在 Dockerfile 中的 `/etc/profile.d/` 下添加脚本。
+- 找不到自定义工具：ClosedClaw 使用 `sh -lc`（登录 shell）运行命令，这会加载 `/etc/profile` 并可能重置 PATH。请设置 `docker.env.PATH` 以前置你的自定义工具路径（例如 `/custom/bin:/usr/local/share/npm-global/bin`），或在 Dockerfile 中的 `/etc/profile.d/` 下添加脚本。

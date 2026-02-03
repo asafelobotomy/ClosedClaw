@@ -22,8 +22,8 @@ x-i18n:
 1. 为机器人使用一个**单独的 Signal 号码**（推荐）。
 2. 安装 `signal-cli`（需要 Java）。
 3. 链接机器人设备并启动守护进程：
-   - `signal-cli link -n "OpenClaw"`
-4. 配置 OpenClaw 并启动 Gateway网关。
+   - `signal-cli link -n "ClosedClaw"`
+4. 配置 ClosedClaw 并启动 Gateway网关。
 
 最小配置：
 
@@ -69,7 +69,7 @@ x-i18n:
 
 1. 安装 `signal-cli`（需要 Java）。
 2. 链接机器人账户：
-   - `signal-cli link -n "OpenClaw"` 然后在 Signal 中扫描二维码。
+   - `signal-cli link -n "ClosedClaw"` 然后在 Signal 中扫描二维码。
 3. 配置 Signal 并启动 Gateway网关。
 
 示例：
@@ -92,7 +92,7 @@ x-i18n:
 
 ## 外部守护进程模式（httpUrl）
 
-如果你想自行管理 `signal-cli`（JVM 冷启动慢、容器初始化或共享 CPU），可以单独运行守护进程并将 OpenClaw 指向它：
+如果你想自行管理 `signal-cli`（JVM 冷启动慢、容器初始化或共享 CPU），可以单独运行守护进程并将 ClosedClaw 指向它：
 
 ```json5
 {
@@ -105,7 +105,7 @@ x-i18n:
 }
 ```
 
-这会跳过 OpenClaw 内部的自动启动和启动等待。当自动启动较慢时，请设置 `channels.signal.startupTimeoutMs`。
+这会跳过 ClosedClaw 内部的自动启动和启动等待。当自动启动较慢时，请设置 `channels.signal.startupTimeoutMs`。
 
 ## 访问控制（私信 + 群组）
 
@@ -114,8 +114,8 @@ x-i18n:
 - 默认：`channels.signal.dmPolicy = "pairing"`。
 - 未知发送者会收到配对码；在批准之前消息会被忽略（配对码 1 小时后过期）。
 - 通过以下方式批准：
-  - `openclaw pairing list signal`
-  - `openclaw pairing approve signal <CODE>`
+  - `ClosedClaw pairing list signal`
+  - `ClosedClaw pairing approve signal <CODE>`
 - 配对是 Signal 私信的默认令牌交换方式。详情：[配对](/start/pairing)
 - 仅 UUID 的发送者（来自 `sourceUuid`）以 `uuid:<id>` 形式存储在 `channels.signal.allowFrom` 中。
 
@@ -141,8 +141,8 @@ x-i18n:
 
 ## 输入指示 + 已读回执
 
-- **输入指示**：OpenClaw 通过 `signal-cli sendTyping` 发送输入信号，并在回复运行期间刷新。
-- **已读回执**：当 `channels.signal.sendReadReceipts` 为 true 时，OpenClaw 为允许的私信转发已读回执。
+- **输入指示**：ClosedClaw 通过 `signal-cli sendTyping` 发送输入信号，并在回复运行期间刷新。
+- **已读回执**：当 `channels.signal.sendReadReceipts` 为 true 时，ClosedClaw 为允许的私信转发已读回执。
 - signal-cli 不暴露群组的已读回执。
 
 ## 回应（message 工具）

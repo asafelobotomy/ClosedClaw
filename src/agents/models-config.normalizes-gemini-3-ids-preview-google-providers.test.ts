@@ -1,14 +1,14 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { ClosedClawConfig } from "../config/config.js";
 import { withTempHome as withTempHomeBase } from "../../test/helpers/temp-home.js";
 
 async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise<T> {
-  return withTempHomeBase(fn, { prefix: "openclaw-models-" });
+  return withTempHomeBase(fn, { prefix: "ClosedClaw-models-" });
 }
 
-const _MODELS_CONFIG: OpenClawConfig = {
+const _MODELS_CONFIG: ClosedClawConfig = {
   models: {
     providers: {
       "custom-proxy": {
@@ -46,10 +46,10 @@ describe("models-config", () => {
   it("normalizes gemini 3 ids to preview for google providers", async () => {
     await withTempHome(async () => {
       vi.resetModules();
-      const { ensureOpenClawModelsJson } = await import("./models-config.js");
-      const { resolveOpenClawAgentDir } = await import("./agent-paths.js");
+      const { ensureClosedClawModelsJson } = await import("./models-config.js");
+      const { resolveClosedClawAgentDir } = await import("./agent-paths.js");
 
-      const cfg: OpenClawConfig = {
+      const cfg: ClosedClawConfig = {
         models: {
           providers: {
             google: {
@@ -83,9 +83,9 @@ describe("models-config", () => {
         },
       };
 
-      await ensureOpenClawModelsJson(cfg);
+      await ensureClosedClawModelsJson(cfg);
 
-      const modelPath = path.join(resolveOpenClawAgentDir(), "models.json");
+      const modelPath = path.join(resolveClosedClawAgentDir(), "models.json");
       const raw = await fs.readFile(modelPath, "utf8");
       const parsed = JSON.parse(raw) as {
         providers: Record<string, { models: Array<{ id: string }> }>;

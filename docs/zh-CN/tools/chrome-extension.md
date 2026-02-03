@@ -3,7 +3,7 @@ read_when:
   - 你想让智能体控制现有的 Chrome 标签页（工具栏按钮）
   - 你需要通过 Tailscale 实现远程 Gateway网关 + 本地浏览器自动化
   - 你想了解浏览器接管的安全影响
-summary: Chrome 扩展：让 OpenClaw 控制你现有的 Chrome 标签页
+summary: Chrome 扩展：让 ClosedClaw 控制你现有的 Chrome 标签页
 title: Chrome 扩展
 x-i18n:
   generated_at: "2026-02-01T21:40:11Z"
@@ -16,7 +16,7 @@ x-i18n:
 
 # Chrome 扩展（浏览器中继）
 
-OpenClaw Chrome 扩展让智能体控制你**现有的 Chrome 标签页**（你日常使用的 Chrome 窗口），而不是启动一个单独的 OpenClaw 托管 Chrome 配置文件。
+ClosedClaw Chrome 扩展让智能体控制你**现有的 Chrome 标签页**（你日常使用的 Chrome 窗口），而不是启动一个单独的 ClosedClaw 托管 Chrome 配置文件。
 
 附加/分离通过**单个 Chrome 工具栏按钮**完成。
 
@@ -28,20 +28,20 @@ OpenClaw Chrome 扩展让智能体控制你**现有的 Chrome 标签页**（你�
 - **本地中继服务器**（local loopback CDP）：在控制服务和扩展之间建立桥接（默认 `http://127.0.0.1:18792`）
 - **Chrome MV3 扩展**：使用 `chrome.debugger` 附加到活动标签页，并将 CDP 消息传递给中继
 
-OpenClaw 随后通过常规的 `browser` 工具界面（选择正确的配置文件）控制附加的标签页。
+ClosedClaw 随后通过常规的 `browser` 工具界面（选择正确的配置文件）控制附加的标签页。
 
 ## 安装/加载（未打包）
 
 1. 将扩展安装到稳定的本地路径：
 
 ```bash
-openclaw browser extension install
+ClosedClaw browser extension install
 ```
 
 2. 打印已安装扩展的目录路径：
 
 ```bash
-openclaw browser extension path
+ClosedClaw browser extension path
 ```
 
 3. Chrome → `chrome://extensions`
@@ -53,26 +53,26 @@ openclaw browser extension path
 
 ## 更新（无需构建步骤）
 
-扩展作为静态文件包含在 OpenClaw 发行版（npm 包）中。没有单独的"构建"步骤。
+扩展作为静态文件包含在 ClosedClaw 发行版（npm 包）中。没有单独的"构建"步骤。
 
-升级 OpenClaw 后：
+升级 ClosedClaw 后：
 
-- 重新运行 `openclaw browser extension install` 以刷新 OpenClaw 状态目录下的已安装文件。
+- 重新运行 `ClosedClaw browser extension install` 以刷新 ClosedClaw 状态目录下的已安装文件。
 - Chrome → `chrome://extensions` → 点击扩展上的"重新加载"。
 
 ## 使用方法（无需额外配置）
 
-OpenClaw 内置了一个名为 `chrome` 的浏览器配置文件，指向默认端口上的扩展中继。
+ClosedClaw 内置了一个名为 `chrome` 的浏览器配置文件，指向默认端口上的扩展中继。
 
 使用方式：
 
-- CLI：`openclaw browser --browser-profile chrome tabs`
+- CLI：`ClosedClaw browser --browser-profile chrome tabs`
 - 智能体工具：`browser`，设置 `profile="chrome"`
 
 如果你需要不同的名称或不同的中继端口，可以创建自己的配置文件：
 
 ```bash
-openclaw browser create-profile \
+ClosedClaw browser create-profile \
   --name my-chrome \
   --driver extension \
   --cdp-url http://127.0.0.1:18792 \
@@ -81,7 +81,7 @@ openclaw browser create-profile \
 
 ## 附加/分离（工具栏按钮）
 
-- 打开你想让 OpenClaw 控制的标签页。
+- 打开你想让 ClosedClaw 控制的标签页。
 - 点击扩展图标。
   - 徽章显示 `ON` 表示已附加。
 - 再次点击即可分离。
@@ -94,7 +94,7 @@ openclaw browser create-profile \
 
 ## 徽章 + 常见错误
 
-- `ON`：已附加；OpenClaw 可以控制该标签页。
+- `ON`：已附加；ClosedClaw 可以控制该标签页。
 - `…`：正在连接本地中继。
 - `!`：中继不可达（最常见原因：浏览器中继服务器未在本机运行）。
 
@@ -145,7 +145,7 @@ Gateway网关会将浏览器操作代理到该节点；扩展 + 中继保持在�
 
 然后确保工具未被工具策略拒绝，并（如有需要）使用 `target="host"` 调用 `browser`。
 
-调试：`openclaw sandbox explain`
+调试：`ClosedClaw sandbox explain`
 
 ## 远程访问提示
 
@@ -154,9 +154,9 @@ Gateway网关会将浏览器操作代理到该节点；扩展 + 中继保持在�
 
 ## "extension path" 的工作原理
 
-`openclaw browser extension path` 打印包含扩展文件的**已安装**磁盘目录。
+`ClosedClaw browser extension path` 打印包含扩展文件的**已安装**磁盘目录。
 
-CLI 故意**不会**打印 `node_modules` 路径。请始终先运行 `openclaw browser extension install`，将扩展复制到 OpenClaw 状态目录下的稳定位置。
+CLI 故意**不会**打印 `node_modules` 路径。请始终先运行 `ClosedClaw browser extension install`，将扩展复制到 ClosedClaw 状态目录下的稳定位置。
 
 如果你移动或删除了安装目录，Chrome 会将扩展标记为损坏，直到你从有效路径重新加载。
 
@@ -168,7 +168,7 @@ CLI 故意**不会**打印 `node_modules` 路径。请始终先运行 `openclaw 
   - 在该标签页中点击/输入/导航
   - 读取页面内容
   - 访问该标签页已登录会话能访问的任何内容
-- **这不像**专用的 OpenClaw 托管配置文件那样是隔离的。
+- **这不像**专用的 ClosedClaw 托管配置文件那样是隔离的。
   - 如果你附加到日常使用的配置文件/标签页，就等于授予了对该账户状态的访问权限。
 
 建议：

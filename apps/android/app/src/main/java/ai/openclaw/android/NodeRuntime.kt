@@ -1,4 +1,4 @@
-package ai.openclaw.android
+package ai.ClosedClaw.android
 
 import android.Manifest
 import android.content.Context
@@ -7,35 +7,35 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.SystemClock
 import androidx.core.content.ContextCompat
-import ai.openclaw.android.chat.ChatController
-import ai.openclaw.android.chat.ChatMessage
-import ai.openclaw.android.chat.ChatPendingToolCall
-import ai.openclaw.android.chat.ChatSessionEntry
-import ai.openclaw.android.chat.OutgoingAttachment
-import ai.openclaw.android.gateway.DeviceAuthStore
-import ai.openclaw.android.gateway.DeviceIdentityStore
-import ai.openclaw.android.gateway.GatewayClientInfo
-import ai.openclaw.android.gateway.GatewayConnectOptions
-import ai.openclaw.android.gateway.GatewayDiscovery
-import ai.openclaw.android.gateway.GatewayEndpoint
-import ai.openclaw.android.gateway.GatewaySession
-import ai.openclaw.android.gateway.GatewayTlsParams
-import ai.openclaw.android.node.CameraCaptureManager
-import ai.openclaw.android.node.LocationCaptureManager
-import ai.openclaw.android.BuildConfig
-import ai.openclaw.android.node.CanvasController
-import ai.openclaw.android.node.ScreenRecordManager
-import ai.openclaw.android.node.SmsManager
-import ai.openclaw.android.protocol.OpenClawCapability
-import ai.openclaw.android.protocol.OpenClawCameraCommand
-import ai.openclaw.android.protocol.OpenClawCanvasA2UIAction
-import ai.openclaw.android.protocol.OpenClawCanvasA2UICommand
-import ai.openclaw.android.protocol.OpenClawCanvasCommand
-import ai.openclaw.android.protocol.OpenClawScreenCommand
-import ai.openclaw.android.protocol.OpenClawLocationCommand
-import ai.openclaw.android.protocol.OpenClawSmsCommand
-import ai.openclaw.android.voice.TalkModeManager
-import ai.openclaw.android.voice.VoiceWakeManager
+import ai.ClosedClaw.android.chat.ChatController
+import ai.ClosedClaw.android.chat.ChatMessage
+import ai.ClosedClaw.android.chat.ChatPendingToolCall
+import ai.ClosedClaw.android.chat.ChatSessionEntry
+import ai.ClosedClaw.android.chat.OutgoingAttachment
+import ai.ClosedClaw.android.gateway.DeviceAuthStore
+import ai.ClosedClaw.android.gateway.DeviceIdentityStore
+import ai.ClosedClaw.android.gateway.GatewayClientInfo
+import ai.ClosedClaw.android.gateway.GatewayConnectOptions
+import ai.ClosedClaw.android.gateway.GatewayDiscovery
+import ai.ClosedClaw.android.gateway.GatewayEndpoint
+import ai.ClosedClaw.android.gateway.GatewaySession
+import ai.ClosedClaw.android.gateway.GatewayTlsParams
+import ai.ClosedClaw.android.node.CameraCaptureManager
+import ai.ClosedClaw.android.node.LocationCaptureManager
+import ai.ClosedClaw.android.BuildConfig
+import ai.ClosedClaw.android.node.CanvasController
+import ai.ClosedClaw.android.node.ScreenRecordManager
+import ai.ClosedClaw.android.node.SmsManager
+import ai.ClosedClaw.android.protocol.ClosedClawCapability
+import ai.ClosedClaw.android.protocol.ClosedClawCameraCommand
+import ai.ClosedClaw.android.protocol.ClosedClawCanvasA2UIAction
+import ai.ClosedClaw.android.protocol.ClosedClawCanvasA2UICommand
+import ai.ClosedClaw.android.protocol.ClosedClawCanvasCommand
+import ai.ClosedClaw.android.protocol.ClosedClawScreenCommand
+import ai.ClosedClaw.android.protocol.ClosedClawLocationCommand
+import ai.ClosedClaw.android.protocol.ClosedClawSmsCommand
+import ai.ClosedClaw.android.voice.TalkModeManager
+import ai.ClosedClaw.android.voice.VoiceWakeManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -451,38 +451,38 @@ class NodeRuntime(context: Context) {
 
   private fun buildInvokeCommands(): List<String> =
     buildList {
-      add(OpenClawCanvasCommand.Present.rawValue)
-      add(OpenClawCanvasCommand.Hide.rawValue)
-      add(OpenClawCanvasCommand.Navigate.rawValue)
-      add(OpenClawCanvasCommand.Eval.rawValue)
-      add(OpenClawCanvasCommand.Snapshot.rawValue)
-      add(OpenClawCanvasA2UICommand.Push.rawValue)
-      add(OpenClawCanvasA2UICommand.PushJSONL.rawValue)
-      add(OpenClawCanvasA2UICommand.Reset.rawValue)
-      add(OpenClawScreenCommand.Record.rawValue)
+      add(ClosedClawCanvasCommand.Present.rawValue)
+      add(ClosedClawCanvasCommand.Hide.rawValue)
+      add(ClosedClawCanvasCommand.Navigate.rawValue)
+      add(ClosedClawCanvasCommand.Eval.rawValue)
+      add(ClosedClawCanvasCommand.Snapshot.rawValue)
+      add(ClosedClawCanvasA2UICommand.Push.rawValue)
+      add(ClosedClawCanvasA2UICommand.PushJSONL.rawValue)
+      add(ClosedClawCanvasA2UICommand.Reset.rawValue)
+      add(ClosedClawScreenCommand.Record.rawValue)
       if (cameraEnabled.value) {
-        add(OpenClawCameraCommand.Snap.rawValue)
-        add(OpenClawCameraCommand.Clip.rawValue)
+        add(ClosedClawCameraCommand.Snap.rawValue)
+        add(ClosedClawCameraCommand.Clip.rawValue)
       }
       if (locationMode.value != LocationMode.Off) {
-        add(OpenClawLocationCommand.Get.rawValue)
+        add(ClosedClawLocationCommand.Get.rawValue)
       }
       if (sms.canSendSms()) {
-        add(OpenClawSmsCommand.Send.rawValue)
+        add(ClosedClawSmsCommand.Send.rawValue)
       }
     }
 
   private fun buildCapabilities(): List<String> =
     buildList {
-      add(OpenClawCapability.Canvas.rawValue)
-      add(OpenClawCapability.Screen.rawValue)
-      if (cameraEnabled.value) add(OpenClawCapability.Camera.rawValue)
-      if (sms.canSendSms()) add(OpenClawCapability.Sms.rawValue)
+      add(ClosedClawCapability.Canvas.rawValue)
+      add(ClosedClawCapability.Screen.rawValue)
+      if (cameraEnabled.value) add(ClosedClawCapability.Camera.rawValue)
+      if (sms.canSendSms()) add(ClosedClawCapability.Sms.rawValue)
       if (voiceWakeMode.value != VoiceWakeMode.Off && hasRecordAudioPermission()) {
-        add(OpenClawCapability.VoiceWake.rawValue)
+        add(ClosedClawCapability.VoiceWake.rawValue)
       }
       if (locationMode.value != LocationMode.Off) {
-        add(OpenClawCapability.Location.rawValue)
+        add(ClosedClawCapability.Location.rawValue)
       }
     }
 
@@ -506,7 +506,7 @@ class NodeRuntime(context: Context) {
     val version = resolvedVersionName()
     val release = Build.VERSION.RELEASE?.trim().orEmpty()
     val releaseLabel = if (release.isEmpty()) "unknown" else release
-    return "OpenClawAndroid/$version (Android $releaseLabel; SDK ${Build.VERSION.SDK_INT})"
+    return "ClosedClawAndroid/$version (Android $releaseLabel; SDK ${Build.VERSION.SDK_INT})"
   }
 
   private fun buildClientInfo(clientId: String, clientMode: String): GatewayClientInfo {
@@ -529,7 +529,7 @@ class NodeRuntime(context: Context) {
       caps = buildCapabilities(),
       commands = buildInvokeCommands(),
       permissions = emptyMap(),
-      client = buildClientInfo(clientId = "openclaw-android", clientMode = "node"),
+      client = buildClientInfo(clientId = "ClosedClaw-android", clientMode = "node"),
       userAgent = buildUserAgent(),
     )
   }
@@ -541,7 +541,7 @@ class NodeRuntime(context: Context) {
       caps = emptyList(),
       commands = emptyList(),
       permissions = emptyMap(),
-      client = buildClientInfo(clientId = "openclaw-control-ui", clientMode = "ui"),
+      client = buildClientInfo(clientId = "ClosedClaw-control-ui", clientMode = "ui"),
       userAgent = buildUserAgent(),
     )
   }
@@ -665,7 +665,7 @@ class NodeRuntime(context: Context) {
       val actionId = (userActionObj["id"] as? JsonPrimitive)?.content?.trim().orEmpty().ifEmpty {
         java.util.UUID.randomUUID().toString()
       }
-      val name = OpenClawCanvasA2UIAction.extractActionName(userActionObj) ?: return@launch
+      val name = ClosedClawCanvasA2UIAction.extractActionName(userActionObj) ?: return@launch
 
       val surfaceId =
         (userActionObj["surfaceId"] as? JsonPrimitive)?.content?.trim().orEmpty().ifEmpty { "main" }
@@ -675,7 +675,7 @@ class NodeRuntime(context: Context) {
 
       val sessionKey = resolveMainSessionKey()
       val message =
-        OpenClawCanvasA2UIAction.formatAgentMessage(
+        ClosedClawCanvasA2UIAction.formatAgentMessage(
           actionName = name,
           sessionKey = sessionKey,
           surfaceId = surfaceId,
@@ -709,7 +709,7 @@ class NodeRuntime(context: Context) {
 
       try {
         canvas.eval(
-          OpenClawCanvasA2UIAction.jsDispatchA2UIActionStatus(
+          ClosedClawCanvasA2UIAction.jsDispatchA2UIActionStatus(
             actionId = actionId,
             ok = connected && error == null,
             error = error,
@@ -827,10 +827,10 @@ class NodeRuntime(context: Context) {
 
   private suspend fun handleInvoke(command: String, paramsJson: String?): GatewaySession.InvokeResult {
     if (
-      command.startsWith(OpenClawCanvasCommand.NamespacePrefix) ||
-        command.startsWith(OpenClawCanvasA2UICommand.NamespacePrefix) ||
-        command.startsWith(OpenClawCameraCommand.NamespacePrefix) ||
-        command.startsWith(OpenClawScreenCommand.NamespacePrefix)
+      command.startsWith(ClosedClawCanvasCommand.NamespacePrefix) ||
+        command.startsWith(ClosedClawCanvasA2UICommand.NamespacePrefix) ||
+        command.startsWith(ClosedClawCameraCommand.NamespacePrefix) ||
+        command.startsWith(ClosedClawScreenCommand.NamespacePrefix)
       ) {
       if (!isForeground.value) {
         return GatewaySession.InvokeResult.error(
@@ -839,13 +839,13 @@ class NodeRuntime(context: Context) {
         )
       }
     }
-    if (command.startsWith(OpenClawCameraCommand.NamespacePrefix) && !cameraEnabled.value) {
+    if (command.startsWith(ClosedClawCameraCommand.NamespacePrefix) && !cameraEnabled.value) {
       return GatewaySession.InvokeResult.error(
         code = "CAMERA_DISABLED",
         message = "CAMERA_DISABLED: enable Camera in Settings",
       )
     }
-    if (command.startsWith(OpenClawLocationCommand.NamespacePrefix) &&
+    if (command.startsWith(ClosedClawLocationCommand.NamespacePrefix) &&
       locationMode.value == LocationMode.Off
     ) {
       return GatewaySession.InvokeResult.error(
@@ -855,18 +855,18 @@ class NodeRuntime(context: Context) {
     }
 
     return when (command) {
-      OpenClawCanvasCommand.Present.rawValue -> {
+      ClosedClawCanvasCommand.Present.rawValue -> {
         val url = CanvasController.parseNavigateUrl(paramsJson)
         canvas.navigate(url)
         GatewaySession.InvokeResult.ok(null)
       }
-      OpenClawCanvasCommand.Hide.rawValue -> GatewaySession.InvokeResult.ok(null)
-      OpenClawCanvasCommand.Navigate.rawValue -> {
+      ClosedClawCanvasCommand.Hide.rawValue -> GatewaySession.InvokeResult.ok(null)
+      ClosedClawCanvasCommand.Navigate.rawValue -> {
         val url = CanvasController.parseNavigateUrl(paramsJson)
         canvas.navigate(url)
         GatewaySession.InvokeResult.ok(null)
       }
-      OpenClawCanvasCommand.Eval.rawValue -> {
+      ClosedClawCanvasCommand.Eval.rawValue -> {
         val js =
           CanvasController.parseEvalJs(paramsJson)
             ?: return GatewaySession.InvokeResult.error(
@@ -884,7 +884,7 @@ class NodeRuntime(context: Context) {
           }
         GatewaySession.InvokeResult.ok("""{"result":${result.toJsonString()}}""")
       }
-      OpenClawCanvasCommand.Snapshot.rawValue -> {
+      ClosedClawCanvasCommand.Snapshot.rawValue -> {
         val snapshotParams = CanvasController.parseSnapshotParams(paramsJson)
         val base64 =
           try {
@@ -901,7 +901,7 @@ class NodeRuntime(context: Context) {
           }
         GatewaySession.InvokeResult.ok("""{"format":"${snapshotParams.format.rawValue}","base64":"$base64"}""")
       }
-      OpenClawCanvasA2UICommand.Reset.rawValue -> {
+      ClosedClawCanvasA2UICommand.Reset.rawValue -> {
         val a2uiUrl = resolveA2uiHostUrl()
           ?: return GatewaySession.InvokeResult.error(
             code = "A2UI_HOST_NOT_CONFIGURED",
@@ -917,7 +917,7 @@ class NodeRuntime(context: Context) {
         val res = canvas.eval(a2uiResetJS)
         GatewaySession.InvokeResult.ok(res)
       }
-      OpenClawCanvasA2UICommand.Push.rawValue, OpenClawCanvasA2UICommand.PushJSONL.rawValue -> {
+      ClosedClawCanvasA2UICommand.Push.rawValue, ClosedClawCanvasA2UICommand.PushJSONL.rawValue -> {
         val messages =
           try {
             decodeA2uiMessages(command, paramsJson)
@@ -940,7 +940,7 @@ class NodeRuntime(context: Context) {
         val res = canvas.eval(js)
         GatewaySession.InvokeResult.ok(res)
       }
-      OpenClawCameraCommand.Snap.rawValue -> {
+      ClosedClawCameraCommand.Snap.rawValue -> {
         showCameraHud(message = "Taking photo…", kind = CameraHudKind.Photo)
         triggerCameraFlash()
         val res =
@@ -954,7 +954,7 @@ class NodeRuntime(context: Context) {
         showCameraHud(message = "Photo captured", kind = CameraHudKind.Success, autoHideMs = 1600)
         GatewaySession.InvokeResult.ok(res.payloadJson)
       }
-      OpenClawCameraCommand.Clip.rawValue -> {
+      ClosedClawCameraCommand.Clip.rawValue -> {
         val includeAudio = paramsJson?.contains("\"includeAudio\":true") != false
         if (includeAudio) externalAudioCaptureActive.value = true
         try {
@@ -973,7 +973,7 @@ class NodeRuntime(context: Context) {
           if (includeAudio) externalAudioCaptureActive.value = false
         }
       }
-      OpenClawLocationCommand.Get.rawValue -> {
+      ClosedClawLocationCommand.Get.rawValue -> {
         val mode = locationMode.value
         if (!isForeground.value && mode != LocationMode.Always) {
           return GatewaySession.InvokeResult.error(
@@ -1026,7 +1026,7 @@ class NodeRuntime(context: Context) {
           GatewaySession.InvokeResult.error(code = "LOCATION_UNAVAILABLE", message = message)
         }
       }
-      OpenClawScreenCommand.Record.rawValue -> {
+      ClosedClawScreenCommand.Record.rawValue -> {
         // Status pill mirrors screen recording state so it stays visible without overlay stacking.
         _screenRecordActive.value = true
         try {
@@ -1042,7 +1042,7 @@ class NodeRuntime(context: Context) {
           _screenRecordActive.value = false
         }
       }
-      OpenClawSmsCommand.Send.rawValue -> {
+      ClosedClawSmsCommand.Send.rawValue -> {
         val res = sms.send(paramsJson)
         if (res.ok) {
           GatewaySession.InvokeResult.ok(res.payloadJson)
@@ -1115,7 +1115,7 @@ class NodeRuntime(context: Context) {
     val raw = if (nodeRaw.isNotBlank()) nodeRaw else operatorRaw
     if (raw.isBlank()) return null
     val base = raw.trimEnd('/')
-    return "${base}/__openclaw__/a2ui/?platform=android"
+    return "${base}/__ClosedClaw__/a2ui/?platform=android"
   }
 
   private suspend fun ensureA2uiReady(a2uiUrl: String): Boolean {
@@ -1150,7 +1150,7 @@ class NodeRuntime(context: Context) {
     val jsonlField = (obj["jsonl"] as? JsonPrimitive)?.content?.trim().orEmpty()
     val hasMessagesArray = obj["messages"] is JsonArray
 
-    if (command == OpenClawCanvasA2UICommand.PushJSONL.rawValue || (!hasMessagesArray && jsonlField.isNotBlank())) {
+    if (command == ClosedClawCanvasA2UICommand.PushJSONL.rawValue || (!hasMessagesArray && jsonlField.isNotBlank())) {
       val jsonl = jsonlField
       if (jsonl.isBlank()) throw IllegalArgumentException("INVALID_REQUEST: jsonl required")
       val messages =
@@ -1207,7 +1207,7 @@ private const val a2uiReadyCheckJS: String =
   """
   (() => {
     try {
-      const host = globalThis.openclawA2UI;
+      const host = globalThis.ClosedClawA2UI;
       return !!host && typeof host.applyMessages === 'function';
     } catch (_) {
       return false;
@@ -1219,8 +1219,8 @@ private const val a2uiResetJS: String =
   """
   (() => {
     try {
-      const host = globalThis.openclawA2UI;
-      if (!host) return { ok: false, error: "missing openclawA2UI" };
+      const host = globalThis.ClosedClawA2UI;
+      if (!host) return { ok: false, error: "missing ClosedClawA2UI" };
       return host.reset();
     } catch (e) {
       return { ok: false, error: String(e?.message ?? e) };
@@ -1232,8 +1232,8 @@ private fun a2uiApplyMessagesJS(messagesJson: String): String {
   return """
     (() => {
       try {
-        const host = globalThis.openclawA2UI;
-        if (!host) return { ok: false, error: "missing openclawA2UI" };
+        const host = globalThis.ClosedClawA2UI;
+        if (!host) return { ok: false, error: "missing ClosedClawA2UI" };
         const messages = $messagesJson;
         return host.applyMessages(messages);
       } catch (e) {

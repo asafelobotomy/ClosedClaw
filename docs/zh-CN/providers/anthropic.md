@@ -1,8 +1,8 @@
 ---
 read_when:
-  - 你想在 OpenClaw 中使用 Anthropic 模型
+  - 你想在 ClosedClaw 中使用 Anthropic 模型
   - 你想使用 setup-token 而非 API 密钥
-summary: 在 OpenClaw 中通过 API 密钥或 setup-token 使用 Anthropic Claude
+summary: 在 ClosedClaw 中通过 API 密钥或 setup-token 使用 Anthropic Claude
 title: Anthropic
 x-i18n:
   generated_at: "2026-02-01T21:34:53Z"
@@ -16,7 +16,7 @@ x-i18n:
 # Anthropic (Claude)
 
 Anthropic 开发了 **Claude** 模型系列，并通过 API 提供访问。
-在 OpenClaw 中，你可以使用 API 密钥或 **setup-token** 进行认证。
+在 ClosedClaw 中，你可以使用 API 密钥或 **setup-token** 进行认证。
 
 ## 方案 A：Anthropic API 密钥
 
@@ -26,11 +26,11 @@ Anthropic 开发了 **Claude** 模型系列，并通过 API 提供访问。
 ### CLI 设置
 
 ```bash
-openclaw onboard
+ClosedClaw onboard
 # 选择：Anthropic API key
 
 # 或非交互式
-openclaw onboard --anthropic-api-key "$ANTHROPIC_API_KEY"
+ClosedClaw onboard --anthropic-api-key "$ANTHROPIC_API_KEY"
 ```
 
 ### 配置片段
@@ -44,7 +44,7 @@ openclaw onboard --anthropic-api-key "$ANTHROPIC_API_KEY"
 
 ## 提示缓存（Anthropic API）
 
-OpenClaw 支持 Anthropic 的提示缓存功能。此功能**仅限 API**；订阅认证不支持缓存设置。
+ClosedClaw 支持 Anthropic 的提示缓存功能。此功能**仅限 API**；订阅认证不支持缓存设置。
 
 ### 配置
 
@@ -72,7 +72,7 @@ OpenClaw 支持 Anthropic 的提示缓存功能。此功能**仅限 API**；订�
 
 ### 默认值
 
-使用 Anthropic API 密钥认证时，OpenClaw 会自动为所有 Anthropic 模型应用 `cacheRetention: "short"`（5 分钟缓存）。你可以在配置中显式设置 `cacheRetention` 来覆盖此默认值。
+使用 Anthropic API 密钥认证时，ClosedClaw 会自动为所有 Anthropic 模型应用 `cacheRetention: "short"`（5 分钟缓存）。你可以在配置中显式设置 `cacheRetention` 来覆盖此默认值。
 
 ### 旧版参数
 
@@ -83,7 +83,7 @@ OpenClaw 支持 Anthropic 的提示缓存功能。此功能**仅限 API**；订�
 
 我们建议迁移到新的 `cacheRetention` 参数。
 
-OpenClaw 在 Anthropic API 请求中包含了 `extended-cache-ttl-2025-04-11` beta 标志；如果你覆盖了提供商请求头，请保留此标志（参见 [/gateway/configuration](/gateway/configuration)）。
+ClosedClaw 在 Anthropic API 请求中包含了 `extended-cache-ttl-2025-04-11` beta 标志；如果你覆盖了提供商请求头，请保留此标志（参见 [/gateway/configuration](/gateway/configuration)）。
 
 ## 方案 B：Claude setup-token
 
@@ -97,23 +97,23 @@ Setup-token 由 **Claude Code CLI** 创建，而非 Anthropic Console。你可�
 claude setup-token
 ```
 
-将令牌粘贴到 OpenClaw 中（向导中选择：**Anthropic token (paste setup-token)**），或在 Gateway网关主机上运行：
+将令牌粘贴到 ClosedClaw 中（向导中选择：**Anthropic token (paste setup-token)**），或在 Gateway网关主机上运行：
 
 ```bash
-openclaw models auth setup-token --provider anthropic
+ClosedClaw models auth setup-token --provider anthropic
 ```
 
 如果你在其他机器上生成了令牌，请粘贴：
 
 ```bash
-openclaw models auth paste-token --provider anthropic
+ClosedClaw models auth paste-token --provider anthropic
 ```
 
 ### CLI 设置
 
 ```bash
 # 在新手引导过程中粘贴 setup-token
-openclaw onboard --auth-choice setup-token
+ClosedClaw onboard --auth-choice setup-token
 ```
 
 ### 配置片段
@@ -126,7 +126,7 @@ openclaw onboard --auth-choice setup-token
 
 ## 注意事项
 
-- 使用 `claude setup-token` 生成令牌并粘贴，或在 Gateway网关主机上运行 `openclaw models auth setup-token`。
+- 使用 `claude setup-token` 生成令牌并粘贴，或在 Gateway网关主机上运行 `ClosedClaw models auth setup-token`。
 - 如果在 Claude 订阅上看到 "OAuth token refresh failed …" 错误，请使用 setup-token 重新认证。参见 [/gateway/troubleshooting#oauth-token-refresh-failed-anthropic-claude-subscription](/gateway/troubleshooting#oauth-token-refresh-failed-anthropic-claude-subscription)。
 - 认证详情和重用规则请参阅 [/concepts/oauth](/concepts/oauth)。
 
@@ -137,22 +137,22 @@ openclaw onboard --auth-choice setup-token
 - Claude 订阅认证可能会过期或被撤销。重新运行 `claude setup-token`
   并将其粘贴到 **Gateway网关主机**上。
 - 如果 Claude CLI 登录在另一台机器上，请在 Gateway网关主机上使用
-  `openclaw models auth paste-token --provider anthropic`。
+  `ClosedClaw models auth paste-token --provider anthropic`。
 
 **No API key found for provider "anthropic"**
 
 - 认证是**按智能体**设置的。新智能体不会继承主智能体的密钥。
 - 为该智能体重新运行新手引导，或在 Gateway网关主机上粘贴 setup-token / API 密钥，
-  然后使用 `openclaw models status` 验证。
+  然后使用 `ClosedClaw models status` 验证。
 
 **No credentials found for profile `anthropic:default`**
 
-- 运行 `openclaw models status` 查看当前活跃的认证配置文件。
+- 运行 `ClosedClaw models status` 查看当前活跃的认证配置文件。
 - 重新运行新手引导，或为该配置文件粘贴 setup-token / API 密钥。
 
 **No available auth profile (all in cooldown/unavailable)**
 
-- 检查 `openclaw models status --json` 中的 `auth.unusableProfiles`。
+- 检查 `ClosedClaw models status --json` 中的 `auth.unusableProfiles`。
 - 添加另一个 Anthropic 配置文件或等待冷却期结束。
 
 更多信息：[/gateway/troubleshooting](/gateway/troubleshooting) 和 [/help/faq](/help/faq)。

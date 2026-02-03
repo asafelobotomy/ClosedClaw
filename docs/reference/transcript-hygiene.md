@@ -91,7 +91,7 @@ Implementation:
 
 ## Historical behavior (pre-2026.1.22)
 
-Before the 2026.1.22 release, OpenClaw applied multiple layers of transcript hygiene:
+Before the 2026.1.22 release, ClosedClaw applied multiple layers of transcript hygiene:
 
 - A **transcript-sanitize extension** ran on every context build and could:
   - Repair tool use/result pairing.

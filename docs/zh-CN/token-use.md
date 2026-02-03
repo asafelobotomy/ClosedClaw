@@ -2,7 +2,7 @@
 read_when:
   - 解释 token 使用量、费用或上下文窗口时
   - 调试上下文增长或压缩行为时
-summary: OpenClaw 如何构建提示上下文以及报告 token 使用量和费用
+summary: ClosedClaw 如何构建提示上下文以及报告 token 使用量和费用
 title: Token 使用与费用
 x-i18n:
   generated_at: "2026-02-01T21:39:26Z"
@@ -15,11 +15,11 @@ x-i18n:
 
 # Token 使用与费用
 
-OpenClaw 跟踪的是 **token**，而非字符。Token 因模型而异，但大多数 OpenAI 风格的模型对英文文本平均约 4 个字符对应 1 个 token。
+ClosedClaw 跟踪的是 **token**，而非字符。Token 因模型而异，但大多数 OpenAI 风格的模型对英文文本平均约 4 个字符对应 1 个 token。
 
 ## 系统提示的构建方式
 
-OpenClaw 在每次运行时组装自己的系统提示。它包括：
+ClosedClaw 在每次运行时组装自己的系统提示。它包括：
 
 - 工具列表 + 简短描述
 - Skills 列表（仅元数据；指令通过 `read` 按需加载）
@@ -52,12 +52,12 @@ OpenClaw 在每次运行时组装自己的系统提示。它包括：
 - `/usage off|tokens|full` → 在每条回复后附加**逐条响应使用量页脚**。
   - 按会话持久化（存储为 `responseUsage`）。
   - OAuth 认证下**隐藏费用**（仅显示 token 数）。
-- `/usage cost` → 显示来自 OpenClaw 会话日志的本地费用摘要。
+- `/usage cost` → 显示来自 ClosedClaw 会话日志的本地费用摘要。
 
 其他界面：
 
 - **TUI/Web TUI：** 支持 `/status` + `/usage`。
-- **CLI：** `openclaw status --usage` 和 `openclaw channels list` 显示提供商配额窗口（非逐条响应费用）。
+- **CLI：** `ClosedClaw status --usage` 和 `ClosedClaw channels list` 显示提供商配额窗口（非逐条响应费用）。
 
 ## 费用估算（何时显示）
 
@@ -67,11 +67,11 @@ OpenClaw 在每次运行时组装自己的系统提示。它包括：
 models.providers.<provider>.models[].cost
 ```
 
-这些是 `input`、`output`、`cacheRead` 和 `cacheWrite` 的**每百万 token 美元价格**。如果缺少定价信息，OpenClaw 仅显示 token 数。OAuth token 永远不显示美元费用。
+这些是 `input`、`output`、`cacheRead` 和 `cacheWrite` 的**每百万 token 美元价格**。如果缺少定价信息，ClosedClaw 仅显示 token 数。OAuth token 永远不显示美元费用。
 
 ## 缓存 TTL 与裁剪影响
 
-提供商的提示缓存仅在缓存 TTL 窗口内有效。OpenClaw 可以选择性地运行**缓存 TTL 裁剪**：在缓存 TTL 过期后裁剪会话，然后重置缓存窗口，使后续请求可以复用新缓存的上下文，而不是重新缓存完整历史。这可以在会话空闲超过 TTL 后降低缓存写入费用。
+提供商的提示缓存仅在缓存 TTL 窗口内有效。ClosedClaw 可以选择性地运行**缓存 TTL 裁剪**：在缓存 TTL 过期后裁剪会话，然后重置缓存窗口，使后续请求可以复用新缓存的上下文，而不是重新缓存完整历史。这可以在会话空闲超过 TTL 后降低缓存写入费用。
 
 在 [Gateway网关配置](/gateway/configuration)中进行配置，并在[会话裁剪](/concepts/session-pruning)中查看行为详情。
 

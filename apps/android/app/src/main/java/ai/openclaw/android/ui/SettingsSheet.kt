@@ -1,4 +1,4 @@
-package ai.openclaw.android.ui
+package ai.ClosedClaw.android.ui
 
 import android.Manifest
 import android.content.Context
@@ -58,12 +58,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import ai.openclaw.android.BuildConfig
-import ai.openclaw.android.LocationMode
-import ai.openclaw.android.MainViewModel
-import ai.openclaw.android.NodeForegroundService
-import ai.openclaw.android.VoiceWakeMode
-import ai.openclaw.android.WakeWords
+import ai.ClosedClaw.android.BuildConfig
+import ai.ClosedClaw.android.LocationMode
+import ai.ClosedClaw.android.MainViewModel
+import ai.ClosedClaw.android.NodeForegroundService
+import ai.ClosedClaw.android.VoiceWakeMode
+import ai.ClosedClaw.android.WakeWords
 
 @Composable
 fun SettingsSheet(viewModel: MainViewModel) {
@@ -457,7 +457,7 @@ fun SettingsSheet(viewModel: MainViewModel) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
           ListItem(
             headlineContent = { Text("Foreground Only") },
-            supportingContent = { Text("Listens only while OpenClaw is open.") },
+            supportingContent = { Text("Listens only while ClosedClaw is open.") },
             trailingContent = {
               RadioButton(
                 selected = voiceWakeMode == VoiceWakeMode.Foreground,
@@ -603,7 +603,7 @@ fun SettingsSheet(viewModel: MainViewModel) {
         )
         ListItem(
           headlineContent = { Text("While Using") },
-          supportingContent = { Text("Only while OpenClaw is open.") },
+          supportingContent = { Text("Only while ClosedClaw is open.") },
           trailingContent = {
             RadioButton(
               selected = locationMode == LocationMode.WhileUsing,
@@ -650,7 +650,7 @@ fun SettingsSheet(viewModel: MainViewModel) {
     item {
       ListItem(
         headlineContent = { Text("Prevent Sleep") },
-        supportingContent = { Text("Keeps the screen awake while OpenClaw is open.") },
+        supportingContent = { Text("Keeps the screen awake while ClosedClaw is open.") },
         trailingContent = { Switch(checked = preventSleep, onCheckedChange = viewModel::setPreventSleep) },
       )
     }

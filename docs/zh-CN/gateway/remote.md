@@ -43,7 +43,7 @@ x-i18n:
 
 笔记本**不**运行智能体。它通过远程连接：
 
-- 使用 macOS 应用的**通过 SSH 远程连接**模式（设置 → 通用 → "OpenClaw 运行位置"）。
+- 使用 macOS 应用的**通过 SSH 远程连接**模式（设置 → 通用 → "ClosedClaw 运行位置"）。
 - 应用会打开并管理隧道，因此 WebChat + 健康检查"开箱即用"。
 
 操作指南：[macOS 远程访问](/platforms/mac/remote)。
@@ -83,10 +83,10 @@ ssh -N -L 18789:127.0.0.1:18789 user@host
 
 隧道建立后：
 
-- `openclaw health` 和 `openclaw status --deep` 现在通过 `ws://127.0.0.1:18789` 访问远程 Gateway网关。
-- `openclaw gateway {status,health,send,agent,call}` 也可以在需要时通过 `--url` 指向转发的 URL。
+- `ClosedClaw health` 和 `ClosedClaw status --deep` 现在通过 `ws://127.0.0.1:18789` 访问远程 Gateway网关。
+- `ClosedClaw gateway {status,health,send,agent,call}` 也可以在需要时通过 `--url` 指向转发的 URL。
 
-注意：将 `18789` 替换为你配置的 `gateway.port`（或 `--port`/`OPENCLAW_GATEWAY_PORT`）。
+注意：将 `18789` 替换为你配置的 `gateway.port`（或 `--port`/`ClosedClaw_GATEWAY_PORT`）。
 
 ## CLI 远程默认值
 

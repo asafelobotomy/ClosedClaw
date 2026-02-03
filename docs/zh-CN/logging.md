@@ -16,7 +16,7 @@ x-i18n:
 
 # 日志
 
-OpenClaw 在两个地方记录日志：
+ClosedClaw 在两个地方记录日志：
 
 - **文件日志**（JSON 行格式），由 Gateway网关写入。
 - **控制台输出**，显示在终端和控制界面中。
@@ -27,16 +27,16 @@ OpenClaw 在两个地方记录日志：
 
 默认情况下，Gateway网关会在以下路径写入滚动日志文件：
 
-`/tmp/openclaw/openclaw-YYYY-MM-DD.log`
+`/tmp/ClosedClaw/ClosedClaw-YYYY-MM-DD.log`
 
 日期使用 Gateway网关主机的本地时区。
 
-你可以在 `~/.openclaw/openclaw.json` 中覆盖此设置：
+你可以在 `~/.ClosedClaw/ClosedClaw.json` 中覆盖此设置：
 
 ```json
 {
   "logging": {
-    "file": "/path/to/openclaw.log"
+    "file": "/path/to/ClosedClaw.log"
   }
 }
 ```
@@ -48,7 +48,7 @@ OpenClaw 在两个地方记录日志：
 使用 CLI 通过 RPC 追踪 Gateway网关日志文件：
 
 ```bash
-openclaw logs --follow
+ClosedClaw logs --follow
 ```
 
 输出模式：
@@ -69,7 +69,7 @@ openclaw logs --follow
 如果 Gateway网关不可达，CLI 会打印简短提示，建议运行：
 
 ```bash
-openclaw doctor
+ClosedClaw doctor
 ```
 
 ### 控制界面（Web）
@@ -82,7 +82,7 @@ openclaw doctor
 要过滤渠道活动（WhatsApp/Telegram 等），请使用：
 
 ```bash
-openclaw channels logs --channel whatsapp
+ClosedClaw channels logs --channel whatsapp
 ```
 
 ## 日志格式
@@ -103,13 +103,13 @@ openclaw channels logs --channel whatsapp
 
 ## 配置日志
 
-所有日志配置位于 `~/.openclaw/openclaw.json` 的 `logging` 下。
+所有日志配置位于 `~/.ClosedClaw/ClosedClaw.json` 的 `logging` 下。
 
 ```json
 {
   "logging": {
     "level": "info",
-    "file": "/tmp/openclaw/openclaw-YYYY-MM-DD.log",
+    "file": "/tmp/ClosedClaw/ClosedClaw-YYYY-MM-DD.log",
     "consoleLevel": "info",
     "consoleStyle": "pretty",
     "redactSensitive": "tools",
@@ -152,7 +152,7 @@ openclaw channels logs --channel whatsapp
 
 - **OpenTelemetry (OTel)**：用于追踪、指标和日志的数据模型 + SDK。
 - **OTLP**：用于将 OTel 数据导出到收集器/后端的传输协议。
-- OpenClaw 目前通过 **OTLP/HTTP (protobuf)** 导出。
+- ClosedClaw 目前通过 **OTLP/HTTP (protobuf)** 导出。
 
 ### 导出的信号
 
@@ -210,7 +210,7 @@ openclaw channels logs --channel whatsapp
 环境变量覆盖（一次性）：
 
 ```
-OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload
+ClosedClaw_DIAGNOSTICS=telegram.http,telegram.payload
 ```
 
 注意事项：
@@ -239,7 +239,7 @@ OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload
       "enabled": true,
       "endpoint": "http://otel-collector:4318",
       "protocol": "http/protobuf",
-      "serviceName": "openclaw-gateway",
+      "serviceName": "ClosedClaw-gateway",
       "traces": true,
       "metrics": true,
       "logs": true,
@@ -252,7 +252,7 @@ OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload
 
 注意事项：
 
-- 你也可以使用 `openclaw plugins enable diagnostics-otel` 来启用插件。
+- 你也可以使用 `ClosedClaw plugins enable diagnostics-otel` 来启用插件。
 - `protocol` 目前仅支持 `http/protobuf`。`grpc` 会被忽略。
 - 指标包括令牌使用、成本、上下文大小、运行持续时间，以及消息流计数器/直方图（webhook、队列、会话状态、队列深度/等待时间）。
 - 追踪/指标可以通过 `traces` / `metrics` 切换（默认：开启）。启用时，追踪包括模型使用 span 以及 webhook/消息处理 span。
@@ -263,45 +263,45 @@ OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload
 
 模型使用：
 
-- `openclaw.tokens`（计数器，属性：`openclaw.token`、`openclaw.channel`、`openclaw.provider`、`openclaw.model`）
-- `openclaw.cost.usd`（计数器，属性：`openclaw.channel`、`openclaw.provider`、`openclaw.model`）
-- `openclaw.run.duration_ms`（直方图，属性：`openclaw.channel`、`openclaw.provider`、`openclaw.model`）
-- `openclaw.context.tokens`（直方图，属性：`openclaw.context`、`openclaw.channel`、`openclaw.provider`、`openclaw.model`）
+- `ClosedClaw.tokens`（计数器，属性：`ClosedClaw.token`、`ClosedClaw.channel`、`ClosedClaw.provider`、`ClosedClaw.model`）
+- `ClosedClaw.cost.usd`（计数器，属性：`ClosedClaw.channel`、`ClosedClaw.provider`、`ClosedClaw.model`）
+- `ClosedClaw.run.duration_ms`（直方图，属性：`ClosedClaw.channel`、`ClosedClaw.provider`、`ClosedClaw.model`）
+- `ClosedClaw.context.tokens`（直方图，属性：`ClosedClaw.context`、`ClosedClaw.channel`、`ClosedClaw.provider`、`ClosedClaw.model`）
 
 消息流：
 
-- `openclaw.webhook.received`（计数器，属性：`openclaw.channel`、`openclaw.webhook`）
-- `openclaw.webhook.error`（计数器，属性：`openclaw.channel`、`openclaw.webhook`）
-- `openclaw.webhook.duration_ms`（直方图，属性：`openclaw.channel`、`openclaw.webhook`）
-- `openclaw.message.queued`（计数器，属性：`openclaw.channel`、`openclaw.source`）
-- `openclaw.message.processed`（计数器，属性：`openclaw.channel`、`openclaw.outcome`）
-- `openclaw.message.duration_ms`（直方图，属性：`openclaw.channel`、`openclaw.outcome`）
+- `ClosedClaw.webhook.received`（计数器，属性：`ClosedClaw.channel`、`ClosedClaw.webhook`）
+- `ClosedClaw.webhook.error`（计数器，属性：`ClosedClaw.channel`、`ClosedClaw.webhook`）
+- `ClosedClaw.webhook.duration_ms`（直方图，属性：`ClosedClaw.channel`、`ClosedClaw.webhook`）
+- `ClosedClaw.message.queued`（计数器，属性：`ClosedClaw.channel`、`ClosedClaw.source`）
+- `ClosedClaw.message.processed`（计数器，属性：`ClosedClaw.channel`、`ClosedClaw.outcome`）
+- `ClosedClaw.message.duration_ms`（直方图，属性：`ClosedClaw.channel`、`ClosedClaw.outcome`）
 
 队列 + 会话：
 
-- `openclaw.queue.lane.enqueue`（计数器，属性：`openclaw.lane`）
-- `openclaw.queue.lane.dequeue`（计数器，属性：`openclaw.lane`）
-- `openclaw.queue.depth`（直方图，属性：`openclaw.lane` 或 `openclaw.channel=heartbeat`）
-- `openclaw.queue.wait_ms`（直方图，属性：`openclaw.lane`）
-- `openclaw.session.state`（计数器，属性：`openclaw.state`、`openclaw.reason`）
-- `openclaw.session.stuck`（计数器，属性：`openclaw.state`）
-- `openclaw.session.stuck_age_ms`（直方图，属性：`openclaw.state`）
-- `openclaw.run.attempt`（计数器，属性：`openclaw.attempt`）
+- `ClosedClaw.queue.lane.enqueue`（计数器，属性：`ClosedClaw.lane`）
+- `ClosedClaw.queue.lane.dequeue`（计数器，属性：`ClosedClaw.lane`）
+- `ClosedClaw.queue.depth`（直方图，属性：`ClosedClaw.lane` 或 `ClosedClaw.channel=heartbeat`）
+- `ClosedClaw.queue.wait_ms`（直方图，属性：`ClosedClaw.lane`）
+- `ClosedClaw.session.state`（计数器，属性：`ClosedClaw.state`、`ClosedClaw.reason`）
+- `ClosedClaw.session.stuck`（计数器，属性：`ClosedClaw.state`）
+- `ClosedClaw.session.stuck_age_ms`（直方图，属性：`ClosedClaw.state`）
+- `ClosedClaw.run.attempt`（计数器，属性：`ClosedClaw.attempt`）
 
 ### 导出的 span（名称 + 关键属性）
 
-- `openclaw.model.usage`
-  - `openclaw.channel`、`openclaw.provider`、`openclaw.model`
-  - `openclaw.sessionKey`、`openclaw.sessionId`
-  - `openclaw.tokens.*`（input/output/cache_read/cache_write/total）
-- `openclaw.webhook.processed`
-  - `openclaw.channel`、`openclaw.webhook`、`openclaw.chatId`
-- `openclaw.webhook.error`
-  - `openclaw.channel`、`openclaw.webhook`、`openclaw.chatId`、`openclaw.error`
-- `openclaw.message.processed`
-  - `openclaw.channel`、`openclaw.outcome`、`openclaw.chatId`、`openclaw.messageId`、`openclaw.sessionKey`、`openclaw.sessionId`、`openclaw.reason`
-- `openclaw.session.stuck`
-  - `openclaw.state`、`openclaw.ageMs`、`openclaw.queueDepth`、`openclaw.sessionKey`、`openclaw.sessionId`
+- `ClosedClaw.model.usage`
+  - `ClosedClaw.channel`、`ClosedClaw.provider`、`ClosedClaw.model`
+  - `ClosedClaw.sessionKey`、`ClosedClaw.sessionId`
+  - `ClosedClaw.tokens.*`（input/output/cache_read/cache_write/total）
+- `ClosedClaw.webhook.processed`
+  - `ClosedClaw.channel`、`ClosedClaw.webhook`、`ClosedClaw.chatId`
+- `ClosedClaw.webhook.error`
+  - `ClosedClaw.channel`、`ClosedClaw.webhook`、`ClosedClaw.chatId`、`ClosedClaw.error`
+- `ClosedClaw.message.processed`
+  - `ClosedClaw.channel`、`ClosedClaw.outcome`、`ClosedClaw.chatId`、`ClosedClaw.messageId`、`ClosedClaw.sessionKey`、`ClosedClaw.sessionId`、`ClosedClaw.reason`
+- `ClosedClaw.session.stuck`
+  - `ClosedClaw.state`、`ClosedClaw.ageMs`、`ClosedClaw.queueDepth`、`ClosedClaw.sessionKey`、`ClosedClaw.sessionId`
 
 ### 采样 + 刷新
 
@@ -323,6 +323,6 @@ OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload
 
 ## 故障排除提示
 
-- **Gateway网关不可达？** 先运行 `openclaw doctor`。
+- **Gateway网关不可达？** 先运行 `ClosedClaw doctor`。
 - **日志为空？** 检查 Gateway网关是否正在运行并写入 `logging.file` 中指定的文件路径。
 - **需要更多细节？** 将 `logging.level` 设置为 `debug` 或 `trace` 并重试。

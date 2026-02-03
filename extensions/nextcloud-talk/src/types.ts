@@ -3,7 +3,7 @@ import type {
   DmConfig,
   DmPolicy,
   GroupPolicy,
-} from "openclaw/plugin-sdk";
+} from "ClosedClaw/plugin-sdk";
 
 export type NextcloudTalkRoomConfig = {
   requireMention?: boolean;

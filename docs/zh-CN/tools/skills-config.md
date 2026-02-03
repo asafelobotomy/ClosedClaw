@@ -15,7 +15,7 @@ x-i18n:
 
 # Skills配置
 
-所有 Skills 相关配置位于 `~/.openclaw/openclaw.json` 的 `skills` 下。
+所有 Skills 相关配置位于 `~/.ClosedClaw/ClosedClaw.json` 的 `skills` 下。
 
 ```json5
 {
@@ -63,7 +63,7 @@ x-i18n:
 
 ## 说明
 
-- `entries` 下的键默认映射到 Skills 名称。如果 Skills 定义了 `metadata.openclaw.skillKey`，请使用该键。
+- `entries` 下的键默认映射到 Skills 名称。如果 Skills 定义了 `metadata.ClosedClaw.skillKey`，请使用该键。
 - 启用监视器时，Skills 的更改会在下一个智能体回合时生效。
 
 ### 沙箱隔离 Skills 与环境变量

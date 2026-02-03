@@ -2,7 +2,7 @@
 read_when:
   - 你想选择一个模型提供商
   - 你需要快速了解支持的 LLM 后端
-summary: OpenClaw 支持的模型提供商（LLM）
+summary: ClosedClaw 支持的模型提供商（LLM）
 title: 模型提供商
 x-i18n:
   generated_at: "2026-02-01T21:35:01Z"
@@ -15,7 +15,7 @@ x-i18n:
 
 # 模型提供商
 
-OpenClaw 可以使用多种 LLM 提供商。选择一个提供商，完成认证，然后将默认模型设置为 `provider/model`。
+ClosedClaw 可以使用多种 LLM 提供商。选择一个提供商，完成认证，然后将默认模型设置为 `provider/model`。
 
 在找聊天渠道文档（WhatsApp/Telegram/Discord/Slack/Mattermost（插件）/等）？请参阅[渠道](/channels)。
 
@@ -30,7 +30,7 @@ Venice 是我们推荐的 Venice AI 配置方案，适合注重隐私的推理�
 
 ## 快速开始
 
-1. 向提供商进行认证（通常通过 `openclaw onboard`）。
+1. 向提供商进行认证（通常通过 `ClosedClaw onboard`）。
 2. 设置默认模型：
 
 ```json5

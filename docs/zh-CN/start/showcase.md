@@ -1,6 +1,6 @@
 ---
-description: Real-world OpenClaw projects from the community
-summary: 由 OpenClaw 驱动的社区项目和集成展示
+description: Real-world ClosedClaw projects from the community
+summary: 由 ClosedClaw 驱动的社区项目和集成展示
 title: 项目展示
 x-i18n:
   generated_at: "2026-02-01T21:40:20Z"
@@ -13,13 +13,13 @@ x-i18n:
 
 # 项目展示
 
-来自社区的真实项目。看看大家正在用 OpenClaw 构建什么。
+来自社区的真实项目。看看大家正在用 ClosedClaw 构建什么。
 
 <Info>
-**想要展示你的项目？** 在 [Discord 的 #showcase 频道](https://discord.gg/clawd) 分享你的项目，或在 [X 上 @openclaw](https://x.com/openclaw)。
+**想要展示你的项目？** 在 [Discord 的 #showcase 频道](https://discord.gg/clawd) 分享你的项目，或在 [X 上 @ClosedClaw](https://x.com/ClosedClaw)。
 </Info>
 
-## 🎥 OpenClaw 实战演示
+## 🎥 ClosedClaw 实战演示
 
 VelvetShark 的完整设置教程（28 分钟）。
 
@@ -34,7 +34,7 @@ VelvetShark 的完整设置教程（28 分钟）。
 >
   <iframe
     src="https://www.youtube-nocookie.com/embed/SaWSPZoPX34"
-    title="OpenClaw: The self-hosted AI that Siri should have been (Full setup)"
+    title="ClosedClaw: The self-hosted AI that Siri should have been (Full setup)"
     style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
     frameBorder="0"
     loading="lazy"
@@ -56,7 +56,7 @@ VelvetShark 的完整设置教程（28 分钟）。
 >
   <iframe
     src="https://www.youtube-nocookie.com/embed/mMSKQvlmFuQ"
-    title="OpenClaw showcase video"
+    title="ClosedClaw showcase video"
     style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
     frameBorder="0"
     loading="lazy"
@@ -78,7 +78,7 @@ VelvetShark 的完整设置教程（28 分钟）。
 >
   <iframe
     src="https://www.youtube-nocookie.com/embed/5kkIJNUGFho"
-    title="OpenClaw community showcase"
+    title="ClosedClaw community showcase"
     style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
     frameBorder="0"
     loading="lazy"
@@ -96,17 +96,17 @@ VelvetShark 的完整设置教程（28 分钟）。
 <Card title="PR 审查 → Telegram 反馈" icon="code-pull-request" href="https://x.com/i/status/2010878524543131691">
   **@bangnokia** • `review` `github` `telegram`
 
-OpenCode 完成修改 → 提交 PR → OpenClaw 审查差异并在 Telegram 中回复"小建议"以及明确的合并意见（包括需要优先应用的关键修复）。
+OpenCode 完成修改 → 提交 PR → ClosedClaw 审查差异并在 Telegram 中回复"小建议"以及明确的合并意见（包括需要优先应用的关键修复）。
 
-  <img src="/assets/showcase/pr-review-telegram.jpg" alt="OpenClaw PR 审查反馈通过 Telegram 发送" />
+  <img src="/assets/showcase/pr-review-telegram.jpg" alt="ClosedClaw PR 审查反馈通过 Telegram 发送" />
 </Card>
 
 <Card title="几分钟内创建酒窖 Skills" icon="wine-glass" href="https://x.com/i/status/2010916352454791216">
   **@prades_maxime** • `skills` `local` `csv`
 
-让"Robby"（@openclaw）创建一个本地酒窖 Skills。它请求一个 CSV 导出样本和存储位置，然后快速构建并测试 Skills（示例中有 962 瓶酒）。
+让"Robby"（@ClosedClaw）创建一个本地酒窖 Skills。它请求一个 CSV 导出样本和存储位置，然后快速构建并测试 Skills（示例中有 962 瓶酒）。
 
-  <img src="/assets/showcase/wine-cellar-skill.jpg" alt="OpenClaw 从 CSV 构建本地酒窖 Skills" />
+  <img src="/assets/showcase/wine-cellar-skill.jpg" alt="ClosedClaw 从 CSV 构建本地酒窖 Skills" />
 </Card>
 
 <Card title="Tesco 购物自动化" icon="cart-shopping" href="https://x.com/i/status/2009724862470689131">
@@ -128,7 +128,7 @@ OpenCode 完成修改 → 提交 PR → OpenClaw 审查差异并在 Telegram 中
 <Card title="Agents UI" icon="window-maximize" href="https://releaseflow.net/kitze/agents-ui">
   **@kitze** • `ui` `skills` `sync`
 
-桌面应用，用于跨 Agents、Claude、Codex 和 OpenClaw 管理 Skills/命令。
+桌面应用，用于跨 Agents、Claude、Codex 和 ClosedClaw 管理 Skills/命令。
 
   <img src="/assets/showcase/agents-ui.jpg" alt="Agents UI 应用" />
 </Card>
@@ -174,7 +174,7 @@ OpenCode 完成修改 → 提交 PR → OpenClaw 审查差异并在 Telegram 中
 <Card title="R2 上传（发送我的文件）" icon="cloud-arrow-up" href="https://clawhub.com/skills/r2-upload">
   **@julianengel** • `files` `r2` `presigned-urls`
 
-上传到 Cloudflare R2/S3 并生成安全的预签名下载链接。非常适合远程 OpenClaw 实例。
+上传到 Cloudflare R2/S3 并生成安全的预签名下载链接。非常适合远程 ClosedClaw 实例。
 </Card>
 
 <Card title="通过 Telegram 开发 iOS 应用" icon="mobile" href="#">
@@ -201,7 +201,7 @@ OpenCode 完成修改 → 提交 PR → OpenClaw 审查差异并在 Telegram 中
 <Card title="Linear CLI" icon="terminal" href="https://github.com/Finesssee/linear-cli">
   **@NessZerra** • `devtools` `linear` `cli` `issues`
 
-集成智能体工作流（Claude Code、OpenClaw）的 Linear CLI。从终端管理 issue、项目和工作流。首个外部 PR 已合并！
+集成智能体工作流（Claude Code、ClosedClaw）的 Linear CLI。从终端管理 issue、项目和工作流。首个外部 PR 已合并！
 </Card>
 
 <Card title="Beeper CLI" icon="message" href="https://github.com/blqke/beepcli">
@@ -219,23 +219,23 @@ OpenCode 完成修改 → 提交 PR → OpenClaw 审查差异并在 Telegram 中
 <Card title="Winix 空气净化器控制" icon="wind" href="https://x.com/antonplex/status/2010518442471006253">
   **@antonplex** • `automation` `hardware` `air-quality`
 
-Claude Code 发现并确认了净化器控制方式，然后 OpenClaw 接管并管理室内空气质量。
+Claude Code 发现并确认了净化器控制方式，然后 ClosedClaw 接管并管理室内空气质量。
 
-  <img src="/assets/showcase/winix-air-purifier.jpg" alt="通过 OpenClaw 控制 Winix 空气净化器" />
+  <img src="/assets/showcase/winix-air-purifier.jpg" alt="通过 ClosedClaw 控制 Winix 空气净化器" />
 </Card>
 
 <Card title="美丽天空相机抓拍" icon="camera" href="https://x.com/signalgaining/status/2010523120604746151">
   **@signalgaining** • `automation` `camera` `skill` `images`
 
-由屋顶摄像头触发：当天空看起来很美时，让 OpenClaw 拍一张天空照片——它设计了一个 Skills 并完成了拍摄。
+由屋顶摄像头触发：当天空看起来很美时，让 ClosedClaw 拍一张天空照片——它设计了一个 Skills 并完成了拍摄。
 
-  <img src="/assets/showcase/roof-camera-sky.jpg" alt="OpenClaw 捕获的屋顶摄像头天空快照" />
+  <img src="/assets/showcase/roof-camera-sky.jpg" alt="ClosedClaw 捕获的屋顶摄像头天空快照" />
 </Card>
 
 <Card title="可视化早间简报场景" icon="robot" href="https://x.com/buddyhadry/status/2010005331925954739">
   **@buddyhadry** • `automation` `briefing` `images` `telegram`
 
-定时提示每天早上通过 OpenClaw 角色生成一张"场景"图片（天气、任务、日期、喜欢的帖子/名言）。
+定时提示每天早上通过 ClosedClaw 角色生成一张"场景"图片（天气、任务、日期、喜欢的帖子/名言）。
 </Card>
 
 <Card title="板式网球场预订" icon="calendar-check" href="https://github.com/joshp123/padel-cli">
@@ -267,13 +267,13 @@ Claude Code 发现并确认了净化器控制方式，然后 OpenClaw 接管并�
 <Card title="Jira Skills 构建器" icon="diagram-project" href="https://x.com/jdrhyne/status/2008336434827002232">
   **@jdrhyne** • `automation` `jira` `skill` `devtools`
 
-OpenClaw 连接到 Jira，然后即时生成了一个新 Skills（在 ClawHub 上还不存在时）。
+ClosedClaw 连接到 Jira，然后即时生成了一个新 Skills（在 ClawHub 上还不存在时）。
 </Card>
 
 <Card title="通过 Telegram 创建 Todoist Skills" icon="list-check" href="https://x.com/iamsubhrajyoti/status/2009949389884920153">
   **@iamsubhrajyoti** • `automation` `todoist` `skill` `telegram`
 
-自动化 Todoist 任务，并让 OpenClaw 直接在 Telegram 聊天中生成 Skills。
+自动化 Todoist 任务，并让 ClosedClaw 直接在 Telegram 聊天中生成 Skills。
 </Card>
 
 <Card title="TradingView 分析" icon="chart-line">
@@ -297,7 +297,7 @@ OpenClaw 连接到 Jira，然后即时生成了一个新 Skills（在 ClawHub �
 <Card title="xuezh 中文学习" icon="language" href="https://github.com/joshp123/xuezh">
   **@joshp123** • `learning` `voice` `skill`
   
-  通过 OpenClaw 实现的中文学习引擎，具备发音反馈和学习流程。
+  通过 ClosedClaw 实现的中文学习引擎，具备发音反馈和学习流程。
   
   <img src="/assets/showcase/xuezh-pronunciation.jpeg" alt="xuezh 发音反馈" />
 </Card>
@@ -329,7 +329,7 @@ OpenClaw 连接到 Jira，然后即时生成了一个新 Skills（在 ClawHub �
 <Card title="Clawdia 电话桥接" icon="phone" href="https://github.com/alejandroOPI/clawdia-bridge">
   **@alejandroOPI** • `voice` `vapi` `bridge`
   
-  Vapi 语音助手 ↔ OpenClaw HTTP 桥接。与你的智能体进行近实时电话通话。
+  Vapi 语音助手 ↔ ClosedClaw HTTP 桥接。与你的智能体进行近实时电话通话。
 </Card>
 
 <Card title="OpenRouter 转录" icon="microphone" href="https://clawhub.com/obviyus/openrouter-transcribe">
@@ -344,10 +344,10 @@ OpenClaw 连接到 Jira，然后即时生成了一个新 Skills（在 ClawHub �
 
 <CardGroup cols={2}>
 
-<Card title="Home Assistant 插件" icon="home" href="https://github.com/ngutman/openclaw-ha-addon">
+<Card title="Home Assistant 插件" icon="home" href="https://github.com/ngutman/ClosedClaw-ha-addon">
   **@ngutman** • `homeassistant` `docker` `raspberry-pi`
   
-  在 Home Assistant OS 上运行 OpenClaw Gateway网关，支持 SSH 隧道和持久化状态。
+  在 Home Assistant OS 上运行 ClosedClaw Gateway网关，支持 SSH 隧道和持久化状态。
 </Card>
 
 <Card title="Home Assistant Skills" icon="toggle-on" href="https://clawhub.com/skills/homeassistant">
@@ -356,10 +356,10 @@ OpenClaw 连接到 Jira，然后即时生成了一个新 Skills（在 ClawHub �
   通过自然语言控制和自动化 Home Assistant 设备。
 </Card>
 
-<Card title="Nix 打包" icon="snowflake" href="https://github.com/openclaw/nix-openclaw">
-  **@openclaw** • `nix` `packaging` `deployment`
+<Card title="Nix 打包" icon="snowflake" href="https://github.com/ClosedClaw/nix-ClosedClaw">
+  **@ClosedClaw** • `nix` `packaging` `deployment`
   
-  开箱即用的 Nix 化 OpenClaw 配置，实现可复现部署。
+  开箱即用的 Nix 化 ClosedClaw 配置，实现可复现部署。
 </Card>
 
 <Card title="CalDAV 日历" icon="calendar" href="https://clawhub.com/skills/caldav-calendar">
@@ -377,7 +377,7 @@ OpenClaw 连接到 Jira，然后即时生成了一个新 Skills（在 ClawHub �
 <Card title="GoHome 自动化" icon="house-signal" href="https://github.com/joshp123/gohome">
   **@joshp123** • `home` `nix` `grafana`
   
-  以 Nix 为基础的家居自动化，OpenClaw 作为交互界面，并配有精美的 Grafana 仪表盘。
+  以 Nix 为基础的家居自动化，ClosedClaw 作为交互界面，并配有精美的 Grafana 仪表盘。
   
   <img src="/assets/showcase/gohome-grafana.png" alt="GoHome Grafana 仪表盘" />
 </Card>
@@ -399,7 +399,7 @@ OpenClaw 连接到 Jira，然后即时生成了一个新 Skills（在 ClawHub �
 <Card title="StarSwap 交易市场" icon="star" href="https://star-swap.com/">
   **社区** • `marketplace` `astronomy` `webapp`
   
-  完整的天文设备交易市场。基于 OpenClaw 生态系统构建。
+  完整的天文设备交易市场。基于 ClosedClaw 生态系统构建。
 </Card>
 
 </CardGroup>
@@ -412,7 +412,7 @@ OpenClaw 连接到 Jira，然后即时生成了一个新 Skills（在 ClawHub �
 
 <Steps>
   <Step title="分享它">
-    发布到 [Discord 的 #showcase 频道](https://discord.gg/clawd) 或 [在推特上 @openclaw](https://x.com/openclaw)
+    发布到 [Discord 的 #showcase 频道](https://discord.gg/clawd) 或 [在推特上 @ClosedClaw](https://x.com/ClosedClaw)
   </Step>
   <Step title="提供详细信息">
     告诉我们它的功能，附上仓库/演示链接，如果有的话分享一张截图

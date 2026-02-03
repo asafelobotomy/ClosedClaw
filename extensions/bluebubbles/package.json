@@ -1,12 +1,12 @@
 {
-  "name": "@openclaw/bluebubbles",
+  "name": "@ClosedClaw/bluebubbles",
   "version": "2026.2.1",
-  "description": "OpenClaw BlueBubbles channel plugin",
+  "description": "ClosedClaw BlueBubbles channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "ClosedClaw": "workspace:*"
   },
-  "openclaw": {
+  "ClosedClaw": {
     "extensions": [
       "./index.ts"
     ],
@@ -28,7 +28,7 @@
       "order": 75
     },
     "install": {
-      "npmSpec": "@openclaw/bluebubbles",
+      "npmSpec": "@ClosedClaw/bluebubbles",
       "localPath": "extensions/bluebubbles",
       "defaultChoice": "npm"
     }

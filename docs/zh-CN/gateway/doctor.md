@@ -15,43 +15,43 @@ x-i18n:
 
 # Doctor
 
-`openclaw doctor` 是 OpenClaw 的修复 + 迁移工具。它修复过时的配置/状态、检查健康状况，并提供可操作的修复步骤。
+`ClosedClaw doctor` 是 ClosedClaw 的修复 + 迁移工具。它修复过时的配置/状态、检查健康状况，并提供可操作的修复步骤。
 
 ## 快速开始
 
 ```bash
-openclaw doctor
+ClosedClaw doctor
 ```
 
 ### 无界面 / 自动化
 
 ```bash
-openclaw doctor --yes
+ClosedClaw doctor --yes
 ```
 
 无需提示即接受默认值（包括适用时的重启/服务/沙箱修复步骤）。
 
 ```bash
-openclaw doctor --repair
+ClosedClaw doctor --repair
 ```
 
 无需提示即应用推荐修复（安全情况下执行修复 + 重启）。
 
 ```bash
-openclaw doctor --repair --force
+ClosedClaw doctor --repair --force
 ```
 
 同时应用激进修复（覆盖自定义 supervisor 配置）。
 
 ```bash
-openclaw doctor --non-interactive
+ClosedClaw doctor --non-interactive
 ```
 
 无提示运行，仅应用安全迁移（配置规范化 + 磁盘状态迁移）。跳过需要人工确认的重启/服务/沙箱操作。
 检测到遗留状态迁移时会自动运行。
 
 ```bash
-openclaw doctor --deep
+ClosedClaw doctor --deep
 ```
 
 扫描系统服务以查找额外的 Gateway网关安装（launchd/systemd/schtasks）。
@@ -59,7 +59,7 @@ openclaw doctor --deep
 如果你想在写入前查看更改，请先打开配置文件：
 
 ```bash
-cat ~/.openclaw/openclaw.json
+cat ~/.ClosedClaw/ClosedClaw.json
 ```
 
 ## 功能概述
@@ -74,7 +74,7 @@ cat ~/.openclaw/openclaw.json
 - 状态完整性和权限检查（会话、转录、状态目录）。
 - 本地运行时的配置文件权限检查（chmod 600）。
 - 模型认证健康：检查 OAuth 过期、可刷新即将过期的令牌、报告认证配置的冷却/禁用状态。
-- 额外工作区目录检测（`~/openclaw`）。
+- 额外工作区目录检测（`~/ClosedClaw`）。
 - 启用沙箱时的沙箱镜像修复。
 - 遗留服务迁移和额外 Gateway网关检测。
 - Gateway网关运行时检查（服务已安装但未运行；缓存的 launchd 标签）。
@@ -100,13 +100,13 @@ cat ~/.openclaw/openclaw.json
 
 ### 2) 遗留配置键迁移
 
-当配置包含已弃用的键时，其他命令会拒绝运行并要求你运行 `openclaw doctor`。
+当配置包含已弃用的键时，其他命令会拒绝运行并要求你运行 `ClosedClaw doctor`。
 
 Doctor 将：
 
 - 说明找到了哪些遗留键。
 - 显示它应用的迁移。
-- 使用更新后的 schema 重写 `~/.openclaw/openclaw.json`。
+- 使用更新后的 schema 重写 `~/.ClosedClaw/ClosedClaw.json`。
 
 Gateway网关在启动时检测到遗留配置格式时也会自动运行 doctor 迁移，因此过时的配置无需手动干预即可修复。
 
@@ -136,14 +136,14 @@ Gateway网关在启动时检测到遗留配置格式时也会自动运行 doctor
 Doctor 可以将旧版磁盘布局迁移到当前结构：
 
 - 会话存储 + 转录：
-  - 从 `~/.openclaw/sessions/` 到 `~/.openclaw/agents/<agentId>/sessions/`
+  - 从 `~/.ClosedClaw/sessions/` 到 `~/.ClosedClaw/agents/<agentId>/sessions/`
 - 智能体目录：
-  - 从 `~/.openclaw/agent/` 到 `~/.openclaw/agents/<agentId>/agent/`
+  - 从 `~/.ClosedClaw/agent/` 到 `~/.ClosedClaw/agents/<agentId>/agent/`
 - WhatsApp 认证状态（Baileys）：
-  - 从遗留的 `~/.openclaw/credentials/*.json`（`oauth.json` 除外）
-  - 到 `~/.openclaw/credentials/whatsapp/<accountId>/...`（默认账户 ID：`default`）
+  - 从遗留的 `~/.ClosedClaw/credentials/*.json`（`oauth.json` 除外）
+  - 到 `~/.ClosedClaw/credentials/whatsapp/<accountId>/...`（默认账户 ID：`default`）
 
-这些迁移尽力执行且幂等；当 doctor 保留任何遗留文件夹作为备份时会发出警告。Gateway网关/CLI 在启动时也会自动迁移遗留会话 + 智能体目录，使历史/认证/模型落入每个智能体的路径中，无需手动运行 doctor。WhatsApp 认证仅通过 `openclaw doctor` 进行迁移。
+这些迁移尽力执行且幂等；当 doctor 保留任何遗留文件夹作为备份时会发出警告。Gateway网关/CLI 在启动时也会自动迁移遗留会话 + 智能体目录，使历史/认证/模型落入每个智能体的路径中，无需手动运行 doctor。WhatsApp 认证仅通过 `ClosedClaw doctor` 进行迁移。
 
 ### 4) 状态完整性检查（会话持久化、路由和安全性）
 
@@ -156,9 +156,9 @@ Doctor 检查：
 - **会话目录缺失**：`sessions/` 和会话存储目录是持久化历史记录和避免 `ENOENT` 崩溃所必需的。
 - **转录不匹配**：当近期会话条目缺少转录文件时发出警告。
 - **主会话"单行 JSONL"**：当主转录只有一行时标记（历史记录未在累积）。
-- **多个状态目录**：当多个 `~/.openclaw` 文件夹存在于不同的 home 目录中，或 `OPENCLAW_STATE_DIR` 指向其他位置时发出警告（历史记录可能在不同安装间分裂）。
+- **多个状态目录**：当多个 `~/.ClosedClaw` 文件夹存在于不同的 home 目录中，或 `ClosedClaw_STATE_DIR` 指向其他位置时发出警告（历史记录可能在不同安装间分裂）。
 - **远程模式提醒**：如果 `gateway.mode=remote`，doctor 提醒你在远程主机上运行（状态存储在那里）。
-- **配置文件权限**：当 `~/.openclaw/openclaw.json` 对组/其他用户可读时发出警告，并提供收紧为 `600` 的选项。
+- **配置文件权限**：当 `~/.ClosedClaw/ClosedClaw.json` 对组/其他用户可读时发出警告，并提供收紧为 `600` 的选项。
 
 ### 5) 模型认证健康（OAuth 过期）
 
@@ -179,7 +179,7 @@ Doctor 还会报告由于以下原因暂时不可用的认证配置：
 
 ### 8) Gateway网关服务迁移和清理提示
 
-Doctor 检测遗留 Gateway网关服务（launchd/systemd/schtasks），并提供删除它们并使用当前 Gateway网关端口安装 OpenClaw 服务的选项。它还可以扫描额外的类 Gateway网关服务并打印清理提示。以配置文件命名的 OpenClaw Gateway网关服务被视为一等公民，不会被标记为"额外"。
+Doctor 检测遗留 Gateway网关服务（launchd/systemd/schtasks），并提供删除它们并使用当前 Gateway网关端口安装 ClosedClaw 服务的选项。它还可以扫描额外的类 Gateway网关服务并打印清理提示。以配置文件命名的 ClosedClaw Gateway网关服务被视为一等公民，不会被标记为"额外"。
 
 ### 9) 安全警告
 
@@ -195,7 +195,7 @@ Doctor 打印当前工作区可用/缺失/受阻 Skills 的快速摘要。
 
 ### 12) Gateway网关认证检查（本地令牌）
 
-当本地 Gateway网关缺少 `gateway.auth` 时，doctor 发出警告并提供生成令牌的选项。使用 `openclaw doctor --generate-gateway-token` 在自动化中强制创建令牌。
+当本地 Gateway网关缺少 `gateway.auth` 时，doctor 发出警告并提供生成令牌的选项。使用 `ClosedClaw doctor --generate-gateway-token` 在自动化中强制创建令牌。
 
 ### 13) Gateway网关健康检查 + 重启
 
@@ -211,11 +211,11 @@ Doctor 检查已安装的 supervisor 配置（launchd/systemd/schtasks）是否�
 
 说明：
 
-- `openclaw doctor` 在重写 supervisor 配置前会提示确认。
-- `openclaw doctor --yes` 接受默认修复提示。
-- `openclaw doctor --repair` 无需提示即应用推荐修复。
-- `openclaw doctor --repair --force` 覆盖自定义 supervisor 配置。
-- 你始终可以通过 `openclaw gateway install --force` 强制完全重写。
+- `ClosedClaw doctor` 在重写 supervisor 配置前会提示确认。
+- `ClosedClaw doctor --yes` 接受默认修复提示。
+- `ClosedClaw doctor --repair` 无需提示即应用推荐修复。
+- `ClosedClaw doctor --repair --force` 覆盖自定义 supervisor 配置。
+- 你始终可以通过 `ClosedClaw gateway install --force` 强制完全重写。
 
 ### 16) Gateway网关运行时 + 端口诊断
 

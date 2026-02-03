@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-IMAGE_NAME="openclaw-plugins-e2e"
+IMAGE_NAME="ClosedClaw-plugins-e2e"
 
 echo "Building Docker image..."
 docker build -t "$IMAGE_NAME" -f "$ROOT_DIR/scripts/e2e/Dockerfile" "$ROOT_DIR"
@@ -11,11 +11,11 @@ echo "Running plugins Docker E2E..."
 docker run --rm -t "$IMAGE_NAME" bash -lc '
   set -euo pipefail
 
-  home_dir=$(mktemp -d "/tmp/openclaw-plugins-e2e.XXXXXX")
+  home_dir=$(mktemp -d "/tmp/ClosedClaw-plugins-e2e.XXXXXX")
   export HOME="$home_dir"
-  mkdir -p "$HOME/.openclaw/extensions/demo-plugin"
+  mkdir -p "$HOME/.ClosedClaw/extensions/demo-plugin"
 
-  cat > "$HOME/.openclaw/extensions/demo-plugin/index.js" <<'"'"'JS'"'"'
+  cat > "$HOME/.ClosedClaw/extensions/demo-plugin/index.js" <<'"'"'JS'"'"'
 module.exports = {
   id: "demo-plugin",
   name: "Demo Plugin",
@@ -28,7 +28,7 @@ module.exports = {
   },
 };
 JS
-  cat > "$HOME/.openclaw/extensions/demo-plugin/openclaw.plugin.json" <<'"'"'JSON'"'"'
+  cat > "$HOME/.ClosedClaw/extensions/demo-plugin/ClosedClaw.plugin.json" <<'"'"'JSON'"'"'
 {
   "id": "demo-plugin",
   "configSchema": {
@@ -70,13 +70,13 @@ console.log("ok");
 NODE
 
   echo "Testing tgz install flow..."
-  pack_dir="$(mktemp -d "/tmp/openclaw-plugin-pack.XXXXXX")"
+  pack_dir="$(mktemp -d "/tmp/ClosedClaw-plugin-pack.XXXXXX")"
   mkdir -p "$pack_dir/package"
   cat > "$pack_dir/package/package.json" <<'"'"'JSON'"'"'
 {
-  "name": "@openclaw/demo-plugin-tgz",
+  "name": "@ClosedClaw/demo-plugin-tgz",
   "version": "0.0.1",
-  "openclaw": { "extensions": ["./index.js"] }
+  "ClosedClaw": { "extensions": ["./index.js"] }
 }
 JSON
   cat > "$pack_dir/package/index.js" <<'"'"'JS'"'"'
@@ -88,7 +88,7 @@ module.exports = {
   },
 };
 JS
-  cat > "$pack_dir/package/openclaw.plugin.json" <<'"'"'JSON'"'"'
+  cat > "$pack_dir/package/ClosedClaw.plugin.json" <<'"'"'JSON'"'"'
 {
   "id": "demo-plugin-tgz",
   "configSchema": {
@@ -118,12 +118,12 @@ console.log("ok");
 NODE
 
   echo "Testing install from local folder (plugins.load.paths)..."
-  dir_plugin="$(mktemp -d "/tmp/openclaw-plugin-dir.XXXXXX")"
+  dir_plugin="$(mktemp -d "/tmp/ClosedClaw-plugin-dir.XXXXXX")"
   cat > "$dir_plugin/package.json" <<'"'"'JSON'"'"'
 {
-  "name": "@openclaw/demo-plugin-dir",
+  "name": "@ClosedClaw/demo-plugin-dir",
   "version": "0.0.1",
-  "openclaw": { "extensions": ["./index.js"] }
+  "ClosedClaw": { "extensions": ["./index.js"] }
 }
 JSON
   cat > "$dir_plugin/index.js" <<'"'"'JS'"'"'
@@ -135,7 +135,7 @@ module.exports = {
   },
 };
 JS
-  cat > "$dir_plugin/openclaw.plugin.json" <<'"'"'JSON'"'"'
+  cat > "$dir_plugin/ClosedClaw.plugin.json" <<'"'"'JSON'"'"'
 {
   "id": "demo-plugin-dir",
   "configSchema": {
@@ -164,13 +164,13 @@ console.log("ok");
 NODE
 
   echo "Testing install from npm spec (file:)..."
-  file_pack_dir="$(mktemp -d "/tmp/openclaw-plugin-filepack.XXXXXX")"
+  file_pack_dir="$(mktemp -d "/tmp/ClosedClaw-plugin-filepack.XXXXXX")"
   mkdir -p "$file_pack_dir/package"
   cat > "$file_pack_dir/package/package.json" <<'"'"'JSON'"'"'
 {
-  "name": "@openclaw/demo-plugin-file",
+  "name": "@ClosedClaw/demo-plugin-file",
   "version": "0.0.1",
-  "openclaw": { "extensions": ["./index.js"] }
+  "ClosedClaw": { "extensions": ["./index.js"] }
 }
 JSON
   cat > "$file_pack_dir/package/index.js" <<'"'"'JS'"'"'
@@ -182,7 +182,7 @@ module.exports = {
   },
 };
 JS
-  cat > "$file_pack_dir/package/openclaw.plugin.json" <<'"'"'JSON'"'"'
+  cat > "$file_pack_dir/package/ClosedClaw.plugin.json" <<'"'"'JSON'"'"'
 {
   "id": "demo-plugin-file",
   "configSchema": {

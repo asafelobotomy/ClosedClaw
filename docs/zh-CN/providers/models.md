@@ -2,7 +2,7 @@
 read_when:
   - 你想选择一个模型提供商
   - 你需要 LLM 认证和模型选择的快速设置示例
-summary: OpenClaw 支持的模型提供商（LLM）
+summary: ClosedClaw 支持的模型提供商（LLM）
 title: 模型提供商快速入门
 x-i18n:
   generated_at: "2026-02-01T21:35:02Z"
@@ -15,7 +15,7 @@ x-i18n:
 
 # 模型提供商
 
-OpenClaw 可以使用多种 LLM 提供商。选择一个，完成认证，然后将默认模型设置为 `provider/model` 格式。
+ClosedClaw 可以使用多种 LLM 提供商。选择一个，完成认证，然后将默认模型设置为 `provider/model` 格式。
 
 ## 推荐：Venice（Venice AI）
 
@@ -28,7 +28,7 @@ Venice 是我们推荐的 Venice AI 配置方案，注重隐私优先的推理�
 
 ## 快速开始（两个步骤）
 
-1. 向提供商进行认证（通常通过 `openclaw onboard`）。
+1. 向提供商进行认证（通常通过 `ClosedClaw onboard`）。
 2. 设置默认模型：
 
 ```json5

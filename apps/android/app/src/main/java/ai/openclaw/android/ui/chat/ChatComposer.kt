@@ -1,4 +1,4 @@
-package ai.openclaw.android.ui.chat
+package ai.ClosedClaw.android.ui.chat
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import ai.openclaw.android.chat.ChatSessionEntry
+import ai.ClosedClaw.android.chat.ChatSessionEntry
 
 @Composable
 fun ChatComposer(
@@ -143,7 +143,7 @@ fun ChatComposer(
         value = input,
         onValueChange = { input = it },
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("Message OpenClaw…") },
+        placeholder = { Text("Message ClosedClaw…") },
         minLines = 2,
         maxLines = 6,
       )

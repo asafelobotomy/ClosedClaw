@@ -2,7 +2,7 @@
 read_when:
   - 你想安全地更新源码检出
   - 你需要了解 `--update` 简写行为
-summary: "`openclaw update`（安全的源码更新 + Gateway网关自动重启）的 CLI 参考"
+summary: "`ClosedClaw update`（安全的源码更新 + Gateway网关自动重启）的 CLI 参考"
 title: update
 x-i18n:
   generated_at: "2026-02-01T20:21:45Z"
@@ -13,24 +13,24 @@ x-i18n:
   workflow: 14
 ---
 
-# `openclaw update`
+# `ClosedClaw update`
 
-安全更新 OpenClaw 并在 stable/beta/dev 渠道之间切换。
+安全更新 ClosedClaw 并在 stable/beta/dev 渠道之间切换。
 
 如果你通过 **npm/pnpm** 安装（全局安装，无 git 元数据），更新将通过[更新](/install/updating)中的包管理器流程进行。
 
 ## 用法
 
 ```bash
-openclaw update
-openclaw update status
-openclaw update wizard
-openclaw update --channel beta
-openclaw update --channel dev
-openclaw update --tag beta
-openclaw update --no-restart
-openclaw update --json
-openclaw --update
+ClosedClaw update
+ClosedClaw update status
+ClosedClaw update wizard
+ClosedClaw update --channel beta
+ClosedClaw update --channel dev
+ClosedClaw update --tag beta
+ClosedClaw update --no-restart
+ClosedClaw update --json
+ClosedClaw --update
 ```
 
 ## 选项
@@ -48,9 +48,9 @@ openclaw --update
 显示当前活跃的更新渠道 + git 标签/分支/SHA（适用于源码检出），以及更新可用性。
 
 ```bash
-openclaw update status
-openclaw update status --json
-openclaw update status --timeout 10
+ClosedClaw update status
+ClosedClaw update status --json
+ClosedClaw update status --timeout 10
 ```
 
 选项：
@@ -64,9 +64,9 @@ openclaw update status --timeout 10
 
 ## 工作原理
 
-当你显式切换渠道（`--channel ...`）时，OpenClaw 也会保持安装方式一致：
+当你显式切换渠道（`--channel ...`）时，ClosedClaw 也会保持安装方式一致：
 
-- `dev` → 确保存在 git 检出（默认：`~/openclaw`，可通过 `OPENCLAW_GIT_DIR` 覆盖），更新它，并从该检出安装全局 CLI。
+- `dev` → 确保存在 git 检出（默认：`~/ClosedClaw`，可通过 `ClosedClaw_GIT_DIR` 覆盖），更新它，并从该检出安装全局 CLI。
 - `stable`/`beta` → 使用匹配的 dist-tag 从 npm 安装。
 
 ## Git 检出流程
@@ -86,16 +86,16 @@ openclaw update status --timeout 10
 5. Rebase 到所选提交（仅 dev）。
 6. 安装依赖（优先使用 pnpm；回退到 npm）。
 7. 构建项目 + 构建控制台 UI。
-8. 运行 `openclaw doctor` 作为最终的"安全更新"检查。
+8. 运行 `ClosedClaw doctor` 作为最终的"安全更新"检查。
 9. 将插件同步到活跃渠道（dev 使用内置扩展；stable/beta 使用 npm）并更新通过 npm 安装的插件。
 
 ## `--update` 简写
 
-`openclaw --update` 会重写为 `openclaw update`（便于在 shell 和启动脚本中使用）。
+`ClosedClaw --update` 会重写为 `ClosedClaw update`（便于在 shell 和启动脚本中使用）。
 
 ## 另请参阅
 
-- `openclaw doctor`（在 git 检出上会提供先运行更新的选项）
+- `ClosedClaw doctor`（在 git 检出上会提供先运行更新的选项）
 - [开发渠道](/install/development-channels)
 - [更新](/install/updating)
 - [CLI 参考](/cli)

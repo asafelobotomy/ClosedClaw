@@ -7,7 +7,7 @@ import { isTruthyEnvValue, normalizeEnv } from "./infra/env.js";
 import { installProcessWarningFilter } from "./infra/warnings.js";
 import { attachChildProcessBridge } from "./process/child-process-bridge.js";
 
-process.title = "openclaw";
+process.title = "ClosedClaw";
 installProcessWarningFilter();
 normalizeEnv();
 
@@ -26,10 +26,10 @@ function hasExperimentalWarningSuppressed(nodeOptions: string): boolean {
 }
 
 function ensureExperimentalWarningSuppressed(): boolean {
-  if (isTruthyEnvValue(process.env.OPENCLAW_NO_RESPAWN)) {
+  if (isTruthyEnvValue(process.env.ClosedClaw_NO_RESPAWN)) {
     return false;
   }
-  if (isTruthyEnvValue(process.env.OPENCLAW_NODE_OPTIONS_READY)) {
+  if (isTruthyEnvValue(process.env.ClosedClaw_NODE_OPTIONS_READY)) {
     return false;
   }
   const nodeOptions = process.env.NODE_OPTIONS ?? "";
@@ -37,7 +37,7 @@ function ensureExperimentalWarningSuppressed(): boolean {
     return false;
   }
 
-  process.env.OPENCLAW_NODE_OPTIONS_READY = "1";
+  process.env.ClosedClaw_NODE_OPTIONS_READY = "1";
   process.env.NODE_OPTIONS = `${nodeOptions} ${EXPERIMENTAL_WARNING_FLAG}`.trim();
 
   const child = spawn(process.execPath, [...process.execArgv, ...process.argv.slice(1)], {
@@ -57,7 +57,7 @@ function ensureExperimentalWarningSuppressed(): boolean {
 
   child.once("error", (error) => {
     console.error(
-      "[openclaw] Failed to respawn CLI:",
+      "[ClosedClaw] Failed to respawn CLI:",
       error instanceof Error ? (error.stack ?? error.message) : error,
     );
     process.exit(1);
@@ -140,7 +140,7 @@ if (!ensureExperimentalWarningSuppressed()) {
   const parsed = parseCliProfileArgs(process.argv);
   if (!parsed.ok) {
     // Keep it simple; Commander will handle rich help/errors after we strip flags.
-    console.error(`[openclaw] ${parsed.error}`);
+    console.error(`[ClosedClaw] ${parsed.error}`);
     process.exit(2);
   }
 
@@ -154,7 +154,7 @@ if (!ensureExperimentalWarningSuppressed()) {
     .then(({ runCli }) => runCli(process.argv))
     .catch((error) => {
       console.error(
-        "[openclaw] Failed to start CLI:",
+        "[ClosedClaw] Failed to start CLI:",
         error instanceof Error ? (error.stack ?? error.message) : error,
       );
       process.exitCode = 1;

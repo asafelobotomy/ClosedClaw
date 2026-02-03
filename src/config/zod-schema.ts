@@ -27,7 +27,7 @@ const NodeHostSchema = z
   .strict()
   .optional();
 
-export const OpenClawSchema = z
+export const ClosedClawSchema = z
   .object({
     meta: z
       .object({
@@ -154,7 +154,7 @@ export const OpenClawSchema = z
               .object({
                 cdpPort: z.number().int().min(1).max(65535).optional(),
                 cdpUrl: z.string().optional(),
-                driver: z.union([z.literal("openclaw"), z.literal("extension")]).optional(),
+                driver: z.union([z.literal("ClosedClaw"), z.literal("extension")]).optional(),
                 color: HexColorSchema,
               })
               .strict()

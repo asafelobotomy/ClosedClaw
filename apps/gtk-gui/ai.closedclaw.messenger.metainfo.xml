@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>ai.closedclaw.messenger</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>ClosedClaw Messenger</name>
+  <summary>Secure AI messaging interface</summary>
+  
+  <description>
+    <p>
+      ClosedClaw Messenger is a secure, minimal GTK4 messaging application
+      that communicates exclusively with the ClosedClaw AI assistant via
+      local Unix socket IPC.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Secure by design - ONLY local Unix socket communication</li>
+      <li>Modern GTK4 + Libadwaita interface</li>
+      <li>Familiar chat-style message layout</li>
+      <li>Basic Markdown formatting support</li>
+      <li>No network connections - completely local</li>
+    </ul>
+  </description>
+  
+  <launchable type="desktop-id">ai.closedclaw.messenger.desktop</launchable>
+  
+  <url type="homepage">https://github.com/closedclaw/closedclaw</url>
+  <url type="bugtracker">https://github.com/closedclaw/closedclaw/issues</url>
+  
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main chat window</caption>
+      <image>https://raw.githubusercontent.com/closedclaw/closedclaw/main/docs/images/gtk-messenger.png</image>
+    </screenshot>
+  </screenshots>
+  
+  <content_rating type="oars-1.1" />
+  
+  <releases>
+    <release version="1.0.0" date="2026-02-02">
+      <description>
+        <p>Initial release</p>
+      </description>
+    </release>
+  </releases>
+  
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  
+  <recommends>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </recommends>
+  
+  <categories>
+    <category>Utility</category>
+    <category>Chat</category>
+  </categories>
+  
+  <keywords>
+    <keyword>ai</keyword>
+    <keyword>chat</keyword>
+    <keyword>messenger</keyword>
+    <keyword>assistant</keyword>
+    <keyword>closedclaw</keyword>
+  </keywords>
+  
+  <developer_name>ClosedClaw Team</developer_name>
+</component>

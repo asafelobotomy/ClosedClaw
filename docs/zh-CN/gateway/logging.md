@@ -17,16 +17,16 @@ x-i18n:
 
 有关面向用户的概述（CLI + 控制界面 + 配置），请参阅 [/logging](/logging)。
 
-OpenClaw 有两个日志"界面"：
+ClosedClaw 有两个日志"界面"：
 
 - **控制台输出**（你在终端 / 调试界面中看到的内容）。
 - **文件日志**（JSON 行），由 Gateway网关日志记录器写入。
 
 ## 基于文件的日志记录器
 
-- 默认滚动日志文件位于 `/tmp/openclaw/` 下（每天一个文件）：`openclaw-YYYY-MM-DD.log`
+- 默认滚动日志文件位于 `/tmp/ClosedClaw/` 下（每天一个文件）：`ClosedClaw-YYYY-MM-DD.log`
   - 日期使用 Gateway网关主机的本地时区。
-- 日志文件路径和级别可通过 `~/.openclaw/openclaw.json` 配置：
+- 日志文件路径和级别可通过 `~/.ClosedClaw/ClosedClaw.json` 配置：
   - `logging.file`
   - `logging.level`
 
@@ -36,7 +36,7 @@ OpenClaw 有两个日志"界面"：
 CLI 也可以执行相同操作：
 
 ```bash
-openclaw logs --follow
+ClosedClaw logs --follow
 ```
 
 **详细模式与日志级别**
@@ -76,7 +76,7 @@ Gateway网关以两种模式打印 WebSocket 协议日志：
 
 ### WebSocket 日志样式
 
-`openclaw gateway` 支持按 Gateway网关设置的样式开关：
+`ClosedClaw gateway` 支持按 Gateway网关设置的样式开关：
 
 - `--ws-log auto`（默认）：普通模式经过优化；详细模式使用紧凑输出
 - `--ws-log compact`：详细模式下使用紧凑输出（配对的请求/响应）
@@ -87,13 +87,13 @@ Gateway网关以两种模式打印 WebSocket 协议日志：
 
 ```bash
 # 优化模式（仅错误/慢调用）
-openclaw gateway
+ClosedClaw gateway
 
 # 显示所有 WS 流量（配对）
-openclaw gateway --verbose --ws-log compact
+ClosedClaw gateway --verbose --ws-log compact
 
 # 显示所有 WS 流量（完整元数据）
-openclaw gateway --verbose --ws-log full
+ClosedClaw gateway --verbose --ws-log full
 ```
 
 ## 控制台格式化（子系统日志）

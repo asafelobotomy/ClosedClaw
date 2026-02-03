@@ -38,7 +38,7 @@ x-i18n:
 
 - `host` 默认为 `sandbox`。
 - 当沙箱关闭时，`elevated` 被忽略（exec 已直接在主机上运行）。
-- `gateway`/`node` 的审批由 `~/.openclaw/exec-approvals.json` 控制。
+- `gateway`/`node` 的审批由 `~/.ClosedClaw/exec-approvals.json` 控制。
 - `node` 需要已配对的节点（伴侣应用或无头节点主机）。
 - 如果有多个节点可用，请设置 `exec.node` 或 `tools.exec.node` 来选择一个。
 - 在非 Windows 主机上，exec 在设置了 `SHELL` 时使用该 shell；如果 `SHELL` 是 `fish`，它会优先从 `PATH` 中选择 `bash`（或 `sh`）以避免 fish 不兼容的脚本，如果两者都不存在则回退到 `SHELL`。
@@ -72,14 +72,14 @@ x-i18n:
 - `host=gateway`：将你的登录 shell `PATH` 合并到 exec 环境中（除非 exec 调用已设置 `env.PATH`）。守护进程本身仍使用最小 `PATH` 运行：
   - macOS：`/opt/homebrew/bin`、`/usr/local/bin`、`/usr/bin`、`/bin`
   - Linux：`/usr/local/bin`、`/usr/bin`、`/bin`
-- `host=sandbox`：在容器内运行 `sh -lc`（登录 shell），因此 `/etc/profile` 可能会重置 `PATH`。OpenClaw 在 profile 加载后通过内部环境变量添加 `env.PATH`（无 shell 插值）；`tools.exec.pathPrepend` 在此同样适用。
+- `host=sandbox`：在容器内运行 `sh -lc`（登录 shell），因此 `/etc/profile` 可能会重置 `PATH`。ClosedClaw 在 profile 加载后通过内部环境变量添加 `env.PATH`（无 shell 插值）；`tools.exec.pathPrepend` 在此同样适用。
 - `host=node`：仅发送你传递的 env 覆盖到节点。`tools.exec.pathPrepend` 仅在 exec 调用已设置 `env.PATH` 时适用。无头节点主机仅在 `PATH` 为节点主机 PATH 前缀时接受 `PATH` 覆盖（不支持替换）。macOS 节点完全忽略 `PATH` 覆盖。
 
 按智能体绑定节点（在配置中使用智能体列表索引）：
 
 ```bash
-openclaw config get agents.list
-openclaw config set agents.list[0].tools.exec.node "node-id-or-name"
+ClosedClaw config get agents.list
+ClosedClaw config set agents.list[0].tools.exec.node "node-id-or-name"
 ```
 
 控制界面：节点选项卡包含一个"Exec 节点绑定"面板，用于相同的设置。

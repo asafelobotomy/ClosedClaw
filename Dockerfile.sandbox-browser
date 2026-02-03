@@ -20,9 +20,9 @@ RUN apt-get update \
     xvfb \
   && rm -rf /var/lib/apt/lists/*
 
-COPY scripts/sandbox-browser-entrypoint.sh /usr/local/bin/openclaw-sandbox-browser
-RUN chmod +x /usr/local/bin/openclaw-sandbox-browser
+COPY scripts/sandbox-browser-entrypoint.sh /usr/local/bin/ClosedClaw-sandbox-browser
+RUN chmod +x /usr/local/bin/ClosedClaw-sandbox-browser
 
 EXPOSE 9222 5900 6080
 
-CMD ["openclaw-sandbox-browser"]
+CMD ["ClosedClaw-sandbox-browser"]

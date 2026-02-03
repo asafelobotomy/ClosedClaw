@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { runCommandWithTimeout } from "../process/exec.js";
 import { defaultRuntime, type RuntimeEnv } from "../runtime.js";
-import { resolveOpenClawPackageRoot } from "./openclaw-root.js";
+import { resolveClosedClawPackageRoot } from "./openclaw-root.js";
 
 export function resolveControlUiRepoRoot(
   argv1: string | undefined = process.argv[1],
@@ -52,7 +52,7 @@ export async function resolveControlUiDistIndexPath(
     return path.join(distDir, "control-ui", "index.html");
   }
 
-  const packageRoot = await resolveOpenClawPackageRoot({ argv1: normalized });
+  const packageRoot = await resolveClosedClawPackageRoot({ argv1: normalized });
   if (!packageRoot) {
     return null;
   }

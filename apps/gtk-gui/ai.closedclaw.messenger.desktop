@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=ClosedClaw Messenger
+Comment=Secure AI messaging interface
+Exec=closedclaw-messenger
+Icon=utilities-terminal
+Terminal=false
+Type=Application
+Categories=Utility;Chat;Network;
+Keywords=ai;chat;messenger;closedclaw;assistant;
+StartupNotify=true
+StartupWMClass=closedclaw-messenger

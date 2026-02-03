@@ -17,26 +17,26 @@ x-i18n:
 
 工作区是智能体的主目录。它是文件工具和工作区上下文使用的唯一工作目录。请将其保持私密，并视为记忆来对待。
 
-它与 `~/.openclaw/` 是分开的，后者存储配置、凭据和会话。
+它与 `~/.ClosedClaw/` 是分开的，后者存储配置、凭据和会话。
 
-**重要提示：** 工作区是**默认工作目录**，而非硬性沙箱。工具会基于工作区解析相对路径，但绝对路径仍然可以访问主机上的其他位置，除非启用了沙箱。如果你需要隔离，请使用 [`agents.defaults.sandbox`](/gateway/sandboxing)（和/或按智能体的沙箱配置）。当启用沙箱且 `workspaceAccess` 不是 `"rw"` 时，工具在 `~/.openclaw/sandboxes` 下的沙箱工作区中运行，而非你的主机工作区。
+**重要提示：** 工作区是**默认工作目录**，而非硬性沙箱。工具会基于工作区解析相对路径，但绝对路径仍然可以访问主机上的其他位置，除非启用了沙箱。如果你需要隔离，请使用 [`agents.defaults.sandbox`](/gateway/sandboxing)（和/或按智能体的沙箱配置）。当启用沙箱且 `workspaceAccess` 不是 `"rw"` 时，工具在 `~/.ClosedClaw/sandboxes` 下的沙箱工作区中运行，而非你的主机工作区。
 
 ## 默认位置
 
-- 默认：`~/.openclaw/workspace`
-- 如果设置了 `OPENCLAW_PROFILE` 且不是 `"default"`，则默认变为
-  `~/.openclaw/workspace-<profile>`。
-- 在 `~/.openclaw/openclaw.json` 中覆盖：
+- 默认：`~/.ClosedClaw/workspace`
+- 如果设置了 `ClosedClaw_PROFILE` 且不是 `"default"`，则默认变为
+  `~/.ClosedClaw/workspace-<profile>`。
+- 在 `~/.ClosedClaw/ClosedClaw.json` 中覆盖：
 
 ```json5
 {
   agent: {
-    workspace: "~/.openclaw/workspace",
+    workspace: "~/.ClosedClaw/workspace",
   },
 }
 ```
 
-`openclaw onboard`、`openclaw configure` 或 `openclaw setup` 将创建工作区，并在引导文件缺失时生成它们。
+`ClosedClaw onboard`、`ClosedClaw configure` 或 `ClosedClaw setup` 将创建工作区，并在引导文件缺失时生成它们。
 
 如果你已经自行管理工作区文件，可以禁用引导文件创建：
 
@@ -46,15 +46,15 @@ x-i18n:
 
 ## 额外的工作区文件夹
 
-较旧的安装可能创建了 `~/openclaw`。保留多个工作区目录可能会导致认证或状态不一致的困惑，因为同一时间只有一个工作区处于活跃状态。
+较旧的安装可能创建了 `~/ClosedClaw`。保留多个工作区目录可能会导致认证或状态不一致的困惑，因为同一时间只有一个工作区处于活跃状态。
 
-**建议：** 保持单一活跃工作区。如果你不再使用额外的文件夹，请将其归档或移至回收站（例如 `trash ~/openclaw`）。如果你有意保留多个工作区，请确保 `agents.defaults.workspace` 指向活跃的那个。
+**建议：** 保持单一活跃工作区。如果你不再使用额外的文件夹，请将其归档或移至回收站（例如 `trash ~/ClosedClaw`）。如果你有意保留多个工作区，请确保 `agents.defaults.workspace` 指向活跃的那个。
 
-`openclaw doctor` 在检测到额外工作区目录时会发出警告。
+`ClosedClaw doctor` 在检测到额外工作区目录时会发出警告。
 
 ## 工作区文件映射（每个文件的含义）
 
-以下是 OpenClaw 在工作区中期望的标准文件：
+以下是 ClosedClaw 在工作区中期望的标准文件：
 
 - `AGENTS.md`
   - 智能体的操作指令以及它应如何使用记忆。
@@ -107,16 +107,16 @@ x-i18n:
 - `canvas/`（可选）
   - 用于节点显示的 Canvas UI 文件（例如 `canvas/index.html`）。
 
-如果任何引导文件缺失，OpenClaw 会在会话中注入"文件缺失"标记并继续运行。大型引导文件在注入时会被截断；可通过 `agents.defaults.bootstrapMaxChars`（默认：20000）调整限制。`openclaw setup` 可以重新创建缺失的默认文件而不会覆盖现有文件。
+如果任何引导文件缺失，ClosedClaw 会在会话中注入"文件缺失"标记并继续运行。大型引导文件在注入时会被截断；可通过 `agents.defaults.bootstrapMaxChars`（默认：20000）调整限制。`ClosedClaw setup` 可以重新创建缺失的默认文件而不会覆盖现有文件。
 
 ## 不在工作区中的内容
 
-以下内容位于 `~/.openclaw/` 下，**不应**提交到工作区仓库：
+以下内容位于 `~/.ClosedClaw/` 下，**不应**提交到工作区仓库：
 
-- `~/.openclaw/openclaw.json`（配置）
-- `~/.openclaw/credentials/`（OAuth 令牌、API 密钥）
-- `~/.openclaw/agents/<agentId>/sessions/`（会话记录和元数据）
-- `~/.openclaw/skills/`（托管 Skills）
+- `~/.ClosedClaw/ClosedClaw.json`（配置）
+- `~/.ClosedClaw/credentials/`（OAuth 令牌、API 密钥）
+- `~/.ClosedClaw/agents/<agentId>/sessions/`（会话记录和元数据）
+- `~/.ClosedClaw/skills/`（托管 Skills）
 
 如果你需要迁移会话或配置，请单独复制它们并将其排除在版本控制之外。
 
@@ -131,7 +131,7 @@ x-i18n:
 如果安装了 git，全新的工作区会自动初始化。如果此工作区尚未是仓库，请运行：
 
 ```bash
-cd ~/.openclaw/workspace
+cd ~/.ClosedClaw/workspace
 git init
 git add AGENTS.md SOUL.md TOOLS.md IDENTITY.md USER.md HEARTBEAT.md memory/
 git commit -m "Add agent workspace"
@@ -156,7 +156,7 @@ git push -u origin main
 
 ```bash
 gh auth login
-gh repo create openclaw-workspace --private --source . --remote origin --push
+gh repo create ClosedClaw-workspace --private --source . --remote origin --push
 ```
 
 选项 C：GitLab 网页界面
@@ -186,10 +186,10 @@ git push
 即使在私有仓库中，也要避免在工作区中存储密钥：
 
 - API 密钥、OAuth 令牌、密码或私有凭据。
-- `~/.openclaw/` 下的任何内容。
+- `~/.ClosedClaw/` 下的任何内容。
 - 聊天记录的原始转储或敏感附件。
 
-如果你必须存储敏感引用，请使用占位符并将真实密钥保存在其他地方（密码管理器、环境变量或 `~/.openclaw/`）。
+如果你必须存储敏感引用，请使用占位符并将真实密钥保存在其他地方（密码管理器、环境变量或 `~/.ClosedClaw/`）。
 
 建议的 `.gitignore` 起始内容：
 
@@ -203,10 +203,10 @@ git push
 
 ## 将工作区迁移到新机器
 
-1. 将仓库克隆到目标路径（默认 `~/.openclaw/workspace`）。
-2. 在 `~/.openclaw/openclaw.json` 中将 `agents.defaults.workspace` 设置为该路径。
-3. 运行 `openclaw setup --workspace <path>` 以生成任何缺失的文件。
-4. 如果你需要会话记录，请从旧机器单独复制 `~/.openclaw/agents/<agentId>/sessions/`。
+1. 将仓库克隆到目标路径（默认 `~/.ClosedClaw/workspace`）。
+2. 在 `~/.ClosedClaw/ClosedClaw.json` 中将 `agents.defaults.workspace` 设置为该路径。
+3. 运行 `ClosedClaw setup --workspace <path>` 以生成任何缺失的文件。
+4. 如果你需要会话记录，请从旧机器单独复制 `~/.ClosedClaw/agents/<agentId>/sessions/`。
 
 ## 高级说明
 

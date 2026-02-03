@@ -15,7 +15,7 @@ x-i18n:
 
 # 语音唤醒（全局唤醒词）
 
-OpenClaw 将**唤醒词视为由 Gateway网关拥有的单一全局列表**。
+ClosedClaw 将**唤醒词视为由 Gateway网关拥有的单一全局列表**。
 
 - **没有按节点自定义的唤醒词**。
 - **任何节点/应用界面均可编辑**该列表；更改由 Gateway网关持久化并广播给所有人。
@@ -25,12 +25,12 @@ OpenClaw 将**唤醒词视为由 Gateway网关拥有的单一全局列表**。
 
 唤醒词存储在 Gateway网关机器上：
 
-- `~/.openclaw/settings/voicewake.json`
+- `~/.ClosedClaw/settings/voicewake.json`
 
 结构：
 
 ```json
-{ "triggers": ["openclaw", "claude", "computer"], "updatedAtMs": 1730000000000 }
+{ "triggers": ["ClosedClaw", "claude", "computer"], "updatedAtMs": 1730000000000 }
 ```
 
 ## 协议

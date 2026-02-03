@@ -31,16 +31,16 @@ Microsoft Teams 作为插件发布，不包含在核心安装中。
 通过 CLI 安装（npm 注册表）：
 
 ```bash
-openclaw plugins install @openclaw/msteams
+ClosedClaw plugins install @ClosedClaw/msteams
 ```
 
 本地检出（从 git 仓库运行时）：
 
 ```bash
-openclaw plugins install ./extensions/msteams
+ClosedClaw plugins install ./extensions/msteams
 ```
 
-如果你在配置/新手引导期间选择了 Teams 并检测到 git 检出，OpenClaw 会自动提供本地安装路径。
+如果你在配置/新手引导期间选择了 Teams 并检测到 git 检出，ClosedClaw 会自动提供本地安装路径。
 
 详情：[插件](/plugin)
 
@@ -48,7 +48,7 @@ openclaw plugins install ./extensions/msteams
 
 1. 安装 Microsoft Teams 插件。
 2. 创建一个 **Azure Bot**（App ID + 客户端密钥 + 租户 ID）。
-3. 使用这些凭据配置 OpenClaw。
+3. 使用这些凭据配置 ClosedClaw。
 4. 通过公共 URL 或隧道暴露 `/api/messages`（默认端口 3978）。
 5. 安装 Teams 应用包并启动 Gateway网关。
 
@@ -72,7 +72,7 @@ openclaw plugins install ./extensions/msteams
 
 ## 目标
 
-- 通过 Teams 私信、群聊或频道与 OpenClaw 对话。
+- 通过 Teams 私信、群聊或频道与 ClosedClaw 对话。
 - 保持路由确定性：回复始终发回消息到达的渠道。
 - 默认使用安全的渠道行为（除非另行配置，否则需要提及）。
 
@@ -121,7 +121,7 @@ openclaw plugins install ./extensions/msteams
 - 键可以是团队 ID 或名称；频道键可以是会话 ID 或名称。
 - 当 `groupPolicy="allowlist"` 且存在团队允许列表时，仅接受列出的团队/频道（提及门控）。
 - 配置向导接受 `Team/Channel` 条目并为你存储。
-- 启动时，OpenClaw 将团队/频道和用户允许列表名称解析为 ID（当 Graph 权限允许时）并记录映射；未解析的条目保持原样。
+- 启动时，ClosedClaw 将团队/频道和用户允许列表名称解析为 ID（当 Graph 权限允许时）并记录映射；未解析的条目保持原样。
 
 示例：
 
@@ -148,12 +148,12 @@ openclaw plugins install ./extensions/msteams
 2. 创建一个 **Azure Bot**（App ID + 密钥 + 租户 ID）。
 3. 构建一个引用该机器人并包含下方 RSC 权限的 **Teams 应用包**。
 4. 将 Teams 应用上传/安装到团队（或私人范围用于私信）。
-5. 在 `~/.openclaw/openclaw.json`（或环境变量）中配置 `msteams` 并启动 Gateway网关。
+5. 在 `~/.ClosedClaw/ClosedClaw.json`（或环境变量）中配置 `msteams` 并启动 Gateway网关。
 6. Gateway网关默认在 `/api/messages` 上监听 Bot Framework webhook 流量。
 
 ## Azure Bot 设置（前提条件）
 
-在配置 OpenClaw 之前，你需要创建一个 Azure Bot 资源。
+在配置 ClosedClaw 之前，你需要创建一个 Azure Bot 资源。
 
 ### 步骤 1：创建 Azure Bot
 
@@ -162,7 +162,7 @@ openclaw plugins install ./extensions/msteams
 
    | 字段               | 值                                                  |
    | ------------------ | --------------------------------------------------- |
-   | **Bot handle**     | 你的机器人名称，例如 `openclaw-msteams`（必须唯一） |
+   | **Bot handle**     | 你的机器人名称，例如 `ClosedClaw-msteams`（必须唯一） |
    | **Subscription**   | 选择你的 Azure 订阅                                 |
    | **Resource group** | 新建或使用现有的                                    |
    | **Pricing tier**   | **Free** 用于开发/测试                              |
@@ -244,8 +244,8 @@ tailscale funnel 3978
 ## 设置（最小纯文本）
 
 1. **安装 Microsoft Teams 插件**
-   - 从 npm：`openclaw plugins install @openclaw/msteams`
-   - 从本地检出：`openclaw plugins install ./extensions/msteams`
+   - 从 npm：`ClosedClaw plugins install @ClosedClaw/msteams`
+   - 从本地检出：`ClosedClaw plugins install ./extensions/msteams`
 
 2. **机器人注册**
    - 创建 Azure Bot（见上方）并记录：
@@ -261,7 +261,7 @@ tailscale funnel 3978
    - 创建图标：`outline.png`（32x32）和 `color.png`（192x192）。
    - 将三个文件打包在一起：`manifest.json`、`outline.png`、`color.png`。
 
-4. **配置 OpenClaw**
+4. **配置 ClosedClaw**
 
    ```json
    {
@@ -321,14 +321,14 @@ tailscale funnel 3978
   "manifestVersion": "1.23",
   "version": "1.0.0",
   "id": "00000000-0000-0000-0000-000000000000",
-  "name": { "short": "OpenClaw" },
+  "name": { "short": "ClosedClaw" },
   "developer": {
     "name": "Your Org",
     "websiteUrl": "https://example.com",
     "privacyUrl": "https://example.com/privacy",
     "termsOfUseUrl": "https://example.com/terms"
   },
-  "description": { "short": "OpenClaw in Teams", "full": "OpenClaw in Teams" },
+  "description": { "short": "ClosedClaw in Teams", "full": "ClosedClaw in Teams" },
   "icons": { "outline": "outline.png", "color": "color.png" },
   "accentColor": "#5B6DEF",
   "bots": [
@@ -438,7 +438,7 @@ Teams 通过 HTTP webhook 投递消息。如果处理时间过长（例如 LLM �
 - Teams 重试消息（导致重复）
 - 回复丢失
 
-OpenClaw 通过快速返回并主动发送回复来处理此问题，但非常慢的响应仍可能导致问题。
+ClosedClaw 通过快速返回并主动发送回复来处理此问题，但非常慢的响应仍可能导致问题。
 
 ### 格式
 
@@ -521,7 +521,7 @@ Teams 最近在相同的底层数据模型上引入了两种频道 UI 样式：
 - **私信：** 图片和文件附件通过 Teams bot 文件 API 可用。
 - **频道/群组：** 附件存储在 M365 存储（SharePoint/OneDrive）中。Webhook 负载仅包含 HTML 占位符，而非实际文件字节。**需要 Graph API 权限**才能下载频道附件。
 
-没有 Graph 权限时，包含图片的频道消息将仅作为纯文本接收（机器人无法访问图片内容）。默认情况下，OpenClaw 仅从 Microsoft/Teams 主机名下载媒体。通过 `channels.msteams.mediaAllowHosts` 覆盖（使用 `["*"]` 允许任何主机）。
+没有 Graph 权限时，包含图片的频道消息将仅作为纯文本接收（机器人无法访问图片内容）。默认情况下，ClosedClaw 仅从 Microsoft/Teams 主机名下载媒体。通过 `channels.msteams.mediaAllowHosts` 覆盖（使用 `["*"]` 允许任何主机）。
 
 ## 在群聊中发送文件
 
@@ -559,7 +559,7 @@ Teams 最近在相同的底层数据模型上引入了两种频道 UI 样式：
    # 响应包含："id": "contoso.sharepoint.com,guid1,guid2"
    ```
 
-4. **配置 OpenClaw：**
+4. **配置 ClosedClaw：**
    ```json5
    {
      channels: {
@@ -591,14 +591,14 @@ Teams 最近在相同的底层数据模型上引入了两种频道 UI 样式：
 
 ### 文件存储位置
 
-上传的文件存储在已配置 SharePoint 站点默认文档库中的 `/OpenClawShared/` 文件夹。
+上传的文件存储在已配置 SharePoint 站点默认文档库中的 `/ClosedClawShared/` 文件夹。
 
 ## 投票（Adaptive Cards）
 
-OpenClaw 通过 Adaptive Cards 发送 Teams 投票（没有原生 Teams 投票 API）。
+ClosedClaw 通过 Adaptive Cards 发送 Teams 投票（没有原生 Teams 投票 API）。
 
-- CLI：`openclaw message poll --channel msteams --target conversation:<id> ...`
-- 投票由 Gateway网关记录在 `~/.openclaw/msteams-polls.json` 中。
+- CLI：`ClosedClaw message poll --channel msteams --target conversation:<id> ...`
+- 投票由 Gateway网关记录在 `~/.ClosedClaw/msteams-polls.json` 中。
 - Gateway网关必须保持在线以记录投票。
 - 投票尚不会自动发布结果摘要（如需要请查看存储文件）。
 
@@ -626,7 +626,7 @@ OpenClaw 通过 Adaptive Cards 发送 Teams 投票（没有原生 Teams 投票 A
 **CLI：**
 
 ```bash
-openclaw message send --channel msteams \
+ClosedClaw message send --channel msteams \
   --target "conversation:19:abc...@thread.tacv2" \
   --card '{"type":"AdaptiveCard","version":"1.5","body":[{"type":"TextBlock","text":"Hello!"}]}'
 ```
@@ -648,16 +648,16 @@ Microsoft Teams 目标使用前缀区分用户和会话：
 
 ```bash
 # 按 ID 发送给用户
-openclaw message send --channel msteams --target "user:40a1a0ed-..." --message "Hello"
+ClosedClaw message send --channel msteams --target "user:40a1a0ed-..." --message "Hello"
 
 # 按显示名称发送给用户（触发 Graph API 查找）
-openclaw message send --channel msteams --target "user:John Smith" --message "Hello"
+ClosedClaw message send --channel msteams --target "user:John Smith" --message "Hello"
 
 # 发送到群聊或频道
-openclaw message send --channel msteams --target "conversation:19:abc...@thread.tacv2" --message "Hello"
+ClosedClaw message send --channel msteams --target "conversation:19:abc...@thread.tacv2" --message "Hello"
 
 # 向会话发送 Adaptive Card
-openclaw message send --channel msteams --target "conversation:19:abc...@thread.tacv2" \
+ClosedClaw message send --channel msteams --target "conversation:19:abc...@thread.tacv2" \
   --card '{"type":"AdaptiveCard","version":"1.5","body":[{"type":"TextBlock","text":"Hello"}]}'
 ```
 

@@ -1,8 +1,8 @@
 ---
 read_when:
-  - 你想为 OpenClaw 选择一个聊天渠道
+  - 你想为 ClosedClaw 选择一个聊天渠道
   - 你需要快速了解支持的消息平台
-summary: OpenClaw 可连接的消息平台
+summary: ClosedClaw 可连接的消息平台
 title: 聊天渠道
 x-i18n:
   generated_at: "2026-02-01T19:21:22Z"
@@ -15,7 +15,7 @@ x-i18n:
 
 # 聊天渠道
 
-OpenClaw 可以在你已经使用的任何聊天应用上与你对话。每个渠道通过 Gateway网关连接。所有渠道都支持文本；媒体和回应功能因渠道而异。
+ClosedClaw 可以在你已经使用的任何聊天应用上与你对话。每个渠道通过 Gateway网关连接。所有渠道都支持文本；媒体和回应功能因渠道而异。
 
 ## 支持的渠道
 
@@ -41,7 +41,7 @@ OpenClaw 可以在你已经使用的任何聊天应用上与你对话。每个�
 
 ## 注意事项
 
-- 渠道可以同时运行；配置多个渠道后 OpenClaw 会按聊天路由。
+- 渠道可以同时运行；配置多个渠道后 ClosedClaw 会按聊天路由。
 - 最快的设置通常是 **Telegram**（简单的 bot token）。WhatsApp 需要二维码配对并在磁盘上存储更多状态。
 - 群组行为因渠道而异；参见[群组](/concepts/groups)。
 - 私信配对和允许列表出于安全考虑强制执行；参见[安全](/gateway/security)。

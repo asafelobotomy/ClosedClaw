@@ -1,6 +1,6 @@
 ---
 read_when:
-  - 你已安装 OpenClaw 但 `openclaw` 提示"command not found"
+  - 你已安装 ClosedClaw 但 `ClosedClaw` 提示"command not found"
   - 你正在新机器上配置 Node.js/npm
   - npm install -g ... 因权限或 PATH 问题失败
 summary: Node.js + npm 安装完整性检查：版本、PATH 及全局安装
@@ -16,9 +16,9 @@ x-i18n:
 
 # Node.js + npm（PATH 安装完整性检查）
 
-OpenClaw 的运行时基线要求为 **Node 22+**。
+ClosedClaw 的运行时基线要求为 **Node 22+**。
 
-如果你能运行 `npm install -g openclaw@latest`，但之后看到 `openclaw: command not found`，这几乎总是 **PATH** 问题：npm 存放全局二进制文件的目录不在你 shell 的 PATH 中。
+如果你能运行 `npm install -g ClosedClaw@latest`，但之后看到 `ClosedClaw: command not found`，这几乎总是 **PATH** 问题：npm 存放全局二进制文件的目录不在你 shell 的 PATH 中。
 
 ## 快速诊断
 
@@ -31,7 +31,7 @@ npm prefix -g
 echo "$PATH"
 ```
 
-如果 `$(npm prefix -g)/bin`（macOS/Linux）或 `$(npm prefix -g)`（Windows）**未出现**在 `echo "$PATH"` 的输出中，你的 shell 就无法找到全局 npm 二进制文件（包括 `openclaw`）。
+如果 `$(npm prefix -g)/bin`（macOS/Linux）或 `$(npm prefix -g)`（Windows）**未出现**在 `echo "$PATH"` 的输出中，你的 shell 就无法找到全局 npm 二进制文件（包括 `ClosedClaw`）。
 
 ## 修复：将 npm 的全局 bin 目录添加到 PATH
 

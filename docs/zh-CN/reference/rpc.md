@@ -15,20 +15,20 @@ x-i18n:
 
 # RPC 适配器
 
-OpenClaw 通过 JSON-RPC 集成外部 CLI。目前使用两种模式。
+ClosedClaw 通过 JSON-RPC 集成外部 CLI。目前使用两种模式。
 
 ## 模式 A：HTTP 守护进程（signal-cli）
 
 - `signal-cli` 作为守护进程运行，通过 HTTP 提供 JSON-RPC。
 - 事件流使用 SSE（`/api/v1/events`）。
 - 健康探测：`/api/v1/check`。
-- 当 `channels.signal.autoStart=true` 时，OpenClaw 管理其生命周期。
+- 当 `channels.signal.autoStart=true` 时，ClosedClaw 管理其生命周期。
 
 设置和端点详见 [Signal](/channels/signal)。
 
 ## 模式 B：stdio 子进程（imsg）
 
-- OpenClaw 将 `imsg rpc` 作为子进程启动。
+- ClosedClaw 将 `imsg rpc` 作为子进程启动。
 - JSON-RPC 通过 stdin/stdout 以行分隔传输（每行一个 JSON 对象）。
 - 无需 TCP 端口，无需守护进程。
 

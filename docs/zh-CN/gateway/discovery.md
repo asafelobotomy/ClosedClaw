@@ -16,12 +16,12 @@ x-i18n:
 
 # 发现与传输
 
-OpenClaw 有两个表面上看起来相似但实际上不同的问题：
+ClosedClaw 有两个表面上看起来相似但实际上不同的问题：
 
 1. **操作者远程控制**：macOS 菜单栏应用控制运行在其他位置的 Gateway网关。
 2. **节点配对**：iOS/Android（以及未来的节点）找到 Gateway网关并安全配对。
 
-设计目标是将所有网络发现/广播保留在 **Node Gateway网关**（`openclaw gateway`）中，让客户端（Mac 应用、iOS）作为消费者。
+设计目标是将所有网络发现/广播保留在 **Node Gateway网关**（`ClosedClaw gateway`）中，让客户端（Mac 应用、iOS）作为消费者。
 
 ## 术语
 
@@ -63,7 +63,7 @@ Bonjour 是尽力而为的机制，无法跨网络。它仅用于"同一局域�
 #### 服务信标详情
 
 - 服务类型：
-  - `_openclaw-gw._tcp`（Gateway网关传输信标）
+  - `_ClosedClaw-gw._tcp`（Gateway网关传输信标）
 - TXT 键（非机密）：
   - `role=gateway`
   - `lanHost=<主机名>.local`
@@ -71,17 +71,17 @@ Bonjour 是尽力而为的机制，无法跨网络。它仅用于"同一局域�
   - `gatewayPort=18789`（Gateway网关 WS + HTTP）
   - `gatewayTls=1`（仅在启用 TLS 时）
   - `gatewayTlsSha256=<sha256>`（仅在启用 TLS 且指纹可用时）
-  - `canvasPort=18793`（默认 canvas 主机端口；服务于 `/__openclaw__/canvas/`）
-  - `cliPath=<路径>`（可选；可运行的 `openclaw` 入口点或二进制文件的绝对路径）
+  - `canvasPort=18793`（默认 canvas 主机端口；服务于 `/__ClosedClaw__/canvas/`）
+  - `cliPath=<路径>`（可选；可运行的 `ClosedClaw` 入口点或二进制文件的绝对路径）
   - `tailnetDns=<magicdns>`（可选提示；当 Tailscale 可用时自动检测）
 
 禁用/覆盖：
 
-- `OPENCLAW_DISABLE_BONJOUR=1` 禁用广播。
-- `~/.openclaw/openclaw.json` 中的 `gateway.bind` 控制 Gateway网关绑定模式。
-- `OPENCLAW_SSH_PORT` 覆盖 TXT 中广播的 SSH 端口（默认为 22）。
-- `OPENCLAW_TAILNET_DNS` 发布 `tailnetDns` 提示（MagicDNS）。
-- `OPENCLAW_CLI_PATH` 覆盖广播的 CLI 路径。
+- `ClosedClaw_DISABLE_BONJOUR=1` 禁用广播。
+- `~/.ClosedClaw/ClosedClaw.json` 中的 `gateway.bind` 控制 Gateway网关绑定模式。
+- `ClosedClaw_SSH_PORT` 覆盖 TXT 中广播的 SSH 端口（默认为 22）。
+- `ClosedClaw_TAILNET_DNS` 发布 `tailnetDns` 提示（MagicDNS）。
+- `ClosedClaw_CLI_PATH` 覆盖广播的 CLI 路径。
 
 ### 2) Tailnet（跨网络）
 

@@ -2,7 +2,7 @@
 read_when:
   - 实现 macOS 应用功能
   - 更改 macOS 上的 Gateway网关生命周期或节点桥接
-summary: OpenClaw macOS 伴侣应用（菜单栏 + Gateway网关代理）
+summary: ClosedClaw macOS 伴侣应用（菜单栏 + Gateway网关代理）
 title: macOS 应用
 x-i18n:
   generated_at: "2026-02-01T21:33:53Z"
@@ -13,9 +13,9 @@ x-i18n:
   workflow: 15
 ---
 
-# OpenClaw macOS 伴侣应用（菜单栏 + Gateway网关代理）
+# ClosedClaw macOS 伴侣应用（菜单栏 + Gateway网关代理）
 
-macOS 应用是 OpenClaw 的**菜单栏伴侣**。它拥有权限，在本地管理/连接 Gateway网关（launchd 或手动），并将 macOS 能力作为节点暴露给智能体。
+macOS 应用是 ClosedClaw 的**菜单栏伴侣**。它拥有权限，在本地管理/连接 Gateway网关（launchd 或手动），并将 macOS 能力作为节点暴露给智能体。
 
 ## 功能说明
 
@@ -25,18 +25,18 @@ macOS 应用是 OpenClaw 的**菜单栏伴侣**。它拥有权限，在本地管
 - 暴露 macOS 专有工具（画布、摄像头、屏幕录制、`system.run`）。
 - 在**远程**模式下启动本地节点宿主服务（launchd），在**本地**模式下停止它。
 - 可选托管 **PeekabooBridge** 用于 UI 自动化。
-- 根据请求通过 npm/pnpm 安装全局 CLI（`openclaw`）（不建议将 bun 用于 Gateway网关运行时）。
+- 根据请求通过 npm/pnpm 安装全局 CLI（`ClosedClaw`）（不建议将 bun 用于 Gateway网关运行时）。
 
 ## 本地模式与远程模式
 
-- **本地**（默认）：如果存在正在运行的本地 Gateway网关，应用会连接到它；否则通过 `openclaw gateway install` 启用 launchd 服务。
+- **本地**（默认）：如果存在正在运行的本地 Gateway网关，应用会连接到它；否则通过 `ClosedClaw gateway install` 启用 launchd 服务。
 - **远程**：应用通过 SSH/Tailscale 连接到 Gateway网关，不会启动本地进程。
   应用会启动本地**节点宿主服务**，以便远程 Gateway网关可以访问这台 Mac。
   应用不会将 Gateway网关作为子进程启动。
 
 ## Launchd 控制
 
-应用管理一个标签为 `bot.molt.gateway` 的用户级 LaunchAgent（使用 `--profile`/`OPENCLAW_PROFILE` 时为 `bot.molt.<profile>`；旧版 `com.openclaw.*` 仍会被卸载）。
+应用管理一个标签为 `bot.molt.gateway` 的用户级 LaunchAgent（使用 `--profile`/`ClosedClaw_PROFILE` 时为 `bot.molt.<profile>`；旧版 `com.ClosedClaw.*` 仍会被卸载）。
 
 ```bash
 launchctl kickstart -k gui/$UID/bot.molt.gateway
@@ -45,7 +45,7 @@ launchctl bootout gui/$UID/bot.molt.gateway
 
 运行命名配置文件时，请将标签替换为 `bot.molt.<profile>`。
 
-如果 LaunchAgent 未安装，可从应用中启用或运行 `openclaw gateway install`。
+如果 LaunchAgent 未安装，可从应用中启用或运行 `ClosedClaw gateway install`。
 
 ## 节点能力（Mac）
 
@@ -78,7 +78,7 @@ Gateway网关 -> Node Service (WS)
 安全策略 + 询问方式 + 允许列表存储在 Mac 本地：
 
 ```
-~/.openclaw/exec-approvals.json
+~/.ClosedClaw/exec-approvals.json
 ```
 
 示例：
@@ -108,14 +108,14 @@ Gateway网关 -> Node Service (WS)
 
 ## 深度链接
 
-应用注册 `openclaw://` URL 方案用于本地操作。
+应用注册 `ClosedClaw://` URL 方案用于本地操作。
 
-### `openclaw://agent`
+### `ClosedClaw://agent`
 
 触发 Gateway网关 `agent` 请求。
 
 ```bash
-open 'openclaw://agent?message=Hello%20from%20deep%20link'
+open 'ClosedClaw://agent?message=Hello%20from%20deep%20link'
 ```
 
 查询参数：
@@ -134,7 +134,7 @@ open 'openclaw://agent?message=Hello%20from%20deep%20link'
 
 ## 新手引导流程（典型）
 
-1. 安装并启动 **OpenClaw.app**。
+1. 安装并启动 **ClosedClaw.app**。
 2. 完成权限清单（TCC 提示）。
 3. 确保**本地**模式已激活且 Gateway网关正在运行。
 4. 如需终端访问，安装 CLI。
@@ -142,7 +142,7 @@ open 'openclaw://agent?message=Hello%20from%20deep%20link'
 ## 构建与开发工作流（原生）
 
 - `cd apps/macos && swift build`
-- `swift run OpenClaw`（或 Xcode）
+- `swift run ClosedClaw`（或 Xcode）
 - 打包应用：`scripts/package-mac-app.sh`
 
 ## 调试 Gateway网关连接（macOS CLI）
@@ -151,8 +151,8 @@ open 'openclaw://agent?message=Hello%20from%20deep%20link'
 
 ```bash
 cd apps/macos
-swift run openclaw-mac connect --json
-swift run openclaw-mac discover --timeout 3000 --json
+swift run ClosedClaw-mac connect --json
+swift run ClosedClaw-mac discover --timeout 3000 --json
 ```
 
 连接选项：
@@ -169,7 +169,7 @@ swift run openclaw-mac discover --timeout 3000 --json
 - `--timeout <ms>`：总发现窗口时间（默认：`2000`）
 - `--json`：结构化输出，便于对比
 
-提示：与 `openclaw gateway discover --json` 对比，查看 macOS 应用的发现管道（NWBrowser + tailnet DNS-SD 回退）是否与 Node CLI 基于 `dns-sd` 的发现有差异。
+提示：与 `ClosedClaw gateway discover --json` 对比，查看 macOS 应用的发现管道（NWBrowser + tailnet DNS-SD 回退）是否与 Node CLI 基于 `dns-sd` 的发现有差异。
 
 ## 远程连接机制（SSH 隧道）
 

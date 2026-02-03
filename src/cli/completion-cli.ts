@@ -47,7 +47,7 @@ export function registerCompletionCli(program: Command) {
     });
 }
 
-export async function installCompletion(shell: string, yes: boolean, binName = "openclaw") {
+export async function installCompletion(shell: string, yes: boolean, binName = "ClosedClaw") {
   const home = process.env.HOME || os.homedir();
   let profilePath = "";
   let sourceLine = "";
@@ -99,7 +99,7 @@ export async function installCompletion(shell: string, yes: boolean, binName = "
       console.log(`Installing completion to ${profilePath}...`);
     }
 
-    await fs.appendFile(profilePath, `\n# OpenClaw Completion\n${sourceLine}\n`);
+    await fs.appendFile(profilePath, `\n# ClosedClaw Completion\n${sourceLine}\n`);
     console.log(`Completion installed. Restart your shell or run: source ${profilePath}`);
   } catch (err) {
     console.error(`Failed to install completion: ${err as string}`);
@@ -327,7 +327,7 @@ function generateFishCompletion(program: Command): string {
     } // Only push if not root, or consistent root handling
 
     // Fish uses 'seen_subcommand_from' to determine context.
-    // For root: complete -c openclaw -n "__fish_use_subcommand" -a "subcmd" -d "desc"
+    // For root: complete -c ClosedClaw -n "__fish_use_subcommand" -a "subcmd" -d "desc"
 
     // Root logic
     if (parents.length === 0) {
@@ -361,7 +361,7 @@ function generateFishCompletion(program: Command): string {
       // Actually, a robust fish completion often requires defining a function to check current line.
       // For simplicity, we'll assume standard fish helper __fish_seen_subcommand_from.
 
-      // To properly scope to 'openclaw gateway' and not 'openclaw other gateway', we need to check the sequence.
+      // To properly scope to 'ClosedClaw gateway' and not 'ClosedClaw other gateway', we need to check the sequence.
       // A simplified approach:
 
       // Subcommands

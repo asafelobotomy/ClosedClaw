@@ -1,12 +1,12 @@
 {
-  "name": "@openclaw/google-gemini-cli-auth",
+  "name": "@ClosedClaw/google-gemini-cli-auth",
   "version": "2026.2.1",
-  "description": "OpenClaw Gemini CLI OAuth provider plugin",
+  "description": "ClosedClaw Gemini CLI OAuth provider plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "ClosedClaw": "workspace:*"
   },
-  "openclaw": {
+  "ClosedClaw": {
     "extensions": [
       "./index.ts"
     ]

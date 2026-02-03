@@ -4,7 +4,7 @@ import {
   GroupPolicySchema,
   MarkdownConfigSchema,
   requireOpenAllowFrom,
-} from "openclaw/plugin-sdk";
+} from "ClosedClaw/plugin-sdk";
 import { z } from "zod";
 
 const MattermostAccountSchemaBase = z

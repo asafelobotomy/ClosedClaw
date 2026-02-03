@@ -1,5 +1,5 @@
 ---
-summary: "Run OpenClaw Gateway on exe.dev (VM + HTTPS proxy) for remote access"
+summary: "Run ClosedClaw Gateway on exe.dev (VM + HTTPS proxy) for remote access"
 read_when:
   - You want a cheap always-on Linux host for the Gateway
   - You want remote Control UI access without running your own VPS
@@ -8,13 +8,13 @@ title: "exe.dev"
 
 # exe.dev
 
-Goal: OpenClaw Gateway running on an exe.dev VM, reachable from your laptop via: `https://<vm-name>.exe.xyz`
+Goal: ClosedClaw Gateway running on an exe.dev VM, reachable from your laptop via: `https://<vm-name>.exe.xyz`
 
 This page assumes exe.dev's default **exeuntu** image. If you picked a different distro, map packages accordingly.
 
 ## Beginner quick path
 
-1. [https://exe.new/openclaw](https://exe.new/openclaw)
+1. [https://exe.new/ClosedClaw](https://exe.new/ClosedClaw)
 2. Fill in your auth key/token as needed
 3. Click on "Agent" next to your VM, and wait...
 4. ???
@@ -27,11 +27,11 @@ This page assumes exe.dev's default **exeuntu** image. If you picked a different
 
 ## Automated Install with Shelley
 
-Shelley, [exe.dev](https://exe.dev)'s agent, can install OpenClaw instantly with our
+Shelley, [exe.dev](https://exe.dev)'s agent, can install ClosedClaw instantly with our
 prompt. The prompt used is as below:
 
 ```
-Set up OpenClaw (https://docs.openclaw.ai/install) on this VM. Use the non-interactive and accept-risk flags for openclaw onboarding. Add the supplied auth or token as needed. Configure nginx to forward from the default port 18789 to the root location on the default enabled site config, making sure to enable Websocket support. Pairing is done by "openclaw devices list" and "openclaw device approve <request id>". Make sure the dashboard shows that OpenClaw's health is OK. exe.dev handles forwarding from port 8000 to port 80/443 and HTTPS for us, so the final "reachable" should be <vm-name>.exe.xyz, without port specification.
+Set up ClosedClaw (https://docs.ClosedClaw.ai/install) on this VM. Use the non-interactive and accept-risk flags for ClosedClaw onboarding. Add the supplied auth or token as needed. Configure nginx to forward from the default port 18789 to the root location on the default enabled site config, making sure to enable Websocket support. Pairing is done by "ClosedClaw devices list" and "ClosedClaw device approve <request id>". Make sure the dashboard shows that ClosedClaw's health is OK. exe.dev handles forwarding from port 8000 to port 80/443 and HTTPS for us, so the final "reachable" should be <vm-name>.exe.xyz, without port specification.
 ```
 
 ## Manual installation
@@ -50,7 +50,7 @@ Then connect:
 ssh <vm-name>.exe.xyz
 ```
 
-Tip: keep this VM **stateful**. OpenClaw stores state under `~/.openclaw/` and `~/.openclaw/workspace/`.
+Tip: keep this VM **stateful**. ClosedClaw stores state under `~/.ClosedClaw/` and `~/.ClosedClaw/workspace/`.
 
 ## 2) Install prerequisites (on the VM)
 
@@ -59,15 +59,15 @@ sudo apt-get update
 sudo apt-get install -y git curl jq ca-certificates openssl
 ```
 
-## 3) Install OpenClaw
+## 3) Install ClosedClaw
 
-Run the OpenClaw install script:
+Run the ClosedClaw install script:
 
 ```bash
-curl -fsSL https://openclaw.ai/install.sh | bash
+curl -fsSL https://ClosedClaw.ai/install.sh | bash
 ```
 
-## 4) Setup nginx to proxy OpenClaw to port 8000
+## 4) Setup nginx to proxy ClosedClaw to port 8000
 
 Edit `/etc/nginx/sites-enabled/default` with
 
@@ -101,10 +101,10 @@ server {
 }
 ```
 
-## 5) Access OpenClaw and grant privileges
+## 5) Access ClosedClaw and grant privileges
 
 Access `https://<vm-name>.exe.xyz/?token=YOUR-TOKEN-FROM-TERMINAL` (see the Control UI output from onboarding). Approve
-devices with `openclaw devices list` and `openclaw devices approve <requestId>`. When in doubt,
+devices with `ClosedClaw devices list` and `ClosedClaw devices approve <requestId>`. When in doubt,
 use Shelley from your browser!
 
 ## Remote Access
@@ -116,10 +116,10 @@ with email auth.
 ## Updating
 
 ```bash
-npm i -g openclaw@latest
-openclaw doctor
-openclaw gateway restart
-openclaw health
+npm i -g ClosedClaw@latest
+ClosedClaw doctor
+ClosedClaw gateway restart
+ClosedClaw health
 ```
 
 Guide: [Updating](/install/updating)

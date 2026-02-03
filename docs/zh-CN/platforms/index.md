@@ -15,7 +15,7 @@ x-i18n:
 
 # 平台
 
-OpenClaw 核心使用 TypeScript 编写。**推荐使用 Node 作为运行时**。
+ClosedClaw 核心使用 TypeScript 编写。**推荐使用 Node 作为运行时**。
 不建议在 Gateway网关上使用 Bun（存在 WhatsApp/Telegram 相关的 bug）。
 
 配套应用支持 macOS（菜单栏应用）和移动节点（iOS/Android）。Windows 和
@@ -43,18 +43,18 @@ Windows 的原生配套应用同样在规划中；推荐通过 WSL2 使用 Gatew
 - 安装指南：[快速开始](/start/getting-started)
 - Gateway网关运维手册：[Gateway网关](/gateway)
 - Gateway网关配置：[配置](/gateway/configuration)
-- 服务状态：`openclaw gateway status`
+- 服务状态：`ClosedClaw gateway status`
 
 ## Gateway网关服务安装（CLI）
 
 使用以下任一方式（均受支持）：
 
-- 向导（推荐）：`openclaw onboard --install-daemon`
-- 直接安装：`openclaw gateway install`
-- 配置流程：`openclaw configure` → 选择 **Gateway网关 service**
-- 修复/迁移：`openclaw doctor`（会提示安装或修复服务）
+- 向导（推荐）：`ClosedClaw onboard --install-daemon`
+- 直接安装：`ClosedClaw gateway install`
+- 配置流程：`ClosedClaw configure` → 选择 **Gateway网关 service**
+- 修复/迁移：`ClosedClaw doctor`（会提示安装或修复服务）
 
 服务目标取决于操作系统：
 
-- macOS：LaunchAgent（`bot.molt.gateway` 或 `bot.molt.<profile>`；旧版 `com.openclaw.*`）
-- Linux/WSL2：systemd 用户服务（`openclaw-gateway[-<profile>].service`）
+- macOS：LaunchAgent（`bot.molt.gateway` 或 `bot.molt.<profile>`；旧版 `com.ClosedClaw.*`）
+- Linux/WSL2：systemd 用户服务（`ClosedClaw-gateway[-<profile>].service`）

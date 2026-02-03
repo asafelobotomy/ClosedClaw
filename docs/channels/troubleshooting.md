@@ -11,8 +11,8 @@ title: "Channel Troubleshooting"
 Start with:
 
 ```bash
-openclaw doctor
-openclaw channels status --probe
+ClosedClaw doctor
+ClosedClaw channels status --probe
 ```
 
 `channels status --probe` prints warnings when it can detect common channel misconfigurations, and includes small live checks (credentials, some permissions/membership).

@@ -18,13 +18,13 @@ WhatsApp 渠道通过 **Baileys Web** 运行。本文档记录了发送、Gatewa
 
 ## 目标
 
-- 通过 `openclaw message send --media` 发送带可选说明文字的媒体。
+- 通过 `ClosedClaw message send --media` 发送带可选说明文字的媒体。
 - 允许来自 Web 收件箱的自动回复在文本旁包含媒体。
 - 保持每种类型的限制合理且可预测。
 
 ## CLI 接口
 
-- `openclaw message send --media <path-or-url> [--message <caption>]`
+- `ClosedClaw message send --media <path-or-url> [--message <caption>]`
   - `--media` 可选；说明文字可以为空，用于仅发送媒体。
   - `--dry-run` 打印解析后的载荷；`--json` 输出 `{ channel, to, messageId, mediaUrl, caption }`。
 
@@ -43,12 +43,12 @@ WhatsApp 渠道通过 **Baileys Web** 运行。本文档记录了发送、Gatewa
 ## 自动回复管道
 
 - `getReplyFromConfig` 返回 `{ text?, mediaUrl?, mediaUrls? }`。
-- 当存在媒体时，Web 发送器使用与 `openclaw message send` 相同的管道解析本地路径或 URL。
+- 当存在媒体时，Web 发送器使用与 `ClosedClaw message send` 相同的管道解析本地路径或 URL。
 - 如果提供了多个媒体条目，则按顺序依次发送。
 
 ## 入站媒体转命令 (Pi)
 
-- 当入站 Web 消息包含媒体时，OpenClaw 会下载到临时文件并暴露模板变量：
+- 当入站 Web 消息包含媒体时，ClosedClaw 会下载到临时文件并暴露模板变量：
   - `{{MediaUrl}}` 入站媒体的伪 URL。
   - `{{MediaPath}}` 运行命令前写入的本地临时路径。
 - 当启用了每会话 Docker 沙箱时，入站媒体会被复制到沙箱工作区中，`MediaPath`/`MediaUrl` 会被重写为类似 `media/inbound/<filename>` 的相对路径。

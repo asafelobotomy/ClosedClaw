@@ -33,9 +33,9 @@ x-i18n:
 
 ## 探测工作原理
 
-- 应用每约 60 秒以及按需通过 `ShellExecutor` 运行 `openclaw health --json`。探测会加载凭据并报告状态，不会发送消息。
+- 应用每约 60 秒以及按需通过 `ShellExecutor` 运行 `ClosedClaw health --json`。探测会加载凭据并报告状态，不会发送消息。
 - 分别缓存上次成功的快照和上次错误，以避免闪烁；显示各自的时间戳。
 
 ## 不确定时
 
-- 你仍然可以使用 [Gateway网关健康检查](/gateway/health) 中的 CLI 流程（`openclaw status`、`openclaw status --deep`、`openclaw health --json`），并跟踪 `/tmp/openclaw/openclaw-*.log` 中的 `web-heartbeat` / `web-reconnect`。
+- 你仍然可以使用 [Gateway网关健康检查](/gateway/health) 中的 CLI 流程（`ClosedClaw status`、`ClosedClaw status --deep`、`ClosedClaw health --json`），并跟踪 `/tmp/ClosedClaw/ClosedClaw-*.log` 中的 `web-heartbeat` / `web-reconnect`。

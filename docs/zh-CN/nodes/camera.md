@@ -15,7 +15,7 @@ x-i18n:
 
 # 相机捕获（智能体）
 
-OpenClaw 支持智能体工作流中的**相机捕获**：
+ClosedClaw 支持智能体工作流中的**相机捕获**：
 
 - **iOS 节点**（通过 Gateway网关配对）：通过 `node.invoke` 捕获**照片**（`jpg`）或**短视频片段**（`mp4`，可选音频）。
 - **Android 节点**（通过 Gateway网关配对）：通过 `node.invoke` 捕获**照片**（`jpg`）或**短视频片段**（`mp4`，可选音频）。
@@ -75,10 +75,10 @@ OpenClaw 支持智能体工作流中的**相机捕获**：
 示例：
 
 ```bash
-openclaw nodes camera snap --node <id>               # 默认：前后摄像头都拍摄（2 行 MEDIA 输出）
-openclaw nodes camera snap --node <id> --facing front
-openclaw nodes camera clip --node <id> --duration 3000
-openclaw nodes camera clip --node <id> --no-audio
+ClosedClaw nodes camera snap --node <id>               # 默认：前后摄像头都拍摄（2 行 MEDIA 输出）
+ClosedClaw nodes camera snap --node <id> --facing front
+ClosedClaw nodes camera clip --node <id> --duration 3000
+ClosedClaw nodes camera clip --node <id> --no-audio
 ```
 
 注意事项：
@@ -116,31 +116,31 @@ openclaw nodes camera clip --node <id> --no-audio
 
 macOS 伴侣应用提供一个复选框：
 
-- **设置 → 通用 → 允许相机**（`openclaw.cameraEnabled`）
+- **设置 → 通用 → 允许相机**（`ClosedClaw.cameraEnabled`）
   - 默认：**关闭**
   - 关闭时：相机请求返回"Camera disabled by user"。
 
 ### CLI 辅助工具（节点调用）
 
-使用主 `openclaw` CLI 在 macOS 节点上调用相机命令。
+使用主 `ClosedClaw` CLI 在 macOS 节点上调用相机命令。
 
 示例：
 
 ```bash
-openclaw nodes camera list --node <id>            # 列出相机 ID
-openclaw nodes camera snap --node <id>            # 输出 MEDIA:<path>
-openclaw nodes camera snap --node <id> --max-width 1280
-openclaw nodes camera snap --node <id> --delay-ms 2000
-openclaw nodes camera snap --node <id> --device-id <id>
-openclaw nodes camera clip --node <id> --duration 10s          # 输出 MEDIA:<path>
-openclaw nodes camera clip --node <id> --duration-ms 3000      # 输出 MEDIA:<path>（旧版标志）
-openclaw nodes camera clip --node <id> --device-id <id>
-openclaw nodes camera clip --node <id> --no-audio
+ClosedClaw nodes camera list --node <id>            # 列出相机 ID
+ClosedClaw nodes camera snap --node <id>            # 输出 MEDIA:<path>
+ClosedClaw nodes camera snap --node <id> --max-width 1280
+ClosedClaw nodes camera snap --node <id> --delay-ms 2000
+ClosedClaw nodes camera snap --node <id> --device-id <id>
+ClosedClaw nodes camera clip --node <id> --duration 10s          # 输出 MEDIA:<path>
+ClosedClaw nodes camera clip --node <id> --duration-ms 3000      # 输出 MEDIA:<path>（旧版标志）
+ClosedClaw nodes camera clip --node <id> --device-id <id>
+ClosedClaw nodes camera clip --node <id> --no-audio
 ```
 
 注意事项：
 
-- `openclaw nodes camera snap` 默认 `maxWidth=1600`，除非被覆盖。
+- `ClosedClaw nodes camera snap` 默认 `maxWidth=1600`，除非被覆盖。
 - 在 macOS 上，`camera.snap` 在预热/曝光稳定后等待 `delayMs`（默认 2000ms）再进行捕获。
 - 照片载荷会被重新压缩，以将 base64 控制在 5 MB 以内。
 
@@ -154,7 +154,7 @@ openclaw nodes camera clip --node <id> --no-audio
 如需*屏幕*录制（非相机），请使用 macOS 伴侣应用：
 
 ```bash
-openclaw nodes screen record --node <id> --duration 10s --fps 15   # 输出 MEDIA:<path>
+ClosedClaw nodes screen record --node <id> --duration 10s --fps 15   # 输出 MEDIA:<path>
 ```
 
 注意事项：

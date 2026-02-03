@@ -1,4 +1,4 @@
-const KEY = "openclaw.control.settings.v1";
+const KEY = "ClosedClaw.control.settings.v1";
 
 import type { ThemeMode } from "./theme";
 

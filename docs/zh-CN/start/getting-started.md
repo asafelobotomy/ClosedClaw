@@ -17,11 +17,11 @@ x-i18n:
 
 目标：从 **零开始** → **第一次成功聊天** （使用合理的默认配置）尽可能快地完成。
 
-最快聊天方式：打开控制界面（无需设置渠道）。运行 `openclaw dashboard`
+最快聊天方式：打开控制界面（无需设置渠道）。运行 `ClosedClaw dashboard`
 然后在浏览器中聊天，或打开 `http://127.0.0.1:18789/` （在 Gateway网关主机上）。
 文档： [仪表盘](/web/dashboard) 和 [控制界面](/web/control-ui)。
 
-推荐路径：使用 **CLI 新手引导向导** （`openclaw onboard`）。它会设置：
+推荐路径：使用 **CLI 新手引导向导** （`ClosedClaw onboard`）。它会设置：
 
 - 模型/认证（推荐使用 OAuth）
 - Gateway网关设置
@@ -39,7 +39,7 @@ x-i18n:
   "routing": {
     "agents": {
       "main": {
-        "workspace": "~/.openclaw/workspace",
+        "workspace": "~/.ClosedClaw/workspace",
         "sandbox": { "mode": "off" }
       }
     }
@@ -52,7 +52,7 @@ x-i18n:
 - Node `>=22`
 - `pnpm` （可选；如果从源码构建则推荐安装）
 - **推荐：** Brave Search API 密钥用于网络搜索。最简单的方式：
-  `openclaw configure --section web` （存储 `tools.web.search.apiKey`）。
+  `ClosedClaw configure --section web` （存储 `tools.web.search.apiKey`）。
   参见 [网络工具](/tools/web)。
 
 macOS：如果你计划构建应用程序，请安装 Xcode / CLT。如果仅使用 CLI + Gateway网关，Node 就足够了。
@@ -61,7 +61,7 @@ Windows：使用 **WSL2** （推荐 Ubuntu）。强烈推荐使用 WSL2；原生
 ## 1）安装 CLI（推荐）
 
 ```bash
-curl -fsSL https://openclaw.bot/install.sh | bash
+curl -fsSL https://ClosedClaw.bot/install.sh | bash
 ```
 
 安装选项（安装方式、非交互式、从 GitHub 安装）： [安装](/install)。
@@ -69,23 +69,23 @@ curl -fsSL https://openclaw.bot/install.sh | bash
 Windows (PowerShell)：
 
 ```powershell
-iwr -useb https://openclaw.ai/install.ps1 | iex
+iwr -useb https://ClosedClaw.ai/install.ps1 | iex
 ```
 
 替代方式（全局安装）：
 
 ```bash
-npm install -g openclaw@latest
+npm install -g ClosedClaw@latest
 ```
 
 ```bash
-pnpm add -g openclaw@latest
+pnpm add -g ClosedClaw@latest
 ```
 
 ## 2）运行新手引导向导（并安装服务）
 
 ```bash
-openclaw onboard --install-daemon
+ClosedClaw onboard --install-daemon
 ```
 
 你需要选择的内容：
@@ -103,21 +103,21 @@ openclaw onboard --install-daemon
 
 - **推荐的 Anthropic 路径：** 设置 API 密钥（向导可以将其存储以供服务使用）。 `claude setup-token`：你可以复用 Claude Code 凭据。
 
-- OAuth 凭据（旧版导入）： `~/.openclaw/credentials/oauth.json`
-- 认证配置文件（OAuth + API 密钥）： `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
+- OAuth 凭据（旧版导入）： `~/.ClosedClaw/credentials/oauth.json`
+- 认证配置文件（OAuth + API 密钥）： `~/.ClosedClaw/agents/<agentId>/agent/auth-profiles.json`
 
 无头/服务器提示：先在普通机器上完成 OAuth，然后复制 `oauth.json` 到 Gateway网关主机上。
 
 ## 3）启动 Gateway网关如果你在新手引导过程中安装了服务，Gateway网关应该已经在运行：
 
 ```bash
-openclaw gateway status
+ClosedClaw gateway status
 ```
 
 手动运行（前台）：
 
 ```bash
-openclaw gateway --port 18789 --verbose
+ClosedClaw gateway --port 18789 --verbose
 ```
 
 仪表盘（本地 local loopback）： `http://127.0.0.1:18789/`
@@ -128,9 +128,9 @@ openclaw gateway --port 18789 --verbose
 ## 3.5）快速验证（2 分钟）
 
 ```bash
-openclaw status
-openclaw health
-openclaw security audit --deep
+ClosedClaw status
+ClosedClaw health
+ClosedClaw security audit --deep
 ```
 
 ## 4）配对 + 连接你的第一个聊天界面
@@ -138,7 +138,7 @@ openclaw security audit --deep
 ### WhatsApp（二维码登录）
 
 ```bash
-openclaw channels login
+ClosedClaw channels login
 ```
 
 通过 WhatsApp → 设置 → 已关联设备 进行扫描。
@@ -161,32 +161,32 @@ WhatsApp 文档： [WhatsApp](/channels/whatsapp)
 如果你的第一条私信没有收到回复，请批准配对：
 
 ```bash
-openclaw pairing list whatsapp
-openclaw pairing approve whatsapp <code>
+ClosedClaw pairing list whatsapp
+ClosedClaw pairing approve whatsapp <code>
 ```
 
 配对文档： [配对](/start/pairing)
 
 ## 从源码安装（开发）
 
-如果你正在开发 OpenClaw 本身，请从源码运行：
+如果你正在开发 ClosedClaw 本身，请从源码运行：
 
 ```bash
-git clone https://github.com/openclaw/openclaw.git
-cd openclaw
+git clone https://github.com/ClosedClaw/ClosedClaw.git
+cd ClosedClaw
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run
 pnpm build
-openclaw onboard --install-daemon
+ClosedClaw onboard --install-daemon
 ```
 
-如果你尚未进行全局安装，请通过以下方式运行新手引导流程 `pnpm openclaw ...` （从仓库中）。
+如果你尚未进行全局安装，请通过以下方式运行新手引导流程 `pnpm ClosedClaw ...` （从仓库中）。
 `pnpm build` 也会打包 A2UI 资源；如果你只需要运行该步骤，请使用 `pnpm canvas:a2ui:bundle`。
 
 Gateway网关（从此仓库）：
 
 ```bash
-node openclaw.mjs gateway --port 18789 --verbose
+node ClosedClaw.mjs gateway --port 18789 --verbose
 ```
 
 ## 7）端到端验证
@@ -194,13 +194,13 @@ node openclaw.mjs gateway --port 18789 --verbose
 在新终端中，发送一条测试消息：
 
 ```bash
-openclaw message send --target +15555550123 --message "Hello from OpenClaw"
+ClosedClaw message send --target +15555550123 --message "Hello from ClosedClaw"
 ```
 
-如果 `openclaw health` 显示"未配置认证"，请返回向导设置 OAuth/密钥认证——智能体在没有认证的情况下将无法响应。
+如果 `ClosedClaw health` 显示"未配置认证"，请返回向导设置 OAuth/密钥认证——智能体在没有认证的情况下将无法响应。
 
-提示： `openclaw status --all` 是最佳的可粘贴只读调试报告。
-健康探针： `openclaw health` （或 `openclaw status --deep`）向运行中的 Gateway网关请求健康快照。
+提示： `ClosedClaw status --all` 是最佳的可粘贴只读调试报告。
+健康探针： `ClosedClaw health` （或 `ClosedClaw status --deep`）向运行中的 Gateway网关请求健康快照。
 
 ## 后续步骤（可选，但强烈推荐）
 

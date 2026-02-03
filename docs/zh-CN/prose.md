@@ -3,7 +3,7 @@ read_when:
   - 你想运行或编写 .prose 工作流
   - 你想启用 OpenProse 插件
   - 你需要了解状态存储
-summary: OpenProse：OpenClaw 中的 .prose 工作流、斜杠命令和状态管理
+summary: OpenProse：ClosedClaw 中的 .prose 工作流、斜杠命令和状态管理
 title: OpenProse
 x-i18n:
   generated_at: "2026-02-01T21:34:47Z"
@@ -16,7 +16,7 @@ x-i18n:
 
 # OpenProse
 
-OpenProse 是一种可移植的、以 Markdown 为核心的工作流格式，用于编排 AI 会话。在 OpenClaw 中，它以插件形式提供，安装后包含一个 OpenProse Skills 包和一个 `/prose` 斜杠命令。程序存放在 `.prose` 文件中，可以通过显式控制流生成多个子智能体。
+OpenProse 是一种可移植的、以 Markdown 为核心的工作流格式，用于编排 AI 会话。在 ClosedClaw 中，它以插件形式提供，安装后包含一个 OpenProse Skills 包和一个 `/prose` 斜杠命令。程序存放在 `.prose` 文件中，可以通过显式控制流生成多个子智能体。
 
 官方网站：https://www.prose.md
 
@@ -31,18 +31,18 @@ OpenProse 是一种可移植的、以 Markdown 为核心的工作流格式，用
 内置插件默认处于禁用状态。启用 OpenProse：
 
 ```bash
-openclaw plugins enable open-prose
+ClosedClaw plugins enable open-prose
 ```
 
 启用插件后重启 Gateway网关。
 
-开发/本地签出：`openclaw plugins install ./extensions/open-prose`
+开发/本地签出：`ClosedClaw plugins install ./extensions/open-prose`
 
 相关文档：[插件](/plugin)、[插件清单](/plugins/manifest)、[Skills](/tools/skills)。
 
 ## 斜杠命令
 
-OpenProse 注册 `/prose` 作为用户可调用的 Skills 命令。它路由到 OpenProse 虚拟机指令，底层使用 OpenClaw 工具。
+OpenProse 注册 `/prose` 作为用户可调用的 Skills 命令。它路由到 OpenProse 虚拟机指令，底层使用 ClosedClaw 工具。
 
 常用命令：
 
@@ -122,11 +122,11 @@ OpenProse 支持多种状态后端：
 `/prose run <handle/slug>` 解析为 `https://p.prose.md/<handle>/<slug>`。
 直接 URL 按原样获取。此功能使用 `web_fetch` 工具（POST 请求使用 `exec`）。
 
-## OpenClaw 运行时映射
+## ClosedClaw 运行时映射
 
-OpenProse 程序映射到 OpenClaw 原语：
+OpenProse 程序映射到 ClosedClaw 原语：
 
-| OpenProse 概念       | OpenClaw 工具    |
+| OpenProse 概念       | ClosedClaw 工具    |
 | -------------------- | ---------------- |
 | 生成会话 / Task 工具 | `sessions_spawn` |
 | 文件读写             | `read` / `write` |
@@ -136,6 +136,6 @@ OpenProse 程序映射到 OpenClaw 原语：
 
 ## 安全与审批
 
-请像对待代码一样对待 `.prose` 文件。运行前请先审查。使用 OpenClaw 工具允许列表和审批门控来控制副作用。
+请像对待代码一样对待 `.prose` 文件。运行前请先审查。使用 ClosedClaw 工具允许列表和审批门控来控制副作用。
 
 如需确定性的、带审批门控的工作流，可参考 [Lobster](/tools/lobster) 进行比较。

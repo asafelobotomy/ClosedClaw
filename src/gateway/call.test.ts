@@ -258,7 +258,7 @@ describe("callGateway error details", () => {
 });
 
 describe("callGateway password resolution", () => {
-  const originalEnvPassword = process.env.OPENCLAW_GATEWAY_PASSWORD;
+  const originalEnvPassword = process.env.ClosedClaw_GATEWAY_PASSWORD;
 
   beforeEach(() => {
     loadConfig.mockReset();
@@ -268,16 +268,16 @@ describe("callGateway password resolution", () => {
     startMode = "hello";
     closeCode = 1006;
     closeReason = "";
-    delete process.env.OPENCLAW_GATEWAY_PASSWORD;
+    delete process.env.ClosedClaw_GATEWAY_PASSWORD;
     resolveGatewayPort.mockReturnValue(18789);
     pickPrimaryTailnetIPv4.mockReturnValue(undefined);
   });
 
   afterEach(() => {
     if (originalEnvPassword == null) {
-      delete process.env.OPENCLAW_GATEWAY_PASSWORD;
+      delete process.env.ClosedClaw_GATEWAY_PASSWORD;
     } else {
-      process.env.OPENCLAW_GATEWAY_PASSWORD = originalEnvPassword;
+      process.env.ClosedClaw_GATEWAY_PASSWORD = originalEnvPassword;
     }
   });
 
@@ -296,7 +296,7 @@ describe("callGateway password resolution", () => {
   });
 
   it("prefers env password over local config password", async () => {
-    process.env.OPENCLAW_GATEWAY_PASSWORD = "from-env";
+    process.env.ClosedClaw_GATEWAY_PASSWORD = "from-env";
     loadConfig.mockReturnValue({
       gateway: {
         mode: "local",
@@ -325,7 +325,7 @@ describe("callGateway password resolution", () => {
   });
 
   it("prefers env password over remote password in remote mode", async () => {
-    process.env.OPENCLAW_GATEWAY_PASSWORD = "from-env";
+    process.env.ClosedClaw_GATEWAY_PASSWORD = "from-env";
     loadConfig.mockReturnValue({
       gateway: {
         mode: "remote",
@@ -341,7 +341,7 @@ describe("callGateway password resolution", () => {
 });
 
 describe("callGateway token resolution", () => {
-  const originalEnvToken = process.env.OPENCLAW_GATEWAY_TOKEN;
+  const originalEnvToken = process.env.ClosedClaw_GATEWAY_TOKEN;
 
   beforeEach(() => {
     loadConfig.mockReset();
@@ -351,21 +351,21 @@ describe("callGateway token resolution", () => {
     startMode = "hello";
     closeCode = 1006;
     closeReason = "";
-    delete process.env.OPENCLAW_GATEWAY_TOKEN;
+    delete process.env.ClosedClaw_GATEWAY_TOKEN;
     resolveGatewayPort.mockReturnValue(18789);
     pickPrimaryTailnetIPv4.mockReturnValue(undefined);
   });
 
   afterEach(() => {
     if (originalEnvToken == null) {
-      delete process.env.OPENCLAW_GATEWAY_TOKEN;
+      delete process.env.ClosedClaw_GATEWAY_TOKEN;
     } else {
-      process.env.OPENCLAW_GATEWAY_TOKEN = originalEnvToken;
+      process.env.ClosedClaw_GATEWAY_TOKEN = originalEnvToken;
     }
   });
 
   it("uses remote token when remote mode uses url override", async () => {
-    process.env.OPENCLAW_GATEWAY_TOKEN = "env-token";
+    process.env.ClosedClaw_GATEWAY_TOKEN = "env-token";
     loadConfig.mockReturnValue({
       gateway: {
         mode: "remote",

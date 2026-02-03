@@ -1,6 +1,6 @@
 ---
 read_when:
-  - 你想通过 OpenClaw 发起外呼语音通话
+  - 你想通过 ClosedClaw 发起外呼语音通话
   - 你正在配置或开发语音通话插件
 summary: 语音通话插件：通过 Twilio/Telnyx/Plivo 进行外呼和来电（插件安装 + 配置 + CLI）
 title: 语音通话插件
@@ -15,7 +15,7 @@ x-i18n:
 
 # 语音通话（插件）
 
-通过插件为 OpenClaw 提供语音通话功能。支持外呼通知和多轮对话的来电策略。
+通过插件为 ClosedClaw 提供语音通话功能。支持外呼通知和多轮对话的来电策略。
 
 当前支持的提供商：
 
@@ -29,7 +29,7 @@ x-i18n:
 - 安装插件
 - 重启 Gateway网关
 - 在 `plugins.entries.voice-call.config` 下进行配置
-- 使用 `openclaw voicecall ...` 或 `voice_call` 工具
+- 使用 `ClosedClaw voicecall ...` 或 `voice_call` 工具
 
 ## 运行位置（本地 vs 远程）
 
@@ -42,7 +42,7 @@ x-i18n:
 ### 方式 A：从 npm 安装（推荐）
 
 ```bash
-openclaw plugins install @openclaw/voice-call
+ClosedClaw plugins install @ClosedClaw/voice-call
 ```
 
 安装后重启 Gateway网关。
@@ -50,7 +50,7 @@ openclaw plugins install @openclaw/voice-call
 ### 方式 B：从本地文件夹安装（开发环境，不复制文件）
 
 ```bash
-openclaw plugins install ./extensions/voice-call
+ClosedClaw plugins install ./extensions/voice-call
 cd ./extensions/voice-call && pnpm install
 ```
 
@@ -218,13 +218,13 @@ cd ./extensions/voice-call && pnpm install
 ## CLI
 
 ```bash
-openclaw voicecall call --to "+15555550123" --message "Hello from OpenClaw"
-openclaw voicecall continue --call-id <id> --message "Any questions?"
-openclaw voicecall speak --call-id <id> --message "One moment"
-openclaw voicecall end --call-id <id>
-openclaw voicecall status --call-id <id>
-openclaw voicecall tail
-openclaw voicecall expose --mode funnel
+ClosedClaw voicecall call --to "+15555550123" --message "Hello from ClosedClaw"
+ClosedClaw voicecall continue --call-id <id> --message "Any questions?"
+ClosedClaw voicecall speak --call-id <id> --message "One moment"
+ClosedClaw voicecall end --call-id <id>
+ClosedClaw voicecall status --call-id <id>
+ClosedClaw voicecall tail
+ClosedClaw voicecall expose --mode funnel
 ```
 
 ## 智能体工具

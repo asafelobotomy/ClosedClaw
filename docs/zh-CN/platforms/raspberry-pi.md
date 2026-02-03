@@ -1,9 +1,9 @@
 ---
 read_when:
-  - 在 Raspberry Pi 上设置 OpenClaw
-  - 在 ARM 设备上运行 OpenClaw
+  - 在 Raspberry Pi 上设置 ClosedClaw
+  - 在 ARM 设备上运行 ClosedClaw
   - 搭建低成本的全天候个人 AI
-summary: 在 Raspberry Pi 上运行 OpenClaw（低成本自托管方案）
+summary: 在 Raspberry Pi 上运行 ClosedClaw（低成本自托管方案）
 title: Raspberry Pi
 x-i18n:
   generated_at: "2026-02-01T21:34:34Z"
@@ -14,11 +14,11 @@ x-i18n:
   workflow: 15
 ---
 
-# 在 Raspberry Pi 上运行 OpenClaw
+# 在 Raspberry Pi 上运行 ClosedClaw
 
 ## 目标
 
-在 Raspberry Pi 上运行一个持久的、全天候在线的 OpenClaw Gateway网关，**一次性费用约 $35-80**（无月费）。
+在 Raspberry Pi 上运行一个持久的、全天候在线的 ClosedClaw Gateway网关，**一次性费用约 $35-80**（无月费）。
 
 适用场景：
 
@@ -114,19 +114,19 @@ echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p
 ```
 
-## 6) 安装 OpenClaw
+## 6) 安装 ClosedClaw
 
 ### 方案 A：标准安装（推荐）
 
 ```bash
-curl -fsSL https://openclaw.ai/install.sh | bash
+curl -fsSL https://ClosedClaw.ai/install.sh | bash
 ```
 
 ### 方案 B：可修改安装（适合折腾）
 
 ```bash
-git clone https://github.com/openclaw/openclaw.git
-cd openclaw
+git clone https://github.com/ClosedClaw/ClosedClaw.git
+cd ClosedClaw
 npm install
 npm run build
 npm link
@@ -137,7 +137,7 @@ npm link
 ## 7) 运行新手引导
 
 ```bash
-openclaw onboard --install-daemon
+ClosedClaw onboard --install-daemon
 ```
 
 按照向导操作：
@@ -151,13 +151,13 @@ openclaw onboard --install-daemon
 
 ```bash
 # 检查状态
-openclaw status
+ClosedClaw status
 
 # 检查服务
-sudo systemctl status openclaw
+sudo systemctl status ClosedClaw
 
 # 查看日志
-journalctl -u openclaw -f
+journalctl -u ClosedClaw -f
 ```
 
 ## 9) 访问仪表盘
@@ -180,8 +180,8 @@ curl -fsSL https://tailscale.com/install.sh | sh
 sudo tailscale up
 
 # 更新配置
-openclaw config set gateway.bind tailnet
-sudo systemctl restart openclaw
+ClosedClaw config set gateway.bind tailnet
+sudo systemctl restart ClosedClaw
 ```
 
 ---
@@ -228,7 +228,7 @@ htop
 
 ### 二进制兼容性
 
-大多数 OpenClaw 功能在 ARM64 上正常工作，但部分外部二进制文件可能需要 ARM 构建版本：
+大多数 ClosedClaw 功能在 ARM64 上正常工作，但部分外部二进制文件可能需要 ARM 构建版本：
 
 | 工具               | ARM64 状态 | 备注                                |
 | ------------------ | ---------- | ----------------------------------- |
@@ -278,13 +278,13 @@ uname -m
 
 ```bash
 # 检查服务是否已启用
-sudo systemctl is-enabled openclaw
+sudo systemctl is-enabled ClosedClaw
 
 # 如未启用则启用
-sudo systemctl enable openclaw
+sudo systemctl enable ClosedClaw
 
 # 开机启动
-sudo systemctl start openclaw
+sudo systemctl start ClosedClaw
 ```
 
 ---
@@ -311,12 +311,12 @@ free -h
 
 ```bash
 # 检查日志
-journalctl -u openclaw --no-pager -n 100
+journalctl -u ClosedClaw --no-pager -n 100
 
 # 常见修复方法：重新构建
-cd ~/openclaw  # 如果使用可修改安装
+cd ~/ClosedClaw  # 如果使用可修改安装
 npm run build
-sudo systemctl restart openclaw
+sudo systemctl restart ClosedClaw
 ```
 
 ### ARM 二进制问题

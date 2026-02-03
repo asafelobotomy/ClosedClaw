@@ -15,7 +15,7 @@ x-i18n:
 
 # 认证
 
-OpenClaw 支持通过 OAuth 和 API 密钥对模型提供商进行认证。对于 Anthropic 账户，我们推荐使用 **API 密钥**。对于 Claude 订阅访问，请使用 `claude setup-token` 创建的长期有效令牌。
+ClosedClaw 支持通过 OAuth 和 API 密钥对模型提供商进行认证。对于 Anthropic 账户，我们推荐使用 **API 密钥**。对于 Claude 订阅访问，请使用 `claude setup-token` 创建的长期有效令牌。
 
 参见 [/concepts/oauth](/concepts/oauth) 了解全部 OAuth 流程和存储布局。
 
@@ -24,17 +24,17 @@ OpenClaw 支持通过 OAuth 和 API 密钥对模型提供商进行认证。对�
 如果你直接使用 Anthropic，请使用 API 密钥。
 
 1. 在 Anthropic 控制台中创建 API 密钥。
-2. 将其放置在 **Gateway网关主机**（运行 `openclaw gateway` 的机器）上。
+2. 将其放置在 **Gateway网关主机**（运行 `ClosedClaw gateway` 的机器）上。
 
 ```bash
 export ANTHROPIC_API_KEY="..."
-openclaw models status
+ClosedClaw models status
 ```
 
-3. 如果 Gateway网关在 systemd/launchd 下运行，建议将密钥放在 `~/.openclaw/.env` 中，以便守护进程能够读取：
+3. 如果 Gateway网关在 systemd/launchd 下运行，建议将密钥放在 `~/.ClosedClaw/.env` 中，以便守护进程能够读取：
 
 ```bash
-cat >> ~/.openclaw/.env <<'EOF'
+cat >> ~/.ClosedClaw/.env <<'EOF'
 ANTHROPIC_API_KEY=...
 EOF
 ```
@@ -42,13 +42,13 @@ EOF
 然后重启守护进程（或重启 Gateway网关进程）并重新检查：
 
 ```bash
-openclaw models status
-openclaw doctor
+ClosedClaw models status
+ClosedClaw doctor
 ```
 
-如果你不想自行管理环境变量，新手引导向导可以为守护进程存储 API 密钥：`openclaw onboard`。
+如果你不想自行管理环境变量，新手引导向导可以为守护进程存储 API 密钥：`ClosedClaw onboard`。
 
-参见[帮助](/help)了解环境变量继承的详细信息（`env.shellEnv`、`~/.openclaw/.env`、systemd/launchd）。
+参见[帮助](/help)了解环境变量继承的详细信息（`env.shellEnv`、`~/.ClosedClaw/.env`、systemd/launchd）。
 
 ## Anthropic：setup-token（订阅认证）
 
@@ -58,16 +58,16 @@ openclaw doctor
 claude setup-token
 ```
 
-然后将其粘贴到 OpenClaw 中：
+然后将其粘贴到 ClosedClaw 中：
 
 ```bash
-openclaw models auth setup-token --provider anthropic
+ClosedClaw models auth setup-token --provider anthropic
 ```
 
 如果令牌是在另一台机器上创建的，请手动粘贴：
 
 ```bash
-openclaw models auth paste-token --provider anthropic
+ClosedClaw models auth paste-token --provider anthropic
 ```
 
 如果你看到如下 Anthropic 错误：
@@ -81,14 +81,14 @@ This credential is only authorized for use with Claude Code and cannot be used f
 手动输入令牌（适用于任何提供商；写入 `auth-profiles.json` 并更新配置）：
 
 ```bash
-openclaw models auth paste-token --provider anthropic
-openclaw models auth paste-token --provider openrouter
+ClosedClaw models auth paste-token --provider anthropic
+ClosedClaw models auth paste-token --provider openrouter
 ```
 
 适用于自动化的检查（过期/缺失时退出码为 `1`，即将过期时为 `2`）：
 
 ```bash
-openclaw models status --check
+ClosedClaw models status --check
 ```
 
 可选的运维脚本（systemd/Termux）文档参见：[/automation/auth-monitoring](/automation/auth-monitoring)
@@ -98,8 +98,8 @@ openclaw models status --check
 ## 检查模型认证状态
 
 ```bash
-openclaw models status
-openclaw doctor
+ClosedClaw models status
+ClosedClaw doctor
 ```
 
 ## 控制使用哪个凭据
@@ -115,9 +115,9 @@ openclaw doctor
 为智能体设置显式的认证配置顺序覆盖（存储在该智能体的 `auth-profiles.json` 中）：
 
 ```bash
-openclaw models auth order get --provider anthropic
-openclaw models auth order set --provider anthropic anthropic:default
-openclaw models auth order clear --provider anthropic
+ClosedClaw models auth order get --provider anthropic
+ClosedClaw models auth order set --provider anthropic anthropic:default
+ClosedClaw models auth order clear --provider anthropic
 ```
 
 使用 `--agent <id>` 指定特定智能体；省略则使用已配置的默认智能体。
@@ -129,12 +129,12 @@ openclaw models auth order clear --provider anthropic
 如果 Anthropic 令牌配置缺失，请在 **Gateway网关主机**上运行 `claude setup-token`，然后重新检查：
 
 ```bash
-openclaw models status
+ClosedClaw models status
 ```
 
 ### 令牌即将过期/已过期
 
-运行 `openclaw models status` 确认哪个配置即将过期。如果配置缺失，请重新运行 `claude setup-token` 并再次粘贴令牌。
+运行 `ClosedClaw models status` 确认哪个配置即将过期。如果配置缺失，请重新运行 `claude setup-token` 并再次粘贴令牌。
 
 ## 要求
 

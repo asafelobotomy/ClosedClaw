@@ -1,16 +1,16 @@
 {
-  "name": "@openclaw/tlon",
+  "name": "@ClosedClaw/tlon",
   "version": "2026.2.1",
-  "description": "OpenClaw Tlon/Urbit channel plugin",
+  "description": "ClosedClaw Tlon/Urbit channel plugin",
   "type": "module",
   "dependencies": {
     "@urbit/aura": "^3.0.0",
     "@urbit/http-api": "^3.0.0"
   },
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "ClosedClaw": "workspace:*"
   },
-  "openclaw": {
+  "ClosedClaw": {
     "extensions": [
       "./index.ts"
     ],
@@ -25,7 +25,7 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@openclaw/tlon",
+      "npmSpec": "@ClosedClaw/tlon",
       "localPath": "extensions/tlon",
       "defaultChoice": "npm"
     }

@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const CORE_PACKAGE_NAMES = new Set(["openclaw"]);
+const CORE_PACKAGE_NAMES = new Set(["ClosedClaw"]);
 
 async function readPackageName(dir: string): Promise<string | null> {
   try {
@@ -43,7 +43,7 @@ function candidateDirsFromArgv1(argv1: string): string[] {
   return candidates;
 }
 
-export async function resolveOpenClawPackageRoot(opts: {
+export async function resolveClosedClawPackageRoot(opts: {
   cwd?: string;
   argv1?: string;
   moduleUrl?: string;

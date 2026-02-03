@@ -1,6 +1,6 @@
 ---
 last_updated: "2026-01-19"
-owner: openclaw
+owner: ClosedClaw
 status: 草稿
 summary: 计划：添加 OpenResponses /v1/responses 端点并平稳废弃 Chat Completions
 title: OpenResponses Gateway网关计划
@@ -17,7 +17,7 @@ x-i18n:
 
 ## 背景
 
-OpenClaw Gateway网关当前在 `/v1/chat/completions` 暴露了一个最小化的 OpenAI 兼容 Chat Completions 端点（参见 [OpenAI Chat Completions](/gateway/openai-http-api)）。
+ClosedClaw Gateway网关当前在 `/v1/chat/completions` 暴露了一个最小化的 OpenAI 兼容 Chat Completions 端点（参见 [OpenAI Chat Completions](/gateway/openai-http-api)）。
 
 Open Responses 是一个基于 OpenAI Responses API 的开放推理标准。它专为智能体工作流设计，使用基于项目的输入和语义化流式事件。OpenResponses 规范定义的是 `/v1/responses`，而非 `/v1/chat/completions`。
 

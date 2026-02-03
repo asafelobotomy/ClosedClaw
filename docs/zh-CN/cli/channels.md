@@ -2,7 +2,7 @@
 read_when:
   - 你想添加/移除渠道账号（WhatsApp/Telegram/Discord/Google Chat/Slack/Mattermost（插件）/Signal/iMessage）
   - 你想检查渠道状态或查看渠道日志
-summary: "`openclaw channels` 的 CLI 参考（账号、状态、登录/登出、日志）"
+summary: "`ClosedClaw channels` 的 CLI 参考（账号、状态、登录/登出、日志）"
 title: channels
 x-i18n:
   generated_at: "2026-02-01T19:58:48Z"
@@ -13,7 +13,7 @@ x-i18n:
   workflow: 14
 ---
 
-# `openclaw channels`
+# `ClosedClaw channels`
 
 管理 Gateway网关上的聊天渠道账号及其运行时状态。
 
@@ -25,43 +25,43 @@ x-i18n:
 ## 常用命令
 
 ```bash
-openclaw channels list
-openclaw channels status
-openclaw channels capabilities
-openclaw channels capabilities --channel discord --target channel:123
-openclaw channels resolve --channel slack "#general" "@jane"
-openclaw channels logs --channel all
+ClosedClaw channels list
+ClosedClaw channels status
+ClosedClaw channels capabilities
+ClosedClaw channels capabilities --channel discord --target channel:123
+ClosedClaw channels resolve --channel slack "#general" "@jane"
+ClosedClaw channels logs --channel all
 ```
 
 ## 添加/移除账号
 
 ```bash
-openclaw channels add --channel telegram --token <bot-token>
-openclaw channels remove --channel telegram --delete
+ClosedClaw channels add --channel telegram --token <bot-token>
+ClosedClaw channels remove --channel telegram --delete
 ```
 
-提示：`openclaw channels add --help` 可查看各渠道的专用参数（token、app token、signal-cli 路径等）。
+提示：`ClosedClaw channels add --help` 可查看各渠道的专用参数（token、app token、signal-cli 路径等）。
 
 ## 登录/登出（交互式）
 
 ```bash
-openclaw channels login --channel whatsapp
-openclaw channels logout --channel whatsapp
+ClosedClaw channels login --channel whatsapp
+ClosedClaw channels logout --channel whatsapp
 ```
 
 ## 故障排除
 
-- 运行 `openclaw status --deep` 进行全面探测。
-- 使用 `openclaw doctor` 获取引导式修复。
-- `openclaw channels list` 输出 `Claude: HTTP 403 ... user:profile` → 用量快照需要 `user:profile` 权限范围。使用 `--no-usage`，或提供 claude.ai 会话密钥（`CLAUDE_WEB_SESSION_KEY` / `CLAUDE_WEB_COOKIE`），或通过 Claude Code CLI 重新认证。
+- 运行 `ClosedClaw status --deep` 进行全面探测。
+- 使用 `ClosedClaw doctor` 获取引导式修复。
+- `ClosedClaw channels list` 输出 `Claude: HTTP 403 ... user:profile` → 用量快照需要 `user:profile` 权限范围。使用 `--no-usage`，或提供 claude.ai 会话密钥（`CLAUDE_WEB_SESSION_KEY` / `CLAUDE_WEB_COOKIE`），或通过 Claude Code CLI 重新认证。
 
 ## 能力探测
 
 获取提供商能力提示（可用的 intents/scopes）以及静态功能支持：
 
 ```bash
-openclaw channels capabilities
-openclaw channels capabilities --channel discord --target channel:123
+ClosedClaw channels capabilities
+ClosedClaw channels capabilities --channel discord --target channel:123
 ```
 
 说明：
@@ -75,9 +75,9 @@ openclaw channels capabilities --channel discord --target channel:123
 使用提供商目录将渠道/用户名称解析为 ID：
 
 ```bash
-openclaw channels resolve --channel slack "#general" "@jane"
-openclaw channels resolve --channel discord "My Server/#support" "@someone"
-openclaw channels resolve --channel matrix "Project Room"
+ClosedClaw channels resolve --channel slack "#general" "@jane"
+ClosedClaw channels resolve --channel discord "My Server/#support" "@someone"
+ClosedClaw channels resolve --channel matrix "Project Room"
 ```
 
 说明：

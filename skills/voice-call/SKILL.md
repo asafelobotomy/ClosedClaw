@@ -1,9 +1,9 @@
 ---
 name: voice-call
-description: Start voice calls via the OpenClaw voice-call plugin.
+description: Start voice calls via the ClosedClaw voice-call plugin.
 metadata:
   {
-    "openclaw":
+    "ClosedClaw":
       {
         "emoji": "📞",
         "skillKey": "voice-call",
@@ -19,8 +19,8 @@ Use the voice-call plugin to start or inspect calls (Twilio, Telnyx, Plivo, or m
 ## CLI
 
 ```bash
-openclaw voicecall call --to "+15555550123" --message "Hello from OpenClaw"
-openclaw voicecall status --call-id <id>
+ClosedClaw voicecall call --to "+15555550123" --message "Hello from ClosedClaw"
+ClosedClaw voicecall status --call-id <id>
 ```
 
 ## Tool

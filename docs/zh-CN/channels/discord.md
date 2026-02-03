@@ -20,7 +20,7 @@ x-i18n:
 
 1. 创建一个 Discord 机器人并复制机器人 token。
 2. 在 Discord 应用设置中，启用 **Message Content Intent**（如果你计划使用允许列表或名称查找，还需启用 **Server Members Intent**）。
-3. 为 OpenClaw 设置 token：
+3. 为 ClosedClaw 设置 token：
    - 环境变量：`DISCORD_BOT_TOKEN=...`
    - 或配置：`channels.discord.token: "..."`。
    - 如果两者都设置了，配置优先（环境变量回退仅用于默认账户）。
@@ -43,7 +43,7 @@ x-i18n:
 
 ## 目标
 
-- 通过 Discord 私信或服务器频道与 OpenClaw 对话。
+- 通过 Discord 私信或服务器频道与 ClosedClaw 对话。
 - 私聊合并到智能体的主会话（默认 `agent:main:main`）；服务器频道作为 `agent:<agentId>:discord:channel:<channelId>` 保持隔离（显示名称使用 `discord:<guildSlug>#<channelSlug>`）。
 - 群组私信默认被忽略；通过 `channels.discord.dm.groupEnabled` 启用，可选通过 `channels.discord.dm.groupChannels` 限制。
 - 保持路由确定性：回复始终发回消息到达的渠道。
@@ -52,12 +52,12 @@ x-i18n:
 
 1. 创建 Discord 应用 → Bot，启用所需的 intent（私信 + 服务器消息 + 消息内容），获取机器人 token。
 2. 邀请机器人到你的服务器，赋予在你需要使用的地方读取/发送消息所需的权限。
-3. 使用 `channels.discord.token` 配置 OpenClaw（或使用 `DISCORD_BOT_TOKEN` 作为回退）。
+3. 使用 `channels.discord.token` 配置 ClosedClaw（或使用 `DISCORD_BOT_TOKEN` 作为回退）。
 4. 运行 Gateway网关；当 token 可用（配置优先，环境变量回退）且 `channels.discord.enabled` 不为 `false` 时，它会自动启动 Discord 渠道。
    - 如果你偏好使用环境变量，设置 `DISCORD_BOT_TOKEN`（配置块是可选的）。
 5. 私聊：投递时使用 `user:<id>`（或 `<@id>` 提及）；所有回合都进入共享的 `main` 会话。裸数字 ID 具有歧义性，会被拒绝。
 6. 服务器频道：投递时使用 `channel:<channelId>`。默认需要提及，可按服务器或按频道设置。
-7. 私聊：默认通过 `channels.discord.dm.policy`（默认：`"pairing"`）进行安全保护。未知发送者会收到配对码（1 小时后过期）；通过 `openclaw pairing approve discord <code>` 批准。
+7. 私聊：默认通过 `channels.discord.dm.policy`（默认：`"pairing"`）进行安全保护。未知发送者会收到配对码（1 小时后过期）；通过 `ClosedClaw pairing approve discord <code>` 批准。
    - 要保持旧的"对任何人开放"行为：设置 `channels.discord.dm.policy="open"` 和 `channels.discord.dm.allowFrom=["*"]`。
    - 要硬性限制允许列表：设置 `channels.discord.dm.policy="allowlist"` 并在 `channels.discord.dm.allowFrom` 中列出发送者。
    - 要忽略所有私信：设置 `channels.discord.dm.enabled=false` 或 `channels.discord.dm.policy="disabled"`。
@@ -89,7 +89,7 @@ x-i18n:
 
 ## 如何创建自己的机器人
 
-这是在服务器（guild）频道（如 `#help`）中运行 OpenClaw 的"Discord 开发者门户"设置。
+这是在服务器（guild）频道（如 `#help`）中运行 ClosedClaw 的"Discord 开发者门户"设置。
 
 ### 1) 创建 Discord 应用 + 机器人用户
 
@@ -98,7 +98,7 @@ x-i18n:
    - **Bot** → **Add Bot**
    - 复制 **Bot Token**（这就是你放入 `DISCORD_BOT_TOKEN` 的值）
 
-### 2) 启用 OpenClaw 所需的网关 intent
+### 2) 启用 ClosedClaw 所需的网关 intent
 
 Discord 会阻止"特权 intent"，除非你明确启用。
 
@@ -134,7 +134,7 @@ Discord 会阻止"特权 intent"，除非你明确启用。
 
 ### 4) 获取 ID（服务器/用户/频道）
 
-Discord 到处使用数字 ID；OpenClaw 配置推荐使用 ID。
+Discord 到处使用数字 ID；ClosedClaw 配置推荐使用 ID。
 
 1. Discord（桌面/网页）→ **用户设置** → **高级** → 启用 **开发者模式**
 2. 右键点击：
@@ -142,7 +142,7 @@ Discord 到处使用数字 ID；OpenClaw 配置推荐使用 ID。
    - 频道（例如 `#help`）→ **复制频道 ID**
    - 你的用户 → **复制用户 ID**
 
-### 5) 配置 OpenClaw
+### 5) 配置 ClosedClaw
 
 #### Token
 
@@ -214,7 +214,7 @@ Discord 到处使用数字 ID；OpenClaw 配置推荐使用 ID。
 
 ### 故障排除
 
-- 首先：运行 `openclaw doctor` 和 `openclaw channels status --probe`（可操作的警告 + 快速审计）。
+- 首先：运行 `ClosedClaw doctor` 和 `ClosedClaw channels status --probe`（可操作的警告 + 快速审计）。
 - **"Used disallowed intents"**：在开发者门户中启用 **Message Content Intent**（以及可能的 **Server Members Intent**），然后重启 Gateway网关。
 - **机器人连接但在服务器频道中从不回复**：
   - 缺少 **Message Content Intent**，或
@@ -285,12 +285,12 @@ Discord 到处使用数字 ID；OpenClaw 配置推荐使用 ID。
         policy: "pairing", // pairing | allowlist | open | disabled
         allowFrom: ["123456789012345678", "steipete"],
         groupEnabled: false,
-        groupChannels: ["openclaw-dm"],
+        groupChannels: ["ClosedClaw-dm"],
       },
       guilds: {
         "*": { requireMention: true },
         "123456789012345678": {
-          slug: "friends-of-openclaw",
+          slug: "friends-of-ClosedClaw",
           requireMention: false,
           reactionNotifications: "own",
           users: ["987654321098765432", "steipete"],
@@ -361,7 +361,7 @@ Discord 到处使用数字 ID；OpenClaw 配置推荐使用 ID。
 
 ### PluralKit（PK）支持
 
-启用 PK 查找，使代理消息解析为底层的系统 + 成员。启用后，OpenClaw 使用成员身份进行允许列表匹配，并将发送者标记为 `Member (PK:System)` 以避免意外的 Discord ping。
+启用 PK 查找，使代理消息解析为底层的系统 + 成员。启用后，ClosedClaw 使用成员身份进行允许列表匹配，并将发送者标记为 `Member (PK:System)` 以避免意外的 Discord ping。
 
 ```json5
 {
@@ -431,13 +431,13 @@ Discord 到处使用数字 ID；OpenClaw 配置推荐使用 ID。
 - 当省略 `guilds.<id>.channels` 时，允许列表中服务器的所有频道都被允许。
 - 要**不允许任何频道**，设置 `channels.discord.groupPolicy: "disabled"`（或保持空的允许列表）。
 - 配置向导接受 `Guild/Channel` 名称（公共 + 私有）并在可能时将其解析为 ID。
-- 启动时，OpenClaw 将允许列表中的频道/用户名称解析为 ID（当机器人可以搜索成员时）并记录映射；未解析的条目保持原样。
+- 启动时，ClosedClaw 将允许列表中的频道/用户名称解析为 ID（当机器人可以搜索成员时）并记录映射；未解析的条目保持原样。
 
 原生命令注意事项：
 
-- 注册的命令与 OpenClaw 的聊天命令一致。
+- 注册的命令与 ClosedClaw 的聊天命令一致。
 - 原生命令遵循与私信/服务器消息相同的允许列表（`channels.discord.dm.allowFrom`、`channels.discord.guilds`、按频道规则）。
-- 斜杠命令在 Discord UI 中可能对不在允许列表中的用户仍然可见；OpenClaw 在执行时强制执行允许列表并回复"未授权"。
+- 斜杠命令在 Discord UI 中可能对不在允许列表中的用户仍然可见；ClosedClaw 在执行时强制执行允许列表并回复"未授权"。
 
 ## 工具操作
 
@@ -460,4 +460,4 @@ Discord 消息 ID 在注入的上下文中呈现（`[discord message id: …]` �
 
 - 将机器人 token 视为密码；在受管主机上推荐使用 `DISCORD_BOT_TOKEN` 环境变量或锁定配置文件权限。
 - 仅授予机器人所需的权限（通常是读取/发送消息）。
-- 如果机器人卡住或被速率限制，在确认没有其他进程占用 Discord 会话后重启 Gateway网关（`openclaw gateway --force`）。
+- 如果机器人卡住或被速率限制，在确认没有其他进程占用 Discord 会话后重启 Gateway网关（`ClosedClaw gateway --force`）。

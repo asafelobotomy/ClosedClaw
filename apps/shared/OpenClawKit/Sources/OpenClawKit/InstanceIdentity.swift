@@ -5,7 +5,7 @@ import UIKit
 #endif
 
 public enum InstanceIdentity {
-    private static let suiteName = "ai.openclaw.shared"
+    private static let suiteName = "ai.ClosedClaw.shared"
     private static let instanceIdKey = "instanceId"
 
     private static var defaults: UserDefaults {
@@ -42,14 +42,14 @@ public enum InstanceIdentity {
         let name = Self.readMainActor {
             UIDevice.current.name.trimmingCharacters(in: .whitespacesAndNewlines)
         }
-        return name.isEmpty ? "openclaw" : name
+        return name.isEmpty ? "ClosedClaw" : name
 #else
         if let name = Host.current().localizedName?.trimmingCharacters(in: .whitespacesAndNewlines),
            !name.isEmpty
         {
             return name
         }
-        return "openclaw"
+        return "ClosedClaw"
 #endif
     }()
 

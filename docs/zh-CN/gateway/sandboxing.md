@@ -1,7 +1,7 @@
 ---
 read_when: 你想深入了解沙箱机制，或需要调整 agents.defaults.sandbox 配置。
 status: active
-summary: OpenClaw 沙箱的工作原理：模式、作用域、工作区访问和镜像
+summary: ClosedClaw 沙箱的工作原理：模式、作用域、工作区访问和镜像
 title: 沙箱
 x-i18n:
   generated_at: "2026-02-01T20:38:47Z"
@@ -14,7 +14,7 @@ x-i18n:
 
 # 沙箱
 
-OpenClaw 可以**在 Docker 容器内运行工具**以缩小影响范围。
+ClosedClaw 可以**在 Docker 容器内运行工具**以缩小影响范围。
 此功能是**可选的**，通过配置控制（`agents.defaults.sandbox` 或
 `agents.list[].sandbox`）。如果沙箱未启用，工具将在宿主机上运行。
 Gateway网关始终在宿主机上运行；启用沙箱后，工具执行将在隔离的沙箱中进行。
@@ -59,13 +59,13 @@ Gateway网关始终在宿主机上运行；启用沙箱后，工具执行将在�
 
 `agents.defaults.sandbox.workspaceAccess` 控制**沙箱能看到什么**：
 
-- `"none"`（默认）：工具在 `~/.openclaw/sandboxes` 下的沙箱工作区中运行。
+- `"none"`（默认）：工具在 `~/.ClosedClaw/sandboxes` 下的沙箱工作区中运行。
 - `"ro"`：以只读方式将智能体工作区挂载到 `/agent`（禁用 `write`/`edit`/`apply_patch`）。
 - `"rw"`：以读写方式将智能体工作区挂载到 `/workspace`。
 
 入站媒体会被复制到活动沙箱工作区中（`media/inbound/*`）。
 Skills 说明：`read` 工具以沙箱为根目录。当 `workspaceAccess: "none"` 时，
-OpenClaw 会将符合条件的 Skills 镜像到沙箱工作区（`.../skills`）中以便读取。当设为 `"rw"` 时，工作区 Skills 可从
+ClosedClaw 会将符合条件的 Skills 镜像到沙箱工作区（`.../skills`）中以便读取。当设为 `"rw"` 时，工作区 Skills 可从
 `/workspace/skills` 读取。
 
 ## 自定义绑定挂载
@@ -110,7 +110,7 @@ OpenClaw 会将符合条件的 Skills 镜像到沙箱工作区（`.../skills`）
 
 ## 镜像 + 设置
 
-默认镜像：`openclaw-sandbox:bookworm-slim`
+默认镜像：`ClosedClaw-sandbox:bookworm-slim`
 
 构建一次即可：
 
@@ -163,7 +163,7 @@ Docker 安装和容器化 Gateway网关的说明在这里：
 
 调试：
 
-- 使用 `openclaw sandbox explain` 检查当前生效的沙箱模式、工具策略和修复配置项。
+- 使用 `ClosedClaw sandbox explain` 检查当前生效的沙箱模式、工具策略和修复配置项。
 - 参见[沙箱 vs 工具策略 vs 提权](/gateway/sandbox-vs-tool-policy-vs-elevated)了解"为什么被阻止了？"的思维模型。
   保持锁定状态。
 

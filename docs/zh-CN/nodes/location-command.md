@@ -109,12 +109,12 @@ x-i18n:
 ## 模型/工具集成
 
 - 工具接口：`nodes` 工具添加 `location_get` 操作（需要节点）。
-- CLI：`openclaw nodes location get --node <id>`。
+- CLI：`ClosedClaw nodes location get --node <id>`。
 - 智能体指南：仅在用户启用位置并了解范围时调用。
 
 ## 界面文案（建议）
 
 - 关闭："位置共享已禁用。"
-- 使用时："仅在 OpenClaw 打开时共享。"
+- 使用时："仅在 ClosedClaw 打开时共享。"
 - 始终："允许后台定位。需要系统权限。"
 - 精确："使用精确 GPS 定位。关闭后将共享大致位置。"

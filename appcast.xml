@@ -1,15 +1,15 @@
 <?xml version="1.0" standalone="yes"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <title>OpenClaw</title>
+        <title>ClosedClaw</title>
         <item>
             <title>2026.2.1</title>
             <pubDate>Mon, 02 Feb 2026 03:53:03 -0800</pubDate>
-            <link>https://raw.githubusercontent.com/openclaw/openclaw/main/appcast.xml</link>
+            <link>https://raw.githubusercontent.com/ClosedClaw/ClosedClaw/main/appcast.xml</link>
             <sparkle:version>8650</sparkle:version>
             <sparkle:shortVersionString>2026.2.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>OpenClaw 2026.2.1</h2>
+            <description><![CDATA[<h2>ClosedClaw 2026.2.1</h2>
 <h3>Changes</h3>
 <ul>
 <li>Docs: onboarding/install/i18n/exec-approvals/Control UI/exe.dev/cacheRetention updates + misc nav/typos. (#3050, #3461, #4064, #4675, #4729, #4763, #5003, #5402, #5446, #5474, #5663, #5689, #5694, #5967, #6270, #6300, #6311, #6416, #6487, #6550, #6789)</li>
@@ -36,7 +36,7 @@
 <li>Auto-reply: avoid referencing workspace files in /new greeting prompt. (#5706) Thanks @bravostation.</li>
 <li>Tools: align tool execute adapters/signatures (legacy + parameter order + arg normalization).</li>
 <li>Tools: treat <code>"*"</code> tool allowlist entries as valid to avoid spurious unknown-entry warnings.</li>
-<li>Skills: update session-logs paths from .clawdbot to .openclaw. (#4502)</li>
+<li>Skills: update session-logs paths from .clawdbot to .ClosedClaw. (#4502)</li>
 <li>Slack: harden media fetch limits and Slack file URL validation. (#6639) Thanks @davidiach.</li>
 <li>Lint: satisfy curly rule after import sorting. (#6310)</li>
 <li>Process: resolve Windows <code>spawn()</code> failures for npm-family CLIs by appending <code>.cmd</code> when needed. (#5815) Thanks @thejhinvirtuoso.</li>
@@ -64,18 +64,18 @@
 <li>Security: harden web tool content wrapping + file parsing safeguards. (#4058) Thanks @VACInc.</li>
 <li>Security: enforce Twitch <code>allowFrom</code> allowlist gating (deny non-allowlisted senders). Thanks @MegaManSec.</li>
 </ul>
-<p><a href="https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md">View full changelog</a></p>
+<p><a href="https://github.com/ClosedClaw/ClosedClaw/blob/main/CHANGELOG.md">View full changelog</a></p>
 ]]></description>
-            <enclosure url="https://github.com/openclaw/openclaw/releases/download/v2026.2.1/OpenClaw-2026.2.1.zip" length="22458919" type="application/octet-stream" sparkle:edSignature="kA/8VQlVdtYphcB1iuFrhWczwWKgkVZMfDfQ7T9WD405D8JKTv5CZ1n8lstIVkpk4xog3UhrfaaoTG8Bf8DMAQ=="/>
+            <enclosure url="https://github.com/ClosedClaw/ClosedClaw/releases/download/v2026.2.1/ClosedClaw-2026.2.1.zip" length="22458919" type="application/octet-stream" sparkle:edSignature="kA/8VQlVdtYphcB1iuFrhWczwWKgkVZMfDfQ7T9WD405D8JKTv5CZ1n8lstIVkpk4xog3UhrfaaoTG8Bf8DMAQ=="/>
         </item>
         <item>
             <title>2026.1.30</title>
             <pubDate>Sat, 31 Jan 2026 14:29:57 +0100</pubDate>
-            <link>https://raw.githubusercontent.com/openclaw/openclaw/main/appcast.xml</link>
+            <link>https://raw.githubusercontent.com/ClosedClaw/ClosedClaw/main/appcast.xml</link>
             <sparkle:version>8469</sparkle:version>
             <sparkle:shortVersionString>2026.1.30</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>OpenClaw 2026.1.30</h2>
+            <description><![CDATA[<h2>ClosedClaw 2026.1.30</h2>
 <h3>Changes</h3>
 <ul>
 <li>CLI: add <code>completion</code> command (Zsh/Bash/PowerShell/Fish) and auto-setup during postinstall/onboarding.</li>
@@ -86,8 +86,8 @@
 <li>Agents: update pi SDK/API usage and dependencies.</li>
 <li>Web UI: refresh sessions after chat commands and improve session display names.</li>
 <li>Build: move TypeScript builds to <code>tsdown</code> + <code>tsgo</code> (faster builds, CI typechecks), update tsconfig target, and clean up lint rules.</li>
-<li>Build: align npm tar override and bin metadata so the <code>openclaw</code> CLI entrypoint is preserved in npm publishes.</li>
-<li>Docs: add pi/pi-dev docs and update OpenClaw branding + install links.</li>
+<li>Build: align npm tar override and bin metadata so the <code>ClosedClaw</code> CLI entrypoint is preserved in npm publishes.</li>
+<li>Docs: add pi/pi-dev docs and update ClosedClaw branding + install links.</li>
 </ul>
 <h3>Fixes</h3>
 <ul>
@@ -109,22 +109,22 @@
 <li>OAuth: skip expired-token warnings when refresh tokens are still valid. (#4593)</li>
 <li>Build: skip redundant UI install step in Dockerfile. (#4584) Thanks @obviyus.</li>
 </ul>
-<p><a href="https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md">View full changelog</a></p>
+<p><a href="https://github.com/ClosedClaw/ClosedClaw/blob/main/CHANGELOG.md">View full changelog</a></p>
 ]]></description>
-            <enclosure url="https://github.com/openclaw/openclaw/releases/download/v2026.1.30/OpenClaw-2026.1.30.zip" length="22458594" type="application/octet-stream" sparkle:edSignature="77/GuEcruKGgu2CJyMq+OVwzaJ2v1VzRQC9NmOirKO3uH5Nn5HaoouwrOHnOanrzlD4OvPW0FS5GH2E4Ntu4CQ=="/>
+            <enclosure url="https://github.com/ClosedClaw/ClosedClaw/releases/download/v2026.1.30/ClosedClaw-2026.1.30.zip" length="22458594" type="application/octet-stream" sparkle:edSignature="77/GuEcruKGgu2CJyMq+OVwzaJ2v1VzRQC9NmOirKO3uH5Nn5HaoouwrOHnOanrzlD4OvPW0FS5GH2E4Ntu4CQ=="/>
         </item>
         <item>
             <title>2026.1.29</title>
             <pubDate>Fri, 30 Jan 2026 06:24:15 +0100</pubDate>
-            <link>https://raw.githubusercontent.com/openclaw/openclaw/main/appcast.xml</link>
+            <link>https://raw.githubusercontent.com/ClosedClaw/ClosedClaw/main/appcast.xml</link>
             <sparkle:version>8345</sparkle:version>
             <sparkle:shortVersionString>2026.1.29</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>OpenClaw 2026.1.29</h2>
+            <description><![CDATA[<h2>ClosedClaw 2026.1.29</h2>
 Status: stable.
 <h3>Changes</h3>
 <ul>
-<li>Rebrand: rename the npm package/CLI to <code>openclaw</code>, add a <code>openclaw</code> compatibility shim, and move extensions to the <code>@openclaw/*</code> scope.</li>
+<li>Rebrand: rename the npm package/CLI to <code>ClosedClaw</code>, add a <code>ClosedClaw</code> compatibility shim, and move extensions to the <code>@ClosedClaw/*</code> scope.</li>
 <li>Onboarding: strengthen security warning copy for beta + access control expectations.</li>
 <li>Onboarding: add Venice API key to non-interactive flow. (#1893) Thanks @jonisjongithub.</li>
 <li>Config: auto-migrate legacy state/config paths and keep config resolution consistent across legacy filenames.</li>
@@ -161,7 +161,7 @@ Status: stable.
 <li>CLI: use Node's module compile cache for faster startup. (#2808) Thanks @pi0.</li>
 <li>Auth: show copyable Google auth URL after ASCII prompt. (#1787) Thanks @robbyczgw-cla.</li>
 <li>TUI: avoid width overflow when rendering selection lists. (#1686) Thanks @mossein.</li>
-<li>macOS: finish OpenClaw app rename for macOS sources, bundle identifiers, and shared kit paths. (#2844) Thanks @fal3.</li>
+<li>macOS: finish ClosedClaw app rename for macOS sources, bundle identifiers, and shared kit paths. (#2844) Thanks @fal3.</li>
 <li>Branding: update launchd labels, mobile bundle IDs, and logging subsystems to bot.molt (legacy bundle ID migrations). Thanks @thewilloftheshadow.</li>
 <li>macOS: limit project-local <code>node_modules/.bin</code> PATH preference to debug builds (reduce PATH hijacking risk).</li>
 <li>macOS: keep custom SSH usernames in remote target. (#2046) Thanks @algal.</li>
@@ -184,7 +184,7 @@ Status: stable.
 <li>Docs: add LINE channel guide. Thanks @thewilloftheshadow.</li>
 <li>Docs: credit both contributors for Control UI refresh. (#1852) Thanks @EnzeD.</li>
 <li>Docs: keep docs header sticky so navbar stays visible while scrolling. (#2445) Thanks @chenyuan99.</li>
-<li>Docs: update exe.dev install instructions. (#https://github.com/openclaw/openclaw/pull/3047) Thanks @zackerthescar.</li>
+<li>Docs: update exe.dev install instructions. (#https://github.com/ClosedClaw/ClosedClaw/pull/3047) Thanks @zackerthescar.</li>
 </ul>
 <h3>Breaking</h3>
 <ul>
@@ -241,9 +241,9 @@ Status: stable.
 <li>Gateway: treat loopback + non-local Host connections as remote unless trusted proxy headers are present.</li>
 <li>Onboarding: remove unsupported gateway auth "off" choice from onboarding/configure flows and CLI flags.</li>
 </ul>
-<p><a href="https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md">View full changelog</a></p>
+<p><a href="https://github.com/ClosedClaw/ClosedClaw/blob/main/CHANGELOG.md">View full changelog</a></p>
 ]]></description>
-            <enclosure url="https://github.com/openclaw/openclaw/releases/download/v2026.1.29/OpenClaw-2026.1.29.zip" length="22458204" type="application/octet-stream" sparkle:edSignature="HqHwZHQyG/CEfBuQnQ/RffJQPKpSbCVrho9C6rgt93S5ek4AH6hUhB3BBKY8sbX1IVFATKK5QZZNE0YPAf7eBw=="/>
+            <enclosure url="https://github.com/ClosedClaw/ClosedClaw/releases/download/v2026.1.29/ClosedClaw-2026.1.29.zip" length="22458204" type="application/octet-stream" sparkle:edSignature="HqHwZHQyG/CEfBuQnQ/RffJQPKpSbCVrho9C6rgt93S5ek4AH6hUhB3BBKY8sbX1IVFATKK5QZZNE0YPAf7eBw=="/>
         </item>
     </channel>
 </rss>

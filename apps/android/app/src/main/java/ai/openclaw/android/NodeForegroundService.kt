@@ -1,4 +1,4 @@
-package ai.openclaw.android
+package ai.ClosedClaw.android
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -29,7 +29,7 @@ class NodeForegroundService : Service() {
   override fun onCreate() {
     super.onCreate()
     ensureChannel()
-    val initial = buildNotification(title = "OpenClaw Node", text = "Starting…")
+    val initial = buildNotification(title = "ClosedClaw Node", text = "Starting…")
     startForegroundWithTypes(notification = initial, requiresMic = false)
 
     val runtime = (application as NodeApp).runtime
@@ -44,7 +44,7 @@ class NodeForegroundService : Service() {
         ) { status, server, connected, voiceMode, voiceListening ->
           Quint(status, server, connected, voiceMode, voiceListening)
         }.collect { (status, server, connected, voiceMode, voiceListening) ->
-          val title = if (connected) "OpenClaw Node · Connected" else "OpenClaw Node"
+          val title = if (connected) "ClosedClaw Node · Connected" else "ClosedClaw Node"
           val voiceSuffix =
             if (voiceMode == VoiceWakeMode.Always) {
               if (voiceListening) " · Voice Wake: Listening" else " · Voice Wake: Paused"
@@ -91,7 +91,7 @@ class NodeForegroundService : Service() {
         "Connection",
         NotificationManager.IMPORTANCE_LOW,
       ).apply {
-        description = "OpenClaw node connection status"
+        description = "ClosedClaw node connection status"
         setShowBadge(false)
       }
     mgr.createNotificationChannel(channel)
@@ -163,7 +163,7 @@ class NodeForegroundService : Service() {
     private const val CHANNEL_ID = "connection"
     private const val NOTIFICATION_ID = 1
 
-    private const val ACTION_STOP = "ai.openclaw.android.action.STOP"
+    private const val ACTION_STOP = "ai.ClosedClaw.android.action.STOP"
 
     fun start(context: Context) {
       val intent = Intent(context, NodeForegroundService::class.java)

@@ -20,7 +20,7 @@ x-i18n:
 
 如果你正在构建操作端或节点客户端，请使用 [Gateway网关协议](/gateway/protocol)。
 
-**注意：** 当前版本的 OpenClaw 不再附带 TCP 桥接监听器；本文档仅作历史参考保留。旧版 `bridge.*` 配置键已不再属于配置模式的一部分。
+**注意：** 当前版本的 ClosedClaw 不再附带 TCP 桥接监听器；本文档仅作历史参考保留。旧版 `bridge.*` 配置键已不再属于配置模式的一部分。
 
 ## 为什么有两种协议
 
@@ -75,7 +75,7 @@ Gateway网关 → 客户端：
 
 ## Tailnet 使用
 
-- 将桥接绑定到 tailnet IP：在 `~/.openclaw/openclaw.json` 中设置 `bridge.bind: "tailnet"`。
+- 将桥接绑定到 tailnet IP：在 `~/.ClosedClaw/ClosedClaw.json` 中设置 `bridge.bind: "tailnet"`。
 - 客户端通过 MagicDNS 名称或 tailnet IP 连接。
 - Bonjour **不能**跨网络；需要时请使用手动指定主机/端口或广域 DNS-SD。
 

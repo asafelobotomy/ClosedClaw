@@ -22,7 +22,7 @@ x-i18n:
 1. 确保此 Mac 上的"信息"已登录。
 2. 安装 `imsg`：
    - `brew install steipete/tap/imsg`
-3. 配置 OpenClaw 的 `channels.imessage.cliPath` 和 `channels.imessage.dbPath`。
+3. 配置 ClosedClaw 的 `channels.imessage.cliPath` 和 `channels.imessage.dbPath`。
 4. 启动 Gateway网关并批准所有 macOS 提示（自动化 + 完全磁盘访问权限）。
 
 最小配置：
@@ -61,7 +61,7 @@ x-i18n:
 ## 要求
 
 - macOS 且"信息"已登录。
-- OpenClaw + `imsg` 需要完全磁盘访问权限（访问 Messages 数据库）。
+- ClosedClaw + `imsg` 需要完全磁盘访问权限（访问 Messages 数据库）。
 - 发送时需要自动化权限。
 - `channels.imessage.cliPath` 可以指向任何代理 stdin/stdout 的命令（例如，通过 SSH 连接到另一台 Mac 并运行 `imsg rpc` 的包装脚本）。
 
@@ -76,7 +76,7 @@ x-i18n:
 
 1. 创建一个专用的 Apple ID（例如：`my-cool-bot@icloud.com`）。
    - Apple 可能需要手机号码进行验证/双重认证。
-2. 创建一个 macOS 用户（例如：`openclawhome`）并登录。
+2. 创建一个 macOS 用户（例如：`ClosedClawhome`）并登录。
 3. 在该 macOS 用户中打开"信息"并使用机器人 Apple ID 登录 iMessage。
 4. 启用远程登录（系统设置 → 通用 → 共享 → 远程登录）。
 5. 安装 `imsg`：
@@ -122,7 +122,7 @@ exec /usr/bin/ssh -o BatchMode=yes -o ConnectTimeout=5 -T <bot-macos-user>@local
 
 ### 远程/SSH 变体（可选）
 
-如果你想在另一台 Mac 上使用 iMessage，将 `channels.imessage.cliPath` 设置为通过 SSH 在远程 macOS 主机上运行 `imsg` 的包装脚本。OpenClaw 只需要 stdio。
+如果你想在另一台 Mac 上使用 iMessage，将 `channels.imessage.cliPath` 设置为通过 SSH 在远程 macOS 主机上运行 `imsg` 的包装脚本。ClosedClaw 只需要 stdio。
 
 示例包装脚本：
 
@@ -131,7 +131,7 @@ exec /usr/bin/ssh -o BatchMode=yes -o ConnectTimeout=5 -T <bot-macos-user>@local
 exec ssh -T gateway-host imsg "$@"
 ```
 
-**远程附件：** 当 `cliPath` 通过 SSH 指向远程主机时，Messages 数据库中的附件路径引用的是远程机器上的文件。OpenClaw 可以通过设置 `channels.imessage.remoteHost` 自动通过 SCP 获取这些文件：
+**远程附件：** 当 `cliPath` 通过 SSH 指向远程主机时，Messages 数据库中的附件路径引用的是远程机器上的文件。ClosedClaw 可以通过设置 `channels.imessage.remoteHost` 自动通过 SCP 获取这些文件：
 
 ```json5
 {
@@ -145,7 +145,7 @@ exec ssh -T gateway-host imsg "$@"
 }
 ```
 
-如果未设置 `remoteHost`，OpenClaw 会尝试通过解析你包装脚本中的 SSH 命令来自动检测。建议显式配置以确保可靠性。
+如果未设置 `remoteHost`，ClosedClaw 会尝试通过解析你包装脚本中的 SSH 命令来自动检测。建议显式配置以确保可靠性。
 
 #### 通过 Tailscale 连接远程 Mac（示例）
 
@@ -156,7 +156,7 @@ exec ssh -T gateway-host imsg "$@"
 ```
 ┌──────────────────────────────┐          SSH (imsg rpc)          ┌──────────────────────────┐
 │ Gateway网关主机（Linux/VM）      │──────────────────────────────────▶│ 装有 Messages + imsg 的 Mac │
-│ - openclaw gateway           │          SCP（附件）              │ - Messages 已登录         │
+│ - ClosedClaw gateway           │          SCP（附件）              │ - Messages 已登录         │
 │ - channels.imessage.cliPath  │◀──────────────────────────────────│ - 远程登录已启用          │
 └──────────────────────────────┘                                   └──────────────────────────┘
               ▲
@@ -172,7 +172,7 @@ exec ssh -T gateway-host imsg "$@"
   channels: {
     imessage: {
       enabled: true,
-      cliPath: "~/.openclaw/scripts/imsg-ssh",
+      cliPath: "~/.ClosedClaw/scripts/imsg-ssh",
       remoteHost: "bot@mac-mini.tailnet-1234.ts.net",
       includeAttachments: true,
       dbPath: "/Users/bot/Library/Messages/chat.db",
@@ -181,7 +181,7 @@ exec ssh -T gateway-host imsg "$@"
 }
 ```
 
-示例包装脚本（`~/.openclaw/scripts/imsg-ssh`）：
+示例包装脚本（`~/.ClosedClaw/scripts/imsg-ssh`）：
 
 ```bash
 #!/usr/bin/env bash
@@ -194,7 +194,7 @@ exec ssh -T bot@mac-mini.tailnet-1234.ts.net imsg "$@"
 - 使用 SSH 密钥使 `ssh bot@mac-mini.tailnet-1234.ts.net` 无需提示即可工作。
 - `remoteHost` 应与 SSH 目标匹配，以便 SCP 可以获取附件。
 
-多账户支持：使用 `channels.imessage.accounts`，每个账户配置独立选项和可选的 `name`。共享模式请参阅 [`gateway/configuration`](/gateway/configuration#telegramaccounts--discordaccounts--slackaccounts--signalaccounts--imessageaccounts)。不要提交 `~/.openclaw/openclaw.json`（它通常包含 token）。
+多账户支持：使用 `channels.imessage.accounts`，每个账户配置独立选项和可选的 `name`。共享模式请参阅 [`gateway/configuration`](/gateway/configuration#telegramaccounts--discordaccounts--slackaccounts--signalaccounts--imessageaccounts)。不要提交 `~/.ClosedClaw/ClosedClaw.json`（它通常包含 token）。
 
 ## 访问控制（私信 + 群组）
 
@@ -203,8 +203,8 @@ exec ssh -T bot@mac-mini.tailnet-1234.ts.net imsg "$@"
 - 默认：`channels.imessage.dmPolicy = "pairing"`。
 - 未知发送者会收到配对码；在批准之前消息会被忽略（配对码 1 小时后过期）。
 - 通过以下方式批准：
-  - `openclaw pairing list imessage`
-  - `openclaw pairing approve imessage <CODE>`
+  - `ClosedClaw pairing list imessage`
+  - `ClosedClaw pairing approve imessage <CODE>`
 - 配对是 iMessage 私信的默认令牌交换方式。详情：[配对](/start/pairing)
 
 群组：
@@ -223,7 +223,7 @@ exec ssh -T bot@mac-mini.tailnet-1234.ts.net imsg "$@"
 
 一些 iMessage 线程可能有多个参与者，但由于"信息"存储聊天标识符的方式，仍然以 `is_group=false` 到达。
 
-如果你在 `channels.imessage.groups` 下显式配置了一个 `chat_id`，OpenClaw 会将该线程视为"群组"，用于：
+如果你在 `channels.imessage.groups` 下显式配置了一个 `chat_id`，ClosedClaw 会将该线程视为"群组"，用于：
 
 - 会话隔离（独立的 `agent:<agentId>:imessage:group:<chat_id>` 会话键）
 - 群组允许列表/提及门控行为

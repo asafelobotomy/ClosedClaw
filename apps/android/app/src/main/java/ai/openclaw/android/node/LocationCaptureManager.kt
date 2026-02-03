@@ -1,4 +1,4 @@
-package ai.openclaw.android.node
+package ai.ClosedClaw.android.node
 
 import android.Manifest
 import android.content.Context

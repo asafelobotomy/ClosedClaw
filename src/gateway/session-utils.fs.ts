@@ -53,7 +53,7 @@ export function resolveSessionTranscriptCandidates(
     candidates.push(resolveSessionTranscriptPath(sessionId, agentId));
   }
   const home = os.homedir();
-  candidates.push(path.join(home, ".openclaw", "sessions", `${sessionId}.jsonl`));
+  candidates.push(path.join(home, ".ClosedClaw", "sessions", `${sessionId}.jsonl`));
   return candidates;
 }
 

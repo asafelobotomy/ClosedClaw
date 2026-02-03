@@ -1,8 +1,8 @@
 ---
 read_when:
-  - 向新用户介绍 OpenClaw
-summary: OpenClaw 的顶层概述、功能特性与用途
-title: OpenClaw
+  - 向新用户介绍 ClosedClaw
+summary: ClosedClaw 的顶层概述、功能特性与用途
+title: ClosedClaw
 x-i18n:
   generated_at: "2026-02-01T13:34:09Z"
   model: claude-opus-4-5
@@ -12,22 +12,22 @@ x-i18n:
   workflow: 9
 ---
 
-# OpenClaw 🦞
+# ClosedClaw 🦞
 
 > _"EXFOLIATE! EXFOLIATE!"_ — 大概是一只太空龙虾说的
 
-> **中文文档提示：** 本页及其他中文文档由自动化翻译流水线生成。如果你发现翻译问题，请在 [#6995](https://github.com/openclaw/openclaw/issues/6995) 反馈（不要提交 PR）。我们正在积极扩展对中文用户、模型与消息平台的支持，更多内容即将推出！需要支持请到 Discord 的 [#help-中文](https://discord.com/channels/1456350064065904867/1466722439789674741)。
+> **中文文档提示：** 本页及其他中文文档由自动化翻译流水线生成。如果你发现翻译问题，请在 [#6995](https://github.com/ClosedClaw/ClosedClaw/issues/6995) 反馈（不要提交 PR）。我们正在积极扩展对中文用户、模型与消息平台的支持，更多内容即将推出！需要支持请到 Discord 的 [#help-中文](https://discord.com/channels/1456350064065904867/1466722439789674741)。
 
 <p align="center">
     <img
-        src="/assets/openclaw-logo-text-dark.png"
-        alt="OpenClaw"
+        src="/assets/ClosedClaw-logo-text-dark.png"
+        alt="ClosedClaw"
         width="500"
         class="dark:hidden"
     />
     <img
-        src="/assets/openclaw-logo-text.png"
-        alt="OpenClaw"
+        src="/assets/ClosedClaw-logo-text.png"
+        alt="ClosedClaw"
         width="500"
         class="hidden dark:block"
     />
@@ -40,22 +40,22 @@ x-i18n:
 </p>
 
 <p align="center">
-  <a href="https://github.com/openclaw/openclaw">GitHub</a> ·
-  <a href="https://github.com/openclaw/openclaw/releases">版本发布</a> ·
+  <a href="https://github.com/ClosedClaw/ClosedClaw">GitHub</a> ·
+  <a href="https://github.com/ClosedClaw/ClosedClaw/releases">版本发布</a> ·
   <a href="/">文档</a> ·
-  <a href="/start/openclaw">OpenClaw 助手设置</a>
+  <a href="/start/ClosedClaw">ClosedClaw 助手设置</a>
 </p>
 
-OpenClaw 将 WhatsApp（通过 WhatsApp Web / Baileys）、Telegram（Bot API / grammY）、Discord（Bot API / channels.discord.js）和 iMessage（imsg CLI）桥接至编程智能体，例如 [Pi](https://github.com/badlogic/pi-mono)。插件可添加 Mattermost（Bot API + WebSocket）等更多渠道支持。
-OpenClaw 同时也驱动着 OpenClaw 助手。
+ClosedClaw 将 WhatsApp（通过 WhatsApp Web / Baileys）、Telegram（Bot API / grammY）、Discord（Bot API / channels.discord.js）和 iMessage（imsg CLI）桥接至编程智能体，例如 [Pi](https://github.com/badlogic/pi-mono)。插件可添加 Mattermost（Bot API + WebSocket）等更多渠道支持。
+ClosedClaw 同时也驱动着 ClosedClaw 助手。
 
 ## 从这里开始
 
 - **从零开始全新安装：** [入门指南](/start/getting-started)
-- **引导式设置（推荐）：** [向导](/start/wizard) （`openclaw onboard`）
+- **引导式设置（推荐）：** [向导](/start/wizard) （`ClosedClaw onboard`）
 - **打开仪表盘（本地 Gateway网关）：** http://127.0.0.1:18789/（或 http://localhost:18789/）
 
-如果 Gateway网关运行在这台计算机上，该链接会立即打开浏览器控制界面。如果无法打开，请先启动 Gateway网关： `openclaw gateway`.
+如果 Gateway网关运行在这台计算机上，该链接会立即打开浏览器控制界面。如果无法打开，请先启动 Gateway网关： `ClosedClaw gateway`.
 
 ## 仪表盘（浏览器控制界面）
 
@@ -64,8 +64,8 @@ OpenClaw 同时也驱动着 OpenClaw 助手。
 远程访问： [Web 界面](/web) 和 [Tailscale](/gateway/tailscale)
 
 <p align="center">
-  <img src="/whatsapp-openclaw.jpg" alt="OpenClaw（英文原图）" width="360" />
-  <img src="/whatsapp-openclaw-ai-zh.jpg" alt="OpenClaw（AI 自动翻译）" width="360" />
+  <img src="/whatsapp-ClosedClaw.jpg" alt="ClosedClaw（英文原图）" width="360" />
+  <img src="/whatsapp-ClosedClaw-ai-zh.jpg" alt="ClosedClaw（AI 自动翻译）" width="360" />
   <br />
   <em>左：英文原图 · 右：AI 自动翻译（玩笑版）</em>
 </p>
@@ -80,27 +80,27 @@ WhatsApp / Telegram / Discord / iMessage (+ plugins)
   │          Gateway网关          │  ws://127.0.0.1:18789 (loopback-only)
   │     (single source)       │
   │                           │  http://<gateway-host>:18793
-  │                           │    /__openclaw__/canvas/ (Canvas host)
+  │                           │    /__ClosedClaw__/canvas/ (Canvas host)
   └───────────┬───────────────┘
               │
               ├─ Pi agent (RPC)
-              ├─ CLI (openclaw …)
+              ├─ CLI (ClosedClaw …)
               ├─ Chat UI (SwiftUI)
-              ├─ macOS app (OpenClaw.app)
+              ├─ macOS app (ClosedClaw.app)
               ├─ iOS node via Gateway网关 WS + pairing
               └─ Android node via Gateway网关 WS + pairing
 ```
 
-大多数操作通过 **Gateway网关** （`openclaw gateway`进行，它是一个长期运行的单进程，负责管理渠道连接和 WebSocket 控制面。
+大多数操作通过 **Gateway网关** （`ClosedClaw gateway`进行，它是一个长期运行的单进程，负责管理渠道连接和 WebSocket 控制面。
 
 ## 网络模型
 
 - **每台主机一个 Gateway网关（推荐）**：它是唯一允许持有 WhatsApp Web 会话的进程。如果需要备用机器人或严格隔离，可使用独立配置文件和端口运行多个 Gateway网关；请参阅 [多 Gateway网关部署](/gateway/multiple-gateways).
 - **优先 local loopback**：Gateway网关 WS 默认监听 `ws://127.0.0.1:18789`.
   - 向导现在默认会生成一个 Gateway网关令牌（即使在 local loopback 模式下也是如此）。
-  - 如需 Tailnet 访问，请运行 `openclaw gateway --bind tailnet --token ...` （非 local loopback 绑定时必须提供令牌）。
+  - 如需 Tailnet 访问，请运行 `ClosedClaw gateway --bind tailnet --token ...` （非 local loopback 绑定时必须提供令牌）。
 - **节点**：通过 WebSocket 连接到 Gateway网关（根据需要使用局域网/Tailnet/SSH）；旧版 TCP 桥接已弃用/移除。
-- **Canvas 主机**：HTTP 文件服务器运行在 `canvasHost.port` （默认 `18793`），提供 `/__openclaw__/canvas/` 用于节点 WebView；请参阅 [Gateway网关配置](/gateway/configuration) （`canvasHost`）。
+- **Canvas 主机**：HTTP 文件服务器运行在 `canvasHost.port` （默认 `18793`），提供 `/__ClosedClaw__/canvas/` 用于节点 WebView；请参阅 [Gateway网关配置](/gateway/configuration) （`canvasHost`）。
 - **远程使用**：SSH 隧道或 Tailnet/VPN；请参阅 [远程访问](/gateway/remote) 和 [发现机制](/gateway/discovery).
 
 ## 功能特性（概览）
@@ -130,53 +130,53 @@ WhatsApp / Telegram / Discord / iMessage (+ plugins)
 
 ```bash
 # Recommended: global install (npm/pnpm)
-npm install -g openclaw@latest
-# or: pnpm add -g openclaw@latest
+npm install -g ClosedClaw@latest
+# or: pnpm add -g ClosedClaw@latest
 
 # Onboard + install the service (launchd/systemd user service)
-openclaw onboard --install-daemon
+ClosedClaw onboard --install-daemon
 
 # Pair WhatsApp Web (shows QR)
-openclaw channels login
+ClosedClaw channels login
 
 # Gateway网关 runs via the service after onboarding; manual run is still possible:
-openclaw gateway --port 18789
+ClosedClaw gateway --port 18789
 ```
 
-之后在 npm 安装和 git 安装之间切换很简单：安装另一种方式并运行 `openclaw doctor` 以更新 Gateway网关服务入口点。
+之后在 npm 安装和 git 安装之间切换很简单：安装另一种方式并运行 `ClosedClaw doctor` 以更新 Gateway网关服务入口点。
 
 从源码安装（开发）：
 
 ```bash
-git clone https://github.com/openclaw/openclaw.git
-cd openclaw
+git clone https://github.com/ClosedClaw/ClosedClaw.git
+cd ClosedClaw
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run
 pnpm build
-openclaw onboard --install-daemon
+ClosedClaw onboard --install-daemon
 ```
 
-如果尚未进行全局安装，请通过以下方式运行新手引导流程 `pnpm openclaw ...` （在仓库目录中执行）。
+如果尚未进行全局安装，请通过以下方式运行新手引导流程 `pnpm ClosedClaw ...` （在仓库目录中执行）。
 
 多实例快速开始（可选）：
 
 ```bash
-OPENCLAW_CONFIG_PATH=~/.openclaw/a.json \
-OPENCLAW_STATE_DIR=~/.openclaw-a \
-openclaw gateway --port 19001
+ClosedClaw_CONFIG_PATH=~/.ClosedClaw/a.json \
+ClosedClaw_STATE_DIR=~/.ClosedClaw-a \
+ClosedClaw gateway --port 19001
 ```
 
 发送测试消息（需要 Gateway网关正在运行）：
 
 ```bash
-openclaw message send --target +15555550123 --message "Hello from OpenClaw"
+ClosedClaw message send --target +15555550123 --message "Hello from ClosedClaw"
 ```
 
 ## 配置（可选）
 
-配置文件位于 `~/.openclaw/openclaw.json`.
+配置文件位于 `~/.ClosedClaw/ClosedClaw.json`.
 
-- 如果你 **不做任何操作**，OpenClaw 将使用内置的 Pi 二进制文件以 RPC 模式运行，并采用按发送者区分的会话。
+- 如果你 **不做任何操作**，ClosedClaw 将使用内置的 Pi 二进制文件以 RPC 模式运行，并采用按发送者区分的会话。
 - 如果你想锁定访问权限，请从以下内容开始 `channels.whatsapp.allowFrom` 以及（针对群组的）提及规则。
 
 示例：
@@ -189,7 +189,7 @@ openclaw message send --target +15555550123 --message "Hello from OpenClaw"
       groups: { "*": { requireMention: true } },
     },
   },
-  messages: { groupChat: { mentionPatterns: ["@openclaw"] } },
+  messages: { groupChat: { mentionPatterns: ["@ClosedClaw"] } },
 }
 ```
 
@@ -205,7 +205,7 @@ openclaw message send --target +15555550123 --message "Hello from OpenClaw"
   - [更新 / 回滚](/install/updating)
   - [配对（私聊 + 节点）](/start/pairing)
   - [Nix 模式](/install/nix)
-  - [OpenClaw 助手设置](/start/openclaw)
+  - [ClosedClaw 助手设置](/start/ClosedClaw)
   - [Skills](/tools/skills)
   - [Skills配置](/tools/skills-config)
   - [工作区模板](/reference/templates/AGENTS)
@@ -242,7 +242,7 @@ openclaw message send --target +15555550123 --message "Hello from OpenClaw"
 
 ## 名称由来
 
-**OpenClaw = CLAW + TARDIS** — 因为每只太空龙虾都需要一台时空机器。
+**ClosedClaw = CLAW + TARDIS** — 因为每只太空龙虾都需要一台时空机器。
 
 ---
 

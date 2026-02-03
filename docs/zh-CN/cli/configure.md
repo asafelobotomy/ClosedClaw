@@ -1,7 +1,7 @@
 ---
 read_when:
   - 你想通过交互方式调整凭据、设备或智能体默认设置
-summary: "`openclaw configure` 的 CLI 参考（交互式配置提示）"
+summary: "`ClosedClaw configure` 的 CLI 参考（交互式配置提示）"
 title: configure
 x-i18n:
   generated_at: "2026-02-01T19:58:46Z"
@@ -12,15 +12,15 @@ x-i18n:
   workflow: 14
 ---
 
-# `openclaw configure`
+# `ClosedClaw configure`
 
 交互式提示，用于设置凭据、设备和智能体默认配置。
 
 注意：**模型**部分现在包含一个多选项，用于设置
 `agents.defaults.models` 允许列表（决定在 `/model` 和模型选择器中显示哪些模型）。
 
-提示：不带子命令运行 `openclaw config` 会打开相同的向导。使用
-`openclaw config get|set|unset` 进行非交互式编辑。
+提示：不带子命令运行 `ClosedClaw config` 会打开相同的向导。使用
+`ClosedClaw config get|set|unset` 进行非交互式编辑。
 
 相关内容：
 
@@ -35,6 +35,6 @@ x-i18n:
 ## 示例
 
 ```bash
-openclaw configure
-openclaw configure --section models --section channels
+ClosedClaw configure
+ClosedClaw configure --section models --section channels
 ```

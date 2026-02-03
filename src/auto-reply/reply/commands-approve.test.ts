@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { ClosedClawConfig } from "../../config/config.js";
 import type { MsgContext } from "../templating.js";
 import { callGateway } from "../../gateway/call.js";
 import { buildCommandContext, handleCommands } from "./commands.js";
@@ -9,7 +9,11 @@ vi.mock("../../gateway/call.js", () => ({
   callGateway: vi.fn(),
 }));
 
-function buildParams(commandBody: string, cfg: OpenClawConfig, ctxOverrides?: Partial<MsgContext>) {
+function buildParams(
+  commandBody: string,
+  cfg: ClosedClawConfig,
+  ctxOverrides?: Partial<MsgContext>,
+) {
   const ctx = {
     Body: commandBody,
     CommandBody: commandBody,
@@ -52,7 +56,7 @@ describe("/approve command", () => {
     const cfg = {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as OpenClawConfig;
+    } as ClosedClawConfig;
     const params = buildParams("/approve", cfg);
     const result = await handleCommands(params);
     expect(result.shouldContinue).toBe(false);
@@ -63,7 +67,7 @@ describe("/approve command", () => {
     const cfg = {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as OpenClawConfig;
+    } as ClosedClawConfig;
     const params = buildParams("/approve abc allow-once", cfg, { SenderId: "123" });
 
     const mockCallGateway = vi.mocked(callGateway);

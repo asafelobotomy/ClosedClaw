@@ -1,20 +1,20 @@
 {
-  "name": "@openclaw/msteams",
+  "name": "@ClosedClaw/msteams",
   "version": "2026.2.1",
-  "description": "OpenClaw Microsoft Teams channel plugin",
+  "description": "ClosedClaw Microsoft Teams channel plugin",
   "type": "module",
   "dependencies": {
     "@microsoft/agents-hosting": "^1.2.3",
     "@microsoft/agents-hosting-express": "^1.2.3",
     "@microsoft/agents-hosting-extensions-teams": "^1.2.3",
     "express": "^5.2.1",
-    "openclaw": "workspace:*",
+    "ClosedClaw": "workspace:*",
     "proper-lockfile": "^4.1.2"
   },
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "ClosedClaw": "workspace:*"
   },
-  "openclaw": {
+  "ClosedClaw": {
     "extensions": [
       "./index.ts"
     ],
@@ -31,7 +31,7 @@
       "order": 60
     },
     "install": {
-      "npmSpec": "@openclaw/msteams",
+      "npmSpec": "@ClosedClaw/msteams",
       "localPath": "extensions/msteams",
       "defaultChoice": "npm"
     }

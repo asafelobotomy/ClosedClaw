@@ -26,7 +26,7 @@ x-i18n:
 
 执行审批在执行主机上本地强制执行：
 
-- **Gateway网关主机** → Gateway网关机器上的 `openclaw` 进程
+- **Gateway网关主机** → Gateway网关机器上的 `ClosedClaw` 进程
 - **节点主机** → 节点运行器（macOS 伴侣应用或无头节点主机）
 
 macOS 拆分：
@@ -38,7 +38,7 @@ macOS 拆分：
 
 审批配置存储在执行主机上的本地 JSON 文件中：
 
-`~/.openclaw/exec-approvals.json`
+`~/.ClosedClaw/exec-approvals.json`
 
 示例结构：
 
@@ -46,7 +46,7 @@ macOS 拆分：
 {
   "version": 1,
   "socket": {
-    "path": "~/.openclaw/exec-approvals.sock",
+    "path": "~/.ClosedClaw/exec-approvals.sock",
     "token": "base64url-token"
   },
   "defaults": {
@@ -134,9 +134,9 @@ Shell 链式调用和重定向在允许列表模式下不会被自动允许。
 使用**控制 UI → 节点 → 执行审批**卡片来编辑默认值、按智能体的覆盖配置和允许列表。选择一个范围（默认值或某个智能体），调整策略，添加/删除允许列表模式，然后点击**保存**。UI 会显示每个模式的**最近使用**元数据，方便你保持列表整洁。
 
 目标选择器可选择 **Gateway网关**（本地审批）或**节点**。节点必须广播 `system.execApprovals.get/set`（macOS 应用或无头节点主机）。
-如果某个节点尚未广播执行审批功能，请直接编辑其本地的 `~/.openclaw/exec-approvals.json` 文件。
+如果某个节点尚未广播执行审批功能，请直接编辑其本地的 `~/.ClosedClaw/exec-approvals.json` 文件。
 
-CLI：`openclaw approvals` 支持 Gateway网关或节点编辑（参见 [审批 CLI](/cli/approvals)）。
+CLI：`ClosedClaw approvals` 支持 Gateway网关或节点编辑（参见 [审批 CLI](/cli/approvals)）。
 
 ## 审批流程
 

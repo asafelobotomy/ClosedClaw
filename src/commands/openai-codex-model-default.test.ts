@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { ClosedClawConfig } from "../config/config.js";
 import {
   applyOpenAICodexModelDefault,
   OPENAI_CODEX_DEFAULT_MODEL,
@@ -7,7 +7,7 @@ import {
 
 describe("applyOpenAICodexModelDefault", () => {
   it("sets openai-codex default when model is unset", () => {
-    const cfg: OpenClawConfig = { agents: { defaults: {} } };
+    const cfg: ClosedClawConfig = { agents: { defaults: {} } };
     const applied = applyOpenAICodexModelDefault(cfg);
     expect(applied.changed).toBe(true);
     expect(applied.next.agents?.defaults?.model).toEqual({
@@ -16,7 +16,7 @@ describe("applyOpenAICodexModelDefault", () => {
   });
 
   it("sets openai-codex default when model is openai/*", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: ClosedClawConfig = {
       agents: { defaults: { model: "openai/gpt-5.2" } },
     };
     const applied = applyOpenAICodexModelDefault(cfg);
@@ -27,7 +27,7 @@ describe("applyOpenAICodexModelDefault", () => {
   });
 
   it("does not override openai-codex/*", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: ClosedClawConfig = {
       agents: { defaults: { model: "openai-codex/gpt-5.2" } },
     };
     const applied = applyOpenAICodexModelDefault(cfg);
@@ -36,7 +36,7 @@ describe("applyOpenAICodexModelDefault", () => {
   });
 
   it("does not override non-openai models", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: ClosedClawConfig = {
       agents: { defaults: { model: "anthropic/claude-opus-4-5" } },
     };
     const applied = applyOpenAICodexModelDefault(cfg);

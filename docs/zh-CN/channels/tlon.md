@@ -14,7 +14,7 @@ x-i18n:
 
 # Tlon（插件）
 
-Tlon 是一个基于 Urbit 构建的去中心化通讯工具。OpenClaw 连接到你的 Urbit ship，可以
+Tlon 是一个基于 Urbit 构建的去中心化通讯工具。ClosedClaw 连接到你的 Urbit ship，可以
 回复私信和群聊消息。群聊回复默认需要 @ 提及，并可通过白名单进一步限制。
 
 状态：通过插件支持。支持私信、群组提及、线程回复和纯文本媒体回退
@@ -27,13 +27,13 @@ Tlon 以插件形式提供，不包含在核心安装包中。
 通过 CLI 安装（npm 注册表）：
 
 ```bash
-openclaw plugins install @openclaw/tlon
+ClosedClaw plugins install @ClosedClaw/tlon
 ```
 
 本地签出（从 git 仓库运行时）：
 
 ```bash
-openclaw plugins install ./extensions/tlon
+ClosedClaw plugins install ./extensions/tlon
 ```
 
 详情：[插件](/plugin)
@@ -126,7 +126,7 @@ openclaw plugins install ./extensions/tlon
 
 ## 投递目标（CLI/定时任务）
 
-与 `openclaw message send` 或定时投递配合使用：
+与 `ClosedClaw message send` 或定时投递配合使用：
 
 - 私信：`~sampel-palnet` 或 `dm/~sampel-palnet`
 - 群组：`chat/~host-ship/channel` 或 `group:~host-ship/channel`
@@ -134,5 +134,5 @@ openclaw plugins install ./extensions/tlon
 ## 备注
 
 - 群聊回复需要提及（例如 `~your-bot-ship`）才会响应。
-- 线程回复：如果收到的消息在线程中，OpenClaw 会在线程内回复。
+- 线程回复：如果收到的消息在线程中，ClosedClaw 会在线程内回复。
 - 媒体：`sendMedia` 回退为文本 + URL（不支持原生上传）。

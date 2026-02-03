@@ -16,7 +16,7 @@ x-i18n:
 
 # CLI 后端（回退运行时）
 
-OpenClaw 可以将**本地 AI CLI** 作为**纯文本回退**运行，适用于 API 提供商宕机、被限流或暂时异常的情况。该方案设计上有意保持保守：
+ClosedClaw 可以将**本地 AI CLI** 作为**纯文本回退**运行，适用于 API 提供商宕机、被限流或暂时异常的情况。该方案设计上有意保持保守：
 
 - **工具已禁用**（不进行工具调用）。
 - **文本输入 → 文本输出**（可靠）。
@@ -27,16 +27,16 @@ OpenClaw 可以将**本地 AI CLI** 作为**纯文本回退**运行，适用于 
 
 ## 新手快速入门
 
-你可以**无需任何配置**直接使用 Claude Code CLI（OpenClaw 内置了默认配置）：
+你可以**无需任何配置**直接使用 Claude Code CLI（ClosedClaw 内置了默认配置）：
 
 ```bash
-openclaw agent --message "hi" --model claude-cli/opus-4.5
+ClosedClaw agent --message "hi" --model claude-cli/opus-4.5
 ```
 
 Codex CLI 同样开箱即用：
 
 ```bash
-openclaw agent --message "hi" --model codex-cli/gpt-5.2-codex
+ClosedClaw agent --message "hi" --model codex-cli/gpt-5.2-codex
 ```
 
 如果你的 Gateway网关在 launchd/systemd 下运行且 PATH 较精简，只需添加命令路径：
@@ -81,7 +81,7 @@ openclaw agent --message "hi" --model codex-cli/gpt-5.2-codex
 注意事项：
 
 - 如果使用了 `agents.defaults.models`（白名单），必须包含 `claude-cli/...`。
-- 如果主提供商失败（认证、限流、超时），OpenClaw 将尝试使用 CLI 后端。
+- 如果主提供商失败（认证、限流、超时），ClosedClaw 将尝试使用 CLI 后端。
 
 ## 配置概览
 
@@ -136,7 +136,7 @@ agents.defaults.cliBackends
 ## 工作原理
 
 1. **根据提供商前缀选择后端**（`claude-cli/...`）。
-2. **构建系统提示词**，使用相同的 OpenClaw 提示词 + 工作区上下文。
+2. **构建系统提示词**，使用相同的 ClosedClaw 提示词 + 工作区上下文。
 3. **执行 CLI**，附带会话 ID（如支持），以保持历史记录一致。
 4. **解析输出**（JSON 或纯文本），返回最终文本。
 5. **持久化会话 ID**（按后端分别存储），后续对话复用同一 CLI 会话。
@@ -159,7 +159,7 @@ imageArg: "--image",
 imageMode: "repeat"
 ```
 
-OpenClaw 会将 base64 图片写入临时文件。如果设置了 `imageArg`，这些路径将作为 CLI 参数传递。如果未设置 `imageArg`，OpenClaw 会将文件路径追加到提示词中（路径注入），这对于能从纯文本路径自动加载本地文件的 CLI 已经足够（Claude Code CLI 的行为即是如此）。
+ClosedClaw 会将 base64 图片写入临时文件。如果设置了 `imageArg`，这些路径将作为 CLI 参数传递。如果未设置 `imageArg`，ClosedClaw 会将文件路径追加到提示词中（路径注入），这对于能从纯文本路径自动加载本地文件的 CLI 已经足够（Claude Code CLI 的行为即是如此）。
 
 ## 输入 / 输出
 
@@ -175,7 +175,7 @@ OpenClaw 会将 base64 图片写入临时文件。如果设置了 `imageArg`，�
 
 ## 默认值（内置）
 
-OpenClaw 为 `claude-cli` 内置了默认配置：
+ClosedClaw 为 `claude-cli` 内置了默认配置：
 
 - `command: "claude"`
 - `args: ["-p", "--output-format", "json", "--dangerously-skip-permissions"]`
@@ -186,7 +186,7 @@ OpenClaw 为 `claude-cli` 内置了默认配置：
 - `systemPromptWhen: "first"`
 - `sessionMode: "always"`
 
-OpenClaw 还为 `codex-cli` 内置了默认配置：
+ClosedClaw 还为 `codex-cli` 内置了默认配置：
 
 - `command: "codex"`
 - `args: ["exec","--json","--color","never","--sandbox","read-only","--skip-git-repo-check"]`
@@ -201,10 +201,10 @@ OpenClaw 还为 `codex-cli` 内置了默认配置：
 
 ## 限制
 
-- **无 OpenClaw 工具**（CLI 后端不会接收工具调用）。某些 CLI 可能仍会运行自身的智能体工具。
+- **无 ClosedClaw 工具**（CLI 后端不会接收工具调用）。某些 CLI 可能仍会运行自身的智能体工具。
 - **无流式传输**（CLI 输出收集完毕后一次性返回）。
 - **结构化输出**取决于 CLI 的 JSON 格式。
-- **Codex CLI 会话**通过文本输出恢复（非 JSONL），其结构化程度不如初始的 `--json` 运行。OpenClaw 会话仍正常工作。
+- **Codex CLI 会话**通过文本输出恢复（非 JSONL），其结构化程度不如初始的 `--json` 运行。ClosedClaw 会话仍正常工作。
 
 ## 故障排除
 

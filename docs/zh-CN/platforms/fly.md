@@ -1,5 +1,5 @@
 ---
-description: Deploy OpenClaw on Fly.io
+description: Deploy ClosedClaw on Fly.io
 title: Fly.io
 x-i18n:
   generated_at: "2026-02-01T21:21:15Z"
@@ -12,7 +12,7 @@ x-i18n:
 
 # Fly.io 部署
 
-**目标：** 在 [Fly.io](https://fly.io) 机器上运行 OpenClaw Gateway网关，配备持久化存储、自动 HTTPS 和 Discord/渠道访问。
+**目标：** 在 [Fly.io](https://fly.io) 机器上运行 ClosedClaw Gateway网关，配备持久化存储、自动 HTTPS 和 Discord/渠道访问。
 
 ## 你需要什么
 
@@ -32,14 +32,14 @@ x-i18n:
 
 ```bash
 # 克隆仓库
-git clone https://github.com/openclaw/openclaw.git
-cd openclaw
+git clone https://github.com/ClosedClaw/ClosedClaw.git
+cd ClosedClaw
 
 # 创建新的 Fly 应用（选择你自己的名称）
-fly apps create my-openclaw
+fly apps create my-ClosedClaw
 
 # 创建持久化卷（1GB 通常足够）
-fly volumes create openclaw_data --size 1 --region iad
+fly volumes create ClosedClaw_data --size 1 --region iad
 ```
 
 **提示：** 选择离你最近的区域。常见选项：`lhr`（伦敦）、`iad`（弗吉尼亚）、`sjc`（圣何塞）。
@@ -51,7 +51,7 @@ fly volumes create openclaw_data --size 1 --region iad
 **安全提示：** 默认配置会暴露公共 URL。如需无公网 IP 的加固部署，请参阅[私有部署](#私有部署加固)或使用 `fly.private.toml`。
 
 ```toml
-app = "my-openclaw"  # 你的应用名称
+app = "my-ClosedClaw"  # 你的应用名称
 primary_region = "iad"
 
 [build]
@@ -59,8 +59,8 @@ primary_region = "iad"
 
 [env]
   NODE_ENV = "production"
-  OPENCLAW_PREFER_PNPM = "1"
-  OPENCLAW_STATE_DIR = "/data"
+  ClosedClaw_PREFER_PNPM = "1"
+  ClosedClaw_STATE_DIR = "/data"
   NODE_OPTIONS = "--max-old-space-size=1536"
 
 [processes]
@@ -79,7 +79,7 @@ primary_region = "iad"
   memory = "2048mb"
 
 [mounts]
-  source = "openclaw_data"
+  source = "ClosedClaw_data"
   destination = "/data"
 ```
 
@@ -89,15 +89,15 @@ primary_region = "iad"
 | ------------------------------ | ------------------------------------------------------------------------- |
 | `--bind lan`                   | 绑定到 `0.0.0.0`，使 Fly 的代理能够访问 Gateway网关                       |
 | `--allow-unconfigured`         | 无需配置文件即可启动（之后再创建）                                        |
-| `internal_port = 3000`         | 必须与 `--port 3000`（或 `OPENCLAW_GATEWAY_PORT`）匹配，用于 Fly 健康检查 |
+| `internal_port = 3000`         | 必须与 `--port 3000`（或 `ClosedClaw_GATEWAY_PORT`）匹配，用于 Fly 健康检查 |
 | `memory = "2048mb"`            | 512MB 太小；推荐 2GB                                                      |
-| `OPENCLAW_STATE_DIR = "/data"` | 将状态持久化到卷上                                                        |
+| `ClosedClaw_STATE_DIR = "/data"` | 将状态持久化到卷上                                                        |
 
 ## 3）设置密钥
 
 ```bash
 # 必需：Gateway网关令牌（用于非 local loopback 绑定）
-fly secrets set OPENCLAW_GATEWAY_TOKEN=$(openssl rand -hex 32)
+fly secrets set ClosedClaw_GATEWAY_TOKEN=$(openssl rand -hex 32)
 
 # 模型提供商 API 密钥
 fly secrets set ANTHROPIC_API_KEY=sk-ant-...
@@ -112,9 +112,9 @@ fly secrets set DISCORD_BOT_TOKEN=MTQ...
 
 **注意事项：**
 
-- 非 local loopback 绑定（`--bind lan`）出于安全需要 `OPENCLAW_GATEWAY_TOKEN`。
+- 非 local loopback 绑定（`--bind lan`）出于安全需要 `ClosedClaw_GATEWAY_TOKEN`。
 - 请像对待密码一样对待这些令牌。
-- **所有 API 密钥和令牌优先使用环境变量而非配置文件**。这样可以避免密钥出现在 `openclaw.json` 中，防止意外暴露或被记录到日志。
+- **所有 API 密钥和令牌优先使用环境变量而非配置文件**。这样可以避免密钥出现在 `ClosedClaw.json` 中，防止意外暴露或被记录到日志。
 
 ## 4）部署
 
@@ -150,7 +150,7 @@ fly ssh console
 
 ```bash
 mkdir -p /data
-cat > /data/openclaw.json << 'EOF'
+cat > /data/ClosedClaw.json << 'EOF'
 {
   "agents": {
     "defaults": {
@@ -202,7 +202,7 @@ cat > /data/openclaw.json << 'EOF'
 EOF
 ```
 
-**注意：** 当 `OPENCLAW_STATE_DIR=/data` 时，配置路径为 `/data/openclaw.json`。
+**注意：** 当 `ClosedClaw_STATE_DIR=/data` 时，配置路径为 `/data/ClosedClaw.json`。
 
 **注意：** Discord 令牌可以来自：
 
@@ -228,9 +228,9 @@ fly machine restart <machine-id>
 fly open
 ```
 
-或访问 `https://my-openclaw.fly.dev/`
+或访问 `https://my-ClosedClaw.fly.dev/`
 
-粘贴你的 Gateway网关令牌（即 `OPENCLAW_GATEWAY_TOKEN` 的值）进行认证。
+粘贴你的 Gateway网关令牌（即 `ClosedClaw_GATEWAY_TOKEN` 的值）进行认证。
 
 ### 日志
 
@@ -257,7 +257,7 @@ Gateway网关绑定到了 `127.0.0.1` 而不是 `0.0.0.0`。
 
 Fly 无法通过配置的端口访问 Gateway网关。
 
-**修复：** 确保 `internal_port` 与 Gateway网关端口匹配（设置 `--port 3000` 或 `OPENCLAW_GATEWAY_PORT=3000`）。
+**修复：** 确保 `internal_port` 与 Gateway网关端口匹配（设置 `--port 3000` 或 `ClosedClaw_GATEWAY_PORT=3000`）。
 
 ### 内存不足（OOM）/ 内存问题
 
@@ -295,12 +295,12 @@ fly machine restart <machine-id>
 
 ### 配置未被读取
 
-如果使用 `--allow-unconfigured`，Gateway网关会创建一个最小配置。你在 `/data/openclaw.json` 的自定义配置应在重启后被读取。
+如果使用 `--allow-unconfigured`，Gateway网关会创建一个最小配置。你在 `/data/ClosedClaw.json` 的自定义配置应在重启后被读取。
 
 验证配置是否存在：
 
 ```bash
-fly ssh console --command "cat /data/openclaw.json"
+fly ssh console --command "cat /data/ClosedClaw.json"
 ```
 
 ### 通过 SSH 写入配置
@@ -309,24 +309,24 @@ fly ssh console --command "cat /data/openclaw.json"
 
 ```bash
 # 使用 echo + tee（从本地管道到远程）
-echo '{"your":"config"}' | fly ssh console -C "tee /data/openclaw.json"
+echo '{"your":"config"}' | fly ssh console -C "tee /data/ClosedClaw.json"
 
 # 或使用 sftp
 fly sftp shell
-> put /local/path/config.json /data/openclaw.json
+> put /local/path/config.json /data/ClosedClaw.json
 ```
 
 **注意：** 如果文件已存在，`fly sftp` 可能会失败。请先删除：
 
 ```bash
-fly ssh console --command "rm /data/openclaw.json"
+fly ssh console --command "rm /data/ClosedClaw.json"
 ```
 
 ### 状态未持久化
 
 如果重启后凭据或会话丢失，说明状态目录写入了容器文件系统。
 
-**修复：** 确保 `fly.toml` 中设置了 `OPENCLAW_STATE_DIR=/data` 并重新部署。
+**修复：** 确保 `fly.toml` 中设置了 `ClosedClaw_STATE_DIR=/data` 并重新部署。
 
 ## 更新
 
@@ -385,18 +385,18 @@ fly deploy -c fly.private.toml
 
 ```bash
 # 列出当前 IP
-fly ips list -a my-openclaw
+fly ips list -a my-ClosedClaw
 
 # 释放公网 IP
-fly ips release <public-ipv4> -a my-openclaw
-fly ips release <public-ipv6> -a my-openclaw
+fly ips release <public-ipv4> -a my-ClosedClaw
+fly ips release <public-ipv6> -a my-ClosedClaw
 
 # 切换到私有配置，使未来的部署不再分配公网 IP
 # （移除 [http_service] 或使用私有模板部署）
 fly deploy -c fly.private.toml
 
 # 分配仅私有的 IPv6
-fly ips allocate-v6 --private -a my-openclaw
+fly ips allocate-v6 --private -a my-ClosedClaw
 ```
 
 之后，`fly ips list` 应该只显示 `private` 类型的 IP：
@@ -414,7 +414,7 @@ v6       fdaa:x:x:x:x::x      private          global
 
 ```bash
 # 将本地端口 3000 转发到应用
-fly proxy 3000:3000 -a my-openclaw
+fly proxy 3000:3000 -a my-ClosedClaw
 
 # 然后在浏览器中打开 http://localhost:3000
 ```
@@ -432,7 +432,7 @@ fly wireguard create
 **方案 3：仅 SSH**
 
 ```bash
-fly ssh console -a my-openclaw
+fly ssh console -a my-ClosedClaw
 ```
 
 ### 私有部署中的 Webhook

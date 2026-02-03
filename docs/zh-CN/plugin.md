@@ -2,7 +2,7 @@
 read_when:
   - 添加或修改插件/扩展
   - 记录插件安装或加载规则
-summary: OpenClaw 插件/扩展：发现、配置与安全
+summary: ClosedClaw 插件/扩展：发现、配置与安全
 title: 插件
 x-i18n:
   generated_at: "2026-02-01T21:36:00Z"
@@ -17,22 +17,22 @@ x-i18n:
 
 ## 快速入门（初次接触插件？）
 
-插件就是一个**小型代码模块**，用于为 OpenClaw 扩展额外功能（命令、工具和 Gateway网关 RPC）。
+插件就是一个**小型代码模块**，用于为 ClosedClaw 扩展额外功能（命令、工具和 Gateway网关 RPC）。
 
-大多数情况下，当你需要某个尚未内置到 OpenClaw 核心的功能（或希望将可选功能从主安装中分离出来）时，就会使用插件。
+大多数情况下，当你需要某个尚未内置到 ClosedClaw 核心的功能（或希望将可选功能从主安装中分离出来）时，就会使用插件。
 
 快速上手：
 
 1. 查看已加载的插件：
 
 ```bash
-openclaw plugins list
+ClosedClaw plugins list
 ```
 
 2. 安装官方插件（示例：Voice Call）：
 
 ```bash
-openclaw plugins install @openclaw/voice-call
+ClosedClaw plugins install @ClosedClaw/voice-call
 ```
 
 3. 重启 Gateway网关，然后在 `plugins.entries.<id>.config` 下进行配置。
@@ -41,21 +41,21 @@ openclaw plugins install @openclaw/voice-call
 
 ## 可用插件（官方）
 
-- 自 2026.1.15 起，Microsoft Teams 仅以插件形式提供；如果使用 Teams，请安装 `@openclaw/msteams`。
+- 自 2026.1.15 起，Microsoft Teams 仅以插件形式提供；如果使用 Teams，请安装 `@ClosedClaw/msteams`。
 - Memory (Core) — 内置记忆搜索插件（默认通过 `plugins.slots.memory` 启用）
 - Memory (LanceDB) — 内置长期记忆插件（自动召回/捕获；设置 `plugins.slots.memory = "memory-lancedb"`）
-- [Voice Call](/plugins/voice-call) — `@openclaw/voice-call`
-- [Zalo Personal](/plugins/zalouser) — `@openclaw/zalouser`
-- [Matrix](/channels/matrix) — `@openclaw/matrix`
-- [Nostr](/channels/nostr) — `@openclaw/nostr`
-- [Zalo](/channels/zalo) — `@openclaw/zalo`
-- [Microsoft Teams](/channels/msteams) — `@openclaw/msteams`
+- [Voice Call](/plugins/voice-call) — `@ClosedClaw/voice-call`
+- [Zalo Personal](/plugins/zalouser) — `@ClosedClaw/zalouser`
+- [Matrix](/channels/matrix) — `@ClosedClaw/matrix`
+- [Nostr](/channels/nostr) — `@ClosedClaw/nostr`
+- [Zalo](/channels/zalo) — `@ClosedClaw/zalo`
+- [Microsoft Teams](/channels/msteams) — `@ClosedClaw/msteams`
 - Google Antigravity OAuth（提供商认证）— 内置为 `google-antigravity-auth`（默认禁用）
 - Gemini CLI OAuth（提供商认证）— 内置为 `google-gemini-cli-auth`（默认禁用）
 - Qwen OAuth（提供商认证）— 内置为 `qwen-portal-auth`（默认禁用）
 - Copilot Proxy（提供商认证）— 本地 VS Code Copilot Proxy 桥接；与内置的 `github-copilot` 设备登录不同（内置，默认禁用）
 
-OpenClaw 插件是**TypeScript 模块**，在运行时通过 jiti 加载。**配置验证不会执行插件代码**；而是使用插件清单和 JSON Schema。参见[插件清单](/plugins/manifest)。
+ClosedClaw 插件是**TypeScript 模块**，在运行时通过 jiti 加载。**配置验证不会执行插件代码**；而是使用插件清单和 JSON Schema。参见[插件清单](/plugins/manifest)。
 
 插件可以注册：
 
@@ -77,7 +77,7 @@ OpenClaw 插件是**TypeScript 模块**，在运行时通过 jiti 加载。**配
 
 ```ts
 const result = await api.runtime.tts.textToSpeechTelephony({
-  text: "Hello from OpenClaw",
+  text: "Hello from ClosedClaw",
   cfg: api.config,
 });
 ```
@@ -90,7 +90,7 @@ const result = await api.runtime.tts.textToSpeechTelephony({
 
 ## 发现与优先级
 
-OpenClaw 按以下顺序扫描：
+ClosedClaw 按以下顺序扫描：
 
 1. 配置路径
 
@@ -98,32 +98,32 @@ OpenClaw 按以下顺序扫描：
 
 2. 工作区扩展
 
-- `<workspace>/.openclaw/extensions/*.ts`
-- `<workspace>/.openclaw/extensions/*/index.ts`
+- `<workspace>/.ClosedClaw/extensions/*.ts`
+- `<workspace>/.ClosedClaw/extensions/*/index.ts`
 
 3. 全局扩展
 
-- `~/.openclaw/extensions/*.ts`
-- `~/.openclaw/extensions/*/index.ts`
+- `~/.ClosedClaw/extensions/*.ts`
+- `~/.ClosedClaw/extensions/*/index.ts`
 
-4. 内置扩展（随 OpenClaw 一起发布，**默认禁用**）
+4. 内置扩展（随 ClosedClaw 一起发布，**默认禁用**）
 
-- `<openclaw>/extensions/*`
+- `<ClosedClaw>/extensions/*`
 
-内置插件必须通过 `plugins.entries.<id>.enabled` 或 `openclaw plugins enable <id>` 显式启用。已安装的插件默认启用，但可以用同样的方式禁用。
+内置插件必须通过 `plugins.entries.<id>.enabled` 或 `ClosedClaw plugins enable <id>` 显式启用。已安装的插件默认启用，但可以用同样的方式禁用。
 
-每个插件的根目录中必须包含一个 `openclaw.plugin.json` 文件。如果路径指向一个文件，插件根目录就是该文件所在目录，且必须包含清单文件。
+每个插件的根目录中必须包含一个 `ClosedClaw.plugin.json` 文件。如果路径指向一个文件，插件根目录就是该文件所在目录，且必须包含清单文件。
 
 如果多个插件解析到相同的 id，按上述顺序第一个匹配的生效，较低优先级的副本将被忽略。
 
 ### 包集合
 
-插件目录可以包含一个带有 `openclaw.extensions` 的 `package.json`：
+插件目录可以包含一个带有 `ClosedClaw.extensions` 的 `package.json`：
 
 ```json
 {
   "name": "my-pack",
-  "openclaw": {
+  "ClosedClaw": {
     "extensions": ["./src/safety.ts", "./src/tools.ts"]
   }
 }
@@ -135,14 +135,14 @@ OpenClaw 按以下顺序扫描：
 
 ### 渠道目录元数据
 
-渠道插件可以通过 `openclaw.channel` 公布新手引导元数据，并通过 `openclaw.install` 提供安装提示。这使核心目录保持无数据状态。
+渠道插件可以通过 `ClosedClaw.channel` 公布新手引导元数据，并通过 `ClosedClaw.install` 提供安装提示。这使核心目录保持无数据状态。
 
 示例：
 
 ```json
 {
-  "name": "@openclaw/nextcloud-talk",
-  "openclaw": {
+  "name": "@ClosedClaw/nextcloud-talk",
+  "ClosedClaw": {
     "extensions": ["./index.ts"],
     "channel": {
       "id": "nextcloud-talk",
@@ -155,7 +155,7 @@ OpenClaw 按以下顺序扫描：
       "aliases": ["nc-talk", "nc"]
     },
     "install": {
-      "npmSpec": "@openclaw/nextcloud-talk",
+      "npmSpec": "@ClosedClaw/nextcloud-talk",
       "localPath": "extensions/nextcloud-talk",
       "defaultChoice": "npm"
     }
@@ -163,13 +163,13 @@ OpenClaw 按以下顺序扫描：
 }
 ```
 
-OpenClaw 还可以合并**外部渠道目录**（例如，MPM 注册表导出）。将 JSON 文件放置在以下位置之一：
+ClosedClaw 还可以合并**外部渠道目录**（例如，MPM 注册表导出）。将 JSON 文件放置在以下位置之一：
 
-- `~/.openclaw/mpm/plugins.json`
-- `~/.openclaw/mpm/catalog.json`
-- `~/.openclaw/plugins/catalog.json`
+- `~/.ClosedClaw/mpm/plugins.json`
+- `~/.ClosedClaw/mpm/catalog.json`
+- `~/.ClosedClaw/plugins/catalog.json`
 
-或者将 `OPENCLAW_PLUGIN_CATALOG_PATHS`（或 `OPENCLAW_MPM_CATALOG_PATHS`）指向一个或多个 JSON 文件（以逗号/分号/`PATH` 分隔）。每个文件应包含 `{ "entries": [ { "name": "@scope/pkg", "openclaw": { "channel": {...}, "install": {...} } } ] }`。
+或者将 `ClosedClaw_PLUGIN_CATALOG_PATHS`（或 `ClosedClaw_MPM_CATALOG_PATHS`）指向一个或多个 JSON 文件（以逗号/分号/`PATH` 分隔）。每个文件应包含 `{ "entries": [ { "name": "@scope/pkg", "ClosedClaw": { "channel": {...}, "install": {...} } } ] }`。
 
 ## 插件 ID
 
@@ -178,7 +178,7 @@ OpenClaw 还可以合并**外部渠道目录**（例如，MPM 注册表导出）
 - 包集合：`package.json` 中的 `name`
 - 独立文件：文件基本名称（`~/.../voice-call.ts` → `voice-call`）
 
-如果插件导出了 `id`，OpenClaw 会使用它，但当它与配置的 id 不匹配时会发出警告。
+如果插件导出了 `id`，ClosedClaw 会使用它，但当它与配置的 id 不匹配时会发出警告。
 
 ## 配置
 
@@ -210,7 +210,7 @@ OpenClaw 还可以合并**外部渠道目录**（例如，MPM 注册表导出）
 
 - `entries`、`allow`、`deny` 或 `slots` 中的未知插件 id 会产生**错误**。
 - 未知的 `channels.<id>` 键会产生**错误**，除非插件清单声明了该渠道 id。
-- 插件配置使用 `openclaw.plugin.json` 中嵌入的 JSON Schema（`configSchema`）进行验证。
+- 插件配置使用 `ClosedClaw.plugin.json` 中嵌入的 JSON Schema（`configSchema`）进行验证。
 - 如果插件被禁用，其配置会被保留并发出**警告**。
 
 ## 插件槽位（排他类别）
@@ -233,7 +233,7 @@ OpenClaw 还可以合并**外部渠道目录**（例如，MPM 注册表导出）
 
 控制界面使用 `config.schema`（JSON Schema + `uiHints`）来渲染更好的表单。
 
-OpenClaw 在运行时根据已发现的插件增强 `uiHints`：
+ClosedClaw 在运行时根据已发现的插件增强 `uiHints`：
 
 - 为 `plugins.entries.<id>` / `.enabled` / `.config` 添加每个插件的标签
 - 合并插件提供的可选配置字段提示到：
@@ -264,24 +264,24 @@ OpenClaw 在运行时根据已发现的插件增强 `uiHints`：
 ## CLI
 
 ```bash
-openclaw plugins list
-openclaw plugins info <id>
-openclaw plugins install <path>                 # 将本地文件/目录复制到 ~/.openclaw/extensions/<id>
-openclaw plugins install ./extensions/voice-call # 相对路径也可以
-openclaw plugins install ./plugin.tgz           # 从本地 tarball 安装
-openclaw plugins install ./plugin.zip           # 从本地 zip 安装
-openclaw plugins install -l ./extensions/voice-call # 链接（不复制）用于开发
-openclaw plugins install @openclaw/voice-call # 从 npm 安装
-openclaw plugins update <id>
-openclaw plugins update --all
-openclaw plugins enable <id>
-openclaw plugins disable <id>
-openclaw plugins doctor
+ClosedClaw plugins list
+ClosedClaw plugins info <id>
+ClosedClaw plugins install <path>                 # 将本地文件/目录复制到 ~/.ClosedClaw/extensions/<id>
+ClosedClaw plugins install ./extensions/voice-call # 相对路径也可以
+ClosedClaw plugins install ./plugin.tgz           # 从本地 tarball 安装
+ClosedClaw plugins install ./plugin.zip           # 从本地 zip 安装
+ClosedClaw plugins install -l ./extensions/voice-call # 链接（不复制）用于开发
+ClosedClaw plugins install @ClosedClaw/voice-call # 从 npm 安装
+ClosedClaw plugins update <id>
+ClosedClaw plugins update --all
+ClosedClaw plugins enable <id>
+ClosedClaw plugins disable <id>
+ClosedClaw plugins doctor
 ```
 
 `plugins update` 仅适用于通过 `plugins.installs` 跟踪的 npm 安装。
 
-插件也可以注册自己的顶级命令（示例：`openclaw voicecall`）。
+插件也可以注册自己的顶级命令（示例：`ClosedClaw voicecall`）。
 
 ## 插件 API（概览）
 
@@ -297,7 +297,7 @@ openclaw plugins doctor
 ### 示例
 
 ```
-import { registerPluginHooksFromDir } from "openclaw/plugin-sdk";
+import { registerPluginHooksFromDir } from "ClosedClaw/plugin-sdk";
 
 export default function register(api) {
   registerPluginHooksFromDir(api, "./hooks");
@@ -308,16 +308,16 @@ export default function register(api) {
 
 - 钩子目录遵循常规钩子结构（`HOOK.md` + `handler.ts`）。
 - 钩子资格规则仍然适用（操作系统/二进制文件/环境/配置要求）。
-- 插件管理的钩子在 `openclaw hooks list` 中显示为 `plugin:<id>`。
-- 你不能通过 `openclaw hooks` 启用/禁用插件管理的钩子；请改为启用/禁用插件。
+- 插件管理的钩子在 `ClosedClaw hooks list` 中显示为 `plugin:<id>`。
+- 你不能通过 `ClosedClaw hooks` 启用/禁用插件管理的钩子；请改为启用/禁用插件。
 
 ## 提供商插件（模型认证）
 
-插件可以注册**模型提供商认证**流程，这样用户可以在 OpenClaw 内运行 OAuth 或 API 密钥设置（无需外部脚本）。
+插件可以注册**模型提供商认证**流程，这样用户可以在 ClosedClaw 内运行 OAuth 或 API 密钥设置（无需外部脚本）。
 
 通过 `api.registerProvider(...)` 注册提供商。每个提供商公开一个或多个认证方法（OAuth、API 密钥、设备代码等）。这些方法驱动：
 
-- `openclaw models auth login --provider <id> [--method <id>]`
+- `ClosedClaw models auth login --provider <id> [--method <id>]`
 
 示例：
 
@@ -537,7 +537,7 @@ export default function (api) {
 - `isAuthorizedSender`：发送者是否为授权用户
 - `args`：命令后传递的参数（如果 `acceptsArgs: true`）
 - `commandBody`：完整的命令文本
-- `config`：当前的 OpenClaw 配置
+- `config`：当前的 ClosedClaw 配置
 
 命令选项：
 
@@ -599,14 +599,14 @@ export default function (api) {
 
 推荐的打包方式：
 
-- 主包：`openclaw`（本仓库）
-- 插件：`@openclaw/*` 下的独立 npm 包（示例：`@openclaw/voice-call`）
+- 主包：`ClosedClaw`（本仓库）
+- 插件：`@ClosedClaw/*` 下的独立 npm 包（示例：`@ClosedClaw/voice-call`）
 
 发布约定：
 
-- 插件 `package.json` 必须包含 `openclaw.extensions`，其中列出一个或多个入口文件。
+- 插件 `package.json` 必须包含 `ClosedClaw.extensions`，其中列出一个或多个入口文件。
 - 入口文件可以是 `.js` 或 `.ts`（jiti 在运行时加载 TS）。
-- `openclaw plugins install <npm-spec>` 使用 `npm pack`，提取到 `~/.openclaw/extensions/<id>/`，并在配置中启用。
+- `ClosedClaw plugins install <npm-spec>` 使用 `npm pack`，提取到 `~/.ClosedClaw/extensions/<id>/`，并在配置中启用。
 - 配置键稳定性：带作用域的包会被规范化为**不带作用域**的 id 用于 `plugins.entries.*`。
 
 ## 示例插件：Voice Call
@@ -615,7 +615,7 @@ export default function (api) {
 
 - 源码：`extensions/voice-call`
 - Skills：`skills/voice-call`
-- CLI：`openclaw voicecall start|status`
+- CLI：`ClosedClaw voicecall start|status`
 - 工具：`voice_call`
 - RPC：`voicecall.start`、`voicecall.status`
 - 配置（twilio）：`provider: "twilio"` + `twilio.accountSid/authToken/from`（可选 `statusCallbackUrl`、`twimlUrl`）
@@ -636,4 +636,4 @@ export default function (api) {
 插件可以（也应该）附带测试：
 
 - 仓库内的插件可以在 `src/**` 下保留 Vitest 测试（示例：`src/plugins/voice-call.plugin.test.ts`）。
-- 单独发布的插件应运行自己的 CI（lint/构建/测试），并验证 `openclaw.extensions` 指向构建后的入口点（`dist/index.js`）。
+- 单独发布的插件应运行自己的 CI（lint/构建/测试），并验证 `ClosedClaw.extensions` 指向构建后的入口点（`dist/index.js`）。

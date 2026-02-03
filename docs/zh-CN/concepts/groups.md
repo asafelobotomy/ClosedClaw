@@ -14,19 +14,19 @@ x-i18n:
 
 # 群组
 
-OpenClaw 在各平台上统一处理群聊：WhatsApp、Telegram、Discord、Slack、Signal、iMessage、Microsoft Teams。
+ClosedClaw 在各平台上统一处理群聊：WhatsApp、Telegram、Discord、Slack、Signal、iMessage、Microsoft Teams。
 
 ## 入门简介（2 分钟）
 
-OpenClaw "运行"在你自己的消息账户上。没有单独的 WhatsApp 机器人用户。
-如果**你**在某个群组中，OpenClaw 就能看到该群组并在其中回复。
+ClosedClaw "运行"在你自己的消息账户上。没有单独的 WhatsApp 机器人用户。
+如果**你**在某个群组中，ClosedClaw 就能看到该群组并在其中回复。
 
 默认行为：
 
 - 群组受限（`groupPolicy: "allowlist"`）。
 - 除非你显式禁用提及门控，否则回复需要 @提及。
 
-含义：允许列表中的发送者可以通过提及 OpenClaw 来触发它。
+含义：允许列表中的发送者可以通过提及 ClosedClaw 来触发它。
 
 > 简而言之
 >
@@ -236,7 +236,7 @@ otherwise -> reply
       {
         id: "main",
         groupChat: {
-          mentionPatterns: ["@openclaw", "openclaw", "\\+15555550123"],
+          mentionPatterns: ["@ClosedClaw", "ClosedClaw", "\\+15555550123"],
           historyLimit: 50,
         },
       },

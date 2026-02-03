@@ -29,7 +29,7 @@ x-i18n:
 - Gateway网关运行在另一台设备上（macOS、Linux 或通过 WSL2 的 Windows）。
 - 网络路径：
   - 通过 Bonjour 的同一局域网，**或**
-  - 通过单播 DNS-SD 的 Tailnet（示例域名：`openclaw.internal.`），**或**
+  - 通过单播 DNS-SD 的 Tailnet（示例域名：`ClosedClaw.internal.`），**或**
   - 手动输入主机/端口（备用方案）。
 
 ## 快速开始（配对 + 连接）
@@ -37,7 +37,7 @@ x-i18n:
 1. 启动 Gateway网关：
 
 ```bash
-openclaw gateway --port 18789
+ClosedClaw gateway --port 18789
 ```
 
 2. 在 iOS 应用中，打开设置并选择已发现的 Gateway网关（或启用手动主机并输入主机/端口）。
@@ -45,26 +45,26 @@ openclaw gateway --port 18789
 3. 在 Gateway网关主机上批准配对请求：
 
 ```bash
-openclaw nodes pending
-openclaw nodes approve <requestId>
+ClosedClaw nodes pending
+ClosedClaw nodes approve <requestId>
 ```
 
 4. 验证连接：
 
 ```bash
-openclaw nodes status
-openclaw gateway call node.list --params "{}"
+ClosedClaw nodes status
+ClosedClaw gateway call node.list --params "{}"
 ```
 
 ## 发现路径
 
 ### Bonjour（局域网）
 
-Gateway网关在 `local.` 上广播 `_openclaw-gw._tcp`。iOS 应用会自动列出这些服务。
+Gateway网关在 `local.` 上广播 `_ClosedClaw-gw._tcp`。iOS 应用会自动列出这些服务。
 
 ### Tailnet（跨网络）
 
-如果 mDNS 被阻止，请使用单播 DNS-SD 区域（选择一个域名；示例：`openclaw.internal.`）和 Tailscale 分割 DNS。
+如果 mDNS 被阻止，请使用单播 DNS-SD 区域（选择一个域名；示例：`ClosedClaw.internal.`）和 Tailscale 分割 DNS。
 参阅 [Bonjour](/gateway/bonjour) 了解 CoreDNS 配置示例。
 
 ### 手动主机/端口
@@ -76,23 +76,23 @@ Gateway网关在 `local.` 上广播 `_openclaw-gw._tcp`。iOS 应用会自动列
 iOS 节点渲染一个 WKWebView 画布。使用 `node.invoke` 来驱动它：
 
 ```bash
-openclaw nodes invoke --node "iOS Node" --command canvas.navigate --params '{"url":"http://<gateway-host>:18793/__openclaw__/canvas/"}'
+ClosedClaw nodes invoke --node "iOS Node" --command canvas.navigate --params '{"url":"http://<gateway-host>:18793/__ClosedClaw__/canvas/"}'
 ```
 
 注意事项：
 
-- Gateway网关画布主机提供 `/__openclaw__/canvas/` 和 `/__openclaw__/a2ui/` 服务。
+- Gateway网关画布主机提供 `/__ClosedClaw__/canvas/` 和 `/__ClosedClaw__/a2ui/` 服务。
 - iOS 节点在连接时如果画布主机 URL 已广播，会自动导航到 A2UI。
 - 使用 `canvas.navigate` 和 `{"url":""}` 返回内置脚手架页面。
 
 ### 画布执行 / 快照
 
 ```bash
-openclaw nodes invoke --node "iOS Node" --command canvas.eval --params '{"javaScript":"(() => { const {ctx} = window.__openclaw; ctx.clearRect(0,0,innerWidth,innerHeight); ctx.lineWidth=6; ctx.strokeStyle=\"#ff2d55\"; ctx.beginPath(); ctx.moveTo(40,40); ctx.lineTo(innerWidth-40, innerHeight-40); ctx.stroke(); return \"ok\"; })()"}'
+ClosedClaw nodes invoke --node "iOS Node" --command canvas.eval --params '{"javaScript":"(() => { const {ctx} = window.__ClosedClaw; ctx.clearRect(0,0,innerWidth,innerHeight); ctx.lineWidth=6; ctx.strokeStyle=\"#ff2d55\"; ctx.beginPath(); ctx.moveTo(40,40); ctx.lineTo(innerWidth-40, innerHeight-40); ctx.stroke(); return \"ok\"; })()"}'
 ```
 
 ```bash
-openclaw nodes invoke --node "iOS Node" --command canvas.snapshot --params '{"maxWidth":900,"format":"jpeg"}'
+ClosedClaw nodes invoke --node "iOS Node" --command canvas.snapshot --params '{"maxWidth":900,"format":"jpeg"}'
 ```
 
 ## 语音唤醒 + 对话模式
@@ -104,7 +104,7 @@ openclaw nodes invoke --node "iOS Node" --command canvas.snapshot --params '{"ma
 
 - `NODE_BACKGROUND_UNAVAILABLE`：将 iOS 应用切换到前台（画布/摄像头/屏幕命令需要前台运行）。
 - `A2UI_HOST_NOT_CONFIGURED`：Gateway网关未广播画布主机 URL；请检查 [Gateway网关配置](/gateway/configuration) 中的 `canvasHost`。
-- 配对提示始终未出现：运行 `openclaw nodes pending` 并手动批准。
+- 配对提示始终未出现：运行 `ClosedClaw nodes pending` 并手动批准。
 - 重新安装后重连失败：钥匙串中的配对令牌已被清除；请重新配对节点。
 
 ## 相关文档

@@ -20,7 +20,7 @@ x-i18n:
 
 旧版传输：[Bridge 协议](/gateway/bridge-protocol)（TCP JSONL；当前节点已弃用/移除）。
 
-macOS 也可以在**节点模式**下运行：菜单栏应用连接到 Gateway网关的 WS 服务器，并将其本地 canvas/相机命令作为节点暴露（因此 `openclaw nodes …` 可以对该 Mac 使用）。
+macOS 也可以在**节点模式**下运行：菜单栏应用连接到 Gateway网关的 WS 服务器，并将其本地 canvas/相机命令作为节点暴露（因此 `ClosedClaw nodes …` 可以对该 Mac 使用）。
 
 注意事项：
 
@@ -34,17 +34,17 @@ macOS 也可以在**节点模式**下运行：菜单栏应用连接到 Gateway�
 快速 CLI：
 
 ```bash
-openclaw devices list
-openclaw devices approve <requestId>
-openclaw devices reject <requestId>
-openclaw nodes status
-openclaw nodes describe --node <idOrNameOrIp>
+ClosedClaw devices list
+ClosedClaw devices approve <requestId>
+ClosedClaw devices reject <requestId>
+ClosedClaw nodes status
+ClosedClaw nodes describe --node <idOrNameOrIp>
 ```
 
 注意事项：
 
 - `nodes status` 在设备配对角色包含 `node` 时将节点标记为**已配对**。
-- `node.pair.*`（CLI：`openclaw nodes pending/approve/reject`）是一个独立的 Gateway网关拥有的节点配对存储；它**不会**拦截 WS `connect` 握手。
+- `node.pair.*`（CLI：`ClosedClaw nodes pending/approve/reject`）是一个独立的 Gateway网关拥有的节点配对存储；它**不会**拦截 WS `connect` 握手。
 
 ## 远程节点主机（system.run）
 
@@ -54,21 +54,21 @@ openclaw nodes describe --node <idOrNameOrIp>
 
 - **Gateway网关主机**：接收消息，运行模型，路由工具调用。
 - **节点主机**：在节点机器上执行 `system.run`/`system.which`。
-- **审批**：通过节点主机上的 `~/.openclaw/exec-approvals.json` 执行。
+- **审批**：通过节点主机上的 `~/.ClosedClaw/exec-approvals.json` 执行。
 
 ### 启动节点主机（前台）
 
 在节点机器上：
 
 ```bash
-openclaw node run --host <gateway-host> --port 18789 --display-name "Build Node"
+ClosedClaw node run --host <gateway-host> --port 18789 --display-name "Build Node"
 ```
 
 ### 启动节点主机（服务）
 
 ```bash
-openclaw node install --host <gateway-host> --port 18789 --display-name "Build Node"
-openclaw node restart
+ClosedClaw node install --host <gateway-host> --port 18789 --display-name "Build Node"
+ClosedClaw node restart
 ```
 
 ### 配对 + 命名
@@ -76,35 +76,35 @@ openclaw node restart
 在 Gateway网关主机上：
 
 ```bash
-openclaw nodes pending
-openclaw nodes approve <requestId>
-openclaw nodes list
+ClosedClaw nodes pending
+ClosedClaw nodes approve <requestId>
+ClosedClaw nodes list
 ```
 
 命名选项：
 
-- 在 `openclaw node run` / `openclaw node install` 上使用 `--display-name`（持久保存在节点的 `~/.openclaw/node.json` 中）。
-- `openclaw nodes rename --node <id|name|ip> --name "Build Node"`（Gateway网关覆盖）。
+- 在 `ClosedClaw node run` / `ClosedClaw node install` 上使用 `--display-name`（持久保存在节点的 `~/.ClosedClaw/node.json` 中）。
+- `ClosedClaw nodes rename --node <id|name|ip> --name "Build Node"`（Gateway网关覆盖）。
 
 ### 将命令加入允许列表
 
 执行审批是**按节点主机**的。从 Gateway网关添加允许列表条目：
 
 ```bash
-openclaw approvals allowlist add --node <id|name|ip> "/usr/bin/uname"
-openclaw approvals allowlist add --node <id|name|ip> "/usr/bin/sw_vers"
+ClosedClaw approvals allowlist add --node <id|name|ip> "/usr/bin/uname"
+ClosedClaw approvals allowlist add --node <id|name|ip> "/usr/bin/sw_vers"
 ```
 
-审批存储在节点主机的 `~/.openclaw/exec-approvals.json` 中。
+审批存储在节点主机的 `~/.ClosedClaw/exec-approvals.json` 中。
 
 ### 将执行指向节点
 
 配置默认值（Gateway网关配置）：
 
 ```bash
-openclaw config set tools.exec.host node
-openclaw config set tools.exec.security allowlist
-openclaw config set tools.exec.node "<id-or-name>"
+ClosedClaw config set tools.exec.host node
+ClosedClaw config set tools.exec.security allowlist
+ClosedClaw config set tools.exec.node "<id-or-name>"
 ```
 
 或按会话设置：
@@ -126,7 +126,7 @@ openclaw config set tools.exec.node "<id-or-name>"
 低级别（原始 RPC）：
 
 ```bash
-openclaw nodes invoke --node <idOrNameOrIp> --command canvas.eval --params '{"javaScript":"location.href"}'
+ClosedClaw nodes invoke --node <idOrNameOrIp> --command canvas.eval --params '{"javaScript":"location.href"}'
 ```
 
 对于常见的"为智能体提供 MEDIA 附件"工作流，有更高级的辅助工具。
@@ -138,17 +138,17 @@ openclaw nodes invoke --node <idOrNameOrIp> --command canvas.eval --params '{"ja
 CLI 辅助工具（写入临时文件并输出 `MEDIA:<path>`）：
 
 ```bash
-openclaw nodes canvas snapshot --node <idOrNameOrIp> --format png
-openclaw nodes canvas snapshot --node <idOrNameOrIp> --format jpg --max-width 1200 --quality 0.9
+ClosedClaw nodes canvas snapshot --node <idOrNameOrIp> --format png
+ClosedClaw nodes canvas snapshot --node <idOrNameOrIp> --format jpg --max-width 1200 --quality 0.9
 ```
 
 ### Canvas 控制
 
 ```bash
-openclaw nodes canvas present --node <idOrNameOrIp> --target https://example.com
-openclaw nodes canvas hide --node <idOrNameOrIp>
-openclaw nodes canvas navigate https://example.com --node <idOrNameOrIp>
-openclaw nodes canvas eval --node <idOrNameOrIp> --js "document.title"
+ClosedClaw nodes canvas present --node <idOrNameOrIp> --target https://example.com
+ClosedClaw nodes canvas hide --node <idOrNameOrIp>
+ClosedClaw nodes canvas navigate https://example.com --node <idOrNameOrIp>
+ClosedClaw nodes canvas eval --node <idOrNameOrIp> --js "document.title"
 ```
 
 注意事项：
@@ -159,9 +159,9 @@ openclaw nodes canvas eval --node <idOrNameOrIp> --js "document.title"
 ### A2UI（Canvas）
 
 ```bash
-openclaw nodes canvas a2ui push --node <idOrNameOrIp> --text "Hello"
-openclaw nodes canvas a2ui push --node <idOrNameOrIp> --jsonl ./payload.jsonl
-openclaw nodes canvas a2ui reset --node <idOrNameOrIp>
+ClosedClaw nodes canvas a2ui push --node <idOrNameOrIp> --text "Hello"
+ClosedClaw nodes canvas a2ui push --node <idOrNameOrIp> --jsonl ./payload.jsonl
+ClosedClaw nodes canvas a2ui reset --node <idOrNameOrIp>
 ```
 
 注意事项：
@@ -173,16 +173,16 @@ openclaw nodes canvas a2ui reset --node <idOrNameOrIp>
 照片（`jpg`）：
 
 ```bash
-openclaw nodes camera list --node <idOrNameOrIp>
-openclaw nodes camera snap --node <idOrNameOrIp>            # 默认：两个朝向（2 行 MEDIA 输出）
-openclaw nodes camera snap --node <idOrNameOrIp> --facing front
+ClosedClaw nodes camera list --node <idOrNameOrIp>
+ClosedClaw nodes camera snap --node <idOrNameOrIp>            # 默认：两个朝向（2 行 MEDIA 输出）
+ClosedClaw nodes camera snap --node <idOrNameOrIp> --facing front
 ```
 
 视频片段（`mp4`）：
 
 ```bash
-openclaw nodes camera clip --node <idOrNameOrIp> --duration 10s
-openclaw nodes camera clip --node <idOrNameOrIp> --duration 3000 --no-audio
+ClosedClaw nodes camera clip --node <idOrNameOrIp> --duration 10s
+ClosedClaw nodes camera clip --node <idOrNameOrIp> --duration 3000 --no-audio
 ```
 
 注意事项：
@@ -196,8 +196,8 @@ openclaw nodes camera clip --node <idOrNameOrIp> --duration 3000 --no-audio
 节点暴露 `screen.record`（mp4）。示例：
 
 ```bash
-openclaw nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10
-openclaw nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10 --no-audio
+ClosedClaw nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10
+ClosedClaw nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10 --no-audio
 ```
 
 注意事项：
@@ -215,8 +215,8 @@ openclaw nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10 --no-
 CLI 辅助工具：
 
 ```bash
-openclaw nodes location get --node <idOrNameOrIp>
-openclaw nodes location get --node <idOrNameOrIp> --accuracy precise --max-age 15000 --location-timeout 10000
+ClosedClaw nodes location get --node <idOrNameOrIp>
+ClosedClaw nodes location get --node <idOrNameOrIp> --accuracy precise --max-age 15000 --location-timeout 10000
 ```
 
 注意事项：
@@ -232,7 +232,7 @@ openclaw nodes location get --node <idOrNameOrIp> --accuracy precise --max-age 1
 低级别调用：
 
 ```bash
-openclaw nodes invoke --node <idOrNameOrIp> --command sms.send --params '{"to":"+15555550123","message":"Hello from OpenClaw"}'
+ClosedClaw nodes invoke --node <idOrNameOrIp> --command sms.send --params '{"to":"+15555550123","message":"Hello from ClosedClaw"}'
 ```
 
 注意事项：
@@ -248,8 +248,8 @@ macOS 节点暴露 `system.run`、`system.notify` 和 `system.execApprovals.get/
 示例：
 
 ```bash
-openclaw nodes run --node <idOrNameOrIp> -- echo "Hello from mac node"
-openclaw nodes notify --node <idOrNameOrIp> --title "Ping" --body "Gateway网关 ready"
+ClosedClaw nodes run --node <idOrNameOrIp> -- echo "Hello from mac node"
+ClosedClaw nodes notify --node <idOrNameOrIp> --title "Ping" --body "Gateway网关 ready"
 ```
 
 注意事项：
@@ -261,7 +261,7 @@ openclaw nodes notify --node <idOrNameOrIp> --title "Ping" --body "Gateway网关
 - macOS 节点会丢弃 `PATH` 覆盖；无头节点主机仅在 `PATH` 前置于节点主机 PATH 时才接受。
 - 在 macOS 节点模式下，`system.run` 受 macOS 应用中的执行审批限制（设置 → 执行审批）。
   询问/允许列表/完全访问的行为与无头节点主机相同；拒绝的提示返回 `SYSTEM_RUN_DENIED`。
-- 在无头节点主机上，`system.run` 受执行审批限制（`~/.openclaw/exec-approvals.json`）。
+- 在无头节点主机上，`system.run` 受执行审批限制（`~/.ClosedClaw/exec-approvals.json`）。
 
 ## Exec 节点绑定
 
@@ -271,21 +271,21 @@ openclaw nodes notify --node <idOrNameOrIp> --title "Ping" --body "Gateway网关
 全局默认：
 
 ```bash
-openclaw config set tools.exec.node "node-id-or-name"
+ClosedClaw config set tools.exec.node "node-id-or-name"
 ```
 
 按智能体覆盖：
 
 ```bash
-openclaw config get agents.list
-openclaw config set agents.list[0].tools.exec.node "node-id-or-name"
+ClosedClaw config get agents.list
+ClosedClaw config set agents.list[0].tools.exec.node "node-id-or-name"
 ```
 
 取消设置以允许任意节点：
 
 ```bash
-openclaw config unset tools.exec.node
-openclaw config unset agents.list[0].tools.exec.node
+ClosedClaw config unset tools.exec.node
+ClosedClaw config unset agents.list[0].tools.exec.node
 ```
 
 ## 权限映射
@@ -294,23 +294,23 @@ openclaw config unset agents.list[0].tools.exec.node
 
 ## 无头节点主机（跨平台）
 
-OpenClaw 可以运行**无头节点主机**（无 UI），它连接到 Gateway网关 WebSocket 并暴露 `system.run` / `system.which`。这适用于 Linux/Windows 或在服务器旁运行一个最小节点。
+ClosedClaw 可以运行**无头节点主机**（无 UI），它连接到 Gateway网关 WebSocket 并暴露 `system.run` / `system.which`。这适用于 Linux/Windows 或在服务器旁运行一个最小节点。
 
 启动方式：
 
 ```bash
-openclaw node run --host <gateway-host> --port 18789
+ClosedClaw node run --host <gateway-host> --port 18789
 ```
 
 注意事项：
 
 - 仍然需要配对（Gateway网关会显示节点审批提示）。
-- 节点主机将其节点 ID、令牌、显示名称和 Gateway网关连接信息存储在 `~/.openclaw/node.json` 中。
-- 执行审批通过 `~/.openclaw/exec-approvals.json` 在本地执行（参见[执行审批](/tools/exec-approvals)）。
-- 在 macOS 上，无头节点主机在伴侣应用执行主机可达时优先使用它，不可用时回退到本地执行。设置 `OPENCLAW_NODE_EXEC_HOST=app` 以要求使用应用，或设置 `OPENCLAW_NODE_EXEC_FALLBACK=0` 以禁用回退。
+- 节点主机将其节点 ID、令牌、显示名称和 Gateway网关连接信息存储在 `~/.ClosedClaw/node.json` 中。
+- 执行审批通过 `~/.ClosedClaw/exec-approvals.json` 在本地执行（参见[执行审批](/tools/exec-approvals)）。
+- 在 macOS 上，无头节点主机在伴侣应用执行主机可达时优先使用它，不可用时回退到本地执行。设置 `ClosedClaw_NODE_EXEC_HOST=app` 以要求使用应用，或设置 `ClosedClaw_NODE_EXEC_FALLBACK=0` 以禁用回退。
 - 当 Gateway网关 WS 使用 TLS 时，添加 `--tls` / `--tls-fingerprint`。
 
 ## Mac 节点模式
 
-- macOS 菜单栏应用作为节点连接到 Gateway网关 WS 服务器（因此 `openclaw nodes …` 可以对该 Mac 使用）。
+- macOS 菜单栏应用作为节点连接到 Gateway网关 WS 服务器（因此 `ClosedClaw nodes …` 可以对该 Mac 使用）。
 - 在远程模式下，应用为 Gateway网关端口打开 SSH 隧道并连接到 `localhost`。

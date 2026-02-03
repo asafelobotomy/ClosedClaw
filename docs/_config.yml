@@ -1,4 +1,4 @@
-title: "OpenClaw Docs"
+title: "ClosedClaw Docs"
 description: "A TypeScript/Node gateway + macOS/iOS/Android companions for WhatsApp (web) and Telegram (bot)."
 markdown: kramdown
 highlighter: rouge
@@ -22,8 +22,8 @@ defaults:
 nav:
   - title: "Home"
     url: "/"
-  - title: "OpenClaw Assistant"
-    url: "/start/openclaw/"
+  - title: "ClosedClaw Assistant"
+    url: "/start/ClosedClaw/"
   - title: "Gateway"
     url: "/gateway/"
   - title: "Remote"

@@ -11,7 +11,7 @@ x-i18n:
 
 # Pi 开发工作流
 
-本指南总结了在 OpenClaw 中进行 Pi 集成开发的合理工作流。
+本指南总结了在 ClosedClaw 中进行 Pi 集成开发的合理工作流。
 
 ## 类型检查和代码检查
 
@@ -50,7 +50,7 @@ scripts/pi/run-tests.sh --live
 - 以开发模式运行 Gateway网关：
   - `pnpm gateway:dev`
 - 直接触发智能体：
-  - `pnpm openclaw agent --message "Hello" --thinking low`
+  - `pnpm ClosedClaw agent --message "Hello" --thinking low`
 - 使用 TUI 进行交互式调试：
   - `pnpm tui`
 
@@ -58,11 +58,11 @@ scripts/pi/run-tests.sh --live
 
 ## 完全重置
 
-状态存储在 OpenClaw 状态目录下。默认为 `~/.openclaw`。如果设置了 `OPENCLAW_STATE_DIR`，则使用该目录。
+状态存储在 ClosedClaw 状态目录下。默认为 `~/.ClosedClaw`。如果设置了 `ClosedClaw_STATE_DIR`，则使用该目录。
 
 要重置所有内容：
 
-- `openclaw.json` 用于配置
+- `ClosedClaw.json` 用于配置
 - `credentials/` 用于认证配置和令牌
 - `agents/<agentId>/sessions/` 用于智能体会话历史
 - `agents/<agentId>/sessions.json` 用于会话索引
@@ -73,5 +73,5 @@ scripts/pi/run-tests.sh --live
 
 ## 参考资料
 
-- https://docs.openclaw.ai/testing
-- https://docs.openclaw.ai/start/getting-started
+- https://docs.ClosedClaw.ai/testing
+- https://docs.ClosedClaw.ai/start/getting-started

@@ -15,14 +15,14 @@ x-i18n:
 
 # 钩子
 
-钩子提供了一个可扩展的事件驱动系统，用于在响应智能体命令和事件时自动执行操作。钩子从目录中自动发现，并可通过 CLI 命令管理，类似于 OpenClaw 中 Skills 的工作方式。
+钩子提供了一个可扩展的事件驱动系统，用于在响应智能体命令和事件时自动执行操作。钩子从目录中自动发现，并可通过 CLI 命令管理，类似于 ClosedClaw 中 Skills 的工作方式。
 
 ## 快速了解
 
 钩子是在某些事件发生时运行的小脚本。有两种类型：
 
 - **钩子**（本页）：在智能体事件触发时在 Gateway网关内部运行，如 `/new`、`/reset`、`/stop` 或生命周期事件。
-- **Webhook**：外部 HTTP webhook，允许其他系统在 OpenClaw 中触发工作。参见 [Webhook 钩子](/automation/webhook) 或使用 `openclaw webhooks` 获取 Gmail 辅助命令。
+- **Webhook**：外部 HTTP webhook，允许其他系统在 ClosedClaw 中触发工作。参见 [Webhook 钩子](/automation/webhook) 或使用 `ClosedClaw webhooks` 获取 Gmail 辅助命令。
 
 钩子也可以捆绑在插件中；参见 [插件](/plugin#plugin-hooks)。
 
@@ -42,54 +42,54 @@ x-i18n:
 - 在发出 `/new` 时将会话上下文保存到记忆中
 - 记录所有命令用于审计
 - 在智能体生命周期事件上触发自定义自动化
-- 扩展 OpenClaw 的行为而无需修改核心代码
+- 扩展 ClosedClaw 的行为而无需修改核心代码
 
 ## 快速开始
 
 ### 内置钩子
 
-OpenClaw 附带四个自动发现的内置钩子：
+ClosedClaw 附带四个自动发现的内置钩子：
 
-- **💾 session-memory**：在你发出 `/new` 时将会话上下文保存到智能体工作区（默认 `~/.openclaw/workspace/memory/`）
-- **📝 command-logger**：将所有命令事件记录到 `~/.openclaw/logs/commands.log`
+- **💾 session-memory**：在你发出 `/new` 时将会话上下文保存到智能体工作区（默认 `~/.ClosedClaw/workspace/memory/`）
+- **📝 command-logger**：将所有命令事件记录到 `~/.ClosedClaw/logs/commands.log`
 - **🚀 boot-md**：在 Gateway网关启动时运行 `BOOT.md`（需要启用内部钩子）
 - **😈 soul-evil**：在清除窗口期间或随机概率下，将注入的 `SOUL.md` 内容替换为 `SOUL_EVIL.md`
 
 列出可用钩子：
 
 ```bash
-openclaw hooks list
+ClosedClaw hooks list
 ```
 
 启用钩子：
 
 ```bash
-openclaw hooks enable session-memory
+ClosedClaw hooks enable session-memory
 ```
 
 检查钩子状态：
 
 ```bash
-openclaw hooks check
+ClosedClaw hooks check
 ```
 
 获取详细信息：
 
 ```bash
-openclaw hooks info session-memory
+ClosedClaw hooks info session-memory
 ```
 
 ### 新手引导
 
-在新手引导（`openclaw onboard`）期间，你会被提示启用推荐的钩子。向导会自动发现符合条件的钩子并展示供你选择。
+在新手引导（`ClosedClaw onboard`）期间，你会被提示启用推荐的钩子。向导会自动发现符合条件的钩子并展示供你选择。
 
 ## 钩子发现
 
 钩子从三个目录自动发现（按优先级排序）：
 
 1. **工作区钩子**：`<workspace>/hooks/`（按智能体，最高优先级）
-2. **托管钩子**：`~/.openclaw/hooks/`（用户安装，跨工作区共享）
-3. **内置钩子**：`<openclaw>/dist/hooks/bundled/`（随 OpenClaw 附带）
+2. **托管钩子**：`~/.ClosedClaw/hooks/`（用户安装，跨工作区共享）
+3. **内置钩子**：`<ClosedClaw>/dist/hooks/bundled/`（随 ClosedClaw 附带）
 
 托管钩子目录可以是**单个钩子**或**钩子包**（包目录）。
 
@@ -103,10 +103,10 @@ my-hook/
 
 ## 钩子包（npm/归档）
 
-钩子包是标准的 npm 包，通过 `package.json` 中的 `openclaw.hooks` 导出一个或多个钩子。使用以下命令安装：
+钩子包是标准的 npm 包，通过 `package.json` 中的 `ClosedClaw.hooks` 导出一个或多个钩子。使用以下命令安装：
 
 ```bash
-openclaw hooks install <path-or-spec>
+ClosedClaw hooks install <path-or-spec>
 ```
 
 示例 `package.json`：
@@ -115,14 +115,14 @@ openclaw hooks install <path-or-spec>
 {
   "name": "@acme/my-hooks",
   "version": "0.1.0",
-  "openclaw": {
+  "ClosedClaw": {
     "hooks": ["./hooks/my-hook", "./hooks/other-hook"]
   }
 }
 ```
 
 每个条目指向一个包含 `HOOK.md` 和 `handler.ts`（或 `index.ts`）的钩子目录。
-钩子包可以附带依赖；它们将安装到 `~/.openclaw/hooks/<id>` 下。
+钩子包可以附带依赖；它们将安装到 `~/.ClosedClaw/hooks/<id>` 下。
 
 ## 钩子结构
 
@@ -134,9 +134,9 @@ openclaw hooks install <path-or-spec>
 ---
 name: my-hook
 description: "这个钩子做什么的简短描述"
-homepage: https://docs.openclaw.ai/hooks#my-hook
+homepage: https://docs.ClosedClaw.ai/hooks#my-hook
 metadata:
-  { "openclaw": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
+  { "ClosedClaw": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
 
 # My Hook
@@ -160,7 +160,7 @@ metadata:
 
 ### 元数据字段
 
-`metadata.openclaw` 对象支持：
+`metadata.ClosedClaw` 对象支持：
 
 - **`emoji`**：CLI 显示用的表情符号（例如 `"💾"`）
 - **`events`**：要监听的事件数组（例如 `["command:new", "command:reset"]`）
@@ -220,7 +220,7 @@ export default myHandler;
     senderId?: string,
     workspaceDir?: string,
     bootstrapFiles?: WorkspaceBootstrapFile[],
-    cfg?: OpenClawConfig
+    cfg?: ClosedClawConfig
   }
 }
 ```
@@ -248,7 +248,7 @@ export default myHandler;
 
 ### 工具结果钩子（插件 API）
 
-这些钩子不是事件流监听器；它们允许插件在 OpenClaw 持久化工具结果之前同步调整工具结果。
+这些钩子不是事件流监听器；它们允许插件在 ClosedClaw 持久化工具结果之前同步调整工具结果。
 
 - **`tool_result_persist`**：在工具结果写入会话记录之前进行转换。必须是同步的；返回更新后的工具结果负载或 `undefined` 以保持原样。参见 [智能体循环](/concepts/agent-loop)。
 
@@ -267,13 +267,13 @@ export default myHandler;
 ### 1. 选择位置
 
 - **工作区钩子**（`<workspace>/hooks/`）：按智能体，最高优先级
-- **托管钩子**（`~/.openclaw/hooks/`）：跨工作区共享
+- **托管钩子**（`~/.ClosedClaw/hooks/`）：跨工作区共享
 
 ### 2. 创建目录结构
 
 ```bash
-mkdir -p ~/.openclaw/hooks/my-hook
-cd ~/.openclaw/hooks/my-hook
+mkdir -p ~/.ClosedClaw/hooks/my-hook
+cd ~/.ClosedClaw/hooks/my-hook
 ```
 
 ### 3. 创建 HOOK.md
@@ -282,7 +282,7 @@ cd ~/.openclaw/hooks/my-hook
 ---
 name: my-hook
 description: "做一些有用的事情"
-metadata: { "openclaw": { "emoji": "🎯", "events": ["command:new"] } }
+metadata: { "ClosedClaw": { "emoji": "🎯", "events": ["command:new"] } }
 ---
 
 # My Hook
@@ -311,10 +311,10 @@ export default handler;
 
 ```bash
 # 验证钩子已被发现
-openclaw hooks list
+ClosedClaw hooks list
 
 # 启用它
-openclaw hooks enable my-hook
+ClosedClaw hooks enable my-hook
 
 # 重启你的 Gateway网关进程（macOS 上重启菜单栏应用，或重启开发进程）
 
@@ -408,46 +408,46 @@ openclaw hooks enable my-hook
 
 ```bash
 # 列出所有钩子
-openclaw hooks list
+ClosedClaw hooks list
 
 # 仅显示符合条件的钩子
-openclaw hooks list --eligible
+ClosedClaw hooks list --eligible
 
 # 详细输出（显示缺失的要求）
-openclaw hooks list --verbose
+ClosedClaw hooks list --verbose
 
 # JSON 输出
-openclaw hooks list --json
+ClosedClaw hooks list --json
 ```
 
 ### 钩子信息
 
 ```bash
 # 显示钩子的详细信息
-openclaw hooks info session-memory
+ClosedClaw hooks info session-memory
 
 # JSON 输出
-openclaw hooks info session-memory --json
+ClosedClaw hooks info session-memory --json
 ```
 
 ### 检查资格
 
 ```bash
 # 显示资格摘要
-openclaw hooks check
+ClosedClaw hooks check
 
 # JSON 输出
-openclaw hooks check --json
+ClosedClaw hooks check --json
 ```
 
 ### 启用/禁用
 
 ```bash
 # 启用钩子
-openclaw hooks enable session-memory
+ClosedClaw hooks enable session-memory
 
 # 禁用钩子
-openclaw hooks disable command-logger
+ClosedClaw hooks disable command-logger
 ```
 
 ## 内置钩子
@@ -460,7 +460,7 @@ openclaw hooks disable command-logger
 
 **要求**：必须配置 `workspace.dir`
 
-**输出**：`<workspace>/memory/YYYY-MM-DD-slug.md`（默认为 `~/.openclaw/workspace`）
+**输出**：`<workspace>/memory/YYYY-MM-DD-slug.md`（默认为 `~/.ClosedClaw/workspace`）
 
 **功能**：
 
@@ -488,7 +488,7 @@ openclaw hooks disable command-logger
 **启用**：
 
 ```bash
-openclaw hooks enable session-memory
+ClosedClaw hooks enable session-memory
 ```
 
 ### command-logger
@@ -499,7 +499,7 @@ openclaw hooks enable session-memory
 
 **要求**：无
 
-**输出**：`~/.openclaw/logs/commands.log`
+**输出**：`~/.ClosedClaw/logs/commands.log`
 
 **功能**：
 
@@ -518,19 +518,19 @@ openclaw hooks enable session-memory
 
 ```bash
 # 查看最近的命令
-tail -n 20 ~/.openclaw/logs/commands.log
+tail -n 20 ~/.ClosedClaw/logs/commands.log
 
 # 用 jq 美化输出
-cat ~/.openclaw/logs/commands.log | jq .
+cat ~/.ClosedClaw/logs/commands.log | jq .
 
 # 按操作过滤
-grep '"action":"new"' ~/.openclaw/logs/commands.log | jq .
+grep '"action":"new"' ~/.ClosedClaw/logs/commands.log | jq .
 ```
 
 **启用**：
 
 ```bash
-openclaw hooks enable command-logger
+ClosedClaw hooks enable command-logger
 ```
 
 ### soul-evil
@@ -546,7 +546,7 @@ openclaw hooks enable command-logger
 **启用**：
 
 ```bash
-openclaw hooks enable soul-evil
+ClosedClaw hooks enable soul-evil
 ```
 
 **配置**：
@@ -587,7 +587,7 @@ openclaw hooks enable soul-evil
 **启用**：
 
 ```bash
-openclaw hooks enable boot-md
+ClosedClaw hooks enable boot-md
 ```
 
 ## 最佳实践
@@ -644,13 +644,13 @@ const handler: HookHandler = async (event) => {
 尽可能在元数据中指定确切的事件：
 
 ```yaml
-metadata: { "openclaw": { "events": ["command:new"] } } # 具体
+metadata: { "ClosedClaw": { "events": ["command:new"] } } # 具体
 ```
 
 而不是：
 
 ```yaml
-metadata: { "openclaw": { "events": ["command"] } } # 通用 - 开销更大
+metadata: { "ClosedClaw": { "events": ["command"] } } # 通用 - 开销更大
 ```
 
 ## 调试
@@ -670,7 +670,7 @@ Registered hook: boot-md -> gateway:startup
 列出所有已发现的钩子：
 
 ```bash
-openclaw hooks list --verbose
+ClosedClaw hooks list --verbose
 ```
 
 ### 检查注册情况
@@ -689,7 +689,7 @@ const handler: HookHandler = async (event) => {
 检查钩子不符合条件的原因：
 
 ```bash
-openclaw hooks info my-hook
+ClosedClaw hooks info my-hook
 ```
 
 查看输出中缺失的要求。
@@ -705,7 +705,7 @@ openclaw hooks info my-hook
 ./scripts/clawlog.sh -f
 
 # 其他平台
-tail -f ~/.openclaw/gateway.log
+tail -f ~/.ClosedClaw/gateway.log
 ```
 
 ### 直接测试钩子
@@ -781,20 +781,20 @@ Gateway网关启动
 1. 检查目录结构：
 
    ```bash
-   ls -la ~/.openclaw/hooks/my-hook/
+   ls -la ~/.ClosedClaw/hooks/my-hook/
    # 应该显示：HOOK.md、handler.ts
    ```
 
 2. 验证 HOOK.md 格式：
 
    ```bash
-   cat ~/.openclaw/hooks/my-hook/HOOK.md
+   cat ~/.ClosedClaw/hooks/my-hook/HOOK.md
    # 应该有包含 name 和 metadata 的 YAML 前置元数据
    ```
 
 3. 列出所有已发现的钩子：
    ```bash
-   openclaw hooks list
+   ClosedClaw hooks list
    ```
 
 ### 钩子不符合条件
@@ -802,7 +802,7 @@ Gateway网关启动
 检查要求：
 
 ```bash
-openclaw hooks info my-hook
+ClosedClaw hooks info my-hook
 ```
 
 查看缺失的内容：
@@ -817,7 +817,7 @@ openclaw hooks info my-hook
 1. 验证钩子已启用：
 
    ```bash
-   openclaw hooks list
+   ClosedClaw hooks list
    # 已启用的钩子旁边应显示 ✓
    ```
 
@@ -864,8 +864,8 @@ node -e "import('./path/to/handler.ts').then(console.log)"
 1. 创建钩子目录：
 
    ```bash
-   mkdir -p ~/.openclaw/hooks/my-hook
-   mv ./hooks/handlers/my-handler.ts ~/.openclaw/hooks/my-hook/handler.ts
+   mkdir -p ~/.ClosedClaw/hooks/my-hook
+   mv ./hooks/handlers/my-handler.ts ~/.ClosedClaw/hooks/my-hook/handler.ts
    ```
 
 2. 创建 HOOK.md：
@@ -874,7 +874,7 @@ node -e "import('./path/to/handler.ts').then(console.log)"
    ---
    name: my-hook
    description: "我的自定义钩子"
-   metadata: { "openclaw": { "emoji": "🎯", "events": ["command:new"] } }
+   metadata: { "ClosedClaw": { "emoji": "🎯", "events": ["command:new"] } }
    ---
 
    # My Hook
@@ -899,7 +899,7 @@ node -e "import('./path/to/handler.ts').then(console.log)"
 
 4. 验证并重启你的 Gateway网关进程：
    ```bash
-   openclaw hooks list
+   ClosedClaw hooks list
    # 应该显示：🎯 my-hook ✓
    ```
 
@@ -914,6 +914,6 @@ node -e "import('./path/to/handler.ts').then(console.log)"
 ## 另请参阅
 
 - [CLI 参考：hooks](/cli/hooks)
-- [内置钩子 README](https://github.com/openclaw/openclaw/tree/main/src/hooks/bundled)
+- [内置钩子 README](https://github.com/ClosedClaw/ClosedClaw/tree/main/src/hooks/bundled)
 - [Webhook 钩子](/automation/webhook)
 - [配置](/gateway/configuration#hooks)

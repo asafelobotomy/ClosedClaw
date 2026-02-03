@@ -23,7 +23,7 @@ x-i18n:
    - 如果尚未启用，请启用该 API。
 2. 创建**服务账户**：
    - 点击 **Create Credentials** > **Service Account**。
-   - 随意命名（例如 `openclaw-chat`）。
+   - 随意命名（例如 `ClosedClaw-chat`）。
    - 权限留空（点击 **Continue**）。
    - 有权访问的主体留空（点击 **Done**）。
 3. 创建并下载 **JSON 密钥**：
@@ -31,17 +31,17 @@ x-i18n:
    - 进入 **Keys** 标签页。
    - 点击 **Add Key** > **Create new key**。
    - 选择 **JSON** 并点击 **Create**。
-4. 将下载的 JSON 文件存储在你的 Gateway网关主机上（例如 `~/.openclaw/googlechat-service-account.json`）。
+4. 将下载的 JSON 文件存储在你的 Gateway网关主机上（例如 `~/.ClosedClaw/googlechat-service-account.json`）。
 5. 在 [Google Cloud Console Chat 配置](https://console.cloud.google.com/apis/api/chat.googleapis.com/hangouts-chat) 中创建 Google Chat 应用：
    - 填写 **Application info**：
-     - **App name**：（例如 `OpenClaw`）
-     - **Avatar URL**：（例如 `https://openclaw.ai/logo.png`）
+     - **App name**：（例如 `ClosedClaw`）
+     - **Avatar URL**：（例如 `https://ClosedClaw.ai/logo.png`）
      - **Description**：（例如 `Personal AI Assistant`）
    - 启用 **Interactive features**。
    - 在 **Functionality** 下，勾选 **Join spaces and group conversations**。
    - 在 **Connection settings** 下，选择 **HTTP endpoint URL**。
    - 在 **Triggers** 下，选择 **Use a common HTTP endpoint URL for all triggers** 并将其设置为你的 Gateway网关公共 URL 后跟 `/googlechat`。
-     - _提示：运行 `openclaw status` 可查找你的 Gateway网关公共 URL。_
+     - _提示：运行 `ClosedClaw status` 可查找你的 Gateway网关公共 URL。_
    - 在 **Visibility** 下，勾选 **Make this Chat app available to specific people and groups in &lt;Your Domain&gt;**。
    - 在文本框中输入你的邮箱地址（例如 `user@example.com`）。
    - 点击底部的 **Save**。
@@ -50,7 +50,7 @@ x-i18n:
    - 查找 **App status** 部分（通常在保存后位于顶部或底部附近）。
    - 将状态更改为 **Live - available to users**。
    - 再次点击 **Save**。
-7. 使用服务账户路径 + webhook audience 配置 OpenClaw：
+7. 使用服务账户路径 + webhook audience 配置 ClosedClaw：
    - 环境变量：`GOOGLE_CHAT_SERVICE_ACCOUNT_FILE=/path/to/service-account.json`
    - 或配置：`channels.googlechat.serviceAccountFile: "/path/to/service-account.json"`。
 8. 设置 webhook audience 类型 + 值（与你的 Chat 应用配置匹配）。
@@ -70,7 +70,7 @@ Gateway网关运行且你的邮箱已添加到可见性列表后：
 
 ## 公共 URL（仅 Webhook）
 
-Google Chat webhook 需要公共 HTTPS 端点。为安全起见，**仅将 `/googlechat` 路径暴露**到互联网。将 OpenClaw 仪表板和其他敏感端点保持在私有网络上。
+Google Chat webhook 需要公共 HTTPS 端点。为安全起见，**仅将 `/googlechat` 路径暴露**到互联网。将 ClosedClaw 仪表板和其他敏感端点保持在私有网络上。
 
 ### 方案 A：Tailscale Funnel（推荐）
 
@@ -133,7 +133,7 @@ your-domain.com {
 }
 ```
 
-使用此配置，对 `your-domain.com/` 的任何请求将被忽略或返回 404，而 `your-domain.com/googlechat` 安全地路由到 OpenClaw。
+使用此配置，对 `your-domain.com/` 的任何请求将被忽略或返回 404，而 `your-domain.com/googlechat` 安全地路由到 ClosedClaw。
 
 ### 方案 C：Cloudflare Tunnel
 
@@ -145,14 +145,14 @@ your-domain.com {
 ## 工作原理
 
 1. Google Chat 向 Gateway网关发送 webhook POST 请求。每个请求包含一个 `Authorization: Bearer <token>` 头。
-2. OpenClaw 根据配置的 `audienceType` + `audience` 验证 token：
+2. ClosedClaw 根据配置的 `audienceType` + `audience` 验证 token：
    - `audienceType: "app-url"` → audience 是你的 HTTPS webhook URL。
    - `audienceType: "project-number"` → audience 是 Cloud 项目编号。
 3. 消息按空间路由：
    - 私信使用会话键 `agent:<agentId>:googlechat:dm:<spaceId>`。
    - 空间使用会话键 `agent:<agentId>:googlechat:group:<spaceId>`。
 4. 私信访问默认需要配对。未知发送者会收到配对码；通过以下方式批准：
-   - `openclaw pairing approve googlechat <code>`
+   - `ClosedClaw pairing approve googlechat <code>`
 5. 群组空间默认需要 @提及。如果提及检测需要应用的用户名，请使用 `botUser`。
 
 ## 目标
@@ -218,7 +218,7 @@ status code: 405, reason phrase: HTTP error response: HTTP/1.1 405 Method Not Al
 1. **渠道未配置**：配置中缺少 `channels.googlechat` 部分。通过以下方式验证：
 
    ```bash
-   openclaw config get channels.googlechat
+   ClosedClaw config get channels.googlechat
    ```
 
    如果返回"Config path not found"，添加配置（参见[配置要点](#配置要点)）。
@@ -226,29 +226,29 @@ status code: 405, reason phrase: HTTP error response: HTTP/1.1 405 Method Not Al
 2. **插件未启用**：检查插件状态：
 
    ```bash
-   openclaw plugins list | grep googlechat
+   ClosedClaw plugins list | grep googlechat
    ```
 
    如果显示"disabled"，在配置中添加 `plugins.entries.googlechat.enabled: true`。
 
 3. **Gateway网关未重启**：添加配置后，重启 Gateway网关：
    ```bash
-   openclaw gateway restart
+   ClosedClaw gateway restart
    ```
 
 验证渠道是否正在运行：
 
 ```bash
-openclaw channels status
+ClosedClaw channels status
 # 应显示：Google Chat default: enabled, configured, ...
 ```
 
 ### 其他问题
 
-- 检查 `openclaw channels status --probe` 查看认证错误或缺失的 audience 配置。
+- 检查 `ClosedClaw channels status --probe` 查看认证错误或缺失的 audience 配置。
 - 如果没有消息到达，确认 Chat 应用的 webhook URL + 事件订阅。
 - 如果提及门控阻止了回复，将 `botUser` 设置为应用的用户资源名称并验证 `requireMention`。
-- 发送测试消息时使用 `openclaw logs --follow` 查看请求是否到达 Gateway网关。
+- 发送测试消息时使用 `ClosedClaw logs --follow` 查看请求是否到达 Gateway网关。
 
 相关文档：
 

@@ -2,7 +2,7 @@
 read_when:
   - 想要对配置/状态进行快速安全审计
   - 想要应用安全的"修复"建议（chmod、收紧默认值）
-summary: 审计和修复常见安全隐患的 `openclaw security` CLI 参考
+summary: 审计和修复常见安全隐患的 `ClosedClaw security` CLI 参考
 title: security
 x-i18n:
   generated_at: "2026-02-01T20:21:24Z"
@@ -13,7 +13,7 @@ x-i18n:
   workflow: 14
 ---
 
-# `openclaw security`
+# `ClosedClaw security`
 
 安全工具（审计 + 可选修复）。
 
@@ -24,9 +24,9 @@ x-i18n:
 ## 审计
 
 ```bash
-openclaw security audit
-openclaw security audit --deep
-openclaw security audit --fix
+ClosedClaw security audit
+ClosedClaw security audit --deep
+ClosedClaw security audit --fix
 ```
 
 当多个私信发送者共享主会话时，审计会发出警告，并建议共享收件箱使用 `session.dmScope="per-channel-peer"`（多账户渠道则使用 `per-account-channel-peer`）。

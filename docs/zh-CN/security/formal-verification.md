@@ -1,6 +1,6 @@
 ---
 permalink: /security/formal-verification/
-summary: OpenClaw 最高风险路径的机器验证安全模型。
+summary: ClosedClaw 最高风险路径的机器验证安全模型。
 title: 形式化验证（安全模型）
 x-i18n:
   generated_at: "2026-02-01T21:38:31Z"
@@ -13,22 +13,22 @@ x-i18n:
 
 # 形式化验证（安全模型）
 
-本页面跟踪 OpenClaw 的**形式化安全模型**（目前使用 TLA+/TLC；后续按需扩展）。
+本页面跟踪 ClosedClaw 的**形式化安全模型**（目前使用 TLA+/TLC；后续按需扩展）。
 
 > 注意：一些较旧的链接可能引用的是之前的项目名称。
 
-**目标（北极星）：** 提供机器验证的论证，证明 OpenClaw 在明确假设下执行了其预期的安全策略（授权、会话隔离、工具门控和错误配置安全性）。
+**目标（北极星）：** 提供机器验证的论证，证明 ClosedClaw 在明确假设下执行了其预期的安全策略（授权、会话隔离、工具门控和错误配置安全性）。
 
 **当前状态：** 一个可执行的、以攻击者为驱动的**安全回归测试套件**：
 
 - 每个声明都有一个在有限状态空间上运行的模型检查。
 - 许多声明都有一个配对的**负面模型**，为现实的漏洞类别生成反例追踪。
 
-**尚未实现的：** 证明"OpenClaw 在所有方面都是安全的"或完整的 TypeScript 实现是正确的。
+**尚未实现的：** 证明"ClosedClaw 在所有方面都是安全的"或完整的 TypeScript 实现是正确的。
 
 ## 模型存放位置
 
-模型维护在一个独立的仓库中：[vignesh07/openclaw-formal-models](https://github.com/vignesh07/openclaw-formal-models)。
+模型维护在一个独立的仓库中：[vignesh07/ClosedClaw-formal-models](https://github.com/vignesh07/ClosedClaw-formal-models)。
 
 ## 重要注意事项
 
@@ -46,8 +46,8 @@ x-i18n:
 开始使用：
 
 ```bash
-git clone https://github.com/vignesh07/openclaw-formal-models
-cd openclaw-formal-models
+git clone https://github.com/vignesh07/ClosedClaw-formal-models
+cd ClosedClaw-formal-models
 
 # Java 11+ required (TLC runs on the JVM).
 # The repo vendors a pinned `tla2tools.jar` (TLA+ tools) and provides `bin/tlc` + Make targets.

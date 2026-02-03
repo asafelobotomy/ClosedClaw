@@ -16,7 +16,7 @@ x-i18n:
 
 # Gateway网关协议 (WebSocket)
 
-Gateway网关 WebSocket 协议是 OpenClaw 的**统一控制平面 + 节点传输层**。所有客户端（CLI、Web UI、macOS 应用、iOS/Android 节点、无头节点）均通过 WebSocket 连接，并在握手时声明其**角色** + **作用域**。
+Gateway网关 WebSocket 协议是 ClosedClaw 的**统一控制平面 + 节点传输层**。所有客户端（CLI、Web UI、macOS 应用、iOS/Android 节点、无头节点）均通过 WebSocket 连接，并在握手时声明其**角色** + **作用域**。
 
 ## 传输
 
@@ -58,7 +58,7 @@ Gateway网关 → 客户端（连接前挑战）：
     "permissions": {},
     "auth": { "token": "…" },
     "locale": "en-US",
-    "userAgent": "openclaw-cli/1.2.3",
+    "userAgent": "ClosedClaw-cli/1.2.3",
     "device": {
       "id": "device_fingerprint",
       "publicKey": "…",
@@ -116,7 +116,7 @@ Gateway网关 → 客户端：
     "permissions": { "camera.capture": true, "screen.record": false },
     "auth": { "token": "…" },
     "locale": "en-US",
-    "userAgent": "openclaw-ios/1.2.3",
+    "userAgent": "ClosedClaw-ios/1.2.3",
     "device": {
       "id": "device_fingerprint",
       "publicKey": "…",
@@ -188,7 +188,7 @@ Gateway网关将这些视为**声明**，并在服务端执行白名单校验。
 
 ## 认证
 
-- 如果设置了 `OPENCLAW_GATEWAY_TOKEN`（或 `--token`），`connect.params.auth.token` 必须匹配，否则连接将被关闭。
+- 如果设置了 `ClosedClaw_GATEWAY_TOKEN`（或 `--token`），`connect.params.auth.token` 必须匹配，否则连接将被关闭。
 - 配对完成后，Gateway网关会签发一个**设备令牌**，其作用域限定为连接的角色 + 作用域。该令牌在 `hello-ok.auth.deviceToken` 中返回，客户端应持久化保存以供后续连接使用。
 - 设备令牌可通过 `device.token.rotate` 和 `device.token.revoke` 进行轮换/撤销（需要 `operator.pairing` 作用域）。
 

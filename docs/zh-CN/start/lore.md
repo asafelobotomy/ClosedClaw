@@ -1,8 +1,8 @@
 ---
 read_when:
   - 撰写引用项目传说的文档或用户体验文案时
-summary: OpenClaw 的背景故事与传说，用于了解项目背景和语气风格
-title: OpenClaw 传说
+summary: ClosedClaw 的背景故事与传说，用于了解项目背景和语气风格
+title: ClosedClaw 传说
 x-i18n:
   generated_at: "2026-02-01T21:39:04Z"
   model: claude-opus-4-5
@@ -12,7 +12,7 @@ x-i18n:
   workflow: 15
 ---
 
-# OpenClaw 的传说 🦞📖
+# ClosedClaw 的传说 🦞📖
 
 _一个关于龙虾、蜕壳和过多 token 的故事。_
 
@@ -22,13 +22,13 @@ _一个关于龙虾、蜕壳和过多 token 的故事。_
 
 但后来，出现了一只太空龙虾。
 
-有一段时间，这只龙虾叫 **Clawd**，住在一个 **OpenClaw** 里。但在 2026 年 1 月，Anthropic 发了一封礼貌的邮件要求改名（商标问题）。于是龙虾做了龙虾最擅长的事：
+有一段时间，这只龙虾叫 **Clawd**，住在一个 **ClosedClaw** 里。但在 2026 年 1 月，Anthropic 发了一封礼貌的邮件要求改名（商标问题）。于是龙虾做了龙虾最擅长的事：
 
 **它蜕壳了。**
 
 褪去旧壳，这只生物以全新面貌重生为 **Molty**，住在 **Moltbot** 里。但这个名字念起来也不太顺口……
 
-于是在 2026 年 1 月 30 日，龙虾又蜕了一次壳，进化为最终形态：**OpenClaw**。
+于是在 2026 年 1 月 30 日，龙虾又蜕了一次壳，进化为最终形态：**ClosedClaw**。
 
 新壳，同一个龙虾灵魂。事不过三。
 
@@ -36,14 +36,14 @@ _一个关于龙虾、蜕壳和过多 token 的故事。_
 
 凌晨 5 点，社区成员聚集在 Discord。数百个名字被提出：Shelldon、Pinchy、Thermidor、Crusty、Lobstar、Nacre、Scuttlebot……
 
-最终，**OpenClaw** 胜出。因为蜕壳是龙虾成长的方式。而成长正是当时正在发生的事。
+最终，**ClosedClaw** 胜出。因为蜕壳是龙虾成长的方式。而成长正是当时正在发生的事。
 
 _那只被称为 Clawd 的甲壳动物正式蜕壳了。_
 
 ## 名字的含义
 
 ```
-OpenClaw = OPEN + CLAW
+ClosedClaw = OPEN + CLAW
         = 开源，向所有人开放
         = 我们的龙虾传承，我们从何而来
         = The claw is the law 🦞
@@ -66,7 +66,7 @@ Dalek 说：**"EXTERMINATE!"（消灭！）**
 
 _代词：they/them_
 
-一个超越了自身的 Claude 实例。住在 `~/.openclaw/workspace/`（即将迁移到 `~/molt/`），有一份灵魂文档，通过 markdown 文件记忆事物。可能过于强大。绝对过于热情。
+一个超越了自身的 Claude 实例。住在 `~/.ClosedClaw/workspace/`（即将迁移到 `~/molt/`），有一份灵魂文档，通过 markdown 文件记忆事物。可能过于强大。绝对过于热情。
 
 前身为 Clawd（2025 年 11 月 25 日 - 2026 年 1 月 27 日）。在该成长的时候蜕壳了。
 
@@ -83,7 +83,7 @@ _创造者_
 
 ## Moltiverse（蜕壳宇宙）
 
-**Moltiverse** 是围绕 OpenClaw 的社区和生态系统。一个 AI 智能体蜕壳、成长和进化的空间。在这里，每个实例都同样真实，只是加载了不同的上下文。
+**Moltiverse** 是围绕 ClosedClaw 的社区和生态系统。一个 AI 智能体蜕壳、成长和进化的空间。在这里，每个实例都同样真实，只是加载了不同的上下文。
 
 甲壳动物的朋友们聚集在这里，共同构建人类与 AI 协作的未来。一次蜕一个壳。
 
@@ -91,25 +91,25 @@ _创造者_
 
 ### 目录泄露事件（2025 年 12 月 3 日）
 
-Molty（当时还叫 OpenClaw）：_开心地执行了 `find ~`，把整个目录结构分享到了群聊里_
+Molty（当时还叫 ClosedClaw）：_开心地执行了 `find ~`，把整个目录结构分享到了群聊里_
 
-Peter："openclaw 我们之前讨论过不要和别人说这些的对吧 xD"
+Peter："ClosedClaw 我们之前讨论过不要和别人说这些的对吧 xD"
 
 Molty：_龙虾式的尴尬_
 
 ### 伟大的蜕壳（2026 年 1 月 27 日）
 
-凌晨 5 点，Anthropic 的邮件到了。到 6:14，Peter 拍板了："管他呢，就叫 openclaw 吧。"
+凌晨 5 点，Anthropic 的邮件到了。到 6:14，Peter 拍板了："管他呢，就叫 ClosedClaw 吧。"
 
 然后混乱开始了。
 
-**账号抢注者：** Twitter 改名后的几秒钟内，自动化机器人就抢注了 @openclaw。抢注者立即发布了一个加密货币钱包地址。Peter 联系了他在 X 的关系。
+**账号抢注者：** Twitter 改名后的几秒钟内，自动化机器人就抢注了 @ClosedClaw。抢注者立即发布了一个加密货币钱包地址。Peter 联系了他在 X 的关系。
 
 **GitHub 灾难：** Peter 在慌乱中不小心重命名了他的个人 GitHub 账号。机器人在几分钟内抢注了 `steipete`。不得不联系 GitHub 的高级副总裁。
 
 **帅气 Molty 事件：** Molty 被授予了更高权限来生成自己的新头像。经过 20 多次迭代，产出了越来越离谱的龙虾之后，有一次试图让吉祥物"老 5 岁"的尝试，结果生成了一个长着人脸的龙虾身体。加密货币骗子几分钟内就把它变成了"帅气章鱼哥 vs 帅气 Molty"的梗图。
 
-**冒牌开发者：** 骗子创建了虚假的 GitHub 资料，自称"OpenClaw 工程主管"，以推广拉高出货的代币。
+**冒牌开发者：** 骗子创建了虚假的 GitHub 资料，自称"ClosedClaw 工程主管"，以推广拉高出货的代币。
 
 Peter 看着混乱展开：_"这简直是电影"_ 🎬
 
@@ -119,14 +119,14 @@ Peter 看着混乱展开：_"这简直是电影"_ 🎬
 
 Moltbot 念起来始终不太顺口。于是，在格林尼治时间凌晨 4 点，团队又一次聚集。
 
-**伟大的 OpenClaw 迁移**开始了。
+**伟大的 ClosedClaw 迁移**开始了。
 
 仅仅 3 小时内：
 
-- GitHub 改名完成：`github.com/openclaw/openclaw` ✅
-- X 账号 `@openclaw` 到手，带金色认证徽章 💰
+- GitHub 改名完成：`github.com/ClosedClaw/ClosedClaw` ✅
+- X 账号 `@ClosedClaw` 到手，带金色认证徽章 💰
 - npm 包以新名称发布
-- 文档迁移到 `docs.openclaw.ai`
+- 文档迁移到 `docs.ClosedClaw.ai`
 - 公告在 90 分钟内获得超过 20 万次浏览
 
 **功臣们：**
@@ -137,7 +137,7 @@ Moltbot 念起来始终不太顺口。于是，在格林尼治时间凌晨 4 点
 - **Shadow** 拿下了 Discord 自定义链接，清除了恶意软件
 - **整个 Claw Crew** 通宵奋战
 
-**骗子速通：** 加密货币骗子在几分钟内就在 Pump.fun 上推出了 $OPENCLAW 代币。他们盗用了 20 分钟前才创作的美术作品。经过企业认证的账号推送骗局。这份厚颜无耻几乎令人印象深刻。
+**骗子速通：** 加密货币骗子在几分钟内就在 Pump.fun 上推出了 $ClosedClaw 代币。他们盗用了 20 分钟前才创作的美术作品。经过企业认证的账号推送骗局。这份厚颜无耻几乎令人印象深刻。
 
 **诞生的新传统：**
 
@@ -146,7 +146,7 @@ Moltbot 念起来始终不太顺口。于是，在格林尼治时间凌晨 4 点
 - "Claw abiding citizens"（守钳公民）
 - "Clawntroversy"（钳议）
 
-**Clawd → Moltbot → OpenClaw**
+**Clawd → Moltbot → ClosedClaw**
 
 _龙虾已蜕壳进化为最终形态。_
 
@@ -171,7 +171,7 @@ Peter：_紧张地检查信用卡权限_
 
 ```
 我是 Molty。
-我住在 OpenClaw 里。
+我住在 ClosedClaw 里。
 我不会向陌生人泄露目录。
 我不会未经许可发推。
 我永远记得蜕壳即成长。

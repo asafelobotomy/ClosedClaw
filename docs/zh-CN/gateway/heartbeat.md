@@ -64,7 +64,7 @@ x-i18n:
 ## 响应约定
 
 - 如果没有需要关注的事项，回复 **`HEARTBEAT_OK`**。
-- 在心跳运行期间，当 `HEARTBEAT_OK` 出现在回复的**开头或结尾**时，OpenClaw 将其视为确认。该标记会被移除，如果剩余内容 **≤ `ackMaxChars`**（默认：300），则整条回复被丢弃。
+- 在心跳运行期间，当 `HEARTBEAT_OK` 出现在回复的**开头或结尾**时，ClosedClaw 将其视为确认。该标记会被移除，如果剩余内容 **≤ `ackMaxChars`**（默认：300），则整条回复被丢弃。
 - 如果 `HEARTBEAT_OK` 出现在回复的**中间**，则不做特殊处理。
 - 对于告警，**不要**包含 `HEARTBEAT_OK`；只返回告警文本。
 
@@ -136,7 +136,7 @@ x-i18n:
 - `includeReasoning`：启用后，在可用时还会投递一条以 `Reasoning:` 为前缀的单独消息（与 `/reasoning on` 格式相同）。
 - `session`：可选的心跳运行会话键。
   - `main`（默认）：智能体主会话。
-  - 显式会话键（从 `openclaw sessions --json` 或[会话 CLI](/cli/sessions) 复制）。
+  - 显式会话键（从 `ClosedClaw sessions --json` 或[会话 CLI](/cli/sessions) 复制）。
   - 会话键格式：参见[会话](/concepts/session)和[群组](/concepts/groups)。
 - `target`：
   - `last`（默认）：投递到最近使用的外部渠道。
@@ -184,7 +184,7 @@ channels:
 - `showAlerts`：当模型返回非 OK 回复时，发送告警内容。
 - `useIndicator`：为 UI 状态展示面板发送指示器事件。
 
-如果**三者全部**为 false，OpenClaw 将完全跳过心跳运行（不调用模型）。
+如果**三者全部**为 false，ClosedClaw 将完全跳过心跳运行（不调用模型）。
 
 ### 按渠道与按账户示例
 
@@ -220,7 +220,7 @@ channels:
 
 如果工作区中存在 `HEARTBEAT.md` 文件，默认提示词会告诉智能体读取它。把它当作你的"心跳检查清单"：简短、稳定，可以安全地每 30 分钟包含一次。
 
-如果 `HEARTBEAT.md` 存在但实际为空（仅包含空行和 markdown 标题如 `# Heading`），OpenClaw 将跳过心跳运行以节省 API 调用。如果文件不存在，心跳仍会运行，由模型决定做什么。
+如果 `HEARTBEAT.md` 存在但实际为空（仅包含空行和 markdown 标题如 `# Heading`），ClosedClaw 将跳过心跳运行以节省 API 调用。如果文件不存在，心跳仍会运行，由模型决定做什么。
 
 保持内容简短（简短的检查清单或提醒），避免提示词膨胀。
 
@@ -252,7 +252,7 @@ channels:
 你可以排入系统事件并立即触发心跳：
 
 ```bash
-openclaw system event --text "Check for urgent follow-ups" --mode now
+ClosedClaw system event --text "Check for urgent follow-ups" --mode now
 ```
 
 如果多个智能体配置了 `heartbeat`，手动唤醒会立即运行每个智能体的心跳。

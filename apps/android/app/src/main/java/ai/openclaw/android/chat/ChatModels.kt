@@ -1,4 +1,4 @@
-package ai.openclaw.android.chat
+package ai.ClosedClaw.android.chat
 
 data class ChatMessage(
   val id: String,

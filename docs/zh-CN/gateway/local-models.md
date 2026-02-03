@@ -3,7 +3,7 @@ read_when:
   - 你想在自己的 GPU 设备上部署模型
   - 你正在配置 LM Studio 或 OpenAI 兼容代理
   - 你需要最安全的本地模型指南
-summary: 在本地 LLM 上运行 OpenClaw（LM Studio、vLLM、LiteLLM、自定义 OpenAI 端点）
+summary: 在本地 LLM 上运行 ClosedClaw（LM Studio、vLLM、LiteLLM、自定义 OpenAI 端点）
 title: 本地模型
 x-i18n:
   generated_at: "2026-02-01T20:35:10Z"
@@ -16,7 +16,7 @@ x-i18n:
 
 # 本地模型
 
-本地部署是可行的，但 OpenClaw 需要大上下文窗口以及强大的提示注入防护能力。小显存会截断上下文并导致安全性降低。建议高配：**≥2 台满配 Mac Studio 或同等级别的 GPU 设备（约 $30k+）**。单块 **24 GB** 显卡仅适用于较轻量的提示，且延迟较高。请使用**你能运行的最大/完整版模型**；激进量化或"小型"检查点会增加提示注入风险（参见[安全](/gateway/security)）。
+本地部署是可行的，但 ClosedClaw 需要大上下文窗口以及强大的提示注入防护能力。小显存会截断上下文并导致安全性降低。建议高配：**≥2 台满配 Mac Studio 或同等级别的 GPU 设备（约 $30k+）**。单块 **24 GB** 显卡仅适用于较轻量的提示，且延迟较高。请使用**你能运行的最大/完整版模型**；激进量化或"小型"检查点会增加提示注入风险（参见[安全](/gateway/security)）。
 
 ## 推荐方案：LM Studio + MiniMax M2.1（Responses API，完整版）
 

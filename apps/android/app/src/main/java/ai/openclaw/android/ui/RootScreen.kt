@@ -1,4 +1,4 @@
-package ai.openclaw.android.ui
+package ai.ClosedClaw.android.ui
 
 import android.annotation.SuppressLint
 import android.Manifest
@@ -65,8 +65,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.ContextCompat
-import ai.openclaw.android.CameraHudKind
-import ai.openclaw.android.MainViewModel
+import ai.ClosedClaw.android.CameraHudKind
+import ai.ClosedClaw.android.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -333,7 +333,7 @@ private fun CanvasView(viewModel: MainViewModel, modifier: Modifier = Modifier) 
           disableForceDarkIfSupported(settings)
         }
         if (isDebuggable) {
-          Log.d("OpenClawWebView", "userAgent: ${settings.userAgentString}")
+          Log.d("ClosedClawWebView", "userAgent: ${settings.userAgentString}")
         }
         isScrollContainer = true
         overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS
@@ -348,7 +348,7 @@ private fun CanvasView(viewModel: MainViewModel, modifier: Modifier = Modifier) 
             ) {
               if (!isDebuggable) return
               if (!request.isForMainFrame) return
-              Log.e("OpenClawWebView", "onReceivedError: ${error.errorCode} ${error.description} ${request.url}")
+              Log.e("ClosedClawWebView", "onReceivedError: ${error.errorCode} ${error.description} ${request.url}")
             }
 
             override fun onReceivedHttpError(
@@ -359,14 +359,14 @@ private fun CanvasView(viewModel: MainViewModel, modifier: Modifier = Modifier) 
               if (!isDebuggable) return
               if (!request.isForMainFrame) return
               Log.e(
-                "OpenClawWebView",
+                "ClosedClawWebView",
                 "onReceivedHttpError: ${errorResponse.statusCode} ${errorResponse.reasonPhrase} ${request.url}",
               )
             }
 
             override fun onPageFinished(view: WebView, url: String?) {
               if (isDebuggable) {
-                Log.d("OpenClawWebView", "onPageFinished: $url")
+                Log.d("ClosedClawWebView", "onPageFinished: $url")
               }
               viewModel.canvas.onPageFinished()
             }
@@ -377,7 +377,7 @@ private fun CanvasView(viewModel: MainViewModel, modifier: Modifier = Modifier) 
             ): Boolean {
               if (isDebuggable) {
                 Log.e(
-                  "OpenClawWebView",
+                  "ClosedClawWebView",
                   "onRenderProcessGone didCrash=${detail.didCrash()} priorityAtExit=${detail.rendererPriorityAtExit()}",
                 )
               }
@@ -390,7 +390,7 @@ private fun CanvasView(viewModel: MainViewModel, modifier: Modifier = Modifier) 
               if (!isDebuggable) return false
               val msg = consoleMessage ?: return false
               Log.d(
-                "OpenClawWebView",
+                "ClosedClawWebView",
                 "console ${msg.messageLevel()} @ ${msg.sourceId()}:${msg.lineNumber()} ${msg.message()}",
               )
               return false
@@ -424,6 +424,6 @@ private class CanvasA2UIActionBridge(private val onMessage: (String) -> Unit) {
   }
 
   companion object {
-    const val interfaceName: String = "openclawCanvasA2UIAction"
+    const val interfaceName: String = "ClosedClawCanvasA2UIAction"
   }
 }

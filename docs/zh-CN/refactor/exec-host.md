@@ -36,11 +36,11 @@ x-i18n:
 - **配置键：**`exec.host` + `exec.security`（允许按智能体覆盖）。
 - **提权：**保留 `/elevated` 作为 gateway 完全访问的别名。
 - **询问默认值：**`on-miss`。
-- **审批存储：**`~/.openclaw/exec-approvals.json`（JSON，不迁移旧版）。
+- **审批存储：**`~/.ClosedClaw/exec-approvals.json`（JSON，不迁移旧版）。
 - **运行器：**无头系统服务；UI 应用托管 Unix socket 用于审批。
 - **节点身份：**使用现有的 `nodeId`。
 - **Socket 认证：**Unix socket + token（跨平台）；后续需要时再拆分。
-- **节点主机状态：**`~/.openclaw/node.json`（节点 ID + 配对 token）。
+- **节点主机状态：**`~/.ClosedClaw/node.json`（节点 ID + 配对 token）。
 - **macOS 执行主机：**在 macOS 应用内运行 `system.run`；节点主机服务通过本地 IPC 转发请求。
 - **不使用 XPC helper：**坚持使用 Unix socket + token + 对端检查。
 
@@ -110,7 +110,7 @@ x-i18n:
 
 ## 审批存储（JSON）
 
-路径：`~/.openclaw/exec-approvals.json`
+路径：`~/.ClosedClaw/exec-approvals.json`
 
 用途：
 
@@ -124,7 +124,7 @@ x-i18n:
 {
   "version": 1,
   "socket": {
-    "path": "~/.openclaw/exec-approvals.sock",
+    "path": "~/.ClosedClaw/exec-approvals.sock",
     "token": "base64-opaque-token"
   },
   "defaults": {
@@ -173,7 +173,7 @@ x-i18n:
 
 ### IPC
 
-- Unix socket 位于 `~/.openclaw/exec-approvals.sock`（0600）。
+- Unix socket 位于 `~/.ClosedClaw/exec-approvals.sock`（0600）。
 - Token 存储在 `exec-approvals.json`（0600）中。
 - 对端检查：仅限相同 UID。
 - 质询/响应：nonce + HMAC(token, request-hash) 以防止重放。

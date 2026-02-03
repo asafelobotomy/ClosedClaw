@@ -1,4 +1,4 @@
-package ai.openclaw.android.gateway
+package ai.ClosedClaw.android.gateway
 
 import android.annotation.SuppressLint
 import java.security.MessageDigest

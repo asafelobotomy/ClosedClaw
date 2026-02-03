@@ -1,6 +1,6 @@
 ---
 read_when: 通过 SSH 将 macOS 应用连接到远程 Gateway网关
-summary: 为 OpenClaw.app 连接远程 Gateway网关设置 SSH 隧道
+summary: 为 ClosedClaw.app 连接远程 Gateway网关设置 SSH 隧道
 title: 远程 Gateway网关设置
 x-i18n:
   generated_at: "2026-02-01T20:35:41Z"
@@ -11,9 +11,9 @@ x-i18n:
   workflow: 14
 ---
 
-# 使用远程 Gateway网关运行 OpenClaw.app
+# 使用远程 Gateway网关运行 ClosedClaw.app
 
-OpenClaw.app 使用 SSH 隧道连接到远程 Gateway网关。本指南将介绍如何进行设置。
+ClosedClaw.app 使用 SSH 隧道连接到远程 Gateway网关。本指南将介绍如何进行设置。
 
 ## 概述
 
@@ -21,7 +21,7 @@ OpenClaw.app 使用 SSH 隧道连接到远程 Gateway网关。本指南将介绍
 ┌─────────────────────────────────────────────────────────────┐
 │                        客户端机器                              │
 │                                                              │
-│  OpenClaw.app ──► ws://127.0.0.1:18789（本地端口）              │
+│  ClosedClaw.app ──► ws://127.0.0.1:18789（本地端口）              │
 │                     │                                        │
 │                     ▼                                        │
 │  SSH 隧道 ──────────────────────────────────────────────────│
@@ -64,7 +64,7 @@ ssh-copy-id -i ~/.ssh/id_rsa <REMOTE_USER>@<REMOTE_IP>
 ### 第 3 步：设置 Gateway网关令牌
 
 ```bash
-launchctl setenv OPENCLAW_GATEWAY_TOKEN "<your-token>"
+launchctl setenv ClosedClaw_GATEWAY_TOKEN "<your-token>"
 ```
 
 ### 第 4 步：启动 SSH 隧道
@@ -73,11 +73,11 @@ launchctl setenv OPENCLAW_GATEWAY_TOKEN "<your-token>"
 ssh -N remote-gateway &
 ```
 
-### 第 5 步：重启 OpenClaw.app
+### 第 5 步：重启 ClosedClaw.app
 
 ```bash
-# 退出 OpenClaw.app（⌘Q），然后重新打开：
-open /path/to/OpenClaw.app
+# 退出 ClosedClaw.app（⌘Q），然后重新打开：
+open /path/to/ClosedClaw.app
 ```
 
 应用现在将通过 SSH 隧道连接到远程 Gateway网关。
@@ -125,7 +125,7 @@ launchctl bootstrap gui/$UID ~/Library/LaunchAgents/bot.molt.ssh-tunnel.plist
 - 崩溃后自动重启
 - 在后台持续运行
 
-旧版说明：如果存在残留的 `com.openclaw.ssh-tunnel` LaunchAgent，请将其删除。
+旧版说明：如果存在残留的 `com.ClosedClaw.ssh-tunnel` LaunchAgent，请将其删除。
 
 ---
 
@@ -161,4 +161,4 @@ launchctl bootout gui/$UID/bot.molt.ssh-tunnel
 | `KeepAlive`                          | 隧道崩溃时自动重启                          |
 | `RunAtLoad`                          | 在代理加载时启动隧道                        |
 
-OpenClaw.app 连接到客户端机器上的 `ws://127.0.0.1:18789`。SSH 隧道将该连接转发到运行 Gateway网关的远程机器的 18789 端口。
+ClosedClaw.app 连接到客户端机器上的 `ws://127.0.0.1:18789`。SSH 隧道将该连接转发到运行 Gateway网关的远程机器的 18789 端口。

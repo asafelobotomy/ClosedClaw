@@ -11,7 +11,7 @@ import {
 import { setupGitHooks } from "../scripts/setup-git-hooks.js";
 
 function makeTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-hooks-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "ClosedClaw-hooks-"));
 }
 
 describe("format-staged helpers", () => {

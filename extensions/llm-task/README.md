@@ -4,7 +4,7 @@ Adds an **optional** agent tool `llm-task` for running **JSON-only** LLM tasks
 (drafting, summarizing, classifying) with optional JSON Schema validation.
 
 Designed to be called from workflow engines (for example, Lobster via
-`openclaw.invoke --each`) without adding new OpenClaw code per workflow.
+`ClosedClaw.invoke --each`) without adding new ClosedClaw code per workflow.
 
 ## Enable
 
@@ -89,9 +89,9 @@ Returns `details.json` containing the parsed JSON (and validates against
 
 ## Bundled extension note
 
-This extension depends on OpenClaw internal modules (the embedded agent runner).
-It is intended to ship as a **bundled** OpenClaw extension (like `lobster`) and
+This extension depends on ClosedClaw internal modules (the embedded agent runner).
+It is intended to ship as a **bundled** ClosedClaw extension (like `lobster`) and
 be enabled via `plugins.entries` + tool allowlists.
 
 It is **not** currently designed to be copied into
-`~/.openclaw/extensions` as a standalone plugin directory.
+`~/.ClosedClaw/extensions` as a standalone plugin directory.

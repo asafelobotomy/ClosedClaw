@@ -25,7 +25,7 @@ x-i18n:
 
 当前范围：**仅限 WhatsApp**（Web 渠道）。
 
-广播群组在渠道允许列表和群组激活规则之后进行评估。在 WhatsApp 群组中，这意味着广播发生在 OpenClaw 正常回复的时机（例如：被提及时，取决于你的群组设置）。
+广播群组在渠道允许列表和群组激活规则之后进行评估。在 WhatsApp 群组中，这意味着广播发生在 ClosedClaw 正常回复的时机（例如：被提及时，取决于你的群组设置）。
 
 ## 使用场景
 
@@ -90,7 +90,7 @@ x-i18n:
 }
 ```
 
-**效果：** 当 OpenClaw 在此聊天中回复时，它会运行所有三个智能体。
+**效果：** 当 ClosedClaw 在此聊天中回复时，它会运行所有三个智能体。
 
 ### 处理策略
 
@@ -199,7 +199,7 @@ x-i18n:
 ```
 会话：agent:alfred:whatsapp:group:120363403215116621@g.us
 历史：[用户消息，alfred 之前的回复]
-工作区：/Users/pascal/openclaw-alfred/
+工作区：/Users/pascal/ClosedClaw-alfred/
 工具：read、write、exec
 ```
 
@@ -208,7 +208,7 @@ x-i18n:
 ```
 会话：agent:baerbel:whatsapp:group:120363403215116621@g.us
 历史：[用户消息，baerbel 之前的回复]
-工作区：/Users/pascal/openclaw-baerbel/
+工作区：/Users/pascal/ClosedClaw-baerbel/
 工具：仅 read
 ```
 
@@ -324,7 +324,7 @@ x-i18n:
 **调试：**
 
 ```bash
-tail -f ~/.openclaw/logs/gateway.log | grep broadcast
+tail -f ~/.ClosedClaw/logs/gateway.log | grep broadcast
 ```
 
 ### 仅一个智能体回复
@@ -410,7 +410,7 @@ tail -f ~/.openclaw/logs/gateway.log | grep broadcast
 ### 配置模式
 
 ```typescript
-interface OpenClawConfig {
+interface ClosedClawConfig {
   broadcast?: {
     strategy?: "parallel" | "sequential";
     [peerId: string]: string[];

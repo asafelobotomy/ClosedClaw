@@ -1,7 +1,7 @@
 ---
 read_when:
   - 编辑 IPC 协议或菜单栏应用 IPC
-summary: OpenClaw 应用、gateway 节点传输和 PeekabooBridge 的 macOS IPC 架构
+summary: ClosedClaw 应用、gateway 节点传输和 PeekabooBridge 的 macOS IPC 架构
 title: macOS IPC
 x-i18n:
   generated_at: "2026-02-01T21:33:31Z"
@@ -12,9 +12,9 @@ x-i18n:
   workflow: 15
 ---
 
-# OpenClaw macOS IPC 架构
+# ClosedClaw macOS IPC 架构
 
-**当前模型：** 本地 Unix 套接字将**节点宿主服务**连接到 **macOS 应用**，用于执行审批和 `system.run`。存在一个 `openclaw-mac` 调试 CLI 用于发现/连接检查；智能体操作仍通过 Gateway网关 WebSocket 和 `node.invoke` 传递。UI 自动化使用 PeekabooBridge。
+**当前模型：** 本地 Unix 套接字将**节点宿主服务**连接到 **macOS 应用**，用于执行审批和 `system.run`。存在一个 `ClosedClaw-mac` 调试 CLI 用于发现/连接检查；智能体操作仍通过 Gateway网关 WebSocket 和 `node.invoke` 传递。UI 自动化使用 PeekabooBridge。
 
 ## 目标
 
@@ -47,7 +47,7 @@ Agent -> Gateway网关 -> Node Service (WS)
 ### PeekabooBridge（UI 自动化）
 
 - UI 自动化使用名为 `bridge.sock` 的独立 UNIX 套接字和 PeekabooBridge JSON 协议。
-- 宿主优先级顺序（客户端侧）：Peekaboo.app → Claude.app → OpenClaw.app → 本地执行。
+- 宿主优先级顺序（客户端侧）：Peekaboo.app → Claude.app → ClosedClaw.app → 本地执行。
 - 安全性：bridge 宿主要求允许的 TeamID；仅 DEBUG 模式下的同 UID 回退机制受 `PEEKABOO_ALLOW_UNSIGNED_SOCKET_CLIENTS=1`（Peekaboo 约定）保护。
 - 详见：[PeekabooBridge 用法](/platforms/mac/peekaboo)。
 

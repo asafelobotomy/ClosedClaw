@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { ClosedClawConfig } from "../../config/config.js";
 import type { AnyAgentTool } from "./common.js";
 import { getMemorySearchManager } from "../../memory/index.js";
 import { resolveSessionAgentId } from "../agent-scope.js";
@@ -19,7 +19,7 @@ const MemoryGetSchema = Type.Object({
 });
 
 export function createMemorySearchTool(options: {
-  config?: OpenClawConfig;
+  config?: ClosedClawConfig;
   agentSessionKey?: string;
 }): AnyAgentTool | null {
   const cfg = options.config;
@@ -72,7 +72,7 @@ export function createMemorySearchTool(options: {
 }
 
 export function createMemoryGetTool(options: {
-  config?: OpenClawConfig;
+  config?: ClosedClawConfig;
   agentSessionKey?: string;
 }): AnyAgentTool | null {
   const cfg = options.config;

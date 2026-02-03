@@ -2,7 +2,7 @@
 read_when:
   - 编辑系统提示词文本、工具列表或时间/心跳部分
   - 更改工作区引导或 Skills 注入行为
-summary: OpenClaw 系统提示词的内容及其组装方式
+summary: ClosedClaw 系统提示词的内容及其组装方式
 title: 系统提示词
 x-i18n:
   generated_at: "2026-02-01T20:24:17Z"
@@ -15,9 +15,9 @@ x-i18n:
 
 # 系统提示词
 
-OpenClaw 为每次智能体运行构建自定义系统提示词。该提示词由 **OpenClaw 自有**，不使用 p-coding-agent 的默认提示词。
+ClosedClaw 为每次智能体运行构建自定义系统提示词。该提示词由 **ClosedClaw 自有**，不使用 p-coding-agent 的默认提示词。
 
-提示词由 OpenClaw 组装并注入到每次智能体运行中。
+提示词由 ClosedClaw 组装并注入到每次智能体运行中。
 
 ## 结构
 
@@ -26,9 +26,9 @@ OpenClaw 为每次智能体运行构建自定义系统提示词。该提示词�
 - **工具**：当前工具列表及简短描述。
 - **安全**：简短的护栏提醒，避免模型追求权力或绕过监督。
 - **Skills**（可用时）：告诉模型如何按需加载 Skills 指令。
-- **OpenClaw 自更新**：如何运行 `config.apply` 和 `update.run`。
+- **ClosedClaw 自更新**：如何运行 `config.apply` 和 `update.run`。
 - **工作区**：工作目录（`agents.defaults.workspace`）。
-- **文档**：OpenClaw 文档的本地路径（仓库或 npm 包）及查阅时机。
+- **文档**：ClosedClaw 文档的本地路径（仓库或 npm 包）及查阅时机。
 - **工作区文件（注入的）**：表明引导文件包含在下方。
 - **沙箱**（启用时）：表明沙箱隔离运行时、沙箱路径，以及是否可用提权执行。
 - **当前日期和时间**：用户本地时间、时区和时间格式。
@@ -41,10 +41,10 @@ OpenClaw 为每次智能体运行构建自定义系统提示词。该提示词�
 
 ## 提示词模式
 
-OpenClaw 可以为子智能体渲染更小的系统提示词。运行时为每次运行设置一个 `promptMode`（非用户可配置项）：
+ClosedClaw 可以为子智能体渲染更小的系统提示词。运行时为每次运行设置一个 `promptMode`（非用户可配置项）：
 
 - `full`（默认）：包含上述所有部分。
-- `minimal`：用于子智能体；省略**Skills**、**记忆召回**、**OpenClaw 自更新**、**模型别名**、**用户身份**、**回复标签**、**消息**、**静默回复**和**心跳**。工具、**安全**、工作区、沙箱、当前日期和时间（已知时）、运行时和注入的上下文仍然可用。
+- `minimal`：用于子智能体；省略**Skills**、**记忆召回**、**ClosedClaw 自更新**、**模型别名**、**用户身份**、**回复标签**、**消息**、**静默回复**和**心跳**。工具、**安全**、工作区、沙箱、当前日期和时间（已知时）、运行时和注入的上下文仍然可用。
 - `none`：仅返回基础身份行。
 
 当 `promptMode=minimal` 时，额外注入的提示词标记为**子智能体上下文**而非**群聊上下文**。
@@ -82,7 +82,7 @@ OpenClaw 可以为子智能体渲染更小的系统提示词。运行时为每�
 
 ## Skills
 
-当存在符合条件的 Skills 时，OpenClaw 会注入一个紧凑的**可用 Skills 列表**（`formatSkillsForPrompt`），其中包含每个 Skills 的**文件路径**。提示词指示模型使用 `read` 加载位于所列位置（工作区、托管或捆绑）的 SKILL.md。如果没有符合条件的 Skills，则省略 Skills 部分。
+当存在符合条件的 Skills 时，ClosedClaw 会注入一个紧凑的**可用 Skills 列表**（`formatSkillsForPrompt`），其中包含每个 Skills 的**文件路径**。提示词指示模型使用 `read` 加载位于所列位置（工作区、托管或捆绑）的 SKILL.md。如果没有符合条件的 Skills，则省略 Skills 部分。
 
 ```
 <available_skills>
@@ -98,4 +98,4 @@ OpenClaw 可以为子智能体渲染更小的系统提示词。运行时为每�
 
 ## 文档
 
-当可用时，系统提示词包含一个**文档**部分，指向本地 OpenClaw 文档目录（仓库工作区中的 `docs/` 或捆绑的 npm 包文档），并注明公共镜像、源代码仓库、社区 Discord 和 ClawHub (https://clawhub.com) 用于 Skills 发现。提示词指示模型在查询 OpenClaw 行为、命令、配置或架构时优先查阅本地文档，并在可能时自行运行 `openclaw status`（仅在无法访问时才询问用户）。
+当可用时，系统提示词包含一个**文档**部分，指向本地 ClosedClaw 文档目录（仓库工作区中的 `docs/` 或捆绑的 npm 包文档），并注明公共镜像、源代码仓库、社区 Discord 和 ClawHub (https://clawhub.com) 用于 Skills 发现。提示词指示模型在查询 ClosedClaw 行为、命令、配置或架构时优先查阅本地文档，并在可能时自行运行 `ClosedClaw status`（仅在无法访问时才询问用户）。

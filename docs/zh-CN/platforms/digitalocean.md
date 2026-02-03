@@ -1,8 +1,8 @@
 ---
 read_when:
-  - 在 DigitalOcean 上设置 OpenClaw
-  - 寻找便宜的 VPS 托管来运行 OpenClaw
-summary: 在 DigitalOcean 上运行 OpenClaw（简单的付费 VPS 方案）
+  - 在 DigitalOcean 上设置 ClosedClaw
+  - 寻找便宜的 VPS 托管来运行 ClosedClaw
+summary: 在 DigitalOcean 上运行 ClosedClaw（简单的付费 VPS 方案）
 title: DigitalOcean
 x-i18n:
   generated_at: "2026-02-01T21:20:02Z"
@@ -13,11 +13,11 @@ x-i18n:
   workflow: 15
 ---
 
-# 在 DigitalOcean 上运行 OpenClaw
+# 在 DigitalOcean 上运行 ClosedClaw
 
 ## 目标
 
-在 DigitalOcean 上运行持久化的 OpenClaw Gateway网关，费用为**每月 $6**（预留定价为每月 $4）。
+在 DigitalOcean 上运行持久化的 ClosedClaw Gateway网关，费用为**每月 $6**（预留定价为每月 $4）。
 
 如果你想要每月 $0 的方案且不介意 ARM + 特定提供商的设置，请参阅 [Oracle Cloud 指南](/platforms/oracle)。
 
@@ -63,7 +63,7 @@ x-i18n:
 ssh root@YOUR_DROPLET_IP
 ```
 
-## 3）安装 OpenClaw
+## 3）安装 ClosedClaw
 
 ```bash
 # 更新系统
@@ -73,17 +73,17 @@ apt update && apt upgrade -y
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt install -y nodejs
 
-# 安装 OpenClaw
-curl -fsSL https://openclaw.ai/install.sh | bash
+# 安装 ClosedClaw
+curl -fsSL https://ClosedClaw.ai/install.sh | bash
 
 # 验证
-openclaw --version
+ClosedClaw --version
 ```
 
 ## 4）运行新手引导
 
 ```bash
-openclaw onboard --install-daemon
+ClosedClaw onboard --install-daemon
 ```
 
 向导将引导你完成：
@@ -97,13 +97,13 @@ openclaw onboard --install-daemon
 
 ```bash
 # 检查状态
-openclaw status
+ClosedClaw status
 
 # 检查服务
-systemctl --user status openclaw-gateway.service
+systemctl --user status ClosedClaw-gateway.service
 
 # 查看日志
-journalctl --user -u openclaw-gateway.service -f
+journalctl --user -u ClosedClaw-gateway.service -f
 ```
 
 ## 6）访问控制面板
@@ -127,8 +127,8 @@ curl -fsSL https://tailscale.com/install.sh | sh
 tailscale up
 
 # 配置 Gateway网关使用 Tailscale Serve
-openclaw config set gateway.tailscale.mode serve
-openclaw gateway restart
+ClosedClaw config set gateway.tailscale.mode serve
+ClosedClaw gateway restart
 ```
 
 打开：`https://<magicdns>/`
@@ -141,8 +141,8 @@ openclaw gateway restart
 **方案 C：Tailnet 绑定（不使用 Serve）**
 
 ```bash
-openclaw config set gateway.bind tailnet
-openclaw gateway restart
+ClosedClaw config set gateway.bind tailnet
+ClosedClaw gateway restart
 ```
 
 打开：`http://<tailscale-ip>:18789`（需要令牌）。
@@ -152,14 +152,14 @@ openclaw gateway restart
 ### Telegram
 
 ```bash
-openclaw pairing list telegram
-openclaw pairing approve telegram <CODE>
+ClosedClaw pairing list telegram
+ClosedClaw pairing approve telegram <CODE>
 ```
 
 ### WhatsApp
 
 ```bash
-openclaw channels login whatsapp
+ClosedClaw channels login whatsapp
 # 扫描二维码
 ```
 
@@ -201,13 +201,13 @@ htop
 
 所有状态存储在：
 
-- `~/.openclaw/` — 配置、凭据、会话数据
-- `~/.openclaw/workspace/` — 工作区（SOUL.md、记忆等）
+- `~/.ClosedClaw/` — 配置、凭据、会话数据
+- `~/.ClosedClaw/workspace/` — 工作区（SOUL.md、记忆等）
 
 这些内容在重启后不会丢失。定期备份：
 
 ```bash
-tar -czvf openclaw-backup.tar.gz ~/.openclaw ~/.openclaw/workspace
+tar -czvf ClosedClaw-backup.tar.gz ~/.ClosedClaw ~/.ClosedClaw/workspace
 ```
 
 ---
@@ -237,9 +237,9 @@ Oracle Cloud 提供 **Always Free** ARM 实例，性能远超此处任何付费�
 ### Gateway网关无法启动
 
 ```bash
-openclaw gateway status
-openclaw doctor --non-interactive
-journalctl -u openclaw --no-pager -n 50
+ClosedClaw gateway status
+ClosedClaw doctor --non-interactive
+journalctl -u ClosedClaw --no-pager -n 50
 ```
 
 ### 端口已被占用

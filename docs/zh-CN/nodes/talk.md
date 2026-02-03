@@ -54,7 +54,7 @@ x-i18n:
 - `seed`、`normalize`、`lang`、`output_format`、`latency_tier`
 - `once`
 
-## 配置（`~/.openclaw/openclaw.json`）
+## 配置（`~/.ClosedClaw/ClosedClaw.json`）
 
 ```json5
 {

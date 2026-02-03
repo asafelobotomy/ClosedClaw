@@ -15,26 +15,26 @@ x-i18n:
 
 # acp
 
-运行与 OpenClaw Gateway网关通信的 ACP（Agent Client Protocol）桥接。
+运行与 ClosedClaw Gateway网关通信的 ACP（Agent Client Protocol）桥接。
 
 此命令通过 stdio 使用 ACP 协议与 IDE 通信，并通过 WebSocket 将提示转发到 Gateway网关。它将 ACP 会话映射到 Gateway网关会话密钥。
 
 ## 用法
 
 ```bash
-openclaw acp
+ClosedClaw acp
 
 # 远程 Gateway网关
-openclaw acp --url wss://gateway-host:18789 --token <token>
+ClosedClaw acp --url wss://gateway-host:18789 --token <token>
 
 # 附加到现有会话密钥
-openclaw acp --session agent:main:main
+ClosedClaw acp --session agent:main:main
 
 # 通过标签附加（必须已存在）
-openclaw acp --session-label "support inbox"
+ClosedClaw acp --session-label "support inbox"
 
 # 在第一个提示之前重置会话密钥
-openclaw acp --session agent:main:main --reset-session
+ClosedClaw acp --session agent:main:main --reset-session
 ```
 
 ## ACP 客户端（调试）
@@ -43,34 +43,34 @@ openclaw acp --session agent:main:main --reset-session
 它会启动 ACP 桥接并允许你交互式地输入提示。
 
 ```bash
-openclaw acp client
+ClosedClaw acp client
 
 # 将启动的桥接指向远程 Gateway网关
-openclaw acp client --server-args --url wss://gateway-host:18789 --token <token>
+ClosedClaw acp client --server-args --url wss://gateway-host:18789 --token <token>
 
-# 覆盖服务器命令（默认：openclaw）
-openclaw acp client --server "node" --server-args openclaw.mjs acp --url ws://127.0.0.1:19001
+# 覆盖服务器命令（默认：ClosedClaw）
+ClosedClaw acp client --server "node" --server-args ClosedClaw.mjs acp --url ws://127.0.0.1:19001
 ```
 
 ## 如何使用
 
-当 IDE（或其他客户端）使用 Agent Client Protocol 并且你希望它驱动 OpenClaw Gateway网关会话时，请使用 ACP。
+当 IDE（或其他客户端）使用 Agent Client Protocol 并且你希望它驱动 ClosedClaw Gateway网关会话时，请使用 ACP。
 
 1. 确保 Gateway网关正在运行（本地或远程）。
 2. 配置 Gateway网关目标（通过配置文件或标志）。
-3. 将你的 IDE 配置为通过 stdio 运行 `openclaw acp`。
+3. 将你的 IDE 配置为通过 stdio 运行 `ClosedClaw acp`。
 
 示例配置（持久化）：
 
 ```bash
-openclaw config set gateway.remote.url wss://gateway-host:18789
-openclaw config set gateway.remote.token <token>
+ClosedClaw config set gateway.remote.url wss://gateway-host:18789
+ClosedClaw config set gateway.remote.token <token>
 ```
 
 示例直接运行（不写入配置）：
 
 ```bash
-openclaw acp --url wss://gateway-host:18789 --token <token>
+ClosedClaw acp --url wss://gateway-host:18789 --token <token>
 ```
 
 ## 选择智能体
@@ -80,9 +80,9 @@ ACP 不直接选择智能体。它通过 Gateway网关会话密钥进行路由�
 使用智能体作用域的会话密钥来指定特定智能体：
 
 ```bash
-openclaw acp --session agent:main:main
-openclaw acp --session agent:design:main
-openclaw acp --session agent:qa:bug-123
+ClosedClaw acp --session agent:main:main
+ClosedClaw acp --session agent:design:main
+ClosedClaw acp --session agent:qa:bug-123
 ```
 
 每个 ACP 会话映射到单个 Gateway网关会话密钥。一个智能体可以有多个会话；除非你覆盖密钥或标签，否则 ACP 默认使用隔离的 `acp:<uuid>` 会话。
@@ -94,9 +94,9 @@ openclaw acp --session agent:qa:bug-123
 ```json
 {
   "agent_servers": {
-    "OpenClaw ACP": {
+    "ClosedClaw ACP": {
       "type": "custom",
-      "command": "openclaw",
+      "command": "ClosedClaw",
       "args": ["acp"],
       "env": {}
     }
@@ -109,9 +109,9 @@ openclaw acp --session agent:qa:bug-123
 ```json
 {
   "agent_servers": {
-    "OpenClaw ACP": {
+    "ClosedClaw ACP": {
       "type": "custom",
-      "command": "openclaw",
+      "command": "ClosedClaw",
       "args": [
         "acp",
         "--url",
@@ -127,7 +127,7 @@ openclaw acp --session agent:qa:bug-123
 }
 ```
 
-在 Zed 中，打开 Agent 面板并选择 "OpenClaw ACP" 来开始一个对话线程。
+在 Zed 中，打开 Agent 面板并选择 "ClosedClaw ACP" 来开始一个对话线程。
 
 ## 会话映射
 
@@ -167,7 +167,7 @@ openclaw acp --session agent:qa:bug-123
 ### `acp client` 选项
 
 - `--cwd <dir>`：ACP 会话的工作目录。
-- `--server <command>`：ACP 服务器命令（默认：`openclaw`）。
+- `--server <command>`：ACP 服务器命令（默认：`ClosedClaw`）。
 - `--server-args <args...>`：传递给 ACP 服务器的额外参数。
 - `--server-verbose`：启用 ACP 服务器的详细日志。
 - `--verbose, -v`：详细客户端日志。

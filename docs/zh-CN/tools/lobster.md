@@ -1,9 +1,9 @@
 ---
-description: Typed workflow runtime for OpenClaw — composable pipelines with approval gates.
+description: Typed workflow runtime for ClosedClaw — composable pipelines with approval gates.
 read_when:
   - 你需要具有显式审批的确定性多步骤工作流
   - 你需要恢复工作流而无需重新运行之前的步骤
-summary: OpenClaw 的类型化工作流运行时，支持可恢复的审批门控。
+summary: ClosedClaw 的类型化工作流运行时，支持可恢复的审批门控。
 title: Lobster
 x-i18n:
   generated_at: "2026-02-01T21:43:19Z"
@@ -16,7 +16,7 @@ x-i18n:
 
 # Lobster
 
-Lobster 是一个工作流外壳，让 OpenClaw 能够将多步骤工具序列作为单个确定性操作运行，并带有显式审批检查点。
+Lobster 是一个工作流外壳，让 ClosedClaw 能够将多步骤工具序列作为单个确定性操作运行，并带有显式审批检查点。
 
 ## 亮点
 
@@ -26,7 +26,7 @@ Lobster 是一个工作流外壳，让 OpenClaw 能够将多步骤工具序列�
 
 如今，复杂的工作流需要大量来回的工具调用。每次调用都消耗 token，而 LLM 必须编排每一个步骤。Lobster 将这种编排移入类型化运行时：
 
-- **一次调用代替多次**：OpenClaw 运行一次 Lobster 工具调用即可获得结构化结果。
+- **一次调用代替多次**：ClosedClaw 运行一次 Lobster 工具调用即可获得结构化结果。
 - **内置审批**：副作用（发送邮件、发布评论）会暂停工作流，直到获得显式批准。
 - **可恢复**：暂停的工作流返回一个令牌；批准后可恢复执行，无需重新运行所有步骤。
 
@@ -42,7 +42,7 @@ Lobster 刻意保持小巧。目标不是"一门新语言"，而是一个可预�
 
 ## 工作原理
 
-OpenClaw 以**工具模式**启动本地 `lobster` CLI，并从 stdout 解析 JSON 信封。
+ClosedClaw 以**工具模式**启动本地 `lobster` CLI，并从 stdout 解析 JSON 信封。
 如果流水线因需要审批而暂停，工具会返回一个 `resumeToken`，以便你稍后继续。
 
 ## 模式：小型 CLI + JSON 管道 + 审批
@@ -79,7 +79,7 @@ AI 触发工作流；Lobster 执行步骤。审批门控保持副作用的显式
 
 ```bash
 gog.gmail.search --query 'newer_than:1d' \
-  | openclaw.invoke --tool message --action send --each --item-key message --args-json '{"provider":"telegram","to":"..."}'
+  | ClosedClaw.invoke --tool message --action send --each --item-key message --args-json '{"provider":"telegram","to":"..."}'
 ```
 
 ## 纯 JSON 的 LLM 步骤（llm-task）
@@ -110,7 +110,7 @@ gog.gmail.search --query 'newer_than:1d' \
 在流水线中使用：
 
 ```lobster
-openclaw.invoke --tool llm-task --action json --args-json '{
+ClosedClaw.invoke --tool llm-task --action json --args-json '{
   "prompt": "Given the input email, return intent and draft.",
   "input": { "subject": "Hello", "body": "Can you help?" },
   "schema": {
@@ -129,7 +129,7 @@ openclaw.invoke --tool llm-task --action json --args-json '{
 
 ## 工作流文件（.lobster）
 
-Lobster 可以运行包含 `name`、`args`、`steps`、`env`、`condition` 和 `approval` 字段的 YAML/JSON 工作流文件。在 OpenClaw 工具调用中，将 `pipeline` 设置为文件路径。
+Lobster 可以运行包含 `name`、`args`、`steps`、`env`、`condition` 和 `approval` 字段的 YAML/JSON 工作流文件。在 ClosedClaw 工具调用中，将 `pipeline` 设置为文件路径。
 
 ```yaml
 name: inbox-triage
@@ -159,7 +159,7 @@ steps:
 
 ## 安装 Lobster
 
-在运行 OpenClaw Gateway网关的**同一主机**上安装 Lobster CLI（参见 [Lobster 仓库](https://github.com/openclaw/lobster)），并确保 `lobster` 在 `PATH` 中。
+在运行 ClosedClaw Gateway网关的**同一主机**上安装 Lobster CLI（参见 [Lobster 仓库](https://github.com/ClosedClaw/lobster)），并确保 `lobster` 在 `PATH` 中。
 如果你想使用自定义二进制文件位置，请在工具调用中传入**绝对路径** `lobsterPath`。
 
 ## 启用工具
@@ -196,7 +196,7 @@ Lobster 是一个**可选**插件工具（默认未启用）。
 避免使用 `tools.allow: ["lobster"]`，除非你打算以严格允许列表模式运行。
 
 注意：允许列表对可选插件是选择性加入的。如果你的允许列表只包含
-插件工具（如 `lobster`），OpenClaw 会保持核心工具启用。要限制核心
+插件工具（如 `lobster`），ClosedClaw 会保持核心工具启用。要限制核心
 工具，请在允许列表中同时包含你需要的核心工具或工具组。
 
 ## 示例：邮件分类
@@ -205,12 +205,12 @@ Lobster 是一个**可选**插件工具（默认未启用）。
 
 ```
 用户："检查我的邮件并起草回复"
-→ openclaw 调用 gmail.list
+→ ClosedClaw 调用 gmail.list
 → LLM 进行摘要
 → 用户："给 #2 和 #5 起草回复"
 → LLM 起草
 → 用户："发送 #2"
-→ openclaw 调用 gmail.send
+→ ClosedClaw 调用 gmail.send
 （每天重复，不记得之前分类了什么）
 ```
 
@@ -324,7 +324,7 @@ OpenProse 与 Lobster 配合良好：使用 `/prose` 编排多智能体准备工
 ## 安全性
 
 - **仅限本地子进程** — 插件本身不发起网络调用。
-- **无密钥** — Lobster 不管理 OAuth；它调用处理 OAuth 的 OpenClaw 工具。
+- **无密钥** — Lobster 不管理 OAuth；它调用处理 OAuth 的 ClosedClaw 工具。
 - **沙箱感知** — 当工具上下文处于沙箱中时自动禁用。
 - **加固** — 如果指定了 `lobsterPath` 则必须为绝对路径；超时和输出上限强制执行。
 

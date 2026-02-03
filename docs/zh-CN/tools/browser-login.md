@@ -17,7 +17,7 @@ x-i18n:
 
 ## 手动登录（推荐）
 
-当网站需要登录时，请在**宿主**浏览器配置文件（openclaw 浏览器）中**手动登录**。
+当网站需要登录时，请在**宿主**浏览器配置文件（ClosedClaw 浏览器）中**手动登录**。
 
 **不要**将你的凭据交给模型。自动登录往往会触发反机器人防御，并可能导致账号被锁定。
 
@@ -25,7 +25,7 @@ x-i18n:
 
 ## 使用哪个 Chrome 配置文件？
 
-OpenClaw 控制一个**专用 Chrome 配置文件**（名为 `openclaw`，橙色调界面）。它与你的日常浏览器配置文件是分开的。
+ClosedClaw 控制一个**专用 Chrome 配置文件**（名为 `ClosedClaw`，橙色调界面）。它与你的日常浏览器配置文件是分开的。
 
 两种简单的访问方式：
 
@@ -33,11 +33,11 @@ OpenClaw 控制一个**专用 Chrome 配置文件**（名为 `openclaw`，橙色
 2. **通过 CLI 打开**：
 
 ```bash
-openclaw browser start
-openclaw browser open https://x.com
+ClosedClaw browser start
+ClosedClaw browser open https://x.com
 ```
 
-如果你有多个配置文件，传入 `--browser-profile <name>`（默认值为 `openclaw`）。
+如果你有多个配置文件，传入 `--browser-profile <name>`（默认值为 `ClosedClaw`）。
 
 ## X/Twitter：推荐流程
 
@@ -69,7 +69,7 @@ openclaw browser open https://x.com
 然后指定宿主浏览器：
 
 ```bash
-openclaw browser open https://x.com --browser-profile openclaw --target host
+ClosedClaw browser open https://x.com --browser-profile ClosedClaw --target host
 ```
 
 或者为发布更新的智能体禁用沙箱。

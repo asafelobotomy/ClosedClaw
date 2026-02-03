@@ -275,11 +275,11 @@ function applyPatchFile({ patchPath, targetDir }) {
 
 function trySetupCompletion(repoRoot) {
   // Skip in CI or if explicitly disabled
-  if (process.env.CI || process.env.OPENCLAW_SKIP_COMPLETION_SETUP) {
+  if (process.env.CI || process.env.ClosedClaw_SKIP_COMPLETION_SETUP) {
     return;
   }
 
-  const binPath = path.join(repoRoot, "openclaw.mjs");
+  const binPath = path.join(repoRoot, "ClosedClaw.mjs");
   if (!fs.existsSync(binPath)) {
     return;
   }
@@ -291,12 +291,12 @@ function trySetupCompletion(repoRoot) {
   }
 
   try {
-    // Run with OPENCLAW_SKIP_POSTINSTALL to avoid any weird recursion,
+    // Run with ClosedClaw_SKIP_POSTINSTALL to avoid any weird recursion,
     // though distinct from this script.
     spawnSync(process.execPath, [binPath, "completion", "--install", "--yes"], {
       cwd: repoRoot,
       stdio: "inherit",
-      env: { ...process.env, OPENCLAW_SKIP_POSTINSTALL: "1" },
+      env: { ...process.env, ClosedClaw_SKIP_POSTINSTALL: "1" },
     });
   } catch {
     // Ignore errors to not break install
@@ -338,7 +338,7 @@ function main() {
 
 try {
   const skip =
-    process.env.OPENCLAW_SKIP_POSTINSTALL === "1" ||
+    process.env.ClosedClaw_SKIP_POSTINSTALL === "1" ||
     process.env.CLAWDBOT_SKIP_POSTINSTALL === "1" ||
     process.env.VITEST === "true" ||
     process.env.NODE_ENV === "test";

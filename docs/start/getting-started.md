@@ -10,11 +10,11 @@ title: "Getting Started"
 
 Goal: go from **zero** → **first working chat** (with sane defaults) as quickly as possible.
 
-Fastest chat: open the Control UI (no channel setup needed). Run `openclaw dashboard`
+Fastest chat: open the Control UI (no channel setup needed). Run `ClosedClaw dashboard`
 and chat in the browser, or open `http://127.0.0.1:18789/` on the gateway host.
 Docs: [Dashboard](/web/dashboard) and [Control UI](/web/control-ui).
 
-Recommended path: use the **CLI onboarding wizard** (`openclaw onboard`). It sets up:
+Recommended path: use the **CLI onboarding wizard** (`ClosedClaw onboard`). It sets up:
 
 - model/auth (OAuth recommended)
 - gateway settings
@@ -34,7 +34,7 @@ run on host, set an explicit per-agent override:
   "routing": {
     "agents": {
       "main": {
-        "workspace": "~/.openclaw/workspace",
+        "workspace": "~/.ClosedClaw/workspace",
         "sandbox": { "mode": "off" }
       }
     }
@@ -47,7 +47,7 @@ run on host, set an explicit per-agent override:
 - Node `>=22`
 - `pnpm` (optional; recommended if you build from source)
 - **Recommended:** Brave Search API key for web search. Easiest path:
-  `openclaw configure --section web` (stores `tools.web.search.apiKey`).
+  `ClosedClaw configure --section web` (stores `tools.web.search.apiKey`).
   See [Web tools](/tools/web).
 
 macOS: if you plan to build the apps, install Xcode / CLT. For the CLI + gateway only, Node is enough.
@@ -56,7 +56,7 @@ Windows: use **WSL2** (Ubuntu recommended). WSL2 is strongly recommended; native
 ## 1) Install the CLI (recommended)
 
 ```bash
-curl -fsSL https://openclaw.ai/install.sh | bash
+curl -fsSL https://ClosedClaw.ai/install.sh | bash
 ```
 
 Installer options (install method, non-interactive, from GitHub): [Install](/install).
@@ -64,23 +64,23 @@ Installer options (install method, non-interactive, from GitHub): [Install](/ins
 Windows (PowerShell):
 
 ```powershell
-iwr -useb https://openclaw.ai/install.ps1 | iex
+iwr -useb https://ClosedClaw.ai/install.ps1 | iex
 ```
 
 Alternative (global install):
 
 ```bash
-npm install -g openclaw@latest
+npm install -g ClosedClaw@latest
 ```
 
 ```bash
-pnpm add -g openclaw@latest
+pnpm add -g ClosedClaw@latest
 ```
 
 ## 2) Run the onboarding wizard (and install the service)
 
 ```bash
-openclaw onboard --install-daemon
+ClosedClaw onboard --install-daemon
 ```
 
 What you’ll choose:
@@ -98,8 +98,8 @@ Wizard doc: [Wizard](/start/wizard)
 
 - **Recommended Anthropic path:** set an API key (wizard can store it for service use). `claude setup-token` is also supported if you want to reuse Claude Code credentials.
 
-- OAuth credentials (legacy import): `~/.openclaw/credentials/oauth.json`
-- Auth profiles (OAuth + API keys): `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
+- OAuth credentials (legacy import): `~/.ClosedClaw/credentials/oauth.json`
+- Auth profiles (OAuth + API keys): `~/.ClosedClaw/agents/<agentId>/agent/auth-profiles.json`
 
 Headless/server tip: do OAuth on a normal machine first, then copy `oauth.json` to the gateway host.
 
@@ -108,13 +108,13 @@ Headless/server tip: do OAuth on a normal machine first, then copy `oauth.json` 
 If you installed the service during onboarding, the Gateway should already be running:
 
 ```bash
-openclaw gateway status
+ClosedClaw gateway status
 ```
 
 Manual run (foreground):
 
 ```bash
-openclaw gateway --port 18789 --verbose
+ClosedClaw gateway --port 18789 --verbose
 ```
 
 Dashboard (local loopback): `http://127.0.0.1:18789/`
@@ -126,9 +126,9 @@ channels. If you use WhatsApp or Telegram, run the Gateway with **Node**.
 ## 3.5) Quick verify (2 min)
 
 ```bash
-openclaw status
-openclaw health
-openclaw security audit --deep
+ClosedClaw status
+ClosedClaw health
+ClosedClaw security audit --deep
 ```
 
 ## 4) Pair + connect your first chat surface
@@ -136,7 +136,7 @@ openclaw security audit --deep
 ### WhatsApp (QR login)
 
 ```bash
-openclaw channels login
+ClosedClaw channels login
 ```
 
 Scan via WhatsApp → Settings → Linked Devices.
@@ -159,32 +159,32 @@ Default posture: unknown DMs get a short code and messages are not processed unt
 If your first DM gets no reply, approve the pairing:
 
 ```bash
-openclaw pairing list whatsapp
-openclaw pairing approve whatsapp <code>
+ClosedClaw pairing list whatsapp
+ClosedClaw pairing approve whatsapp <code>
 ```
 
 Pairing doc: [Pairing](/start/pairing)
 
 ## From source (development)
 
-If you’re hacking on OpenClaw itself, run from source:
+If you’re hacking on ClosedClaw itself, run from source:
 
 ```bash
-git clone https://github.com/openclaw/openclaw.git
-cd openclaw
+git clone https://github.com/ClosedClaw/ClosedClaw.git
+cd ClosedClaw
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run
 pnpm build
-openclaw onboard --install-daemon
+ClosedClaw onboard --install-daemon
 ```
 
-If you don’t have a global install yet, run the onboarding step via `pnpm openclaw ...` from the repo.
+If you don’t have a global install yet, run the onboarding step via `pnpm ClosedClaw ...` from the repo.
 `pnpm build` also bundles A2UI assets; if you need to run just that step, use `pnpm canvas:a2ui:bundle`.
 
 Gateway (from this repo):
 
 ```bash
-node openclaw.mjs gateway --port 18789 --verbose
+node ClosedClaw.mjs gateway --port 18789 --verbose
 ```
 
 ## 7) Verify end-to-end
@@ -192,13 +192,13 @@ node openclaw.mjs gateway --port 18789 --verbose
 In a new terminal, send a test message:
 
 ```bash
-openclaw message send --target +15555550123 --message "Hello from OpenClaw"
+ClosedClaw message send --target +15555550123 --message "Hello from ClosedClaw"
 ```
 
-If `openclaw health` shows “no auth configured”, go back to the wizard and set OAuth/key auth — the agent won’t be able to respond without it.
+If `ClosedClaw health` shows “no auth configured”, go back to the wizard and set OAuth/key auth — the agent won’t be able to respond without it.
 
-Tip: `openclaw status --all` is the best pasteable, read-only debug report.
-Health probes: `openclaw health` (or `openclaw status --deep`) asks the running gateway for a health snapshot.
+Tip: `ClosedClaw status --all` is the best pasteable, read-only debug report.
+Health probes: `ClosedClaw health` (or `ClosedClaw status --deep`) asks the running gateway for a health snapshot.
 
 ## Next steps (optional, but great)
 

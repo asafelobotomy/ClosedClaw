@@ -1,6 +1,6 @@
-package ai.openclaw.android.chat
+package ai.ClosedClaw.android.chat
 
-import ai.openclaw.android.gateway.GatewaySession
+import ai.ClosedClaw.android.gateway.GatewaySession
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineScope

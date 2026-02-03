@@ -2,7 +2,7 @@
 summary: Node + tsx "__name is not a function" crash notes and workarounds
 read_when:
   - Debugging Node-only dev scripts or watch mode failures
-  - Investigating tsx/esbuild loader crashes in OpenClaw
+  - Investigating tsx/esbuild loader crashes in ClosedClaw
 title: "Node + tsx Crash"
 ---
 
@@ -10,10 +10,10 @@ title: "Node + tsx Crash"
 
 ## Summary
 
-Running OpenClaw via Node with `tsx` fails at startup with:
+Running ClosedClaw via Node with `tsx` fails at startup with:
 
 ```
-[openclaw] Failed to start CLI: TypeError: __name is not a function
+[ClosedClaw] Failed to start CLI: TypeError: __name is not a function
     at createSubsystemLogger (.../src/logging/subsystem.ts:203:25)
     at .../src/agents/auth-profiles/constants.ts:25:20
 ```
@@ -56,7 +56,7 @@ node --import tsx scripts/repro/tsx-name-repro.ts
 ## Regression history
 
 - `2871657e` (2026-01-06): scripts changed from Bun to tsx to make Bun optional.
-- Before that (Bun path), `openclaw status` and `gateway:watch` worked.
+- Before that (Bun path), `ClosedClaw status` and `gateway:watch` worked.
 
 ## Workarounds
 
@@ -64,9 +64,9 @@ node --import tsx scripts/repro/tsx-name-repro.ts
 - Use Node + tsc watch, then run compiled output:
   ```bash
   pnpm exec tsc --watch --preserveWatchOutput
-  node --watch openclaw.mjs status
+  node --watch ClosedClaw.mjs status
   ```
-- Confirmed locally: `pnpm exec tsc -p tsconfig.json` + `node openclaw.mjs status` works on Node 25.
+- Confirmed locally: `pnpm exec tsc -p tsconfig.json` + `node ClosedClaw.mjs status` works on Node 25.
 - Disable esbuild keepNames in the TS loader if possible (prevents `__name` helper insertion); tsx does not currently expose this.
 - Test Node LTS (22/24) with `tsx` to see if the issue is Node 25–specific.
 

@@ -3,7 +3,7 @@ read_when:
   - 从 CLI 运行 Gateway网关（开发或服务器环境）
   - 调试 Gateway网关认证、绑定模式和连接问题
   - 通过 Bonjour 发现 Gateway网关（局域网 + tailnet）
-summary: OpenClaw Gateway网关 CLI（`openclaw gateway`）— 运行、查询和发现 Gateway网关
+summary: ClosedClaw Gateway网关 CLI（`ClosedClaw gateway`）— 运行、查询和发现 Gateway网关
 title: gateway
 x-i18n:
   generated_at: "2026-02-01T19:59:19Z"
@@ -16,9 +16,9 @@ x-i18n:
 
 # Gateway网关 CLI
 
-Gateway网关是 OpenClaw 的 WebSocket 服务器（渠道、节点、会话、钩子）。
+Gateway网关是 ClosedClaw 的 WebSocket 服务器（渠道、节点、会话、钩子）。
 
-本页中的子命令位于 `openclaw gateway …` 下。
+本页中的子命令位于 `ClosedClaw gateway …` 下。
 
 相关文档：
 
@@ -29,18 +29,18 @@ Gateway网关是 OpenClaw 的 WebSocket 服务器（渠道、节点、会话、�
 ## 运行 Gateway网关运行本地 Gateway网关进程：
 
 ```bash
-openclaw gateway
+ClosedClaw gateway
 ```
 
 前台运行别名：
 
 ```bash
-openclaw gateway run
+ClosedClaw gateway run
 ```
 
 注意事项：
 
-- 默认情况下，除非在 `~/.openclaw/openclaw.json` 中设置了 `gateway.mode=local`，否则 Gateway网关会拒绝启动。使用 `--allow-unconfigured` 进行临时/开发运行。
+- 默认情况下，除非在 `~/.ClosedClaw/ClosedClaw.json` 中设置了 `gateway.mode=local`，否则 Gateway网关会拒绝启动。使用 `--allow-unconfigured` 进行临时/开发运行。
 - 在没有认证的情况下绑定到 local loopback 以外的地址会被阻止（安全防护措施）。
 - 授权后 `SIGUSR1` 会触发进程内重启（需启用 `commands.restart` 或使用 Gateway网关工具/配置应用/更新）。
 - `SIGINT`/`SIGTERM` 处理程序会停止 Gateway网关进程，但不会恢复任何自定义终端状态。如果你使用 TUI 或原始模式输入包装 CLI，请在退出前恢复终端。
@@ -50,8 +50,8 @@ openclaw gateway run
 - `--port <port>`：WebSocket 端口（默认来自配置/环境变量；通常为 `18789`）。
 - `--bind <loopback|lan|tailnet|auto|custom>`：监听器绑定模式。
 - `--auth <token|password>`：认证模式覆盖。
-- `--token <token>`：令牌覆盖（同时为进程设置 `OPENCLAW_GATEWAY_TOKEN`）。
-- `--password <password>`：密码覆盖（同时为进程设置 `OPENCLAW_GATEWAY_PASSWORD`）。
+- `--token <token>`：令牌覆盖（同时为进程设置 `ClosedClaw_GATEWAY_TOKEN`）。
+- `--password <password>`：密码覆盖（同时为进程设置 `ClosedClaw_GATEWAY_PASSWORD`）。
 - `--tailscale <off|serve|funnel>`：通过 Tailscale 暴露 Gateway网关。
 - `--tailscale-reset-on-exit`：关闭时重置 Tailscale serve/funnel 配置。
 - `--allow-unconfigured`：允许在配置中没有 `gateway.mode=local` 的情况下启动 Gateway网关。
@@ -84,7 +84,7 @@ openclaw gateway run
 ### `gateway health`
 
 ```bash
-openclaw gateway health --url ws://127.0.0.1:18789
+ClosedClaw gateway health --url ws://127.0.0.1:18789
 ```
 
 ### `gateway status`
@@ -92,8 +92,8 @@ openclaw gateway health --url ws://127.0.0.1:18789
 `gateway status` 显示 Gateway网关服务（launchd/systemd/schtasks）以及可选的 RPC 探测。
 
 ```bash
-openclaw gateway status
-openclaw gateway status --json
+ClosedClaw gateway status
+ClosedClaw gateway status --json
 ```
 
 选项：
@@ -115,8 +115,8 @@ openclaw gateway status --json
 如果有多个 Gateway网关可达，它会全部输出。当你使用隔离的配置文件/端口时（例如救援机器人），支持多个 Gateway网关，但大多数安装仍然运行单个 Gateway网关。
 
 ```bash
-openclaw gateway probe
-openclaw gateway probe --json
+ClosedClaw gateway probe
+ClosedClaw gateway probe --json
 ```
 
 #### 通过 SSH 远程连接（Mac 应用对等模式）
@@ -126,7 +126,7 @@ macOS 应用的"通过 SSH 远程连接"模式使用本地端口转发，使远�
 CLI 等效命令：
 
 ```bash
-openclaw gateway probe --ssh user@gateway-host
+ClosedClaw gateway probe --ssh user@gateway-host
 ```
 
 选项：
@@ -145,18 +145,18 @@ openclaw gateway probe --ssh user@gateway-host
 底层 RPC 辅助工具。
 
 ```bash
-openclaw gateway call status
-openclaw gateway call logs.tail --params '{"sinceMs": 60000}'
+ClosedClaw gateway call status
+ClosedClaw gateway call logs.tail --params '{"sinceMs": 60000}'
 ```
 
 ## 管理 Gateway网关服务
 
 ```bash
-openclaw gateway install
-openclaw gateway start
-openclaw gateway stop
-openclaw gateway restart
-openclaw gateway uninstall
+ClosedClaw gateway install
+ClosedClaw gateway start
+ClosedClaw gateway stop
+ClosedClaw gateway restart
+ClosedClaw gateway uninstall
 ```
 
 注意事项：
@@ -166,10 +166,10 @@ openclaw gateway uninstall
 
 ## 发现 Gateway网关（Bonjour）
 
-`gateway discover` 扫描 Gateway网关信标（`_openclaw-gw._tcp`）。
+`gateway discover` 扫描 Gateway网关信标（`_ClosedClaw-gw._tcp`）。
 
 - 组播 DNS-SD：`local.`
-- 单播 DNS-SD（广域 Bonjour）：选择一个域名（例如：`openclaw.internal.`）并设置分离 DNS + DNS 服务器；参见 [/gateway/bonjour](/gateway/bonjour)
+- 单播 DNS-SD（广域 Bonjour）：选择一个域名（例如：`ClosedClaw.internal.`）并设置分离 DNS + DNS 服务器；参见 [/gateway/bonjour](/gateway/bonjour)
 
 只有启用了 Bonjour 发现（默认启用）的 Gateway网关才会广播信标。
 
@@ -186,7 +186,7 @@ openclaw gateway uninstall
 ### `gateway discover`
 
 ```bash
-openclaw gateway discover
+ClosedClaw gateway discover
 ```
 
 选项：
@@ -197,6 +197,6 @@ openclaw gateway discover
 示例：
 
 ```bash
-openclaw gateway discover --timeout 4000
-openclaw gateway discover --json | jq '.beacons[].wsUrl'
+ClosedClaw gateway discover --timeout 4000
+ClosedClaw gateway discover --json | jq '.beacons[].wsUrl'
 ```
