@@ -423,6 +423,220 @@ const WEB_SEARCH: LiteTool = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// P2 TOOLS: Clipboard, Calculator, Reminders
+// ═══════════════════════════════════════════════════════════════════════════
+
+const CLIPBOARD_READ: LiteTool = {
+  name: "clipboard_read",
+  description: "Read the current contents of the system clipboard",
+  parameters: {
+    type: "object",
+    properties: {},
+    required: [],
+  },
+  async execute() {
+    try {
+      // Try Wayland first (wl-paste), then X11 (xclip)
+      try {
+        const { stdout } = await execAsync("wl-paste 2>/dev/null", {
+          timeout: 5000,
+          maxBuffer: MAX_OUTPUT_SIZE,
+        });
+        return stdout.trim() || "(clipboard is empty)";
+      } catch {
+        // Fall back to X11
+        const { stdout } = await execAsync("xclip -selection clipboard -o 2>/dev/null", {
+          timeout: 5000,
+          maxBuffer: MAX_OUTPUT_SIZE,
+        });
+        return stdout.trim() || "(clipboard is empty)";
+      }
+    } catch (err) {
+      return `Error reading clipboard: ${(err as Error).message}`;
+    }
+  },
+};
+
+const CLIPBOARD_WRITE: LiteTool = {
+  name: "clipboard_write",
+  description: "Write text to the system clipboard",
+  parameters: {
+    type: "object",
+    properties: {
+      text: {
+        type: "string",
+        description: "The text to copy to the clipboard",
+      },
+    },
+    required: ["text"],
+  },
+  async execute({ text }) {
+    const content = String(text);
+    if (content.length > MAX_OUTPUT_SIZE) {
+      return `Error: Text too large for clipboard (max ${MAX_OUTPUT_SIZE} bytes)`;
+    }
+
+    try {
+      // Try Wayland first (wl-copy), then X11 (xclip)
+      try {
+        await execAsync(`echo -n ${JSON.stringify(content)} | wl-copy`, {
+          timeout: 5000,
+        });
+        return `Copied ${content.length} characters to clipboard`;
+      } catch {
+        // Fall back to X11
+        await execAsync(`echo -n ${JSON.stringify(content)} | xclip -selection clipboard`, {
+          timeout: 5000,
+        });
+        return `Copied ${content.length} characters to clipboard`;
+      }
+    } catch (err) {
+      return `Error writing to clipboard: ${(err as Error).message}`;
+    }
+  },
+};
+
+const CALCULATOR: LiteTool = {
+  name: "calculator",
+  description: "Evaluate a mathematical expression. Supports basic arithmetic, Math functions (sin, cos, sqrt, pow, etc.), and constants (PI, E).",
+  parameters: {
+    type: "object",
+    properties: {
+      expression: {
+        type: "string",
+        description: "The mathematical expression to evaluate (e.g., '2 + 2', 'sqrt(16)', 'sin(PI/2)')",
+      },
+    },
+    required: ["expression"],
+  },
+  async execute({ expression }) {
+    const expr = String(expression);
+
+    // Sanitize: only allow safe math characters and functions
+    const safePattern = /^[\d\s+\-*/().,%^]+$|^[\d\s+\-*/().,%^]*(sqrt|pow|sin|cos|tan|asin|acos|atan|log|log10|exp|abs|floor|ceil|round|min|max|PI|E|Math\.)+[\d\s+\-*/().,%^()\w]*$/i;
+
+    // More permissive pattern for math expressions
+    const allowedChars = /^[0-9\s+\-*/().^,a-zA-Z]+$/;
+    if (!allowedChars.test(expr)) {
+      return `Error: Expression contains invalid characters`;
+    }
+
+    // Block dangerous patterns
+    const dangerousPatterns = [
+      /\beval\b/i,
+      /\bFunction\b/i,
+      /\bimport\b/i,
+      /\brequire\b/i,
+      /\bprocess\b/i,
+      /\bglobal\b/i,
+      /\bwindow\b/i,
+      /\bdocument\b/i,
+      /\b__\w+__\b/,
+      /\bconstructor\b/i,
+      /\bprototype\b/i,
+    ];
+
+    for (const pattern of dangerousPatterns) {
+      if (pattern.test(expr)) {
+        return `Error: Expression contains disallowed pattern`;
+      }
+    }
+
+    try {
+      // Replace common math notation with JavaScript equivalents
+      let jsExpr = expr
+        .replace(/\^/g, "**") // Power operator
+        .replace(/\bPI\b/gi, "Math.PI")
+        .replace(/\bE\b/g, "Math.E")
+        .replace(/\bsqrt\s*\(/gi, "Math.sqrt(")
+        .replace(/\bpow\s*\(/gi, "Math.pow(")
+        .replace(/\bsin\s*\(/gi, "Math.sin(")
+        .replace(/\bcos\s*\(/gi, "Math.cos(")
+        .replace(/\btan\s*\(/gi, "Math.tan(")
+        .replace(/\basin\s*\(/gi, "Math.asin(")
+        .replace(/\bacos\s*\(/gi, "Math.acos(")
+        .replace(/\batan\s*\(/gi, "Math.atan(")
+        .replace(/\blog\s*\(/gi, "Math.log(")
+        .replace(/\blog10\s*\(/gi, "Math.log10(")
+        .replace(/\bexp\s*\(/gi, "Math.exp(")
+        .replace(/\babs\s*\(/gi, "Math.abs(")
+        .replace(/\bfloor\s*\(/gi, "Math.floor(")
+        .replace(/\bceil\s*\(/gi, "Math.ceil(")
+        .replace(/\bround\s*\(/gi, "Math.round(")
+        .replace(/\bmin\s*\(/gi, "Math.min(")
+        .replace(/\bmax\s*\(/gi, "Math.max(");
+
+      // Use Function constructor with restricted scope
+      const result = new Function(`"use strict"; return (${jsExpr})`)();
+
+      if (typeof result !== "number" || !Number.isFinite(result)) {
+        return `Error: Result is not a valid number (got ${result})`;
+      }
+
+      // Format result nicely
+      const formatted = Number.isInteger(result) ? result.toString() : result.toPrecision(10).replace(/\.?0+$/, "");
+      return `${expr} = ${formatted}`;
+    } catch (err) {
+      return `Error evaluating expression: ${(err as Error).message}`;
+    }
+  },
+};
+
+const SET_REMINDER: LiteTool = {
+  name: "set_reminder",
+  description: "Set a reminder that will show a desktop notification after a specified delay",
+  parameters: {
+    type: "object",
+    properties: {
+      message: {
+        type: "string",
+        description: "The reminder message to display",
+      },
+      delay_minutes: {
+        type: "number",
+        description: "Number of minutes from now to show the reminder",
+      },
+    },
+    required: ["message", "delay_minutes"],
+  },
+  async execute({ message, delay_minutes }) {
+    const msg = String(message);
+    const minutes = Number(delay_minutes);
+
+    if (!Number.isFinite(minutes) || minutes <= 0 || minutes > 1440) {
+      return `Error: Delay must be between 1 and 1440 minutes (24 hours)`;
+    }
+
+    if (msg.length > 500) {
+      return `Error: Message too long (max 500 characters)`;
+    }
+
+    try {
+      // Calculate when to fire
+      const delaySeconds = Math.round(minutes * 60);
+
+      // Use shell background process with sleep and notify-send
+      // This survives even if the gateway restarts
+      const escapedMsg = msg.replace(/'/g, "'\"'\"'");
+      const cmd = `(sleep ${delaySeconds} && notify-send "ClosedClaw Reminder" '${escapedMsg}' --urgency=normal) &`;
+
+      await execAsync(cmd, { timeout: 5000 });
+
+      const triggerTime = new Date(Date.now() + delaySeconds * 1000);
+      const timeStr = triggerTime.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+
+      return `Reminder set for ${timeStr} (in ${minutes} minute${minutes === 1 ? "" : "s"}): "${msg}"`;
+    } catch (err) {
+      return `Error setting reminder: ${(err as Error).message}`;
+    }
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 // TOOL REGISTRY
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -435,6 +649,10 @@ export const LITE_TOOLS: LiteTool[] = [
   RECALL_NOTES,
   CURRENT_TIME,
   WEB_SEARCH,
+  CLIPBOARD_READ,
+  CLIPBOARD_WRITE,
+  CALCULATOR,
+  SET_REMINDER,
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -500,10 +718,16 @@ const PATTERNS: PatternDef[] = [
   { regex: /\[RECALL\]/g, tool: "recall_notes", paramKey: null },
   { regex: /\[TIME\]/g, tool: "current_time", paramKey: null },
   { regex: /\[SEARCH:\s*([^\]]+)\]/g, tool: "web_search", paramKey: "query" },
+  { regex: /\[CLIPBOARD\]/g, tool: "clipboard_read", paramKey: null },
+  { regex: /\[COPY:\s*([^\]]+)\]/g, tool: "clipboard_write", paramKey: "text" },
+  { regex: /\[CALC:\s*([^\]]+)\]/g, tool: "calculator", paramKey: "expression" },
 ];
 
 // Special pattern for WRITE (multiline content between tags)
 const WRITE_PATTERN = /\[WRITE:\s*([^\]]+)\]([\s\S]*?)\[\/WRITE\]/g;
+
+// Special pattern for REMIND: [REMIND: 5m] message or [REMIND: 30] message
+const REMIND_PATTERN = /\[REMIND:\s*(\d+)m?\]\s*(.+?)(?=\n|$)/g;
 
 /**
  * Parse and execute inline patterns like [READ: /path/to/file]
@@ -519,6 +743,16 @@ export async function executePatterns(text: string): Promise<string> {
     const path = match[1]?.trim();
     const content = match[2]?.trim();
     const output = await executeTool("write_file", { path, content });
+    result = result.replace(match[0], `\n\`\`\`\n${output}\n\`\`\`\n`);
+  }
+
+  // Handle REMIND pattern (special case with minutes + message)
+  REMIND_PATTERN.lastIndex = 0;
+  const remindMatches = [...result.matchAll(REMIND_PATTERN)];
+  for (const match of remindMatches) {
+    const minutes = parseInt(match[1], 10);
+    const message = match[2]?.trim();
+    const output = await executeTool("set_reminder", { message, delay_minutes: minutes });
     result = result.replace(match[0], `\n\`\`\`\n${output}\n\`\`\`\n`);
   }
 
@@ -545,6 +779,10 @@ export function hasPatterns(text: string): boolean {
   // Check WRITE pattern
   WRITE_PATTERN.lastIndex = 0;
   if (WRITE_PATTERN.test(text)) return true;
+
+  // Check REMIND pattern
+  REMIND_PATTERN.lastIndex = 0;
+  if (REMIND_PATTERN.test(text)) return true;
 
   return PATTERNS.some(({ regex }) => {
     regex.lastIndex = 0;
@@ -610,13 +848,17 @@ To perform actions, use these exact patterns in your response:
 [RECALL] - Show saved notes
 [TIME] - Get current date/time
 [SEARCH: query] - Search the web
+[CLIPBOARD] - Read clipboard contents
+[COPY: text] - Copy text to clipboard
+[CALC: expression] - Calculate math (e.g., sqrt(16), 2^10)
+[REMIND: 5] message - Set reminder for 5 minutes
 
 Examples:
-User: What's my hostname?
-You: [EXEC: hostname]
+User: What's 25 * 48?
+You: [CALC: 25 * 48]
 
-User: Search for Linux kernel news
-You: [SEARCH: Linux kernel latest news]
+User: Remind me in 10 minutes to check the oven
+You: [REMIND: 10] Check the oven
 
 Be concise. Only use patterns when an action is needed.`;
 }
