@@ -637,6 +637,218 @@ const SET_REMINDER: LiteTool = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// P3 TOOLS: Screenshot, OCR
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SCREENSHOTS_DIR = join(homedir(), ".closedclaw", "screenshots");
+const OCR_TIMEOUT_MS = 30_000;
+
+const SCREENSHOT: LiteTool = {
+  name: "screenshot",
+  description: "Take a screenshot of the entire screen and save it. Returns the path to the saved image.",
+  parameters: {
+    type: "object",
+    properties: {
+      filename: {
+        type: "string",
+        description: "Optional filename for the screenshot (without extension). Defaults to timestamp.",
+      },
+    },
+    required: [],
+  },
+  async execute({ filename }) {
+    try {
+      await mkdir(SCREENSHOTS_DIR, { recursive: true });
+
+      const name = filename ? String(filename).replace(/[^a-zA-Z0-9_-]/g, "_") : `screenshot_${Date.now()}`;
+      const filepath = join(SCREENSHOTS_DIR, `${name}.png`);
+
+      // Use grim for Wayland screenshot (full screen)
+      const { stderr } = await execAsync(`grim "${filepath}"`, {
+        timeout: 10_000,
+      });
+
+      if (stderr && stderr.trim()) {
+        return `Screenshot taken but with warning: ${stderr.trim()}\nSaved to: ${filepath}`;
+      }
+
+      return `Screenshot saved to: ${filepath}`;
+    } catch (err) {
+      const error = err as Error;
+      // Check if grim is available
+      if (error.message.includes("not found") || error.message.includes("command not found")) {
+        return `Error: grim not installed. Install with: sudo pacman -S grim`;
+      }
+      return `Error taking screenshot: ${error.message}`;
+    }
+  },
+};
+
+const SCREENSHOT_REGION: LiteTool = {
+  name: "screenshot_region",
+  description: "Take a screenshot of a user-selected screen region. The user will be prompted to select an area.",
+  parameters: {
+    type: "object",
+    properties: {
+      filename: {
+        type: "string",
+        description: "Optional filename for the screenshot (without extension). Defaults to timestamp.",
+      },
+    },
+    required: [],
+  },
+  async execute({ filename }) {
+    try {
+      await mkdir(SCREENSHOTS_DIR, { recursive: true });
+
+      const name = filename ? String(filename).replace(/[^a-zA-Z0-9_-]/g, "_") : `region_${Date.now()}`;
+      const filepath = join(SCREENSHOTS_DIR, `${name}.png`);
+
+      // Use slurp to select region, then grim to capture
+      const { stderr } = await execAsync(`grim -g "$(slurp)" "${filepath}"`, {
+        timeout: 60_000, // Give user time to select
+      });
+
+      if (stderr && stderr.trim()) {
+        return `Screenshot taken but with warning: ${stderr.trim()}\nSaved to: ${filepath}`;
+      }
+
+      return `Region screenshot saved to: ${filepath}`;
+    } catch (err) {
+      const error = err as Error;
+      if (error.message.includes("selection cancelled") || error.message.includes("aborted")) {
+        return `Screenshot cancelled by user`;
+      }
+      if (error.message.includes("not found")) {
+        return `Error: grim and slurp required. Install with: sudo pacman -S grim slurp`;
+      }
+      return `Error taking screenshot: ${error.message}`;
+    }
+  },
+};
+
+const OCR_IMAGE: LiteTool = {
+  name: "ocr_image",
+  description: "Extract text from an image file using OCR (Optical Character Recognition)",
+  parameters: {
+    type: "object",
+    properties: {
+      path: {
+        type: "string",
+        description: "Path to the image file (PNG, JPG, etc.)",
+      },
+      language: {
+        type: "string",
+        description: "Language code for OCR (default: eng). Use 'eng+deu' for multiple languages.",
+      },
+    },
+    required: ["path"],
+  },
+  async execute({ path, language }) {
+    const imagePath = String(path).startsWith("~") 
+      ? String(path).replace("~", homedir()) 
+      : String(path);
+    const lang = language ? String(language) : "eng";
+
+    try {
+      // Check if file exists
+      await stat(imagePath);
+
+      // Run tesseract OCR
+      const { stdout, stderr } = await execAsync(
+        `tesseract "${imagePath}" stdout -l ${lang} 2>/dev/null`,
+        {
+          timeout: OCR_TIMEOUT_MS,
+          maxBuffer: MAX_OUTPUT_SIZE * 2,
+        }
+      );
+
+      const text = stdout.trim();
+      if (!text) {
+        return `No text found in image: ${imagePath}`;
+      }
+
+      // Truncate if too long
+      if (text.length > MAX_OUTPUT_SIZE) {
+        return `OCR text from ${imagePath}:\n\n${text.slice(0, MAX_OUTPUT_SIZE)}\n\n...[truncated, ${text.length - MAX_OUTPUT_SIZE} more characters]`;
+      }
+
+      return `OCR text from ${imagePath}:\n\n${text}`;
+    } catch (err) {
+      const error = err as NodeJS.ErrnoException;
+      if (error.code === "ENOENT") {
+        return `Error: Image file not found: ${imagePath}`;
+      }
+      if (error.message?.includes("not found") || error.message?.includes("command not found")) {
+        return `Error: tesseract not installed. Install with: sudo pacman -S tesseract tesseract-data-eng`;
+      }
+      return `Error running OCR: ${(err as Error).message}`;
+    }
+  },
+};
+
+const SCREENSHOT_OCR: LiteTool = {
+  name: "screenshot_ocr",
+  description: "Take a screenshot and immediately extract text from it using OCR. Useful for reading text from the screen.",
+  parameters: {
+    type: "object",
+    properties: {
+      region: {
+        type: "boolean",
+        description: "If true, let user select a region. If false, capture full screen.",
+      },
+    },
+    required: [],
+  },
+  async execute({ region }) {
+    try {
+      await mkdir(SCREENSHOTS_DIR, { recursive: true });
+
+      const filepath = join(SCREENSHOTS_DIR, `ocr_temp_${Date.now()}.png`);
+      const selectRegion = region === true;
+
+      // Take screenshot
+      const screenshotCmd = selectRegion 
+        ? `grim -g "$(slurp)" "${filepath}"`
+        : `grim "${filepath}"`;
+
+      await execAsync(screenshotCmd, {
+        timeout: selectRegion ? 60_000 : 10_000,
+      });
+
+      // Run OCR on the screenshot
+      const { stdout } = await execAsync(
+        `tesseract "${filepath}" stdout -l eng 2>/dev/null`,
+        {
+          timeout: OCR_TIMEOUT_MS,
+          maxBuffer: MAX_OUTPUT_SIZE * 2,
+        }
+      );
+
+      // Clean up temp file
+      await execAsync(`rm -f "${filepath}"`).catch(() => {});
+
+      const text = stdout.trim();
+      if (!text) {
+        return `No text found in the ${selectRegion ? "selected region" : "screenshot"}`;
+      }
+
+      if (text.length > MAX_OUTPUT_SIZE) {
+        return `Text from screen:\n\n${text.slice(0, MAX_OUTPUT_SIZE)}\n\n...[truncated]`;
+      }
+
+      return `Text from screen:\n\n${text}`;
+    } catch (err) {
+      const error = err as Error;
+      if (error.message.includes("selection cancelled") || error.message.includes("aborted")) {
+        return `Screenshot cancelled by user`;
+      }
+      return `Error: ${error.message}`;
+    }
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 // TOOL REGISTRY
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -653,6 +865,10 @@ export const LITE_TOOLS: LiteTool[] = [
   CLIPBOARD_WRITE,
   CALCULATOR,
   SET_REMINDER,
+  SCREENSHOT,
+  SCREENSHOT_REGION,
+  OCR_IMAGE,
+  SCREENSHOT_OCR,
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -721,6 +937,11 @@ const PATTERNS: PatternDef[] = [
   { regex: /\[CLIPBOARD\]/g, tool: "clipboard_read", paramKey: null },
   { regex: /\[COPY:\s*([^\]]+)\]/g, tool: "clipboard_write", paramKey: "text" },
   { regex: /\[CALC:\s*([^\]]+)\]/g, tool: "calculator", paramKey: "expression" },
+  { regex: /\[SCREENSHOT\]/g, tool: "screenshot", paramKey: null },
+  { regex: /\[SCREENSHOT_REGION\]/g, tool: "screenshot_region", paramKey: null },
+  { regex: /\[OCR:\s*([^\]]+)\]/g, tool: "ocr_image", paramKey: "path" },
+  { regex: /\[SCREEN_OCR\]/g, tool: "screenshot_ocr", paramKey: null },
+  { regex: /\[SCREEN_OCR_REGION\]/g, tool: "screenshot_ocr", paramKey: null },
 ];
 
 // Special pattern for WRITE (multiline content between tags)
@@ -852,13 +1073,17 @@ To perform actions, use these exact patterns in your response:
 [COPY: text] - Copy text to clipboard
 [CALC: expression] - Calculate math (e.g., sqrt(16), 2^10)
 [REMIND: 5] message - Set reminder for 5 minutes
+[SCREENSHOT] - Take a full screen screenshot
+[SCREENSHOT_REGION] - Take a screenshot of a selected region
+[OCR: /path/to/image.png] - Extract text from an image
+[SCREEN_OCR] - Take screenshot and extract text from it
 
 Examples:
 User: What's 25 * 48?
 You: [CALC: 25 * 48]
 
-User: Remind me in 10 minutes to check the oven
-You: [REMIND: 10] Check the oven
+User: Read the text from this screenshot
+You: [SCREEN_OCR]
 
 Be concise. Only use patterns when an action is needed.`;
 }
