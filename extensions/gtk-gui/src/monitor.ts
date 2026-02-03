@@ -40,9 +40,11 @@ interface LiteModeMessage {
 
 const liteModeSessions = new Map<string, LiteModeMessage[]>();
 const LITE_MODE_MAX_HISTORY = 10; // Keep last 10 exchanges
+const LITE_MODE_MAX_ITERATIONS = 8; // Max ReAct iterations (Thought→Action→Observation cycles)
 
 /**
- * Call Ollama API with native tool calling support
+ * Call Ollama API with native tool calling support and ReAct-style multi-step reasoning.
+ * Implements a loop: the model can request tools multiple times until it provides a final answer.
  * For models like qwen3, llama3.1+, mistral, etc.
  */
 async function callOllamaWithTools(params: {
@@ -52,9 +54,11 @@ async function callOllamaWithTools(params: {
   userMessage: string;
   agentName: string;
   enableTools: boolean;
-  log?: { debug?: (msg: string) => void; error?: (msg: string) => void };
+  maxIterations?: number;
+  log?: { debug?: (msg: string) => void; error?: (msg: string) => void; info?: (msg: string) => void };
 }): Promise<string> {
   const { baseUrl, model, sessionKey, userMessage, agentName, enableTools, log } = params;
+  const maxIterations = params.maxIterations ?? LITE_MODE_MAX_ITERATIONS;
 
   // Get or create conversation history
   let history = liteModeSessions.get(sessionKey);
@@ -78,81 +82,17 @@ async function callOllamaWithTools(params: {
 
   // Use Ollama's native API for tool calling
   const ollamaNativeUrl = baseUrl.replace("/v1", "");
-  log?.debug?.(`Lite mode (tools): calling ${ollamaNativeUrl}/api/chat with ${history.length} messages`);
 
-  const requestBody: Record<string, unknown> = {
-    model,
-    messages: history.map((m) => ({
-      role: m.role,
-      content: m.content,
-      ...(m.tool_calls ? { tool_calls: m.tool_calls } : {}),
-      ...(m.tool_name ? { tool_name: m.tool_name } : {}),
-    })),
-    stream: false,
-  };
+  // ReAct loop: continue until model stops requesting tools or we hit max iterations
+  let iteration = 0;
+  let lastContent = "";
 
-  if (enableTools) {
-    requestBody.tools = getOllamaTools();
-    log?.info?.(`Tools enabled: ${(requestBody.tools as unknown[]).length} tools available`);
-  } else {
-    log?.info?.(`Tools disabled`);
-  }
+  while (iteration < maxIterations) {
+    iteration++;
+    log?.info?.(`ReAct iteration ${iteration}/${maxIterations}`);
+    log?.debug?.(`Lite mode (tools): calling ${ollamaNativeUrl}/api/chat with ${history.length} messages`);
 
-  const response = await fetch(`${ollamaNativeUrl}/api/chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(requestBody),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Ollama API error: ${response.status} - ${errorText}`);
-  }
-
-  const data = (await response.json()) as {
-    message?: {
-      role: string;
-      content: string;
-      tool_calls?: Array<{
-        function: { name: string; arguments: Record<string, unknown> };
-      }>;
-    };
-  };
-
-  const assistantMessage = data.message;
-  if (!assistantMessage) {
-    throw new Error("No message in Ollama response");
-  }
-
-  // Check if model wants to call tools
-  if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
-    log?.info?.(`Model requested ${assistantMessage.tool_calls.length} tool call(s)`);
-
-    // Add assistant message with tool calls to history
-    history.push({
-      role: "assistant" as const,
-      content: assistantMessage.content || "",
-      tool_calls: assistantMessage.tool_calls,
-    });
-
-    // Execute each tool and collect results
-    for (const toolCall of assistantMessage.tool_calls) {
-      const { name, arguments: args } = toolCall.function;
-      log?.info?.(`Executing tool: ${name} with args: ${JSON.stringify(args)}`);
-
-      const output = await executeTool(name, args);
-      log?.info?.(`Tool ${name} output: ${output.slice(0, 100)}...`);
-
-      // Add tool result to history
-      history.push({
-        role: "tool" as const,
-        content: output,
-        tool_name: name,
-      });
-    }
-
-    // Call model again to get final response with tool results
-    const finalRequestBody: Record<string, unknown> = {
+    const requestBody: Record<string, unknown> = {
       model,
       messages: history.map((m) => ({
         role: m.role,
@@ -164,33 +104,87 @@ async function callOllamaWithTools(params: {
     };
 
     if (enableTools) {
-      finalRequestBody.tools = getOllamaTools();
+      requestBody.tools = getOllamaTools();
+      if (iteration === 1) {
+        log?.info?.(`Tools enabled: ${(requestBody.tools as unknown[]).length} tools available`);
+      }
+    } else {
+      if (iteration === 1) {
+        log?.info?.(`Tools disabled`);
+      }
     }
 
-    const finalResponse = await fetch(`${ollamaNativeUrl}/api/chat`, {
+    const response = await fetch(`${ollamaNativeUrl}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(finalRequestBody),
+      body: JSON.stringify(requestBody),
     });
 
-    if (!finalResponse.ok) {
-      const errorText = await finalResponse.text();
-      throw new Error(`Ollama API error on final call: ${finalResponse.status} - ${errorText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Ollama API error: ${response.status} - ${errorText}`);
     }
 
-    const finalData = (await finalResponse.json()) as {
-      message?: { content: string };
+    const data = (await response.json()) as {
+      message?: {
+        role: string;
+        content: string;
+        tool_calls?: Array<{
+          function: { name: string; arguments: Record<string, unknown> };
+        }>;
+      };
     };
 
-    const finalContent = finalData.message?.content?.trim() || "";
-    history.push({ role: "assistant" as const, content: finalContent });
-    return finalContent;
+    const assistantMessage = data.message;
+    if (!assistantMessage) {
+      throw new Error("No message in Ollama response");
+    }
+
+    lastContent = assistantMessage.content?.trim() || "";
+
+    // Check if model wants to call tools (continue ReAct loop)
+    if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
+      log?.info?.(`Iteration ${iteration}: Model requested ${assistantMessage.tool_calls.length} tool call(s)`);
+
+      // Add assistant message with tool calls to history
+      history.push({
+        role: "assistant" as const,
+        content: lastContent,
+        tool_calls: assistantMessage.tool_calls,
+      });
+
+      // Execute each tool and collect results (Observation phase)
+      for (const toolCall of assistantMessage.tool_calls) {
+        const { name, arguments: args } = toolCall.function;
+        log?.info?.(`Executing tool: ${name} with args: ${JSON.stringify(args)}`);
+
+        const output = await executeTool(name, args);
+        log?.info?.(`Tool ${name} output: ${output.slice(0, 100)}...`);
+
+        // Add tool result to history (Observation)
+        history.push({
+          role: "tool" as const,
+          content: output,
+          tool_name: name,
+        });
+      }
+
+      // Continue loop - model will process tool results and potentially call more tools
+      continue;
+    }
+
+    // No tool calls - model has provided final answer
+    log?.info?.(`Iteration ${iteration}: Model provided final answer (no more tool calls)`);
+    history.push({ role: "assistant" as const, content: lastContent });
+    return lastContent;
   }
 
-  // No tool calls, just add assistant response
-  const content = assistantMessage.content?.trim() || "";
-  history.push({ role: "assistant" as const, content });
-  return content;
+  // Hit max iterations - return whatever we have
+  log?.error?.(`ReAct loop hit max iterations (${maxIterations}). Returning last response.`);
+  if (lastContent) {
+    history.push({ role: "assistant" as const, content: lastContent });
+  }
+  return lastContent || "I apologize, but I ran into my iteration limit while processing your request. Please try a simpler query.";
 }
 
 /**
@@ -282,6 +276,22 @@ function areLiteModeToolsEnabled(cfg: CoreConfig): boolean {
   const config = gtkConfig?.config as Record<string, unknown> | undefined;
   // Default to true if not specified
   return config?.liteModeTools !== false;
+}
+
+/**
+ * Get max iterations for ReAct loop from config
+ */
+function getLiteModeMaxIterations(cfg: CoreConfig): number {
+  const pluginConfig = (cfg as Record<string, unknown>).plugins as Record<string, unknown> | undefined;
+  const entries = pluginConfig?.entries as Record<string, unknown> | undefined;
+  const gtkConfig = entries?.["gtk-gui"] as Record<string, unknown> | undefined;
+  const config = gtkConfig?.config as Record<string, unknown> | undefined;
+  const maxIter = config?.liteModeMaxIterations;
+  // Default to 8, clamp between 1 and 20
+  if (typeof maxIter === "number" && maxIter >= 1 && maxIter <= 20) {
+    return Math.floor(maxIter);
+  }
+  return LITE_MODE_MAX_ITERATIONS;
 }
 
 /**
@@ -400,16 +410,17 @@ export async function processGtkMessage(
 
     const toolsEnabled = areLiteModeToolsEnabled(coreConfig);
     const supportsNativeTools = modelSupportsTools(model);
+    const maxIterations = getLiteModeMaxIterations(coreConfig);
 
     log?.debug?.(
-      `Using lite mode: model=${model}, toolsEnabled=${toolsEnabled}, nativeTools=${supportsNativeTools}`,
+      `Using lite mode: model=${model}, toolsEnabled=${toolsEnabled}, nativeTools=${supportsNativeTools}, maxIterations=${maxIterations}`,
     );
 
     try {
       let text: string;
 
       if (toolsEnabled && supportsNativeTools) {
-        // Use native tool calling for capable models
+        // Use native tool calling for capable models (with ReAct loop)
         log?.debug?.(`Lite mode: using native tool calling for ${model}`);
         text = await callOllamaWithTools({
           baseUrl,
@@ -418,6 +429,7 @@ export async function processGtkMessage(
           userMessage,
           agentName,
           enableTools: true,
+          maxIterations,
           log,
         });
       } else if (toolsEnabled) {
@@ -441,6 +453,7 @@ export async function processGtkMessage(
           userMessage,
           agentName,
           enableTools: false,
+          maxIterations: 1, // No tool loop needed when tools are disabled
           log,
         });
       }

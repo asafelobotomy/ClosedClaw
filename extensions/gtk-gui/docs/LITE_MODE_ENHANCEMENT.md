@@ -318,20 +318,78 @@ describe('lite-tools', () => {
 
 ---
 
+## Multi-step ReAct Implementation
+
+### Overview
+
+The ReAct (Reasoning + Acting) pattern enables complex query decomposition by allowing the model to:
+1. **Think** about what information or actions are needed
+2. **Act** by calling one or more tools
+3. **Observe** the results
+4. **Repeat** until a final answer is formulated
+
+### Configuration
+
+```json5
+{
+  "plugins": {
+    "entries": {
+      "gtk-gui": {
+        "config": {
+          "liteMode": true,
+          "liteModeTools": true,
+          "liteModeMaxIterations": 8  // Default: 8, Range: 1-20
+        }
+      }
+    }
+  }
+}
+```
+
+### Implementation Details
+
+**Location:** `extensions/gtk-gui/src/monitor.ts` - `callOllamaWithTools()`
+
+**Loop Logic:**
+```
+while (iteration < maxIterations) {
+  1. Send history to model
+  2. If model returns tool_calls → execute tools, add results to history, continue
+  3. If no tool_calls → model has final answer, break
+}
+```
+
+**Safety:**
+- Default max iterations: 8
+- Configurable via `liteModeMaxIterations` (clamped 1-20)
+- Graceful fallback message if max iterations exceeded
+
+### Example Multi-step Query
+
+**User:** "What is the current time and save it to /tmp/time.txt?"
+
+**ReAct Loop:**
+1. **Iteration 1:** Model calls `current_time()` and `write_file()` in parallel
+2. **Iteration 2:** Model synthesizes results into final answer
+
+**Response:** "The current time is Tuesday, February 3, 2026 at 01:27:38 AM GMT, and it has been successfully saved to /tmp/time.txt."
+
+---
+
 ## Future Improvements
 
 ### Backlog
 
-| Priority | Feature | Description | Effort |
+| Priority | Feature | Description | Status |
 |----------|---------|-------------|--------|
-| P1 | Web search | DuckDuckGo HTML scraping | Medium |
-| P1 | Write file | Create/update files | Small |
-| P2 | Clipboard | Read/write system clipboard | Small |
-| P2 | Reminders | Schedule notifications | Medium |
-| P2 | Calculator | Evaluate math expressions | Small |
-| P3 | Image OCR | Read text from images | Large |
-| P3 | Screenshot | Capture screen region | Medium |
-| P3 | Multi-step ReAct | Complex query decomposition | Large |
+| P1 | Web search | DuckDuckGo HTML scraping | ✅ Complete |
+| P1 | Write file | Create/update files | ✅ Complete |
+| P2 | Clipboard | Read/write system clipboard | ✅ Complete |
+| P2 | Reminders | Schedule notifications | ✅ Complete |
+| P2 | Calculator | Evaluate math expressions | ✅ Complete |
+| P3 | Image OCR | Read text from images | ✅ Complete |
+| P3 | Screenshot | Capture screen region | ✅ Complete |
+| P3 | Multi-step ReAct | Complex query decomposition | ✅ Complete |
 
 ### Security Considerations (For Review)
 
@@ -360,6 +418,10 @@ describe('lite-tools', () => {
 | 2026-02-02 | Created this planning document. |
 | 2026-02-03 | Implementation complete! Created lite-tools.ts, updated monitor.ts with native tool calling. |
 | 2026-02-03 | Tested: qwen3:1.7b correctly calls tools (current_time, read_file verified). |
+| 2026-02-03 | P1 complete: Added web_search (DDG HTML), write_file (64KB max, path safety). |
+| 2026-02-03 | P2 complete: clipboard_read/write (Wayland+X11), calculator (safe eval), set_reminder (notify-send). |
+| 2026-02-03 | P3 complete: screenshot/screenshot_region (grim+slurp), ocr_image/screenshot_ocr (tesseract). |
+| 2026-02-03 | Multi-step ReAct complete: Implemented loop in callOllamaWithTools() with max 8 iterations. Model can now chain multiple tool calls for complex queries. |
 
 ### Open Questions
 

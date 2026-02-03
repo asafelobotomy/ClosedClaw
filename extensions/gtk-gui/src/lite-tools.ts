@@ -1047,11 +1047,19 @@ export function modelSupportsTools(model: string): boolean {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Minimal system prompt for native tool calling (~50 tokens)
+ * Minimal system prompt for native tool calling with ReAct reasoning (~100 tokens)
  */
 export function getNativeToolSystemPrompt(agentName: string): string {
   return `You are ${agentName}, a helpful assistant running on Linux.
-Be concise and friendly. Use the available tools when needed to help the user.`;
+Be concise and friendly. Use the available tools when needed to help the user.
+
+For complex tasks, break them into steps:
+1. Think about what information or actions you need
+2. Use a tool to get information or perform an action
+3. Process the result and decide if more steps are needed
+4. When you have everything, provide your final answer
+
+You can call multiple tools in sequence to complete multi-step tasks.`;
 }
 
 /**
