@@ -1,34 +1,203 @@
 /**
  * GTK GUI Monitor
- * 
+ *
  * Handles inbound messages from the GTK GUI and routes them through
  * the embedded Pi agent for AI responses.
- * 
+ *
  * Supports "lite mode" for small local models (e.g., Ollama 1B/3B) that
  * bypasses the full Pi agent system and uses a minimal prompt.
+ *
+ * Enhanced lite mode supports:
+ * - Native tool calling for models that support it (qwen3, llama3.1+, etc.)
+ * - Pattern-based tool fallback for models that don't
+ * - Tools: read_file, run_command, list_directory, save_note, recall_notes, current_time
  */
 
 import crypto from "node:crypto";
 import type { ChannelAccountSnapshot, ClosedClawConfig } from "ClosedClaw/plugin-sdk";
 import type { GtkMessage } from "./ipc.js";
 import { loadCoreAgentDeps, type CoreConfig } from "./core-bridge.js";
+import {
+  getOllamaTools,
+  executeTool,
+  executePatterns,
+  modelSupportsTools,
+  getNativeToolSystemPrompt,
+  getPatternSystemPrompt,
+} from "./lite-tools.js";
 
 /**
- * Simple conversation history for lite mode
+ * Conversation message for lite mode
  */
 interface LiteModeMessage {
-  role: "system" | "user" | "assistant";
+  role: "system" | "user" | "assistant" | "tool";
   content: string;
+  tool_calls?: Array<{
+    function: { name: string; arguments: Record<string, unknown> };
+  }>;
+  tool_name?: string;
 }
 
 const liteModeSessions = new Map<string, LiteModeMessage[]>();
-const LITE_MODE_MAX_HISTORY = 10; // Keep last 10 messages for context
+const LITE_MODE_MAX_HISTORY = 10; // Keep last 10 exchanges
 
 /**
- * Call Ollama API directly with a minimal prompt (lite mode)
- * Used for small local models that can't handle the full Pi agent system prompt
+ * Call Ollama API with native tool calling support
+ * For models like qwen3, llama3.1+, mistral, etc.
  */
-async function callOllamaLite(params: {
+async function callOllamaWithTools(params: {
+  baseUrl: string;
+  model: string;
+  sessionKey: string;
+  userMessage: string;
+  agentName: string;
+  enableTools: boolean;
+  log?: { debug?: (msg: string) => void; error?: (msg: string) => void };
+}): Promise<string> {
+  const { baseUrl, model, sessionKey, userMessage, agentName, enableTools, log } = params;
+
+  // Get or create conversation history
+  let history = liteModeSessions.get(sessionKey);
+  if (!history) {
+    history = [
+      {
+        role: "system" as const,
+        content: getNativeToolSystemPrompt(agentName),
+      },
+    ];
+    liteModeSessions.set(sessionKey, history);
+  }
+
+  // Add user message
+  history.push({ role: "user" as const, content: userMessage });
+
+  // Trim history if too long (keep system + last N exchanges)
+  while (history.length > LITE_MODE_MAX_HISTORY * 2 + 1) {
+    history.splice(1, 2);
+  }
+
+  // Use Ollama's native API for tool calling
+  const ollamaNativeUrl = baseUrl.replace("/v1", "");
+  log?.debug?.(`Lite mode (tools): calling ${ollamaNativeUrl}/api/chat with ${history.length} messages`);
+
+  const requestBody: Record<string, unknown> = {
+    model,
+    messages: history.map((m) => ({
+      role: m.role,
+      content: m.content,
+      ...(m.tool_calls ? { tool_calls: m.tool_calls } : {}),
+      ...(m.tool_name ? { tool_name: m.tool_name } : {}),
+    })),
+    stream: false,
+  };
+
+  if (enableTools) {
+    requestBody.tools = getOllamaTools();
+    log?.info?.(`Tools enabled: ${(requestBody.tools as unknown[]).length} tools available`);
+  } else {
+    log?.info?.(`Tools disabled`);
+  }
+
+  const response = await fetch(`${ollamaNativeUrl}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(requestBody),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Ollama API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = (await response.json()) as {
+    message?: {
+      role: string;
+      content: string;
+      tool_calls?: Array<{
+        function: { name: string; arguments: Record<string, unknown> };
+      }>;
+    };
+  };
+
+  const assistantMessage = data.message;
+  if (!assistantMessage) {
+    throw new Error("No message in Ollama response");
+  }
+
+  // Check if model wants to call tools
+  if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
+    log?.info?.(`Model requested ${assistantMessage.tool_calls.length} tool call(s)`);
+
+    // Add assistant message with tool calls to history
+    history.push({
+      role: "assistant" as const,
+      content: assistantMessage.content || "",
+      tool_calls: assistantMessage.tool_calls,
+    });
+
+    // Execute each tool and collect results
+    for (const toolCall of assistantMessage.tool_calls) {
+      const { name, arguments: args } = toolCall.function;
+      log?.info?.(`Executing tool: ${name} with args: ${JSON.stringify(args)}`);
+
+      const output = await executeTool(name, args);
+      log?.info?.(`Tool ${name} output: ${output.slice(0, 100)}...`);
+
+      // Add tool result to history
+      history.push({
+        role: "tool" as const,
+        content: output,
+        tool_name: name,
+      });
+    }
+
+    // Call model again to get final response with tool results
+    const finalRequestBody: Record<string, unknown> = {
+      model,
+      messages: history.map((m) => ({
+        role: m.role,
+        content: m.content,
+        ...(m.tool_calls ? { tool_calls: m.tool_calls } : {}),
+        ...(m.tool_name ? { tool_name: m.tool_name } : {}),
+      })),
+      stream: false,
+    };
+
+    if (enableTools) {
+      finalRequestBody.tools = getOllamaTools();
+    }
+
+    const finalResponse = await fetch(`${ollamaNativeUrl}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(finalRequestBody),
+    });
+
+    if (!finalResponse.ok) {
+      const errorText = await finalResponse.text();
+      throw new Error(`Ollama API error on final call: ${finalResponse.status} - ${errorText}`);
+    }
+
+    const finalData = (await finalResponse.json()) as {
+      message?: { content: string };
+    };
+
+    const finalContent = finalData.message?.content?.trim() || "";
+    history.push({ role: "assistant" as const, content: finalContent });
+    return finalContent;
+  }
+
+  // No tool calls, just add assistant response
+  const content = assistantMessage.content?.trim() || "";
+  history.push({ role: "assistant" as const, content });
+  return content;
+}
+
+/**
+ * Call Ollama API with pattern-based tool fallback
+ * For models that don't support native tool calling
+ */
+async function callOllamaWithPatterns(params: {
   baseUrl: string;
   model: string;
   sessionKey: string;
@@ -44,7 +213,7 @@ async function callOllamaLite(params: {
     history = [
       {
         role: "system" as const,
-        content: `You are ${agentName}, a helpful AI assistant. Be concise, friendly, and helpful. Respond naturally to the user's messages.`,
+        content: getPatternSystemPrompt(agentName),
       },
     ];
     liteModeSessions.set(sessionKey, history);
@@ -53,19 +222,19 @@ async function callOllamaLite(params: {
   // Add user message
   history.push({ role: "user" as const, content: userMessage });
 
-  // Trim history if too long (keep system + last N exchanges)
+  // Trim history
   while (history.length > LITE_MODE_MAX_HISTORY * 2 + 1) {
-    history.splice(1, 2); // Remove oldest user+assistant pair after system
+    history.splice(1, 2);
   }
 
-  log?.debug?.(`Lite mode: calling ${baseUrl} with ${history.length} messages`);
+  log?.debug?.(`Lite mode (patterns): calling ${baseUrl} with ${history.length} messages`);
 
   const response = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model,
-      messages: history,
+      messages: history.map((m) => ({ role: m.role, content: m.content })),
       max_tokens: 1024,
       temperature: 0.7,
     }),
@@ -79,9 +248,12 @@ async function callOllamaLite(params: {
   const data = (await response.json()) as {
     choices?: Array<{ message?: { content?: string } }>;
   };
-  const assistantMessage = data.choices?.[0]?.message?.content?.trim() || "";
+  let assistantMessage = data.choices?.[0]?.message?.content?.trim() || "";
 
-  // Add assistant response to history
+  // Parse and execute any patterns in the response
+  assistantMessage = await executePatterns(assistantMessage);
+
+  // Add processed response to history
   if (assistantMessage) {
     history.push({ role: "assistant" as const, content: assistantMessage });
   }
@@ -98,6 +270,18 @@ function shouldUseLiteMode(cfg: CoreConfig): boolean {
   const gtkConfig = entries?.["gtk-gui"] as Record<string, unknown> | undefined;
   const config = gtkConfig?.config as Record<string, unknown> | undefined;
   return config?.liteMode === true;
+}
+
+/**
+ * Check if lite mode tools are enabled
+ */
+function areLiteModeToolsEnabled(cfg: CoreConfig): boolean {
+  const pluginConfig = (cfg as Record<string, unknown>).plugins as Record<string, unknown> | undefined;
+  const entries = pluginConfig?.entries as Record<string, unknown> | undefined;
+  const gtkConfig = entries?.["gtk-gui"] as Record<string, unknown> | undefined;
+  const config = gtkConfig?.config as Record<string, unknown> | undefined;
+  // Default to true if not specified
+  return config?.liteModeTools !== false;
 }
 
 /**
@@ -214,18 +398,53 @@ export async function processGtkMessage(
       return { text: null, error: "Lite mode requires Ollama baseUrl in config" };
     }
 
-    log?.debug?.(`Using lite mode for Ollama model: ${model}`);
-    
+    const toolsEnabled = areLiteModeToolsEnabled(coreConfig);
+    const supportsNativeTools = modelSupportsTools(model);
+
+    log?.debug?.(
+      `Using lite mode: model=${model}, toolsEnabled=${toolsEnabled}, nativeTools=${supportsNativeTools}`,
+    );
+
     try {
-      const text = await callOllamaLite({
-        baseUrl,
-        model,
-        sessionKey,
-        userMessage,
-        agentName,
-        log,
-      });
-      
+      let text: string;
+
+      if (toolsEnabled && supportsNativeTools) {
+        // Use native tool calling for capable models
+        log?.debug?.(`Lite mode: using native tool calling for ${model}`);
+        text = await callOllamaWithTools({
+          baseUrl,
+          model,
+          sessionKey,
+          userMessage,
+          agentName,
+          enableTools: true,
+          log,
+        });
+      } else if (toolsEnabled) {
+        // Use pattern-based fallback for non-tool models
+        log?.debug?.(`Lite mode: using pattern-based tools for ${model}`);
+        text = await callOllamaWithPatterns({
+          baseUrl,
+          model,
+          sessionKey,
+          userMessage,
+          agentName,
+          log,
+        });
+      } else {
+        // Tools disabled, just chat
+        log?.debug?.(`Lite mode: tools disabled, plain chat for ${model}`);
+        text = await callOllamaWithTools({
+          baseUrl,
+          model,
+          sessionKey,
+          userMessage,
+          agentName,
+          enableTools: false,
+          log,
+        });
+      }
+
       log?.info?.(`Lite mode response: ${text.slice(0, 80)}...`);
       return { text };
     } catch (err) {
