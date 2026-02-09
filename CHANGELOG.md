@@ -6,6 +6,21 @@ Docs: https://docs.OpenClaw.ai
 
 ### Code Quality & Architecture
 
+- **Agent Squad: Three-Tier Memory System** (Phase 1 complete): Brain-inspired memory architecture for multi-agent collaboration
+  - **Long-Term Memory** (`src/agents/squad/memory/long-term-memory.ts`): Persistent episodic store backed by EncryptedStore
+    - `EpisodicStore` class: store, search, getRecent, getByOutcome, getBySquad, cleanup (retention-based)
+    - `LongTermMemory` facade: future-proofed for semantic + procedural stores (Phase 3)
+    - Full serialization/deserialization with Date handling
+    - Retention policies: 90 days for successes, 30 days for failures (from centralized constants)
+    - Statistics: success/failure counts, avg duration, total tokens
+  - **Memory Consolidation** (`src/agents/squad/memory/consolidation.ts`): Promotes hot short-term entries to long-term storage
+    - `consolidateMemory()`: batch processing with time budgets, min-age filters, configurable batch sizes
+    - `startConsolidationScheduler()`: periodic background consolidation (non-blocking, unref'd timer)
+    - `convertToEpisode()`: intelligent extraction of task descriptions, outcomes, tokens, tags from arbitrary entry values
+  - **Memory Index** (`src/agents/squad/memory/index.ts`): Barrel re-export for all three tiers + consolidation
+  - Comprehensive test suites for both modules (long-term memory + consolidation)
+  - See [Squad System Plan](/docs/agents/squad-system-plan.md) for full architecture
+
 - **DevOps Subagent for Meta-Development**: Created specialized AI agent that audits, maintains, and improves ClosedClaw itself
   - Agent profile at `~/.closedclaw/agents/devops.md` with comprehensive analysis protocols
   - Capabilities: security audits, code quality scans, performance profiling, documentation review, test coverage analysis
