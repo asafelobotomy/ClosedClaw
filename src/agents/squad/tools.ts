@@ -75,6 +75,7 @@ export interface SquadToolSet {
  */
 export function createDelegateToAgentTool(ctx: SquadToolContext): AnyAgentTool {
   return {
+    label: "Delegate Task",
     name: "delegate_to_agent",
     description: [
       "Delegate a subtask to another agent in the squad.",
@@ -109,13 +110,13 @@ export function createDelegateToAgentTool(ctx: SquadToolContext): AnyAgentTool {
         description: "JSON-encoded input data for the task",
       },
     },
-    handler: async (params) => {
-      const description = readStringParam(params, "task_description", { required: true });
-      const taskType = readStringParam(params, "task_type") ?? "general";
-      const priority = readStringParam(params, "priority") ?? "normal";
-      const targetRole = readStringParam(params, "target_role");
-      const targetAgentId = readStringParam(params, "target_agent_id");
-      const inputDataStr = readStringParam(params, "input_data");
+    execute: async (_toolCallId, params) => {
+      const description = readStringParam(params as Record<string, unknown>, "task_description", { required: true });
+      const taskType = readStringParam(params as Record<string, unknown>, "task_type") ?? "general";
+      const priority = readStringParam(params as Record<string, unknown>, "priority") ?? "normal";
+      const targetRole = readStringParam(params as Record<string, unknown>, "target_role");
+      const targetAgentId = readStringParam(params as Record<string, unknown>, "target_agent_id");
+      const inputDataStr = readStringParam(params as Record<string, unknown>, "input_data");
 
       let input: unknown = {};
       if (inputDataStr) {
@@ -164,6 +165,7 @@ export function createDelegateToAgentTool(ctx: SquadToolContext): AnyAgentTool {
  */
 export function createSquadMemoryReadTool(ctx: SquadToolContext): AnyAgentTool {
   return {
+    label: "Squad Memory Read",
     name: "squad_memory_read",
     description: [
       "Read a value from the squad's shared memory.",
@@ -181,9 +183,9 @@ export function createSquadMemoryReadTool(ctx: SquadToolContext): AnyAgentTool {
         description: "The memory key to read (required for 'get' action)",
       },
     },
-    handler: async (params) => {
-      const action = readStringParam(params, "action", { required: true });
-      const key = readStringParam(params, "key");
+    execute: async (_toolCallId, params) => {
+      const action = readStringParam(params as Record<string, unknown>, "action", { required: true });
+      const key = readStringParam(params as Record<string, unknown>, "key");
 
       if (action === "list_keys") {
         const keys = ctx.sharedMemory.keys();
@@ -215,6 +217,7 @@ export function createSquadMemoryReadTool(ctx: SquadToolContext): AnyAgentTool {
  */
 export function createSquadMemoryWriteTool(ctx: SquadToolContext): AnyAgentTool {
   return {
+    label: "Squad Memory Write",
     name: "squad_memory_write",
     description: [
       "Write a value to the squad's shared memory.",
@@ -242,11 +245,11 @@ export function createSquadMemoryWriteTool(ctx: SquadToolContext): AnyAgentTool 
         description: "Time to live in seconds. Defaults to 300 (5 minutes).",
       },
     },
-    handler: async (params) => {
-      const key = readStringParam(params, "key", { required: true });
-      const rawValue = readStringParam(params, "value", { required: true });
-      const important = readStringParam(params, "important") === "true";
-      const ttlStr = readStringParam(params, "ttl_seconds");
+    execute: async (_toolCallId, params) => {
+      const key = readStringParam(params as Record<string, unknown>, "key", { required: true });
+      const rawValue = readStringParam(params as Record<string, unknown>, "value", { required: true });
+      const important = readStringParam(params as Record<string, unknown>, "important") === "true";
+      const ttlStr = readStringParam(params as Record<string, unknown>, "ttl_seconds");
 
       let value: unknown;
       try {
@@ -280,6 +283,7 @@ export function createSquadMemoryWriteTool(ctx: SquadToolContext): AnyAgentTool 
  */
 export function createSquadBroadcastTool(ctx: SquadToolContext): AnyAgentTool {
   return {
+    label: "Squad Broadcast",
     name: "squad_broadcast",
     description: [
       "Broadcast a message to all other agents in the squad.",
@@ -297,19 +301,16 @@ export function createSquadBroadcastTool(ctx: SquadToolContext): AnyAgentTool {
         description: "Message type: 'notification', 'result', 'question', or 'error'. Defaults to 'notification'",
       },
     },
-    handler: async (params) => {
-      const message = readStringParam(params, "message", { required: true });
-      const type = readStringParam(params, "message_type") ?? "notification";
+    execute: async (_toolCallId, params) => {
+      const message = readStringParam(params as Record<string, unknown>, "message", { required: true });
+      const type = readStringParam(params as Record<string, unknown>, "message_type") ?? "notification";
 
       const validTypes = ["notification", "result", "question", "error"];
       const messageType = validTypes.includes(type) ? type : "notification";
 
       ctx.ipc.broadcast(ctx.agentId, {
-        id: crypto.randomUUID(),
-        from: ctx.agentId,
         type: messageType as AgentMessage["type"],
         payload: { message },
-        timestamp: new Date().toISOString(),
       });
 
       return jsonResult({
@@ -328,6 +329,7 @@ export function createSquadBroadcastTool(ctx: SquadToolContext): AnyAgentTool {
  */
 export function createSquadStatusTool(ctx: SquadToolContext): AnyAgentTool {
   return {
+    label: "Squad Status",
     name: "squad_status",
     description: [
       "Get the current status of the squad.",
@@ -335,7 +337,7 @@ export function createSquadStatusTool(ctx: SquadToolContext): AnyAgentTool {
       "and overall squad health. Useful for coordination decisions.",
     ].join(" "),
     parameters: {},
-    handler: async () => {
+    execute: async () => {
       let status: SquadStatus | undefined;
       try {
         status = ctx.coordinator.getSquadStatus(ctx.squadId);
@@ -355,7 +357,8 @@ export function createSquadStatusTool(ctx: SquadToolContext): AnyAgentTool {
           claimed: queueStats.claimed,
           completed: queueStats.completed,
           failed: queueStats.failed,
-          total: queueStats.total,
+          cancelled: queueStats.cancelled,
+          total: queueStats.pending + queueStats.claimed + queueStats.completed + queueStats.failed + queueStats.cancelled,
         },
         myAgentId: ctx.agentId,
       });
@@ -370,6 +373,7 @@ export function createSquadStatusTool(ctx: SquadToolContext): AnyAgentTool {
  */
 export function createWaitForTaskTool(ctx: SquadToolContext): AnyAgentTool {
   return {
+    label: "Wait for Task",
     name: "wait_for_task",
     description: [
       "Check the status of a previously delegated task.",
@@ -383,8 +387,8 @@ export function createWaitForTaskTool(ctx: SquadToolContext): AnyAgentTool {
         required: true,
       },
     },
-    handler: async (params) => {
-      const taskId = readStringParam(params, "task_id", { required: true });
+    execute: async (_toolCallId, params) => {
+      const taskId = readStringParam(params as Record<string, unknown>, "task_id", { required: true });
 
       const info = ctx.taskQueue.getTask(taskId);
       if (!info) {

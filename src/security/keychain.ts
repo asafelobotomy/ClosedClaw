@@ -526,8 +526,8 @@ export async function storeCredential(
     case "encrypted-file":
       return fileStore(namespace, identifier, secret, opts?.stateDir);
     default: {
-      const _: never = info.backend;
-      throw new KeychainError(_ as string, "store", "Unknown backend");
+      const _exhaustive: never = info.backend;
+      throw new Error(`Unknown backend: ${String(_exhaustive)}`);
     }
   }
 }
@@ -564,8 +564,8 @@ export async function getCredential(
     case "encrypted-file":
       return fileRetrieve(namespace, identifier, opts?.stateDir);
     default: {
-      const _: never = info.backend;
-      throw new KeychainError(_ as string, "get", "Unknown backend");
+      const _exhaustive: never = info.backend;
+      throw new Error(`Unknown backend: ${String(_exhaustive)}`);
     }
   }
 }
@@ -602,8 +602,8 @@ export async function deleteCredential(
     case "encrypted-file":
       return fileDelete(namespace, identifier, opts?.stateDir);
     default: {
-      const _: never = info.backend;
-      throw new KeychainError(_ as string, "delete", "Unknown backend");
+      const _exhaustive: never = info.backend;
+      throw new Error(`Unknown backend: ${String(_exhaustive)}`);
     }
   }
 }

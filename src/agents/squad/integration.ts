@@ -17,6 +17,7 @@
 
 import type { AgentSpawnConfig } from "./spawner.js";
 import type { SquadConfig, CoordinationStrategy, ComplexTask } from "./coordinator.js";
+import type { TaskInput, TaskPriority } from "./task-queue.js";
 import type { AgentProfile, ProfileRegistrySnapshot } from "../profiles/types.js";
 import { AGENT_TEMPLATES } from "./templates.js";
 import { AGENTS } from "../../constants/agents.js";
@@ -395,20 +396,28 @@ export function buildComplexTask(
   analysis: TaskAnalysis,
 ): ComplexTask {
   // Generate subtasks based on recommended profiles
-  const subtasks = analysis.recommendedProfiles.map((profileId) => {
+  const subtasks: TaskInput[] = analysis.recommendedProfiles.map((profileId) => {
     const taskType = analysis.taskTypes.find((t) =>
       TASK_CAPABILITY_MAP[t]?.some((cap) =>
         AGENT_TEMPLATES[profileId]?.capabilities.includes(cap),
       ),
     );
 
-    return `[${profileId}] ${taskType ? `Focus on ${taskType}: ` : ""}${description}`;
+    return {
+      description: `[${profileId}] ${taskType ? `Focus on ${taskType}: ` : ""}${description}`,
+      type: taskType ?? "general",
+      priority: "normal" as const,
+      input: { profileId, taskType, description },
+    };
   });
+
+  const priority: TaskPriority =
+    analysis.complexity > 0.6 ? "high" : analysis.complexity > 0.3 ? "normal" : "low";
 
   return {
     description,
     subtasks: subtasks.length > 1 ? subtasks : undefined,
-    priority: analysis.complexity > 0.6 ? 1 : analysis.complexity > 0.3 ? 2 : 3,
+    priority,
     input: description,
   };
 }
