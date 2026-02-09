@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import type { RuntimeEnv } from "../../runtime.js";
-import { theme } from "../../terminal/theme.js";
 import { GitService, classifyCommit } from "./upstream.git.js";
 import { loadUpstreamTracking } from "./upstream.storage.js";
 import { DEFAULT_UPSTREAM_TRACKING } from "./upstream.types.js";
@@ -12,7 +11,7 @@ interface DiffOptions {
   semantic?: boolean;
 }
 
-export async function upstreamDiffCommand(opts: DiffOptions, runtime: RuntimeEnv): Promise<void> {
+export async function upstreamDiffCommand(opts: DiffOptions, _runtime: RuntimeEnv): Promise<void> {
   const git = new GitService();
   const tracking = await loadUpstreamTracking(DEFAULT_UPSTREAM_TRACKING);
 

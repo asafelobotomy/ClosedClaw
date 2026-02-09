@@ -16,18 +16,8 @@
  * @module workflows/executor
  */
 
-import type {
-  WorkflowDefinition,
-  WorkflowStep,
-  RetryPolicy,
-  InterpolationContext,
-} from "./schema.js";
-import {
-  topologicalSort,
-  interpolate,
-  interpolateParams,
-  DEFAULT_RETRY_POLICY,
-} from "./schema.js";
+import type { WorkflowDefinition, WorkflowStep, InterpolationContext } from "./schema.js";
+import { topologicalSort, interpolate, interpolateParams, DEFAULT_RETRY_POLICY } from "./schema.js";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -45,13 +35,7 @@ export type WorkflowStatus =
 /**
  * Status of a single step execution.
  */
-export type StepStatus =
-  | "pending"
-  | "running"
-  | "completed"
-  | "failed"
-  | "skipped"
-  | "timed_out";
+export type StepStatus = "pending" | "running" | "completed" | "failed" | "skipped" | "timed_out";
 
 /**
  * Result of a step execution.
@@ -247,7 +231,9 @@ export async function executeWorkflow(
     // Execute batches
     for (let batchIdx = 0; batchIdx < batches.length; batchIdx++) {
       // Check cancellation
-      if (ctx.signal?.aborted || timeoutReached) {break;}
+      if (ctx.signal?.aborted || timeoutReached) {
+        break;
+      }
 
       const batch = batches[batchIdx];
       emit({ type: "batch:start", batchIndex: batchIdx });
@@ -355,7 +341,7 @@ async function executeStep(
   stepResults: Map<string, StepResult>,
   ctx: WorkflowExecutionContext,
   emit: (event: Omit<WorkflowEvent, "timestamp" | "workflowName" | "executionId">) => void,
-  executionId: string,
+  _executionId: string,
 ): Promise<StepResult> {
   const startedAt = Date.now();
 

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, _vi, _beforeEach } from "vitest";
-import { FallbackChain, type FallbackChainConfig } from "./fallback-chain.js";
+import { FallbackChain } from "./fallback-chain.js";
 
 // ─── Basic Execution ────────────────────────────────────────────────────────
 

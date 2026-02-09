@@ -17,12 +17,12 @@
  */
 
 import type { AnyAgentTool } from "../tools/common.js";
-import { jsonResult, readStringParam } from "../tools/common.js";
 import type { SquadCoordinator, SquadStatus } from "./coordinator.js";
-import type { ShortTermMemory, ShortTermEntry } from "./memory/short-term-memory.js";
-import type { WorkingMemory } from "./memory/working-memory.js";
 import type { AgentIPC, AgentMessage } from "./ipc.js";
-import type { TaskQueue, TaskInfo, TaskInput } from "./task-queue.js";
+import type { ShortTermMemory } from "./memory/short-term-memory.js";
+import type { WorkingMemory } from "./memory/working-memory.js";
+import type { TaskQueue, TaskInput } from "./task-queue.js";
+import { jsonResult, readStringParam } from "../tools/common.js";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -99,7 +99,8 @@ export function createDelegateToAgentTool(ctx: SquadToolContext): AnyAgentTool {
       },
       task_type: {
         type: "string",
-        description: "Task type for routing (e.g. 'research', 'code', 'review', 'test'). Defaults to 'general'",
+        description:
+          "Task type for routing (e.g. 'research', 'code', 'review', 'test'). Defaults to 'general'",
       },
       priority: {
         type: "string",
@@ -111,7 +112,9 @@ export function createDelegateToAgentTool(ctx: SquadToolContext): AnyAgentTool {
       },
     },
     execute: async (_toolCallId, params) => {
-      const description = readStringParam(params as Record<string, unknown>, "task_description", { required: true });
+      const description = readStringParam(params as Record<string, unknown>, "task_description", {
+        required: true,
+      });
       const taskType = readStringParam(params as Record<string, unknown>, "task_type") ?? "general";
       const priority = readStringParam(params as Record<string, unknown>, "priority") ?? "normal";
       const targetRole = readStringParam(params as Record<string, unknown>, "target_role");
@@ -184,7 +187,9 @@ export function createSquadMemoryReadTool(ctx: SquadToolContext): AnyAgentTool {
       },
     },
     execute: async (_toolCallId, params) => {
-      const action = readStringParam(params as Record<string, unknown>, "action", { required: true });
+      const action = readStringParam(params as Record<string, unknown>, "action", {
+        required: true,
+      });
       const key = readStringParam(params as Record<string, unknown>, "key");
 
       if (action === "list_keys") {
@@ -247,7 +252,9 @@ export function createSquadMemoryWriteTool(ctx: SquadToolContext): AnyAgentTool 
     },
     execute: async (_toolCallId, params) => {
       const key = readStringParam(params as Record<string, unknown>, "key", { required: true });
-      const rawValue = readStringParam(params as Record<string, unknown>, "value", { required: true });
+      const rawValue = readStringParam(params as Record<string, unknown>, "value", {
+        required: true,
+      });
       const important = readStringParam(params as Record<string, unknown>, "important") === "true";
       const ttlStr = readStringParam(params as Record<string, unknown>, "ttl_seconds");
 
@@ -298,12 +305,16 @@ export function createSquadBroadcastTool(ctx: SquadToolContext): AnyAgentTool {
       },
       message_type: {
         type: "string",
-        description: "Message type: 'notification', 'result', 'question', or 'error'. Defaults to 'notification'",
+        description:
+          "Message type: 'notification', 'result', 'question', or 'error'. Defaults to 'notification'",
       },
     },
     execute: async (_toolCallId, params) => {
-      const message = readStringParam(params as Record<string, unknown>, "message", { required: true });
-      const type = readStringParam(params as Record<string, unknown>, "message_type") ?? "notification";
+      const message = readStringParam(params as Record<string, unknown>, "message", {
+        required: true,
+      });
+      const type =
+        readStringParam(params as Record<string, unknown>, "message_type") ?? "notification";
 
       const validTypes = ["notification", "result", "question", "error"];
       const messageType = validTypes.includes(type) ? type : "notification";
@@ -358,7 +369,12 @@ export function createSquadStatusTool(ctx: SquadToolContext): AnyAgentTool {
           completed: queueStats.completed,
           failed: queueStats.failed,
           cancelled: queueStats.cancelled,
-          total: queueStats.pending + queueStats.claimed + queueStats.completed + queueStats.failed + queueStats.cancelled,
+          total:
+            queueStats.pending +
+            queueStats.claimed +
+            queueStats.completed +
+            queueStats.failed +
+            queueStats.cancelled,
         },
         myAgentId: ctx.agentId,
       });
@@ -388,7 +404,9 @@ export function createWaitForTaskTool(ctx: SquadToolContext): AnyAgentTool {
       },
     },
     execute: async (_toolCallId, params) => {
-      const taskId = readStringParam(params as Record<string, unknown>, "task_id", { required: true });
+      const taskId = readStringParam(params as Record<string, unknown>, "task_id", {
+        required: true,
+      });
 
       const info = ctx.taskQueue.getTask(taskId);
       if (!info) {

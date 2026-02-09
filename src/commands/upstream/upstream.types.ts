@@ -1,5 +1,3 @@
-import type { ClosedClawConfig } from "../../config/config.js";
-
 export interface UpstreamTrackingState {
   forkPoint: string; // Version/commit where fork started
   lastSync: string; // ISO timestamp

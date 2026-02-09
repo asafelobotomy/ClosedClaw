@@ -8,12 +8,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  AgentIPC,
-  createAgentIPC,
-  type AgentMessage,
-  type MessageHandler,
-} from "./ipc.js";
+import { AgentIPC, createAgentIPC, type AgentMessage } from "./ipc.js";
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
@@ -121,16 +116,16 @@ describe("AgentIPC", () => {
 
     it("should throw if sender not registered", () => {
       ipc.register("a2");
-      expect(() =>
-        ipc.send("unknown", "a2", { type: "task", payload: null }),
-      ).toThrow(/not registered/);
+      expect(() => ipc.send("unknown", "a2", { type: "task", payload: null })).toThrow(
+        /not registered/,
+      );
     });
 
     it("should throw if recipient not registered", () => {
       ipc.register("a1");
-      expect(() =>
-        ipc.send("a1", "unknown", { type: "task", payload: null }),
-      ).toThrow(/not registered/);
+      expect(() => ipc.send("a1", "unknown", { type: "task", payload: null })).toThrow(
+        /not registered/,
+      );
     });
 
     it("should drop oldest messages when inbox is full", () => {
@@ -157,9 +152,7 @@ describe("AgentIPC", () => {
       });
 
       // Should not throw
-      expect(() =>
-        ipc.send("a1", "a2", { type: "notification", payload: "test" }),
-      ).not.toThrow();
+      expect(() => ipc.send("a1", "a2", { type: "notification", payload: "test" })).not.toThrow();
     });
 
     it("should include replyTo when provided", () => {
@@ -239,9 +232,9 @@ describe("AgentIPC", () => {
     });
 
     it("should throw if broadcaster not registered", () => {
-      expect(() =>
-        ipc.broadcast("unknown", { type: "notification", payload: null }),
-      ).toThrow(/not registered/);
+      expect(() => ipc.broadcast("unknown", { type: "notification", payload: null })).toThrow(
+        /not registered/,
+      );
     });
   });
 
@@ -264,9 +257,7 @@ describe("AgentIPC", () => {
       ipc.register("a1");
       ipc.register("a2");
 
-      await expect(ipc.request("a1", "a2", {})).rejects.toThrow(
-        /no request handler/,
-      );
+      await expect(ipc.request("a1", "a2", {})).rejects.toThrow(/no request handler/);
     });
 
     it("should throw on duplicate request handler", () => {
@@ -296,9 +287,7 @@ describe("AgentIPC", () => {
         throw new Error("Handler failed");
       });
 
-      await expect(ipc.request("a1", "a2", {})).rejects.toThrow(
-        /Handler failed/,
-      );
+      await expect(ipc.request("a1", "a2", {})).rejects.toThrow(/Handler failed/);
     });
 
     it("should timeout if handler takes too long", async () => {
@@ -402,9 +391,9 @@ describe("AgentIPC", () => {
       limitedIpc.subscribe("a1", "topic-1", vi.fn());
       limitedIpc.subscribe("a1", "topic-2", vi.fn());
 
-      expect(() =>
-        limitedIpc.subscribe("a1", "topic-3", vi.fn()),
-      ).toThrow(/max topic subscriptions/);
+      expect(() => limitedIpc.subscribe("a1", "topic-3", vi.fn())).toThrow(
+        /max topic subscriptions/,
+      );
     });
 
     it("should not break if topic handler throws", () => {

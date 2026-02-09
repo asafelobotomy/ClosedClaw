@@ -11,13 +11,7 @@ import { xchacha20poly1305 } from "@noble/ciphers/chacha";
 import { randomBytes } from "@noble/ciphers/webcrypto";
 import { argon2id } from "@noble/hashes/argon2";
 import { utf8ToBytes } from "@noble/hashes/utils";
-import type {
-  Argon2idParams,
-  EncryptionAlgorithm,
-  EncryptionConfig,
-  EncryptedPayload,
-  KeyDerivationFunction,
-} from "./encryption-types.js";
+import type { Argon2idParams, EncryptionConfig, EncryptedPayload } from "./encryption-types.js";
 import { SECURITY } from "../constants/index.js";
 
 /**

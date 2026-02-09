@@ -6,12 +6,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, _vi } from "vitest";
 import type { TaskInput } from "./task-queue.js";
-import {
-  SquadCoordinator,
-  createSquadCoordinator,
-  type SquadConfig,
-  type ComplexTask,
-} from "./coordinator.js";
+import { SquadCoordinator, createSquadCoordinator, type SquadConfig } from "./coordinator.js";
 import { AgentSpawner, type AgentTaskHandler } from "./spawner.js";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -209,7 +209,7 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
 
   gateway: {
     async startAccount(ctx) {
-      const { cfg, log, accountId, account, setStatus } = ctx;
+      const { cfg, log, accountId, _account, setStatus } = ctx;
       const config = resolveGtkConfig(cfg);
       const bridge = getIpcBridge(cfg);
 

@@ -6,7 +6,6 @@
  */
 
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 import type { PassphraseSource } from "./encryption-types.js";
 import { STATE_DIR } from "../config/config.js";

@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import type { RuntimeEnv } from "../../runtime.js";
-import { theme } from "../../terminal/theme.js";
 import { loadUpstreamConfig, saveUpstreamConfig } from "./upstream.storage.js";
 import { DEFAULT_UPSTREAM_CONFIG, type UpstreamConfig } from "./upstream.types.js";
 
@@ -12,7 +11,7 @@ interface ConfigureOptions {
 
 export async function upstreamConfigureCommand(
   opts: ConfigureOptions,
-  runtime: RuntimeEnv,
+  _runtime: RuntimeEnv,
 ): Promise<void> {
   const config = await loadUpstreamConfig<UpstreamConfig>(DEFAULT_UPSTREAM_CONFIG);
 

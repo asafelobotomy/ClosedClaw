@@ -8,11 +8,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   AgentSpawner,
   createAgentSpawner,
-  type AgentHandle,
-  type AgentResponse,
   type AgentSpawnConfig,
   type AgentTaskHandler,
-  type AgentTaskMessage,
   type SpawnerEvent,
 } from "./spawner.js";
 
@@ -87,9 +84,7 @@ describe("AgentSpawner", () => {
       await smallSpawner.spawn(makeConfig());
       await smallSpawner.spawn(makeConfig());
 
-      await expect(smallSpawner.spawn(makeConfig())).rejects.toThrow(
-        /max capacity/,
-      );
+      await expect(smallSpawner.spawn(makeConfig())).rejects.toThrow(/max capacity/);
 
       await smallSpawner.shutdown();
     });
@@ -118,9 +113,9 @@ describe("AgentSpawner", () => {
         throw new Error("Init failed");
       };
 
-      await expect(
-        spawner.spawn(makeConfig({ onInit: badInit })),
-      ).rejects.toThrow(/Failed to initialize/);
+      await expect(spawner.spawn(makeConfig({ onInit: badInit }))).rejects.toThrow(
+        /Failed to initialize/,
+      );
 
       expect(spawner.agentCount).toBe(0);
     });
@@ -264,9 +259,7 @@ describe("AgentSpawner", () => {
 
     it("should run onTerminate callback", async () => {
       const terminateFn = vi.fn();
-      const handle = await spawner.spawn(
-        makeConfig({ onTerminate: terminateFn }),
-      );
+      const handle = await spawner.spawn(makeConfig({ onTerminate: terminateFn }));
 
       await spawner.terminate(handle.id);
       expect(terminateFn).toHaveBeenCalledTimes(1);
@@ -276,18 +269,14 @@ describe("AgentSpawner", () => {
       const badTerminate = async () => {
         throw new Error("Cleanup failed");
       };
-      const handle = await spawner.spawn(
-        makeConfig({ onTerminate: badTerminate }),
-      );
+      const handle = await spawner.spawn(makeConfig({ onTerminate: badTerminate }));
 
       await spawner.terminate(handle.id);
       expect(spawner.agentCount).toBe(0);
     });
 
     it("should throw if agent not found", async () => {
-      await expect(spawner.terminate("nonexistent")).rejects.toThrow(
-        /not found/,
-      );
+      await expect(spawner.terminate("nonexistent")).rejects.toThrow(/not found/);
     });
 
     it("should no-op if agent already terminated", async () => {
@@ -354,9 +343,7 @@ describe("AgentSpawner", () => {
       handle.heartbeat();
       const after = handle.getStatus();
       expect(after.missedHeartbeats).toBe(0);
-      expect(after.lastHeartbeat.getTime()).toBeGreaterThanOrEqual(
-        before.lastHeartbeat.getTime(),
-      );
+      expect(after.lastHeartbeat.getTime()).toBeGreaterThanOrEqual(before.lastHeartbeat.getTime());
     });
 
     it("should start and stop heartbeat timer", () => {
@@ -384,9 +371,7 @@ describe("AgentSpawner", () => {
 
       quickSpawner.stopHeartbeat();
 
-      const missedEvents = events.filter(
-        (e) => e.type === "agent:heartbeat-missed",
-      );
+      const missedEvents = events.filter((e) => e.type === "agent:heartbeat-missed");
       expect(missedEvents.length).toBeGreaterThan(0);
 
       await quickSpawner.shutdown();
@@ -397,9 +382,7 @@ describe("AgentSpawner", () => {
 
   describe("restart", () => {
     it("should restart an agent with the same config", async () => {
-      const handle = await spawner.spawn(
-        makeConfig({ role: "coder", name: "Bob" }),
-      );
+      const handle = await spawner.spawn(makeConfig({ role: "coder", name: "Bob" }));
       const oldId = handle.id;
 
       const newHandle = await spawner.restartAgent(oldId);
@@ -423,9 +406,7 @@ describe("AgentSpawner", () => {
     });
 
     it("should throw when restarting nonexistent agent", async () => {
-      await expect(spawner.restartAgent("nonexistent")).rejects.toThrow(
-        /not found/,
-      );
+      await expect(spawner.restartAgent("nonexistent")).rejects.toThrow(/not found/);
     });
 
     it("should emit agent:restarted event", async () => {

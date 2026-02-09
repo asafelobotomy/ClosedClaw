@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import type { RuntimeEnv } from "../../runtime.js";
-import { theme } from "../../terminal/theme.js";
 import { GitService, classifyCommit } from "./upstream.git.js";
 import { loadUpstreamTracking, saveUpstreamTracking } from "./upstream.storage.js";
 import { DEFAULT_UPSTREAM_TRACKING, type UpstreamTrackingState } from "./upstream.types.js";
@@ -12,7 +11,7 @@ interface StatusOptions {
 
 export async function upstreamStatusCommand(
   opts: StatusOptions,
-  runtime: RuntimeEnv,
+  _runtime: RuntimeEnv,
 ): Promise<void> {
   const git = new GitService();
   const tracking = await loadUpstreamTracking<UpstreamTrackingState>(DEFAULT_UPSTREAM_TRACKING);

@@ -16,7 +16,6 @@ import {
   listCredentials,
   migrateCredentials,
   KeychainError,
-  type KeychainBackend,
   type KeychainOptions,
 } from "./keychain.js";
 

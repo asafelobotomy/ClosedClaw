@@ -14,7 +14,6 @@ import {
   LongTermMemory,
   createLongTermMemory,
   type Episode,
-  type EpisodeOutcome,
 } from "./long-term-memory.js";
 
 // ─────────────────── Test helpers ───────────────────

@@ -1,6 +1,5 @@
 import { execFile, spawn } from "node:child_process";
 import { promisify } from "node:util";
-import type { UpstreamTrackingState, UpstreamConfig } from "./upstream.types.js";
 
 const execFileAsync = promisify(execFile);
 

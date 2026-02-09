@@ -4,7 +4,6 @@ import type { ClosedClawConfig, GatewayBindMode } from "../config/config.js";
 import { resolveChannelDefaultAccountId } from "../channels/plugins/helpers.js";
 import { listChannelPlugins } from "../channels/plugins/index.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import { encryptAllConfigBackups } from "../config/backup-encryption.js";
 import { resolveConfigPath } from "../config/paths.js";
 import { resolveGatewayAuth } from "../gateway/auth.js";
 import { isLoopbackHost, resolveGatewayBindHost } from "../gateway/net.js";
@@ -195,7 +194,7 @@ export async function noteSecurityWarnings(cfg: ClosedClawConfig) {
 /**
  * Check encryption configuration and backup encryption status.
  */
-async function noteEncryptionStatus(cfg: ClosedClawConfig) {
+async function noteEncryptionStatus(_cfg: ClosedClawConfig) {
   const configPath = resolveConfigPath();
   const backupInfoLines: string[] = [];
 

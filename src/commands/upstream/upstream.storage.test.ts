@@ -7,7 +7,11 @@
  * - Path resolution
  */
 
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import type { UpstreamTrackingState, UpstreamConfig } from "./upstream.types.js";
 import {
   loadUpstreamTracking,
   saveUpstreamTracking,
@@ -16,11 +20,7 @@ import {
   getUpstreamTrackingPath,
   getUpstreamConfigPath,
 } from "./upstream.storage.js";
-import type { UpstreamTrackingState, UpstreamConfig } from "./upstream.types.js";
 import { DEFAULT_UPSTREAM_TRACKING, DEFAULT_UPSTREAM_CONFIG } from "./upstream.types.js";
-import fs from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
 
 // ─── Path Resolution ─────────────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ describe("path resolution", () => {
 
 describe("upstream tracking state", () => {
   let tmpDir: string;
-  let trackingFile: string;
+  let _trackingFile: string;
 
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "closedclaw-test-"));
@@ -87,7 +87,7 @@ describe("upstream tracking state", () => {
 
 describe("tracking save/load round-trip", () => {
   let tmpDir: string;
-  let originalHomedir: string;
+  let _originalHomedir: string;
 
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "closedclaw-test-"));

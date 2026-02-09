@@ -29,9 +29,7 @@ describe("executeWorkflow - basic", () => {
   it("executes a single tool step", async () => {
     const workflow = parseWorkflowDefinition({
       name: "simple",
-      steps: [
-        { name: "s1", tool: "fetch_data", params: { url: "https://example.com" } },
-      ],
+      steps: [{ name: "s1", tool: "fetch_data", params: { url: "https://example.com" } }],
     });
 
     const ctx = makeContext();
@@ -48,9 +46,7 @@ describe("executeWorkflow - basic", () => {
   it("executes a single agent step", async () => {
     const workflow = parseWorkflowDefinition({
       name: "agent-wf",
-      steps: [
-        { name: "s1", agent: "main", prompt: "Hello world" },
-      ],
+      steps: [{ name: "s1", agent: "main", prompt: "Hello world" }],
     });
 
     const ctx = makeContext();
@@ -65,8 +61,18 @@ describe("executeWorkflow - basic", () => {
       name: "sequential",
       steps: [
         { name: "fetch", tool: "fetch_data", params: { url: "https://api.test" } },
-        { name: "summarize", agent: "main", prompt: "Summarize: {{steps.fetch.output}}", dependsOn: ["fetch"] },
-        { name: "send", tool: "send_message", params: { message: "{{steps.summarize.output}}" }, dependsOn: ["summarize"] },
+        {
+          name: "summarize",
+          agent: "main",
+          prompt: "Summarize: {{steps.fetch.output}}",
+          dependsOn: ["fetch"],
+        },
+        {
+          name: "send",
+          tool: "send_message",
+          params: { message: "{{steps.summarize.output}}" },
+          dependsOn: ["summarize"],
+        },
       ],
     });
 
@@ -122,7 +128,9 @@ describe("executeWorkflow - errors", () => {
 
     const ctx = makeContext({
       toolHandler: vi.fn(async (tool) => {
-        if (tool === "bad_tool") {throw new Error("Tool failed!");}
+        if (tool === "bad_tool") {
+          throw new Error("Tool failed!");
+        }
         return "ok";
       }),
     });
@@ -147,7 +155,9 @@ describe("executeWorkflow - errors", () => {
 
     const ctx = makeContext({
       toolHandler: vi.fn(async (tool) => {
-        if (tool === "bad_tool") {throw new Error("Expected failure");}
+        if (tool === "bad_tool") {
+          throw new Error("Expected failure");
+        }
         return "ok";
       }),
     });
@@ -171,7 +181,7 @@ describe("executeWorkflow - errors", () => {
     });
 
     const ctx = makeContext({
-      toolHandler: vi.fn(async (tool) => {
+      toolHandler: vi.fn(async (_tool) => {
         // root succeeds, then a fails
         throw new Error("Something went wrong");
       }),
@@ -186,8 +196,9 @@ describe("executeWorkflow - errors", () => {
 
     // Simpler approach: just make everything after root fail
     const ctx2 = makeContext({
-      toolHandler: vi.fn()
-        .mockResolvedValueOnce("root ok")     // root
+      toolHandler: vi
+        .fn()
+        .mockResolvedValueOnce("root ok") // root
         .mockRejectedValueOnce(new Error("a failed")), // a
     });
 
@@ -261,18 +272,22 @@ describe("executeWorkflow - retry", () => {
   it("retries failing steps", async () => {
     const workflow = parseWorkflowDefinition({
       name: "retry-wf",
-      steps: [{
-        name: "flaky",
-        tool: "flaky_tool",
-        retry: { maxRetries: 2, baseDelayMs: 10, maxDelayMs: 100, backoffMultiplier: 2 },
-      }],
+      steps: [
+        {
+          name: "flaky",
+          tool: "flaky_tool",
+          retry: { maxRetries: 2, baseDelayMs: 10, maxDelayMs: 100, backoffMultiplier: 2 },
+        },
+      ],
     });
 
     let callCount = 0;
     const ctx = makeContext({
       toolHandler: vi.fn(async () => {
         callCount++;
-        if (callCount < 3) {throw new Error("Transient error");}
+        if (callCount < 3) {
+          throw new Error("Transient error");
+        }
         return "success";
       }),
     });
@@ -287,11 +302,13 @@ describe("executeWorkflow - retry", () => {
   it("fails after exhausting retries", async () => {
     const workflow = parseWorkflowDefinition({
       name: "exhaust-retry",
-      steps: [{
-        name: "always-fail",
-        tool: "bad",
-        retry: { maxRetries: 1, baseDelayMs: 10, maxDelayMs: 100, backoffMultiplier: 2 },
-      }],
+      steps: [
+        {
+          name: "always-fail",
+          tool: "bad",
+          retry: { maxRetries: 1, baseDelayMs: 10, maxDelayMs: 100, backoffMultiplier: 2 },
+        },
+      ],
     });
 
     const ctx = makeContext({

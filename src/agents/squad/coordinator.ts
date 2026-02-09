@@ -12,7 +12,7 @@
 
 import type { AgentHandle, AgentSpawnConfig, AgentSpawner, AgentResponse } from "./spawner.js";
 import { AGENTS } from "../../constants/index.js";
-import { AgentIPC, type AgentMessage } from "./ipc.js";
+import { AgentIPC } from "./ipc.js";
 import { TaskQueue, type Task, type TaskInput, type TaskPriority } from "./task-queue.js";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -153,7 +153,7 @@ export interface CoordinatorConfig {
 async function executePipeline(
   squad: Squad,
   tasks: TaskInput[],
-  spawner: AgentSpawner,
+  _spawner: AgentSpawner,
 ): Promise<SquadResult> {
   const startTime = Date.now();
   const contributions: AgentContribution[] = [];
@@ -232,7 +232,7 @@ async function executePipeline(
 async function executeParallel(
   squad: Squad,
   tasks: TaskInput[],
-  spawner: AgentSpawner,
+  _spawner: AgentSpawner,
 ): Promise<SquadResult> {
   const startTime = Date.now();
   const contributions: AgentContribution[] = [];
@@ -372,7 +372,7 @@ async function executeMapReduce(
 async function executeConsensus(
   squad: Squad,
   tasks: TaskInput[],
-  spawner: AgentSpawner,
+  _spawner: AgentSpawner,
 ): Promise<SquadResult> {
   const startTime = Date.now();
   const contributions: AgentContribution[] = [];

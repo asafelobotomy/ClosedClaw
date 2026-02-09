@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import type { RuntimeEnv } from "../../runtime.js";
-import { theme } from "../../terminal/theme.js";
 import { GitService, classifyCommit } from "./upstream.git.js";
 import { loadUpstreamTracking, saveUpstreamTracking } from "./upstream.storage.js";
 import { DEFAULT_UPSTREAM_TRACKING } from "./upstream.types.js";
@@ -13,7 +12,7 @@ interface SyncOptions {
   dryRun?: boolean;
 }
 
-export async function upstreamSyncCommand(opts: SyncOptions, runtime: RuntimeEnv): Promise<void> {
+export async function upstreamSyncCommand(opts: SyncOptions, _runtime: RuntimeEnv): Promise<void> {
   const git = new GitService();
   const tracking = await loadUpstreamTracking(DEFAULT_UPSTREAM_TRACKING);
 

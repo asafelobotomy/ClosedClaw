@@ -7,7 +7,6 @@ import {
   classifyIntent,
   describeClassification,
   type ModelRoutingConfig,
-  type IntentClassification,
 } from "./intent-router.js";
 
 const ROUTING: ModelRoutingConfig = {
@@ -117,10 +116,7 @@ describe("classifyIntent - creative", () => {
 
 describe("classifyIntent - sensitive", () => {
   it("classifies password-related messages", () => {
-    const result = classifyIntent(
-      "Generate a strong password for my bank account",
-      ROUTING,
-    );
+    const result = classifyIntent("Generate a strong password for my bank account", ROUTING);
     expect(result.intent).toBe("sensitive");
     expect(result.model).toBe("ollama:llama3");
   });
@@ -134,10 +130,7 @@ describe("classifyIntent - sensitive", () => {
   });
 
   it("classifies encryption tasks", () => {
-    const result = classifyIntent(
-      "Encrypt this message with my API key and sign it",
-      ROUTING,
-    );
+    const result = classifyIntent("Encrypt this message with my API key and sign it", ROUTING);
     expect(result.intent).toBe("sensitive");
   });
 });
@@ -146,10 +139,7 @@ describe("classifyIntent - sensitive", () => {
 
 describe("classifyIntent - code", () => {
   it("classifies implementation requests", () => {
-    const result = classifyIntent(
-      "Implement a binary search function in TypeScript",
-      ROUTING,
-    );
+    const result = classifyIntent("Implement a binary search function in TypeScript", ROUTING);
     expect(result.intent).toBe("code");
     expect(result.model).toBe("claude-sonnet-4");
   });
@@ -233,10 +223,7 @@ describe("confidence and signals", () => {
   });
 
   it("marks strong matches correctly", () => {
-    const strong = classifyIntent(
-      "Write a creative story about a dragon",
-      ROUTING,
-    );
+    const strong = classifyIntent("Write a creative story about a dragon", ROUTING);
     expect(strong.isStrongMatch).toBe(true);
   });
 });
@@ -245,10 +232,7 @@ describe("confidence and signals", () => {
 
 describe("describeClassification", () => {
   it("produces human-readable description", () => {
-    const result = classifyIntent(
-      "Implement a function to sort arrays in TypeScript",
-      ROUTING,
-    );
+    const result = classifyIntent("Implement a function to sort arrays in TypeScript", ROUTING);
     const desc = describeClassification(result);
 
     expect(desc).toContain("Intent:");

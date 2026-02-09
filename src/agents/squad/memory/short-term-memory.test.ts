@@ -6,11 +6,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, _vi } from "vitest";
 import { AGENTS } from "../../../constants/index.js";
-import {
-  ShortTermMemory,
-  createShortTermMemory,
-  type ShortTermEntry,
-} from "./short-term-memory.js";
+import { ShortTermMemory, createShortTermMemory } from "./short-term-memory.js";
 
 describe("ShortTermMemory", () => {
   let stm: ShortTermMemory;

@@ -38,7 +38,7 @@ type EncryptionSetupOptions = {
 /**
  * Check encryption status of ClosedClaw state stores.
  */
-async function checkEncryptionStatus(runtime: RuntimeEnv): Promise<{
+async function checkEncryptionStatus(_runtime: RuntimeEnv): Promise<{
   encrypted: string[];
   plaintext: string[];
   missing: string[];
