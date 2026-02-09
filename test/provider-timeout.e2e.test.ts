@@ -5,7 +5,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { GatewayClient } from "../src/gateway/client.js";
 import { startGatewayServer } from "../src/gateway/server.js";
-import { getDeterministicFreePortBlock } from "../src/test-utils/ports.js";
+import { getDeterministicFreePortBlock } from "./helpers/ports.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../src/utils/message-channel.js";
 
 type OpenAIResponseStreamEvent =

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { HealthSummary } from "./health.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { stripAnsi } from "../terminal/ansi.js";
-import { createTestRegistry } from "../test-utils/channel-plugins.js";
+import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
 import { healthCommand } from "./health.js";
 
 const callGatewayMock = vi.fn();

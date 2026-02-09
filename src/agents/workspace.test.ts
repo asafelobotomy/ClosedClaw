@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makeTempWorkspace, writeWorkspaceFile } from "../test-helpers/workspace.js";
+import { makeTempWorkspace, writeWorkspaceFile } from "../../test/helpers/workspace.js";
 import {
   DEFAULT_MEMORY_ALT_FILENAME,
   DEFAULT_MEMORY_FILENAME,

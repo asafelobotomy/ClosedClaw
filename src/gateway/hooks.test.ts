@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
 import type { ClosedClawConfig } from "../config/config.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
-import { createIMessageTestPlugin, createTestRegistry } from "../test-utils/channel-plugins.js";
+import { createIMessageTestPlugin, createTestRegistry } from "../../test/helpers/channel-plugins.js";
 import {
   extractHookToken,
   normalizeAgentPayload,

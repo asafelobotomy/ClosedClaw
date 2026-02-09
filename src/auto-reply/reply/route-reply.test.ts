@@ -13,7 +13,7 @@ import {
   createIMessageTestPlugin,
   createOutboundTestPlugin,
   createTestRegistry,
-} from "../../test-utils/channel-plugins.js";
+} from "../../../test/helpers/channel-plugins.js";
 import { SILENT_REPLY_TOKEN } from "../tokens.js";
 
 const mocks = vi.hoisted(() => ({

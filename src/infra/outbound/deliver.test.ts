@@ -9,7 +9,7 @@ import {
   createIMessageTestPlugin,
   createOutboundTestPlugin,
   createTestRegistry,
-} from "../../test-utils/channel-plugins.js";
+} from "../../../test/helpers/channel-plugins.js";
 
 const mocks = vi.hoisted(() => ({
   appendAssistantMessageToSessionTranscript: vi.fn(async () => ({ ok: true, sessionFile: "x" })),

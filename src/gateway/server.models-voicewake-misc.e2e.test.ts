@@ -10,7 +10,7 @@ import { getChannelPlugin } from "../channels/plugins/index.js";
 import { resolveCanvasHostUrl } from "../infra/canvas-host-url.js";
 import { GatewayLockError } from "../infra/gateway-lock.js";
 import { getActivePluginRegistry, setActivePluginRegistry } from "../plugins/runtime.js";
-import { createOutboundTestPlugin } from "../test-utils/channel-plugins.js";
+import { createOutboundTestPlugin } from "../../test/helpers/channel-plugins.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import {
   connectOk,

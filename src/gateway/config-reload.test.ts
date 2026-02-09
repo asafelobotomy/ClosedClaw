@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
 import { listChannelPlugins } from "../channels/plugins/index.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
-import { createTestRegistry } from "../test-utils/channel-plugins.js";
+import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
 import {
   buildGatewayReloadPlan,
   diffConfigPaths,

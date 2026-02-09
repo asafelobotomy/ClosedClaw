@@ -5,7 +5,7 @@ import {
   signDevicePayload,
 } from "../infra/device-identity.js";
 import { rawDataToString } from "../infra/ws.js";
-import { getDeterministicFreePortBlock } from "../test-utils/ports.js";
+import { getDeterministicFreePortBlock } from "../../test/helpers/ports.js";
 import {
   GATEWAY_CLIENT_MODES,
   GATEWAY_CLIENT_NAMES,

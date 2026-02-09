@@ -6,7 +6,7 @@ import type {
 } from "../channels/plugins/types.js";
 import type { CliDeps } from "../cli/deps.js";
 import type { RuntimeEnv } from "../runtime.js";
-import { createTestRegistry } from "../test-utils/channel-plugins.js";
+import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
 const loadMessageCommand = async () => await import("./message.js");
 
 let testConfig: Record<string, unknown> = {};

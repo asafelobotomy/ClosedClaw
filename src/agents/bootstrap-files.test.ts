@@ -5,7 +5,7 @@ import {
   registerInternalHook,
   type AgentBootstrapHookContext,
 } from "../hooks/internal-hooks.js";
-import { makeTempWorkspace } from "../test-helpers/workspace.js";
+import { makeTempWorkspace } from "../../test/helpers/workspace.js";
 import { resolveBootstrapContextForRun, resolveBootstrapFilesForRun } from "./bootstrap-files.js";
 
 describe("resolveBootstrapFilesForRun", () => {

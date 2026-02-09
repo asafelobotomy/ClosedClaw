@@ -200,21 +200,7 @@ async function saveSessionStoreUnlocked(
 
   // Windows: avoid atomic rename swaps (can be flaky under concurrent access).
   // We serialize writers via the session-store lock instead.
-  if (process.platform === "win32") {
-    try {
-      await fs.promises.writeFile(storePath, json, "utf-8");
-    } catch (err) {
-      const code =
-        err && typeof err === "object" && "code" in err
-          ? String((err as { code?: unknown }).code)
-          : null;
-      if (code === "ENOENT") {
-        return;
-      }
-      throw err;
-    }
-    return;
-  }
+
 
   const tmp = `${storePath}.${process.pid}.${crypto.randomUUID()}.tmp`;
   try {

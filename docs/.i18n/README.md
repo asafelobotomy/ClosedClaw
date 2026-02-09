@@ -28,4 +28,4 @@ Fields:
 ## Notes
 
 - Glossary entries are passed to the model as **prompt guidance** (no deterministic rewrites).
-- The translation memory is updated by `scripts/docs-i18n`.
+- The translation memory is updated by `tools/docs/i18n`.
