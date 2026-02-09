@@ -5,8 +5,8 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { AGENTS } from "../../../constants/index.js";
 import { WorkingMemory, createWorkingMemory } from "./working-memory.js";
+import { AGENTS } from "../../../constants/index.js";
 
 describe("WorkingMemory", () => {
   let wm: WorkingMemory;
@@ -18,7 +18,9 @@ describe("WorkingMemory", () => {
   describe("constructor", () => {
     it("creates with default max size 10", () => {
       const defaultWm = new WorkingMemory();
-      expect(defaultWm.capacity()).toBe(AGENTS.MEMORY.WORKING.DEFAULT_CAPACITY);
+      expect(defaultWm.capacity()).toBe(
+        AGENTS.MEMORY.WORKING.DEFAULT_CAPACITY,
+      );
     });
 
     it("creates with custom max size", () => {
