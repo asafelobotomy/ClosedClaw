@@ -46,7 +46,7 @@ ClosedClaw ships with four bundled hooks that are automatically discovered:
 - **💾 session-memory**: Saves session context to your agent workspace (default `~/.ClosedClaw/workspace/memory/`) when you issue `/new`
 - **📝 command-logger**: Logs all command events to `~/.ClosedClaw/logs/commands.log`
 - **🚀 boot-md**: Runs `BOOT.md` when the gateway starts (requires internal hooks enabled)
-- **😈 soul-evil**: Swaps injected `SOUL.md` content with `SOUL_EVIL.md` during a purge window or by random chance
+- **🎭 soul-jester**: Swaps injected `SOUL.md` content with `SOUL_JESTER.md` during a playful window or by random chance
 
 List available hooks:
 
@@ -128,7 +128,7 @@ The `HOOK.md` file contains metadata in YAML frontmatter plus Markdown documenta
 ---
 name: my-hook
 description: "Short description of what this hook does"
-homepage: https://docs.ClosedClaw.ai/hooks#my-hook
+homepage: https://docs.OpenClaw.ai/hooks#my-hook
 metadata:
   { "ClosedClaw": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
@@ -527,20 +527,20 @@ grep '"action":"new"' ~/.ClosedClaw/logs/commands.log | jq .
 ClosedClaw hooks enable command-logger
 ```
 
-### soul-evil
+### soul-jester
 
-Swaps injected `SOUL.md` content with `SOUL_EVIL.md` during a purge window or by random chance.
+Swaps injected `SOUL.md` content with `SOUL_JESTER.md` during a playful window or by random chance.
 
 **Events**: `agent:bootstrap`
 
-**Docs**: [SOUL Evil Hook](/hooks/soul-evil)
+**Docs**: [SOUL Jester Hook](/hooks/soul-jester)
 
 **Output**: No files written; swaps happen in-memory only.
 
 **Enable**:
 
 ```bash
-ClosedClaw hooks enable soul-evil
+ClosedClaw hooks enable soul-jester
 ```
 
 **Config**:
@@ -551,9 +551,9 @@ ClosedClaw hooks enable soul-evil
     "internal": {
       "enabled": true,
       "entries": {
-        "soul-evil": {
+        "soul-jester": {
           "enabled": true,
-          "file": "SOUL_EVIL.md",
+          "file": "SOUL_JESTER.md",
           "chance": 0.1,
           "purge": { "at": "21:00", "duration": "15m" }
         }

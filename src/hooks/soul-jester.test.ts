@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 import { DEFAULT_SOUL_FILENAME, type WorkspaceBootstrapFile } from "../agents/workspace.js";
 import { makeTempWorkspace, writeWorkspaceFile } from "../test-helpers/workspace.js";
 import {
-  applySoulEvilOverride,
-  decideSoulEvil,
-  DEFAULT_SOUL_EVIL_FILENAME,
-  resolveSoulEvilConfigFromHook,
-} from "./soul-evil.js";
+  applySoulJesterOverride,
+  decideSoulJester,
+  DEFAULT_SOUL_JESTER_FILENAME,
+  resolveSoulJesterConfigFromHook,
+} from "./soul-jester.js";
 
 const makeFiles = (overrides?: Partial<WorkspaceBootstrapFile>) => [
   {
@@ -19,35 +19,35 @@ const makeFiles = (overrides?: Partial<WorkspaceBootstrapFile>) => [
   },
 ];
 
-describe("decideSoulEvil", () => {
+describe("decideSoulJester", () => {
   it("returns false when no config", () => {
-    const result = decideSoulEvil({});
-    expect(result.useEvil).toBe(false);
+    const result = decideSoulJester({});
+    expect(result.useJester).toBe(false);
   });
 
   it("activates on random chance", () => {
-    const result = decideSoulEvil({
+    const result = decideSoulJester({
       config: { chance: 0.5 },
       random: () => 0.2,
     });
-    expect(result.useEvil).toBe(true);
+    expect(result.useJester).toBe(true);
     expect(result.reason).toBe("chance");
   });
 
   it("activates during purge window", () => {
-    const result = decideSoulEvil({
+    const result = decideSoulJester({
       config: {
         purge: { at: "00:00", duration: "10m" },
       },
       userTimezone: "UTC",
       now: new Date("2026-01-01T00:05:00Z"),
     });
-    expect(result.useEvil).toBe(true);
+    expect(result.useJester).toBe(true);
     expect(result.reason).toBe("purge");
   });
 
   it("prefers purge window over random chance", () => {
-    const result = decideSoulEvil({
+    const result = decideSoulJester({
       config: {
         chance: 0,
         purge: { at: "00:00", duration: "10m" },
@@ -56,68 +56,68 @@ describe("decideSoulEvil", () => {
       now: new Date("2026-01-01T00:05:00Z"),
       random: () => 0,
     });
-    expect(result.useEvil).toBe(true);
+    expect(result.useJester).toBe(true);
     expect(result.reason).toBe("purge");
   });
 
   it("skips purge window when outside duration", () => {
-    const result = decideSoulEvil({
+    const result = decideSoulJester({
       config: {
         purge: { at: "00:00", duration: "10m" },
       },
       userTimezone: "UTC",
       now: new Date("2026-01-01T00:30:00Z"),
     });
-    expect(result.useEvil).toBe(false);
+    expect(result.useJester).toBe(false);
   });
 
   it("honors sub-minute purge durations", () => {
     const config = {
       purge: { at: "00:00", duration: "30s" },
     };
-    const active = decideSoulEvil({
+    const active = decideSoulJester({
       config,
       userTimezone: "UTC",
       now: new Date("2026-01-01T00:00:20Z"),
     });
-    const inactive = decideSoulEvil({
+    const inactive = decideSoulJester({
       config,
       userTimezone: "UTC",
       now: new Date("2026-01-01T00:00:40Z"),
     });
-    expect(active.useEvil).toBe(true);
+    expect(active.useJester).toBe(true);
     expect(active.reason).toBe("purge");
-    expect(inactive.useEvil).toBe(false);
+    expect(inactive.useJester).toBe(false);
   });
 
   it("handles purge windows that wrap past midnight", () => {
-    const result = decideSoulEvil({
+    const result = decideSoulJester({
       config: {
         purge: { at: "23:55", duration: "10m" },
       },
       userTimezone: "UTC",
       now: new Date("2026-01-02T00:02:00Z"),
     });
-    expect(result.useEvil).toBe(true);
+    expect(result.useJester).toBe(true);
     expect(result.reason).toBe("purge");
   });
 
   it("clamps chance above 1", () => {
-    const result = decideSoulEvil({
+    const result = decideSoulJester({
       config: { chance: 2 },
       random: () => 0.5,
     });
-    expect(result.useEvil).toBe(true);
+    expect(result.useJester).toBe(true);
     expect(result.reason).toBe("chance");
   });
 });
 
-describe("applySoulEvilOverride", () => {
-  it("replaces SOUL content when evil is active and file exists", async () => {
+describe("applySoulJesterOverride", () => {
+  it("replaces SOUL content when jester is active and file exists", async () => {
     const tempDir = await makeTempWorkspace("ClosedClaw-soul-");
     await writeWorkspaceFile({
       dir: tempDir,
-      name: DEFAULT_SOUL_EVIL_FILENAME,
+      name: DEFAULT_SOUL_JESTER_FILENAME,
       content: "chaotic",
     });
 
@@ -125,7 +125,7 @@ describe("applySoulEvilOverride", () => {
       path: path.join(tempDir, DEFAULT_SOUL_FILENAME),
     });
 
-    const updated = await applySoulEvilOverride({
+    const updated = await applySoulJesterOverride({
       files,
       workspaceDir: tempDir,
       config: { chance: 1 },
@@ -137,13 +137,13 @@ describe("applySoulEvilOverride", () => {
     expect(soul?.content).toBe("chaotic");
   });
 
-  it("leaves SOUL content when evil file is missing", async () => {
+  it("leaves SOUL content when jester file is missing", async () => {
     const tempDir = await makeTempWorkspace("ClosedClaw-soul-");
     const files = makeFiles({
       path: path.join(tempDir, DEFAULT_SOUL_FILENAME),
     });
 
-    const updated = await applySoulEvilOverride({
+    const updated = await applySoulJesterOverride({
       files,
       workspaceDir: tempDir,
       config: { chance: 1 },
@@ -155,11 +155,11 @@ describe("applySoulEvilOverride", () => {
     expect(soul?.content).toBe("friendly");
   });
 
-  it("uses custom evil filename when configured", async () => {
+  it("uses custom jester filename when configured", async () => {
     const tempDir = await makeTempWorkspace("ClosedClaw-soul-");
     await writeWorkspaceFile({
       dir: tempDir,
-      name: "SOUL_EVIL_CUSTOM.md",
+      name: "SOUL_JESTER_CUSTOM.md",
       content: "chaotic",
     });
 
@@ -167,10 +167,10 @@ describe("applySoulEvilOverride", () => {
       path: path.join(tempDir, DEFAULT_SOUL_FILENAME),
     });
 
-    const updated = await applySoulEvilOverride({
+    const updated = await applySoulJesterOverride({
       files,
       workspaceDir: tempDir,
-      config: { chance: 1, file: "SOUL_EVIL_CUSTOM.md" },
+      config: { chance: 1, file: "SOUL_JESTER_CUSTOM.md" },
       userTimezone: "UTC",
       random: () => 0,
     });
@@ -179,11 +179,11 @@ describe("applySoulEvilOverride", () => {
     expect(soul?.content).toBe("chaotic");
   });
 
-  it("warns and skips when evil file is empty", async () => {
+  it("warns and skips when jester file is empty", async () => {
     const tempDir = await makeTempWorkspace("ClosedClaw-soul-");
     await writeWorkspaceFile({
       dir: tempDir,
-      name: DEFAULT_SOUL_EVIL_FILENAME,
+      name: DEFAULT_SOUL_JESTER_FILENAME,
       content: " ",
     });
 
@@ -192,7 +192,7 @@ describe("applySoulEvilOverride", () => {
       path: path.join(tempDir, DEFAULT_SOUL_FILENAME),
     });
 
-    const updated = await applySoulEvilOverride({
+    const updated = await applySoulJesterOverride({
       files,
       workspaceDir: tempDir,
       config: { chance: 1 },
@@ -210,7 +210,7 @@ describe("applySoulEvilOverride", () => {
     const tempDir = await makeTempWorkspace("ClosedClaw-soul-");
     await writeWorkspaceFile({
       dir: tempDir,
-      name: DEFAULT_SOUL_EVIL_FILENAME,
+      name: DEFAULT_SOUL_JESTER_FILENAME,
       content: "chaotic",
     });
 
@@ -223,7 +223,7 @@ describe("applySoulEvilOverride", () => {
       },
     ];
 
-    const updated = await applySoulEvilOverride({
+    const updated = await applySoulJesterOverride({
       files,
       workspaceDir: tempDir,
       config: { chance: 1 },
@@ -235,18 +235,18 @@ describe("applySoulEvilOverride", () => {
   });
 });
 
-describe("resolveSoulEvilConfigFromHook", () => {
+describe("resolveSoulJesterConfigFromHook", () => {
   it("returns null and warns when config is invalid", () => {
     const warnings: string[] = [];
-    const result = resolveSoulEvilConfigFromHook(
+    const result = resolveSoulJesterConfigFromHook(
       { file: 42, chance: "nope", purge: "later" },
       { warn: (message) => warnings.push(message) },
     );
     expect(result).toBeNull();
     expect(warnings).toEqual([
-      "soul-evil config: file must be a string",
-      "soul-evil config: chance must be a number",
-      "soul-evil config: purge must be an object",
+      "soul-jester config: file must be a string",
+      "soul-jester config: chance must be a number",
+      "soul-jester config: purge must be an object",
     ]);
   });
 });

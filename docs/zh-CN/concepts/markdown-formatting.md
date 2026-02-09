@@ -43,7 +43,7 @@ ClosedClaw 通过将出站 Markdown 转换为共享的中间表示（IR），然
 输入 Markdown：
 
 ```markdown
-Hello **world** — see [docs](https://docs.ClosedClaw.ai).
+Hello **world** — see [docs](https://docs.OpenClaw.ai).
 ```
 
 IR（示意）：
@@ -52,7 +52,7 @@ IR（示意）：
 {
   "text": "Hello world — see docs.",
   "styles": [{ "start": 6, "end": 11, "style": "bold" }],
-  "links": [{ "start": 19, "end": 23, "href": "https://docs.ClosedClaw.ai" }]
+  "links": [{ "start": 19, "end": 23, "href": "https://docs.OpenClaw.ai" }]
 }
 ```
 

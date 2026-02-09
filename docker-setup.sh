@@ -196,7 +196,7 @@ echo "Telegram (bot token):"
 echo "  ${COMPOSE_HINT} run --rm ClosedClaw-cli channels add --channel telegram --token <token>"
 echo "Discord (bot token):"
 echo "  ${COMPOSE_HINT} run --rm ClosedClaw-cli channels add --channel discord --token <token>"
-echo "Docs: https://docs.ClosedClaw.ai/channels"
+echo "Docs: https://docs.OpenClaw.ai/channels"
 
 echo ""
 echo "==> Starting gateway"

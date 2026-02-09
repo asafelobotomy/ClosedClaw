@@ -459,6 +459,81 @@ function collectElevatedFindings(cfg: ClosedClawConfig): SecurityAuditFinding[] 
   return findings;
 }
 
+function collectSandboxSecurityFindings(cfg: ClosedClawConfig): SecurityAuditFinding[] {
+  const findings: SecurityAuditFinding[] = [];
+
+  // Check default sandbox mode
+  const defaultMode = cfg.agents?.defaults?.sandbox?.mode;
+
+  if (defaultMode === "off") {
+    findings.push({
+      checkId: "sandbox.mode_disabled",
+      severity: "critical",
+      title: "Sandbox is disabled by default",
+      detail: `agents.defaults.sandbox.mode="off" disables sandboxing for all tool execution. This allows arbitrary code execution without isolation.`,
+      remediation: `Set agents.defaults.sandbox.mode="all" to enable mandatory sandboxing.`,
+    });
+  } else if (defaultMode === "non-main") {
+    findings.push({
+      checkId: "sandbox.mode_non_main",
+      severity: "warn",
+      title: "Sandbox only enabled for non-main sessions",
+      detail: `agents.defaults.sandbox.mode="non-main" leaves main session unsandboxed. If the main session is compromised, full system access is possible.`,
+      remediation: `Set agents.defaults.sandbox.mode="all" for maximum security.`,
+    });
+  }
+
+  // Check workspace access
+  const workspaceAccess = cfg.agents?.defaults?.sandbox?.workspaceAccess;
+  if (workspaceAccess === "rw") {
+    findings.push({
+      checkId: "sandbox.workspace_writable",
+      severity: "warn",
+      title: "Sandbox has read-write workspace access",
+      detail: `agents.defaults.sandbox.workspaceAccess="rw" allows sandboxed code to modify your workspace files.`,
+      remediation: `Set agents.defaults.sandbox.workspaceAccess="ro" or "none" unless you need file modifications.`,
+    });
+  }
+
+  // Check Docker network access
+  const dockerNetwork = cfg.agents?.defaults?.sandbox?.docker?.network;
+  if (dockerNetwork && dockerNetwork !== "none") {
+    findings.push({
+      checkId: "sandbox.network_enabled",
+      severity: "warn",
+      title: "Sandbox has network access",
+      detail: `agents.defaults.sandbox.docker.network="${dockerNetwork}" allows sandboxed processes to make network requests, potentially exfiltrating data.`,
+      remediation: `Set agents.defaults.sandbox.docker.network="none" unless network access is required.`,
+    });
+  }
+
+  // Check if all important capabilities are dropped
+  const capDrop = cfg.agents?.defaults?.sandbox?.docker?.capDrop;
+  if (Array.isArray(capDrop) && !capDrop.includes("ALL")) {
+    findings.push({
+      checkId: "sandbox.capabilities_not_dropped",
+      severity: "warn",
+      title: "Not all Linux capabilities are dropped",
+      detail: `agents.defaults.sandbox.docker.capDrop should include "ALL" to drop dangerous capabilities.`,
+      remediation: `Set agents.defaults.sandbox.docker.capDrop=["ALL"] for maximum isolation.`,
+    });
+  }
+
+  // Check read-only root filesystem
+  const readOnlyRoot = cfg.agents?.defaults?.sandbox?.docker?.readOnlyRoot;
+  if (readOnlyRoot === false) {
+    findings.push({
+      checkId: "sandbox.filesystem_writable",
+      severity: "warn",
+      title: "Sandbox filesystem is not read-only",
+      detail: `agents.defaults.sandbox.docker.readOnlyRoot=false allows sandboxed processes to modify the container filesystem.`,
+      remediation: `Set agents.defaults.sandbox.docker.readOnlyRoot=true for immutable containers.`,
+    });
+  }
+
+  return findings;
+}
+
 async function collectChannelSecurityFindings(params: {
   cfg: ClosedClawConfig;
   plugins: ReturnType<typeof listChannelPlugins>;
@@ -925,6 +1000,7 @@ export async function runSecurityAudit(opts: SecurityAuditOptions): Promise<Secu
   findings.push(...collectBrowserControlFindings(cfg));
   findings.push(...collectLoggingFindings(cfg));
   findings.push(...collectElevatedFindings(cfg));
+  findings.push(...collectSandboxSecurityFindings(cfg));
   findings.push(...collectHooksHardeningFindings(cfg));
   findings.push(...collectSecretsInConfigFindings(cfg));
   findings.push(...collectModelHygieneFindings(cfg));

@@ -46,7 +46,7 @@ export function registerDirectoryCli(program: Command) {
       () =>
         `\n${theme.muted("Docs:")} ${formatDocsLink(
           "/cli/directory",
-          "docs.ClosedClaw.ai/cli/directory",
+          "docs.OpenClaw.ai/cli/directory",
         )}\n`,
     )
     .action(() => {

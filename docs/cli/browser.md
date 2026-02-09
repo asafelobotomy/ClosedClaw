@@ -56,7 +56,7 @@ ClosedClaw browser --browser-profile work tabs
 
 ```bash
 ClosedClaw browser tabs
-ClosedClaw browser open https://docs.ClosedClaw.ai
+ClosedClaw browser open https://docs.OpenClaw.ai
 ClosedClaw browser focus <targetId>
 ClosedClaw browser close <targetId>
 ```

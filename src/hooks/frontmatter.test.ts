@@ -233,7 +233,7 @@ describe("resolveClosedClawMetadata", () => {
     const content = `---
 name: session-memory
 description: "Save session context to memory when /new command is issued"
-homepage: https://docs.ClosedClaw.ai/hooks#session-memory
+homepage: https://docs.OpenClaw.ai/hooks#session-memory
 metadata:
   {
     "ClosedClaw":

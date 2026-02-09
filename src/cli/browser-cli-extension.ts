@@ -88,7 +88,7 @@ export function registerBrowserExtensionCommands(
             `- “Load unpacked” → select: ${displayPath}`,
             `- Pin “ClosedClaw Browser Relay”, then click it on the tab (badge shows ON)`,
             "",
-            `${theme.muted("Docs:")} ${formatDocsLink("/tools/chrome-extension", "docs.ClosedClaw.ai/tools/chrome-extension")}`,
+            `${theme.muted("Docs:")} ${formatDocsLink("/tools/chrome-extension", "docs.OpenClaw.ai/tools/chrome-extension")}`,
           ].join("\n"),
         ),
       );
@@ -105,7 +105,7 @@ export function registerBrowserExtensionCommands(
           danger(
             [
               `Chrome extension is not installed. Run: "${formatCliCommand("ClosedClaw browser extension install")}"`,
-              `Docs: ${formatDocsLink("/tools/chrome-extension", "docs.ClosedClaw.ai/tools/chrome-extension")}`,
+              `Docs: ${formatDocsLink("/tools/chrome-extension", "docs.OpenClaw.ai/tools/chrome-extension")}`,
             ].join("\n"),
           ),
         );

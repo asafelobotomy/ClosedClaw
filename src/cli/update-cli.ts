@@ -1200,7 +1200,7 @@ ${theme.heading("Notes:")}
   - Downgrades require confirmation (can break configuration)
   - Skips update if the working directory has uncommitted changes
 
-${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.ClosedClaw.ai/cli/update")}`;
+${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.OpenClaw.ai/cli/update")}`;
     })
     .action(async (opts) => {
       try {
@@ -1224,7 +1224,7 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.ClosedClaw.ai/cli/
     .option("--timeout <seconds>", "Timeout for each update step in seconds (default: 1200)")
     .addHelpText(
       "after",
-      `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.ClosedClaw.ai/cli/update")}\n`,
+      `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.OpenClaw.ai/cli/update")}\n`,
     )
     .action(async (opts) => {
       try {
@@ -1253,7 +1253,7 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.ClosedClaw.ai/cli/
           "- Shows current update channel (stable/beta/dev) and source",
         )}\n${theme.muted("- Includes git tag/branch/SHA for source checkouts")}\n\n${theme.muted(
           "Docs:",
-        )} ${formatDocsLink("/cli/update", "docs.ClosedClaw.ai/cli/update")}`,
+        )} ${formatDocsLink("/cli/update", "docs.OpenClaw.ai/cli/update")}`,
     )
     .action(async (opts) => {
       try {

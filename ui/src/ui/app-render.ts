@@ -160,7 +160,7 @@ export function renderApp(state: AppViewState) {
           <div class="nav-group__items">
             <a
               class="nav-item nav-item--external"
-              href="https://docs.ClosedClaw.ai"
+              href="https://docs.OpenClaw.ai"
               target="_blank"
               rel="noreferrer"
               title="Docs (opens in new tab)"

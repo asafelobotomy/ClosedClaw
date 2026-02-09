@@ -212,8 +212,8 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       await prompter.note(
         [
           "Docs:",
-          "https://docs.ClosedClaw.ai/gateway/health",
-          "https://docs.ClosedClaw.ai/gateway/troubleshooting",
+          "https://docs.OpenClaw.ai/gateway/health",
+          "https://docs.OpenClaw.ai/gateway/troubleshooting",
         ].join("\n"),
         "Health check help",
       );
@@ -275,7 +275,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       tokenParam ? `Web UI (with token): ${authedUrl}` : undefined,
       `Gateway WS: ${links.wsUrl}`,
       gatewayStatusLine,
-      "Docs: https://docs.ClosedClaw.ai/web/control-ui",
+      "Docs: https://docs.OpenClaw.ai/web/control-ui",
     ]
       .filter(Boolean)
       .join("\n"),
@@ -383,13 +383,13 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
   await prompter.note(
     [
       "Back up your agent workspace.",
-      "Docs: https://docs.ClosedClaw.ai/concepts/agent-workspace",
+      "Docs: https://docs.OpenClaw.ai/concepts/agent-workspace",
     ].join("\n"),
     "Workspace backup",
   );
 
   await prompter.note(
-    "Running agents on your computer is risky — harden your setup: https://docs.ClosedClaw.ai/security",
+    "Running agents on your computer is risky — harden your setup: https://docs.OpenClaw.ai/security",
     "Security",
   );
 
@@ -442,7 +442,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
           webSearchKey
             ? "API key: stored in config (tools.web.search.apiKey)."
             : "API key: provided via BRAVE_API_KEY env var (Gateway environment).",
-          "Docs: https://docs.ClosedClaw.ai/tools/web",
+          "Docs: https://docs.OpenClaw.ai/tools/web",
         ].join("\n")
       : [
           "If you want your agent to be able to search the web, you’ll need an API key.",
@@ -454,7 +454,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
           "- Enable web_search and paste your Brave Search API key",
           "",
           "Alternative: set BRAVE_API_KEY in the Gateway environment (no config changes).",
-          "Docs: https://docs.ClosedClaw.ai/tools/web",
+          "Docs: https://docs.OpenClaw.ai/tools/web",
         ].join("\n"),
     "Web search (optional)",
   );

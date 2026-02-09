@@ -1,11 +1,11 @@
 import { isSubagentSessionKey } from "../../../routing/session-key.js";
 import { resolveHookConfig } from "../../config.js";
 import { isAgentBootstrapEvent, type HookHandler } from "../../hooks.js";
-import { applySoulEvilOverride, resolveSoulEvilConfigFromHook } from "../../soul-evil.js";
+import { applySoulJesterOverride, resolveSoulJesterConfigFromHook } from "../../soul-jester.js";
 
-const HOOK_KEY = "soul-evil";
+const HOOK_KEY = "soul-jester";
 
-const soulEvilHook: HookHandler = async (event) => {
+const soulJesterHook: HookHandler = async (event) => {
   if (!isAgentBootstrapEvent(event)) {
     return;
   }
@@ -20,8 +20,8 @@ const soulEvilHook: HookHandler = async (event) => {
     return;
   }
 
-  const soulConfig = resolveSoulEvilConfigFromHook(hookConfig as Record<string, unknown>, {
-    warn: (message) => console.warn(`[soul-evil] ${message}`),
+  const soulConfig = resolveSoulJesterConfigFromHook(hookConfig as Record<string, unknown>, {
+    warn: (message) => console.warn(`[soul-jester] ${message}`),
   });
   if (!soulConfig) {
     return;
@@ -32,18 +32,18 @@ const soulEvilHook: HookHandler = async (event) => {
     return;
   }
 
-  const updated = await applySoulEvilOverride({
+  const updated = await applySoulJesterOverride({
     files: context.bootstrapFiles,
     workspaceDir,
     config: soulConfig,
     userTimezone: cfg?.agents?.defaults?.userTimezone,
     log: {
-      warn: (message) => console.warn(`[soul-evil] ${message}`),
-      debug: (message) => console.debug?.(`[soul-evil] ${message}`),
+      warn: (message) => console.warn(`[soul-jester] ${message}`),
+      debug: (message) => console.debug?.(`[soul-jester] ${message}`),
     },
   });
 
   context.bootstrapFiles = updated;
 };
 
-export default soulEvilHook;
+export default soulJesterHook;

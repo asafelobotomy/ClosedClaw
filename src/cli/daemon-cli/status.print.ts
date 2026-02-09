@@ -317,5 +317,5 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
   }
 
   defaultRuntime.log(`${label("Troubles:")} run ${formatCliCommand("ClosedClaw status")}`);
-  defaultRuntime.log(`${label("Troubleshooting:")} https://docs.ClosedClaw.ai/troubleshooting`);
+  defaultRuntime.log(`${label("Troubleshooting:")} https://docs.OpenClaw.ai/troubleshooting`);
 }

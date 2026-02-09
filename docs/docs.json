@@ -1045,7 +1045,7 @@
             "group": "Automation & Hooks",
             "pages": [
               "hooks",
-              "hooks/soul-evil",
+              "hooks/soul-jester",
               "automation/auth-monitoring",
               "automation/webhook",
               "automation/gmail-pubsub",
@@ -1362,7 +1362,7 @@
             "group": "Automation & Hooks",
             "pages": [
               "zh-CN/hooks",
-              "zh-CN/hooks/soul-evil",
+              "zh-CN/hooks/soul-jester",
               "zh-CN/automation/auth-monitoring",
               "zh-CN/automation/webhook",
               "zh-CN/automation/gmail-pubsub",

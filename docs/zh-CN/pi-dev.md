@@ -73,5 +73,5 @@ scripts/pi/run-tests.sh --live
 
 ## 参考资料
 
-- https://docs.ClosedClaw.ai/testing
-- https://docs.ClosedClaw.ai/start/getting-started
+- https://docs.OpenClaw.ai/testing
+- https://docs.OpenClaw.ai/start/getting-started

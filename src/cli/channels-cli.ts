@@ -76,7 +76,7 @@ export function registerChannelsCli(program: Command) {
       () =>
         `\n${theme.muted("Docs:")} ${formatDocsLink(
           "/cli/channels",
-          "docs.ClosedClaw.ai/cli/channels",
+          "docs.OpenClaw.ai/cli/channels",
         )}\n`,
     );
 

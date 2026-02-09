@@ -30,7 +30,7 @@ type SandboxExplainOptions = {
   json: boolean;
 };
 
-const SANDBOX_DOCS_URL = "https://docs.ClosedClaw.ai/sandbox";
+const SANDBOX_DOCS_URL = "https://docs.OpenClaw.ai/sandbox";
 
 function normalizeExplainSessionKey(params: {
   cfg: ClosedClawConfig;
@@ -331,7 +331,7 @@ export async function sandboxExplainCommand(
     lines.push(`  - ${key}`);
   }
   lines.push("");
-  lines.push(`${key("Docs:")} ${formatDocsLink("/sandbox", "docs.ClosedClaw.ai/sandbox")}`);
+  lines.push(`${key("Docs:")} ${formatDocsLink("/sandbox", "docs.OpenClaw.ai/sandbox")}`);
 
   runtime.log(`${lines.join("\n")}\n`);
 }

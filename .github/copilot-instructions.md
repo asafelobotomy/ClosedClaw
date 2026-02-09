@@ -2,6 +2,27 @@
 
 ClosedClaw is a personal AI assistant gateway that connects multiple messaging channels (WhatsApp, Telegram, Discord, Slack, Signal, iMessage, etc.) to AI models through a unified control plane. This guide covers the essential patterns and workflows for contributing.
 
+## Quick Reference
+
+**Common Commands**:
+```bash
+# Development
+pnpm closedclaw gateway --port 18789 --verbose  # Start gateway with logging
+pnpm gateway:watch                              # Hot-reload development
+pnpm closedclaw doctor                          # Run diagnostics
+
+# Testing
+pnpm test                                       # Run all tests (parallel)
+pnpm test -- src/path/to/specific.test.ts      # Run specific test file
+pnpm test:coverage                              # Coverage report (70% required)
+pnpm test:live                                  # Real provider tests (costs money)
+
+# Quality Gates
+pnpm check                                      # Lint + format
+pnpm build                                      # Type-check + compile
+scripts/committer "msg" file1.ts file2.ts      # Scoped commit helper
+```
+
 ## Architecture Overview
 
 - **Gateway Control Plane**: `src/gateway/` coordinates sessions, channels, tools, and agent execution. Supports RPC methods, WebSocket/HTTP, config hot-reload via SIGUSR1
@@ -25,6 +46,27 @@ ClosedClaw is a personal AI assistant gateway that connects multiple messaging c
 
 **Config Schema**: Config types in `src/config/types.*.ts`, Zod schemas in `src/config/zod-schema.ts`. Plugins can register `configSchema` (JSON Schema) + `uiHints` for form rendering. Breaking changes require migration in `src/config/legacy-migrate.ts`
 
+**Tool Implementation Pattern**: Tools use factory functions returning `AnyAgentTool`. Example:
+```typescript
+import { type AnyAgentTool, jsonResult, readStringParam } from "./common.js";
+
+export function createMyTool(options?: { config?: ClosedClawConfig }): AnyAgentTool {
+  return {
+    name: "my_tool",
+    description: "What this tool does and when to use it",
+    parameters: {
+      param1: { type: "string", description: "...", required: true },
+    },
+    handler: async (params) => {
+      const value = readStringParam(params, "param1", { required: true });
+      // Implementation
+      return jsonResult({ result: "data" });
+    },
+  };
+}
+```
+Register in `src/agents/openclaw-tools.ts` or `src/agents/bash-tools.ts`
+
 ## Development Workflow
 
 ### Setup
@@ -40,22 +82,56 @@ pnpm closedclaw ...     # Run CLI directly via tsx
 pnpm gateway:watch    # Watch mode for gateway
 ```
 
+**Build process**: `pnpm build` runs:
+1. `canvas:a2ui:bundle` - Bundle Canvas A2UI components
+2. `tsc` - TypeScript compilation
+3. `canvas-a2ui-copy.ts` - Copy Canvas artifacts
+4. `copy-hook-metadata.ts` - Hook metadata extraction
+5. `write-build-info.ts` - Embed build info
+
 ### Pre-Commit Gate
 
 ```bash
 prek install          # Install pre-commit hooks (runs same checks as CI)
 pnpm check            # Lint + format (oxlint/oxfmt)
 pnpm build            # Type-check + build
-pnpm test             # Vitest unit/integration tests
+pnpm test             # Vitest unit/integration tests (parallel split via scripts/test-parallel.mjs)
 ```
 
 ### Testing Strategy
 
-- **Unit/Integration** (`pnpm test`): Fast, deterministic, no real keys. Files: `src/**/*.test.ts`. Config: `vitest.config.ts`
-- **E2E** (`pnpm test:e2e`): Gateway smoke tests with WebSocket/HTTP, node pairing, multi-instance. Files: `src/**/*.e2e.test.ts`. Config: `vitest.e2e.config.ts`
-- **Live** (`pnpm test:live`): Real provider/model tests. Requires credentials. Files: `src/**/*.live.test.ts`. Config: `vitest.live.config.ts`. Sources `~/.profile` for env vars. Use `ClosedClaw_LIVE_ANTHROPIC_KEYS="sk-...,sk-..."` for key rotation on rate limits
-- **Coverage**: `pnpm test:coverage` enforces 70% lines/branches/functions/statements. Run before pushing logic changes
-- **Docker E2E**: Full install/onboard/plugin tests in isolation via `pnpm test:docker:*` scripts
+**Test parallelization**: `pnpm test` runs `scripts/test-parallel.mjs` which splits tests across three configs in parallel (unit, extensions, gateway) with adaptive worker allocation. Windows CI uses sharding + serial gateway tests to avoid flakes.
+
+**Five Vitest configs**:
+- **Unit** (`vitest.unit.config.ts`): `src/**/*.test.ts` excluding gateway - fast, deterministic, no real keys
+- **Extensions** (`vitest.extensions.config.ts`): `extensions/**/*.test.ts` - plugin tests isolated from core
+- **Gateway** (`vitest.gateway.config.ts`): `src/gateway/**/*.test.ts` - gateway control plane tests
+- **E2E** (`vitest.e2e.config.ts`): `src/**/*.e2e.test.ts` - WebSocket/HTTP, node pairing, multi-instance
+- **Live** (`vitest.live.config.ts`): `src/**/*.live.test.ts` - real provider/model tests (requires credentials)
+
+**Test commands**:
+- `pnpm test` - Default parallelized unit/extensions/gateway suite
+- `pnpm test -- path/to/file.test.ts` - Run specific test file
+- `pnpm test -- path/to/file.test.ts -t "test name"` - Run specific test case
+- `pnpm test:e2e` - Gateway smoke tests (heavier networking)
+- `pnpm test:live` - Real providers (sources `~/.profile`; use `ClosedClaw_LIVE_ANTHROPIC_KEYS="sk-...,sk-..."` for key rotation)
+- `pnpm test:coverage` - Enforces 70% lines/branches/functions/statements
+- `pnpm test:docker:*` - Full install/onboard/plugin tests in Docker isolation
+
+**Narrow test execution** (faster iteration):
+```bash
+# Run single file
+pnpm test -- src/config/config.test.ts
+
+# Run specific test within file
+pnpm test -- src/config/config.test.ts -t "loads default config"
+
+# Run multiple related files
+pnpm test -- src/config src/security/crypto.test.ts
+
+# Watch mode for active development
+pnpm test:watch -- src/agents/tools/my-tool.test.ts
+```
 
 Before pushing logic changes: `pnpm build && pnpm check && pnpm test`
 
@@ -76,9 +152,16 @@ See `docs/testing.md` for detailed test harness info, credential discovery, and 
 - **Language**: TypeScript (ESM), strict mode, avoid `any`
 - **LOC guideline**: ~500-700 lines per file (not a hard limit; split when it improves clarity)
 - **Formatting**: Oxlint + Oxfmt (run `pnpm check` before commits)
-- **CLI Progress**: Use `src/cli/progress.ts` (osc-progress + @clack/prompts); don't hand-roll spinners
+- **Error Handling**: Custom error classes extend `Error` for domain-specific failures (e.g., `ConfigIncludeError`, `MediaFetchError`, `FailoverError`, `GatewayLockError`). Check `src/config/includes.ts`, `src/media/fetch.ts`, `src/agents/failover-error.ts` for patterns
+- **CLI Progress**: Use `src/cli/progress.ts` (`createCliProgress()`); handles OSC progress with fallbacks (spinner/line/log/none); don't hand-roll spinners
 - **Terminal Output**: Keep tables + ANSI-safe wrapping via `src/terminal/table.ts`
-- **Colors**: Use shared CLI palette from `src/terminal/palette.ts` (no hardcoded colors)
+- **Colors**: Use shared CLI palette from `src/terminal/palette.ts` (LOBSTER_PALETTE constants: `accent`, `accentBright`, `success`, `warn`, `error`, `muted`); no hardcoded colors
+
+### CLI Tooling
+
+- **From source** (dev): `pnpm closedclaw ...` runs via tsx; `node scripts/run-node.mjs` for custom dev runner
+- **Installed binary**: `closedclaw ...` (post-install via npm/pnpm -g)
+- **Watch mode**: `pnpm gateway:watch` hot-reloads TypeScript changes
 
 ## Channel Development
 
@@ -122,6 +205,79 @@ Extensions are workspace packages under `extensions/*`:
 - Plugin commands: use `validateCommandName()` to check reserved names. Namespace collision detection prevents duplicate registrations
 - Config validation is strict: unknown keys in plugin config sections cause Gateway startup failure
 
+### Minimal Plugin Template
+```typescript
+// extensions/my-plugin/index.ts
+import type { ClosedClawPluginApi } from "closedclaw/plugin-sdk";
+
+export function register(api: ClosedClawPluginApi) {
+  // Register a tool
+  api.registerTool({
+    factory: (ctx) => ({
+      name: "my_plugin_tool",
+      description: "What this tool does",
+      parameters: { input: { type: "string", required: true } },
+      handler: async (params) => ({ result: "success" }),
+    }),
+  });
+
+  // Register a hook
+  api.registerHook({
+    entry: "message:received",
+    priority: 100,
+    handler: async (ctx, next) => {
+      // Pre-process
+      const result = await next();
+      // Post-process
+      return result;
+    },
+  });
+
+  // Register a CLI command
+  api.registerCommand({
+    name: "my-command",
+    description: "Command description",
+    handler: async (args) => {
+      console.log("Command executed");
+    },
+  });
+}
+```
+
+```json5
+// extensions/my-plugin/ClosedClaw.plugin.json
+{
+  "id": "my-plugin",
+  "version": "1.0.0",
+  "description": "Plugin description",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "enabled": { "type": "boolean", "default": true },
+      "apiKey": { "type": "string" }
+    }
+  },
+  "uiHints": {
+    "apiKey": { "sensitive": true, "label": "API Key" }
+  }
+}
+```
+
+```json
+// extensions/my-plugin/package.json
+{
+  "name": "@closedclaw/my-plugin",
+  "version": "1.0.0",
+  "type": "module",
+  "devDependencies": {
+    "closedclaw": "workspace:*"
+  },
+  "closedclaw": {
+    "extensions": ["./index.ts"]
+  }
+}
+```
+
 ## Release Channels
 
 - **stable**: Tagged releases (`vYYYY.M.D`), npm dist-tag `latest`
@@ -138,13 +294,168 @@ Switch channels: `closedclaw update --channel stable|beta|dev`
 
 ## Common Tasks
 
-**Add a new channel**: Extend `CliDeps` in `src/cli/deps.ts`, add send method, update routing in `src/routing/`, add docs in `docs/channels/`, update all UIs
+### Add a New Tool (Checklist)
+1. Create `src/agents/tools/my-tool.ts` with factory function
+2. Export tool factory from appropriate module (`openclaw-tools.ts` or `bash-tools.ts`)
+3. Add tool to assembly function (e.g., in `createClosedClawTools()`)
+4. Create `src/agents/tools/my-tool.test.ts` with unit tests
+5. Document in `docs/tools/my-tool.md`
+6. Run `pnpm test -- src/agents/tools/my-tool.test.ts` to verify
 
-**Add a tool**: Implement in `src/tools/`, register in agent tool catalog, add tests, document in `docs/tools/`
+### Add a New Channel (Checklist)
+1. Create extension: `extensions/my-channel/`
+2. Add `package.json` with `devDependencies: { "closedclaw": "workspace:*" }`
+3. Create `ClosedClaw.plugin.json` with `id` and `configSchema`
+4. Implement `register(api: ClosedClawPluginApi)` in `index.ts`
+5. Extend `CliDeps` in `src/cli/deps.ts`: add `sendMessageMyChannel` method
+6. Update `createDefaultDeps()` and `createOutboundSendDeps()` in `src/cli/deps.ts`
+7. Add routing logic in `src/routing/`
+8. Add docs in `docs/channels/my-channel.md`
+9. Update UI surfaces (web, macOS, mobile)
+10. Add tests in `extensions/my-channel/*.test.ts`
 
-**Modify config schema**: Update `src/config/types.ts` + `src/config/zod-schema.ts`, run validation, test migration in `src/config/legacy-migrate.ts` if breaking
+### Modify Config Schema (Workflow)
+1. Update types in `src/config/types.*.ts`
+2. Update Zod schema in `src/config/zod-schema.ts`
+3. If breaking: add migration in `src/config/legacy-migrate.ts`
+4. Test validation: `pnpm test -- src/config/`
+5. Update docs in `docs/` if user-facing
+6. Run `closedclaw doctor` to catch issues
 
-**Debug Gateway**: `pnpm gateway:watch` for hot-reload, check `~/.closedclaw/logs/`, use `closedclaw channels status --probe`
+### Debug Gateway Issues
+```bash
+pnpm gateway:watch               # Hot-reload for iterative debugging
+tail -f ~/.closedclaw/logs/*     # Watch logs
+closedclaw channels status       # Check channel connectivity
+closedclaw doctor                # Run full diagnostics
+closedclaw gateway --reset       # Fresh start (careful: clears state)
+```
+
+## Troubleshooting Patterns
+
+### Common Error Classes
+- **ConfigIncludeError** (`src/config/includes.ts`): Config file includes failed (circular/missing)
+  - Fix: Check `~/.closedclaw/config.json5` for `$include` paths
+- **MediaFetchError** (`src/media/fetch.ts`): Failed to fetch/process media
+  - Fix: Check network, size limits, MIME type support
+- **FailoverError** (`src/agents/failover-error.ts`): All model providers failed
+  - Fix: Check credentials, rate limits, provider status
+- **GatewayLockError** (`src/infra/gateway-lock.ts`): Gateway already running
+  - Fix: `pkill -f closedclaw` or check `~/.closedclaw/gateway.lock`
+- **DuplicateAgentDirError** (`src/config/agent-dirs.ts`): Multiple agents share same directory
+  - Fix: Ensure unique `agentDir` per agent in config
+
+### Test Failures
+```bash
+# Run failing test in isolation
+pnpm test -- path/to/failing.test.ts
+
+# Check for test environment issues
+pnpm test:e2e                    # If networking/gateway tests fail
+pnpm test:live                   # If provider integration fails (needs creds)
+
+# Coverage failures
+pnpm test:coverage               # See what's not covered (need 70%)
+```
+
+### Build Failures
+```bash
+# TypeScript errors
+pnpm build                       # Full type check
+pnpm check                       # Lint + format issues
+
+# Circular dependency
+# Look for import cycles in error output, refactor to break cycle
+
+# Missing types
+# Add to src/types/ or import from @types/*
+```
+
+### Gateway Not Starting
+1. Check port in use: `lsof -i :18789` (default port)
+2. Check lock file: `rm ~/.closedclaw/gateway.lock` if stale
+3. Check config validity: `closedclaw doctor`
+4. Check logs: `~/.closedclaw/logs/gateway-*.log`
+5. Try clean start: `closedclaw gateway --reset --verbose`
+
+## File Patterns & Guidelines
+
+**When editing `src/config/types.*.ts`**: Always update `src/config/zod-schema.ts` in parallel. Config types must match Zod validation.
+
+**When editing `src/agents/tools/*.ts`**: Include test file with same basename. Tools must have clear `description` (AI uses this for selection).
+
+**When editing `extensions/*/index.ts`**: Plugin `register()` function is entry point. Use `api.register*()` methods, never direct imports from core.
+
+**When editing `src/gateway/**/*.ts`**: Gateway tests go in separate config (`vitest.gateway.config.ts`). Be mindful of RPC/WebSocket state.
+
+**When editing test files**: Use appropriate config:
+- `*.test.ts` → unit tests (fast, no network)
+- `*.e2e.test.ts` → e2e tests (networking, multi-instance)
+- `*.live.test.ts` → provider tests (requires credentials, costs money)
+
+## Agent Skills (Recommended)
+
+**Skills vs Instructions**: This file (`.github/copilot-instructions.md`) provides always-on coding guidelines. **Agent Skills** (`.github/skills/`) are task-specific capabilities that load on-demand with scripts and resources. Skills are portable across VS Code, Copilot CLI, and coding agent.
+
+**How Skills Work**:
+- **Level 1 (Discovery)**: Copilot always knows available skills via `name`/`description` in YAML frontmatter
+- **Level 2 (Instructions)**: `SKILL.md` body loads when skill matches your request
+- **Level 3 (Resources)**: Additional files (scripts, examples) load only when referenced
+
+**Create a Skill**:
+```bash
+mkdir -p .github/skills/my-skill
+cat > .github/skills/my-skill/SKILL.md << 'EOF'
+---
+name: my-skill
+description: Description of what this skill does and when to use it
+---
+
+# My Skill
+
+Detailed instructions, guidelines, and examples...
+
+## When to Use
+- Scenario 1
+- Scenario 2
+
+## Workflow
+1. Step 1
+2. Step 2
+
+## Examples
+[Example script](./example.sh)
+EOF
+```
+
+**Recommended Skills for ClosedClaw**:
+
+1. **`channel-plugin-creator`** - Guide for creating new messaging channel extensions
+   - Template files, routing setup, CliDeps extension, test scaffolding
+   
+2. **`agent-tool-creator`** - Guide for implementing new agent tools
+   - Tool factory pattern, parameter helpers, test structure, registration
+   
+3. **`gateway-debugger`** - Troubleshooting gateway issues
+   - Log analysis, port checks, config validation, lock file cleanup
+   
+4. **`config-migrator`** - Help with config schema changes
+   - Type updates, Zod schema sync, migration scripts, validation
+   
+5. **`test-runner`** - Efficient test execution patterns
+   - Narrow execution, coverage checks, live test management
+   
+6. **`release-manager`** - Version bumping and release workflow
+   - Changelog updates, version tagging, npm publishing
+
+**Skill Locations**:
+- **Project**: `.github/skills/` (recommended) or `.claude/skills/` (legacy)
+- **Personal**: `~/.copilot/skills/` or `~/.claude/skills/`
+- **Custom**: Use `chat.agentSkillsLocations` setting for shared skill libraries
+
+**Use Shared Skills**: Browse [github/awesome-copilot](https://github.com/github/awesome-copilot) and [anthropics/skills](https://github.com/anthropics/skills) for community skills. Always review before using.
+
+More info: [VS Code Agent Skills docs](https://code.visualstudio.com/docs/copilot/customization/agent-skills) | [agentskills.io](https://agentskills.io/)
 
 ## Resources
 

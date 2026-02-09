@@ -53,7 +53,7 @@ ClosedClaw 附带四个自动发现的内置钩子：
 - **💾 session-memory**：在你发出 `/new` 时将会话上下文保存到智能体工作区（默认 `~/.ClosedClaw/workspace/memory/`）
 - **📝 command-logger**：将所有命令事件记录到 `~/.ClosedClaw/logs/commands.log`
 - **🚀 boot-md**：在 Gateway网关启动时运行 `BOOT.md`（需要启用内部钩子）
-- **😈 soul-evil**：在清除窗口期间或随机概率下，将注入的 `SOUL.md` 内容替换为 `SOUL_EVIL.md`
+- **🎭 soul-jester**：在清除窗口期间或随机概率下，将注入的 `SOUL.md` 内容替换为 `SOUL_JESTER.md`
 
 列出可用钩子：
 
@@ -134,7 +134,7 @@ ClosedClaw hooks install <path-or-spec>
 ---
 name: my-hook
 description: "这个钩子做什么的简短描述"
-homepage: https://docs.ClosedClaw.ai/hooks#my-hook
+homepage: https://docs.OpenClaw.ai/hooks#my-hook
 metadata:
   { "ClosedClaw": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
@@ -533,20 +533,20 @@ grep '"action":"new"' ~/.ClosedClaw/logs/commands.log | jq .
 ClosedClaw hooks enable command-logger
 ```
 
-### soul-evil
+### soul-jester
 
-在清除窗口期间或随机概率下，将注入的 `SOUL.md` 内容替换为 `SOUL_EVIL.md`。
+在清除窗口期间或随机概率下，将注入的 `SOUL.md` 内容替换为 `SOUL_JESTER.md`。
 
 **事件**：`agent:bootstrap`
 
-**文档**：[SOUL Evil 钩子](/hooks/soul-evil)
+**文档**：[SOUL Jester 钩子](/hooks/soul-jester)
 
 **输出**：不写入文件；替换仅在内存中进行。
 
 **启用**：
 
 ```bash
-ClosedClaw hooks enable soul-evil
+ClosedClaw hooks enable soul-jester
 ```
 
 **配置**：
@@ -557,9 +557,9 @@ ClosedClaw hooks enable soul-evil
     "internal": {
       "enabled": true,
       "entries": {
-        "soul-evil": {
+        "soul-jester": {
           "enabled": true,
-          "file": "SOUL_EVIL.md",
+          "file": "SOUL_JESTER.md",
           "chance": 0.1,
           "purge": { "at": "21:00", "duration": "15m" }
         }

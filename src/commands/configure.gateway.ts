@@ -144,11 +144,9 @@ export async function promptGatewayConfig(
   let tailscaleResetOnExit = false;
   if (tailscaleMode !== "off") {
     note(
-      [
-        "Docs:",
-        "https://docs.ClosedClaw.ai/gateway/tailscale",
-        "https://docs.ClosedClaw.ai/web",
-      ].join("\n"),
+      ["Docs:", "https://docs.OpenClaw.ai/gateway/tailscale", "https://docs.OpenClaw.ai/web"].join(
+        "\n",
+      ),
       "Tailscale",
     );
     tailscaleResetOnExit = Boolean(

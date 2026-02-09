@@ -7,14 +7,19 @@ status: active
 
 # Sandboxing
 
-ClosedClaw can run **tools inside Docker containers** to reduce blast radius.
-This is **optional** and controlled by configuration (`agents.defaults.sandbox` or
-`agents.list[].sandbox`). If sandboxing is off, tools run on the host.
-The Gateway stays on the host; tool execution runs in an isolated sandbox
-when enabled.
+ClosedClaw runs **all tool execution inside Docker containers by default** to minimize security risks.
+This is controlled by configuration (`agents.defaults.sandbox` or `agents.list[].sandbox`). 
+If sandboxing is explicitly disabled, tools run directly on the host.
+
+The Gateway process stays on the host; tool execution runs in an isolated sandbox
+when enabled (which is the default).
+
+**ClosedClaw vs OpenClaw**: Unlike OpenClaw (which defaults to sandboxing off), 
+ClosedClaw is **security-first by default**. All tool calls are sandboxed unless you 
+explicitly opt out by setting `agents.defaults.sandbox.mode="off"` (not recommended).
 
 This is not a perfect security boundary, but it materially limits filesystem
-and process access when the model does something dumb.
+and process access when the model makes risky decisions.
 
 ## What gets sandboxed
 
@@ -36,11 +41,12 @@ Not sandboxed:
 
 `agents.defaults.sandbox.mode` controls **when** sandboxing is used:
 
-- `"off"`: no sandboxing.
-- `"non-main"`: sandbox only **non-main** sessions (default if you want normal chats on host).
-- `"all"`: every session runs in a sandbox.
-  Note: `"non-main"` is based on `session.mainKey` (default `"main"`), not agent id.
-  Group/channel sessions use their own keys, so they count as non-main and will be sandboxed.
+- `"all"` (default): every session runs in a sandbox (recommended for maximum security).
+- `"non-main"`: sandbox only **non-main** sessions (use if you want your main chat on host).
+- `"off"`: no sandboxing (not recommended; use only for testing or if you fully trust all inputs).
+
+Note: `"non-main"` is based on `session.mainKey` (default `"main"`), not agent id.
+Group/channel sessions use their own keys, so they count as non-main and will be sandboxed.
 
 ## Scope
 
@@ -169,16 +175,32 @@ Debugging:
 Each agent can override sandbox + tools:
 `agents.list[].sandbox` and `agents.list[].tools` (plus `agents.list[].tools.sandbox.tools` for sandbox tool policy).
 See [Multi-Agent Sandbox & Tools](/multi-agent-sandbox-tools) for precedence.
+configuration example
 
-## Minimal enable example
+Default configuration (sandboxing enabled with recommended defaults):
 
 ```json5
 {
   agents: {
     defaults: {
       sandbox: {
-        mode: "non-main",
-        scope: "session",
+        // mode: "all",             // implicit default
+        // scope: "session",        // implicit default
+        // workspaceAccess: "none", // implicit default
+      },
+    },
+  },
+}
+```
+
+To disable sandboxing (not recommended):
+
+```json5
+{
+  agents: {
+    defaults: {
+      sandbox: {
+        mode: "off
         workspaceAccess: "none",
       },
     },

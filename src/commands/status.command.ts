@@ -599,8 +599,8 @@ export async function statusCommand(
   }
 
   runtime.log("");
-  runtime.log("FAQ: https://docs.ClosedClaw.ai/faq");
-  runtime.log("Troubleshooting: https://docs.ClosedClaw.ai/troubleshooting");
+  runtime.log("FAQ: https://docs.OpenClaw.ai/faq");
+  runtime.log("Troubleshooting: https://docs.OpenClaw.ai/troubleshooting");
   runtime.log("");
   const updateHint = formatUpdateAvailableHint(update);
   if (updateHint) {

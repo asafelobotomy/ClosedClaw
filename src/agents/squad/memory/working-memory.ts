@@ -53,18 +53,12 @@ export class WorkingMemory {
    *
    * @param maxSize - Maximum items (default: 10, aligned with 7±2 items)
    */
-  constructor(
-    private readonly maxSize: number = AGENTS.MEMORY.WORKING.DEFAULT_CAPACITY,
-  ) {
+  constructor(private readonly maxSize: number = AGENTS.MEMORY.WORKING.DEFAULT_CAPACITY) {
     if (maxSize < AGENTS.MEMORY.WORKING.MIN_CAPACITY) {
-      throw new Error(
-        `Working memory maxSize must be >= ${AGENTS.MEMORY.WORKING.MIN_CAPACITY}`,
-      );
+      throw new Error(`Working memory maxSize must be >= ${AGENTS.MEMORY.WORKING.MIN_CAPACITY}`);
     }
     if (maxSize > AGENTS.MEMORY.WORKING.MAX_CAPACITY) {
-      throw new Error(
-        `Working memory maxSize must be <= ${AGENTS.MEMORY.WORKING.MAX_CAPACITY}`,
-      );
+      throw new Error(`Working memory maxSize must be <= ${AGENTS.MEMORY.WORKING.MAX_CAPACITY}`);
     }
   }
 

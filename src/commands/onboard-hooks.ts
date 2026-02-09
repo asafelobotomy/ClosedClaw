@@ -15,7 +15,7 @@ export async function setupInternalHooks(
       "Hooks let you automate actions when agent commands are issued.",
       "Example: Save session context to memory when you issue /new.",
       "",
-      "Learn more: https://docs.ClosedClaw.ai/hooks",
+      "Learn more: https://docs.OpenClaw.ai/hooks",
     ].join("\n"),
     "Hooks",
   );

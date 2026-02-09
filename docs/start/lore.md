@@ -119,7 +119,7 @@ In just 3 hours:
 - GitHub renamed: `github.com/ClosedClaw/ClosedClaw` ✅
 - X handle `@ClosedClaw` secured with GOLD CHECKMARK 💰
 - npm packages released under new name
-- Docs migrated to `docs.ClosedClaw.ai`
+- Docs migrated to `docs.OpenClaw.ai`
 - 200K+ views on announcement in 90 minutes
 
 **The Heroes:**

@@ -126,7 +126,7 @@ Moltbot 念起来始终不太顺口。于是，在格林尼治时间凌晨 4 点
 - GitHub 改名完成：`github.com/ClosedClaw/ClosedClaw` ✅
 - X 账号 `@ClosedClaw` 到手，带金色认证徽章 💰
 - npm 包以新名称发布
-- 文档迁移到 `docs.ClosedClaw.ai`
+- 文档迁移到 `docs.OpenClaw.ai`
 - 公告在 90 分钟内获得超过 20 万次浏览
 
 **功臣们：**

@@ -66,5 +66,5 @@ If you only want to reset sessions, delete `agents/<agentId>/sessions/` and `age
 
 ## References
 
-- https://docs.ClosedClaw.ai/testing
-- https://docs.ClosedClaw.ai/start/getting-started
+- https://docs.OpenClaw.ai/testing
+- https://docs.OpenClaw.ai/start/getting-started

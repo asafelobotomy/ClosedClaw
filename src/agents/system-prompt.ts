@@ -151,7 +151,7 @@ function buildDocsSection(params: { docsPath?: string; isMinimal: boolean; readT
   return [
     "## Documentation",
     `ClosedClaw docs: ${docsPath}`,
-    "Mirror: https://docs.ClosedClaw.ai",
+    "Mirror: https://docs.OpenClaw.ai",
     "Source: https://github.com/ClosedClaw/ClosedClaw",
     "Community: https://discord.com/invite/clawd",
     "Find new skills: https://clawhub.com",

@@ -81,6 +81,14 @@ const entries: SubCliEntry[] = [
     },
   },
   {
+    name: "upstream",
+    description: "Track and sync with OpenClaw upstream",
+    register: async (program) => {
+      const mod = await import("../upstream-cli.js");
+      mod.registerUpstreamCli(program);
+    },
+  },
+  {
     name: "approvals",
     description: "Exec approvals",
     register: async (program) => {

@@ -1,7 +1,7 @@
 ---
 name: boot-md
 description: "Run BOOT.md on gateway startup"
-homepage: https://docs.ClosedClaw.ai/hooks#boot-md
+homepage: https://docs.OpenClaw.ai/hooks#boot-md
 metadata:
   {
     "ClosedClaw":

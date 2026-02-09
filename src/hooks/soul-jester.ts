@@ -5,12 +5,12 @@ import { resolveUserTimezone } from "../agents/date-time.js";
 import { parseDurationMs } from "../cli/parse-duration.js";
 import { resolveUserPath } from "../utils.js";
 
-export const DEFAULT_SOUL_EVIL_FILENAME = "SOUL_EVIL.md";
+export const DEFAULT_SOUL_JESTER_FILENAME = "SOUL_JESTER.md";
 
-export type SoulEvilConfig = {
-  /** Alternate SOUL file name (default: SOUL_EVIL.md). */
+export type SoulJesterConfig = {
+  /** Alternate SOUL file name (default: SOUL_JESTER.md). */
   file?: string;
-  /** Random chance (0-1) to use SOUL_EVIL on any message. */
+  /** Random chance (0-1) to use SOUL_JESTER on any message. */
   chance?: number;
   /** Daily purge window (static time each day). */
   purge?: {
@@ -21,34 +21,34 @@ export type SoulEvilConfig = {
   };
 };
 
-type SoulEvilDecision = {
-  useEvil: boolean;
+type SoulJesterDecision = {
+  useJester: boolean;
   reason?: "purge" | "chance";
   fileName: string;
 };
 
-type SoulEvilCheckParams = {
-  config?: SoulEvilConfig;
+type SoulJesterCheckParams = {
+  config?: SoulJesterConfig;
   userTimezone?: string;
   now?: Date;
   random?: () => number;
 };
 
-type SoulEvilLog = {
+type SoulJesterLog = {
   debug?: (message: string) => void;
   warn?: (message: string) => void;
 };
 
-export function resolveSoulEvilConfigFromHook(
+export function resolveSoulJesterConfigFromHook(
   entry: Record<string, unknown> | undefined,
-  log?: SoulEvilLog,
-): SoulEvilConfig | null {
+  log?: SoulJesterLog,
+): SoulJesterConfig | null {
   if (!entry) {
     return null;
   }
   const file = typeof entry.file === "string" ? entry.file : undefined;
   if (entry.file !== undefined && !file) {
-    log?.warn?.("soul-evil config: file must be a string");
+    log?.warn?.("soul-jester config: file must be a string");
   }
 
   let chance: number | undefined;
@@ -56,11 +56,11 @@ export function resolveSoulEvilConfigFromHook(
     if (typeof entry.chance === "number" && Number.isFinite(entry.chance)) {
       chance = entry.chance;
     } else {
-      log?.warn?.("soul-evil config: chance must be a number");
+      log?.warn?.("soul-jester config: chance must be a number");
     }
   }
 
-  let purge: SoulEvilConfig["purge"];
+  let purge: SoulJesterConfig["purge"];
   if (entry.purge && typeof entry.purge === "object") {
     const at =
       typeof (entry.purge as { at?: unknown }).at === "string"
@@ -71,14 +71,14 @@ export function resolveSoulEvilConfigFromHook(
         ? (entry.purge as { duration?: string }).duration
         : undefined;
     if ((entry.purge as { at?: unknown }).at !== undefined && !at) {
-      log?.warn?.("soul-evil config: purge.at must be a string");
+      log?.warn?.("soul-jester config: purge.at must be a string");
     }
     if ((entry.purge as { duration?: unknown }).duration !== undefined && !duration) {
-      log?.warn?.("soul-evil config: purge.duration must be a string");
+      log?.warn?.("soul-jester config: purge.duration must be a string");
     }
     purge = { at, duration };
   } else if (entry.purge !== undefined) {
-    log?.warn?.("soul-evil config: purge must be an object");
+    log?.warn?.("soul-jester config: purge must be an object");
   }
 
   if (!file && chance === undefined && !purge) {
@@ -184,70 +184,70 @@ function isWithinDailyPurgeWindow(params: {
   return nowMs >= startMs || nowMs < wrappedEnd;
 }
 
-export function decideSoulEvil(params: SoulEvilCheckParams): SoulEvilDecision {
-  const evil = params.config;
-  const fileName = evil?.file?.trim() || DEFAULT_SOUL_EVIL_FILENAME;
-  if (!evil) {
-    return { useEvil: false, fileName };
+export function decideSoulJester(params: SoulJesterCheckParams): SoulJesterDecision {
+  const jester = params.config;
+  const fileName = jester?.file?.trim() || DEFAULT_SOUL_JESTER_FILENAME;
+  if (!jester) {
+    return { useJester: false, fileName };
   }
 
   const timeZone = resolveUserTimezone(params.userTimezone);
   const now = params.now ?? new Date();
   const inPurge = isWithinDailyPurgeWindow({
-    at: evil.purge?.at,
-    duration: evil.purge?.duration,
+    at: jester.purge?.at,
+    duration: jester.purge?.duration,
     now,
     timeZone,
   });
   if (inPurge) {
-    return { useEvil: true, reason: "purge", fileName };
+    return { useJester: true, reason: "purge", fileName };
   }
 
-  const chance = clampChance(evil.chance);
+  const chance = clampChance(jester.chance);
   if (chance > 0) {
     const random = params.random ?? Math.random;
     if (random() < chance) {
-      return { useEvil: true, reason: "chance", fileName };
+      return { useJester: true, reason: "chance", fileName };
     }
   }
 
-  return { useEvil: false, fileName };
+  return { useJester: false, fileName };
 }
 
-export async function applySoulEvilOverride(params: {
+export async function applySoulJesterOverride(params: {
   files: WorkspaceBootstrapFile[];
   workspaceDir: string;
-  config?: SoulEvilConfig;
+  config?: SoulJesterConfig;
   userTimezone?: string;
   now?: Date;
   random?: () => number;
-  log?: SoulEvilLog;
+  log?: SoulJesterLog;
 }): Promise<WorkspaceBootstrapFile[]> {
-  const decision = decideSoulEvil({
+  const decision = decideSoulJester({
     config: params.config,
     userTimezone: params.userTimezone,
     now: params.now,
     random: params.random,
   });
-  if (!decision.useEvil) {
+  if (!decision.useJester) {
     return params.files;
   }
 
   const workspaceDir = resolveUserPath(params.workspaceDir);
-  const evilPath = path.join(workspaceDir, decision.fileName);
-  let evilContent: string;
+  const jesterPath = path.join(workspaceDir, decision.fileName);
+  let jesterContent: string;
   try {
-    evilContent = await fs.readFile(evilPath, "utf-8");
+    jesterContent = await fs.readFile(jesterPath, "utf-8");
   } catch {
     params.log?.warn?.(
-      `SOUL_EVIL active (${decision.reason ?? "unknown"}) but file missing: ${evilPath}`,
+      `SOUL_JESTER active (${decision.reason ?? "unknown"}) but file missing: ${jesterPath}`,
     );
     return params.files;
   }
 
-  if (!evilContent.trim()) {
+  if (!jesterContent.trim()) {
     params.log?.warn?.(
-      `SOUL_EVIL active (${decision.reason ?? "unknown"}) but file empty: ${evilPath}`,
+      `SOUL_JESTER active (${decision.reason ?? "unknown"}) but file empty: ${jesterPath}`,
     );
     return params.files;
   }
@@ -255,7 +255,7 @@ export async function applySoulEvilOverride(params: {
   const hasSoulEntry = params.files.some((file) => file.name === "SOUL.md");
   if (!hasSoulEntry) {
     params.log?.warn?.(
-      `SOUL_EVIL active (${decision.reason ?? "unknown"}) but SOUL.md not in bootstrap files`,
+      `SOUL_JESTER active (${decision.reason ?? "unknown"}) but SOUL.md not in bootstrap files`,
     );
     return params.files;
   }
@@ -266,14 +266,14 @@ export async function applySoulEvilOverride(params: {
       return file;
     }
     replaced = true;
-    return { ...file, content: evilContent, missing: false };
+    return { ...file, content: jesterContent, missing: false };
   });
   if (!replaced) {
     return params.files;
   }
 
   params.log?.debug?.(
-    `SOUL_EVIL active (${decision.reason ?? "unknown"}) using ${decision.fileName}`,
+    `SOUL_JESTER active (${decision.reason ?? "unknown"}) using ${decision.fileName}`,
   );
 
   return updated;

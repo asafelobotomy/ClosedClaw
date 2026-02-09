@@ -169,7 +169,7 @@ export async function setupSkills(
         runtime.log(
           `Tip: run \`${formatCliCommand("ClosedClaw doctor")}\` to review skills + requirements.`,
         );
-        runtime.log("Docs: https://docs.ClosedClaw.ai/skills");
+        runtime.log("Docs: https://docs.OpenClaw.ai/skills");
       }
     }
   }

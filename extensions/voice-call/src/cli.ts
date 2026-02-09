@@ -54,7 +54,7 @@ export function registerVoiceCallCli(params: {
   const root = program
     .command("voicecall")
     .description("Voice call utilities")
-    .addHelpText("after", () => `\nDocs: https://docs.ClosedClaw.ai/cli/voicecall\n`);
+    .addHelpText("after", () => `\nDocs: https://docs.OpenClaw.ai/cli/voicecall\n`);
 
   root
     .command("call")

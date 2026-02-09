@@ -60,10 +60,10 @@ You can also set `ClosedClaw_VERBOSE=1` instead of the flag.
 - [Gateway troubleshooting](/gateway/troubleshooting)
 - [Control UI](/web/control-ui#insecure-http)
 
-### `docs.ClosedClaw.ai` shows an SSL error (Comcast/Xfinity)
+### `docs.OpenClaw.ai` shows an SSL error (Comcast/Xfinity)
 
-Some Comcast/Xfinity connections block `docs.ClosedClaw.ai` via Xfinity Advanced Security.
-Disable Advanced Security or add `docs.ClosedClaw.ai` to the allowlist, then retry.
+Some Comcast/Xfinity connections block `docs.OpenClaw.ai` via Xfinity Advanced Security.
+Disable Advanced Security or add `docs.OpenClaw.ai` to the allowlist, then retry.
 
 - Xfinity Advanced Security help: https://www.xfinity.com/support/articles/using-xfinity-xfi-advanced-security
 - Quick sanity checks: try a mobile hotspot or VPN to confirm it’s ISP-level filtering

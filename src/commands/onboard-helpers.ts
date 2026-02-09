@@ -197,8 +197,8 @@ export function formatControlUiSshHint(params: {
     localUrl,
     authedUrl,
     "Docs:",
-    "https://docs.ClosedClaw.ai/gateway/remote",
-    "https://docs.ClosedClaw.ai/web/control-ui",
+    "https://docs.OpenClaw.ai/gateway/remote",
+    "https://docs.OpenClaw.ai/web/control-ui",
   ]
     .filter(Boolean)
     .join("\n");

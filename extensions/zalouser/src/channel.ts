@@ -505,7 +505,7 @@ export const zalouserPlugin: ChannelPlugin<ResolvedZalouserAccount> = {
       const ok = await checkZcaInstalled();
       if (!ok) {
         throw new Error(
-          "Missing dependency: `zca` not found in PATH. See docs.ClosedClaw.ai/channels/zalouser",
+          "Missing dependency: `zca` not found in PATH. See docs.OpenClaw.ai/channels/zalouser",
         );
       }
       runtime.log(

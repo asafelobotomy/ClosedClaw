@@ -10,8 +10,10 @@ import {
   shouldDeferShellEnvFallback,
   shouldEnableShellEnvFallback,
 } from "../infra/shell-env.js";
+import { DEFAULT_ENCRYPTION_CONFIG } from "../security/crypto.js";
 import { VERSION } from "../version.js";
 import { DuplicateAgentDirError, findDuplicateAgentDirs } from "./agent-dirs.js";
+import { encryptConfigBackup } from "./backup-encryption.js";
 import {
   applyCompactionDefaults,
   applyContextPruningDefaults,
@@ -512,6 +514,14 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
       await deps.fs.promises.copyFile(configPath, `${configPath}.bak`).catch(() => {
         // best-effort
       });
+
+      // Encrypt the backup file if encryption is enabled
+      try {
+        await encryptConfigBackup(`${configPath}.bak`, DEFAULT_ENCRYPTION_CONFIG);
+      } catch (err) {
+        // Best-effort encryption - log but don't fail the write
+        deps.logger.warn(`Failed to encrypt config backup: ${err}`);
+      }
     }
 
     try {

@@ -1,7 +1,7 @@
 ---
 name: command-logger
 description: "Log all command events to a centralized audit file"
-homepage: https://docs.ClosedClaw.ai/hooks#command-logger
+homepage: https://docs.OpenClaw.ai/hooks#command-logger
 metadata:
   {
     "ClosedClaw":

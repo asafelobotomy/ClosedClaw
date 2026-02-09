@@ -80,7 +80,7 @@ Multi-account config (advanced):
 
 ## Full documentation
 
-See https://docs.ClosedClaw.ai/channels/twitch for:
+See https://docs.OpenClaw.ai/channels/twitch for:
 
 - Token refresh setup
 - Access control patterns

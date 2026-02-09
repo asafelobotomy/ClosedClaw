@@ -1,6 +1,6 @@
 /**
  * Tests for centralized constants library.
- * 
+ *
  * Validates:
  * - Security constants meet OWASP/NIST guidelines
  * - Type safety and immutability
@@ -31,7 +31,7 @@ describe("SECURITY constants", () => {
 
     it("should meet OWASP Argon2id minimums", () => {
       const { memory, iterations, parallelism, keyLength } = SECURITY.ENCRYPTION.KDF_PARAMS;
-      
+
       // OWASP 2022: minimum 46 MB memory, 1 iteration for interactive
       // We exceed this with 64 MB and 3 iterations
       expect(memory).toBeGreaterThanOrEqual(46 * 1024); // 46 MB in KiB
@@ -340,14 +340,18 @@ describe("Type safety", () => {
   it("should enforce compile-time immutability for nested objects", () => {
     // TypeScript `as const` prevents mutation at compile-time
     // @ts-expect-error - Cannot assign to read-only property
-    const _test1 = () => { SECURITY.ENCRYPTION.KDF_PARAMS.memory = 1024; };
+    const _test1 = () => {
+      SECURITY.ENCRYPTION.KDF_PARAMS.memory = 1024;
+    };
     expect(_test1).toBeDefined();
   });
 
   it("should enforce compile-time immutability for arrays", () => {
     // TypeScript `as const` prevents array mutation at compile-time
     // @ts-expect-error - Cannot assign to read-only array
-    const _test2 = () => { SECURITY.PASSPHRASE.WEAK_PATTERNS.push("new-pattern"); };
+    const _test2 = () => {
+      SECURITY.PASSPHRASE.WEAK_PATTERNS.push("new-pattern");
+    };
     expect(_test2).toBeDefined();
   });
 
@@ -357,7 +361,7 @@ describe("Type safety", () => {
     const _kdf: "argon2id" = SECURITY.ENCRYPTION.KDF;
     const _mode: "all" = SECURITY.SANDBOX.MODE;
     const _channel: "stable" = NETWORK.UPDATE.PACKAGE_CHANNEL;
-    
+
     // Silence unused variable warnings
     expect(_encryptionAlgorithm).toBeDefined();
     expect(_kdf).toBeDefined();

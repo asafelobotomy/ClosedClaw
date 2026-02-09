@@ -1,8 +1,11 @@
+import fs from "node:fs/promises";
 import type { ChannelId } from "../channels/plugins/types.js";
 import type { ClosedClawConfig, GatewayBindMode } from "../config/config.js";
 import { resolveChannelDefaultAccountId } from "../channels/plugins/helpers.js";
 import { listChannelPlugins } from "../channels/plugins/index.js";
 import { formatCliCommand } from "../cli/command-format.js";
+import { encryptAllConfigBackups } from "../config/backup-encryption.js";
+import { resolveConfigPath } from "../config/paths.js";
 import { resolveGatewayAuth } from "../gateway/auth.js";
 import { isLoopbackHost, resolveGatewayBindHost } from "../gateway/net.js";
 import { readChannelAllowFromStore } from "../pairing/pairing-store.js";
@@ -182,4 +185,65 @@ export async function noteSecurityWarnings(cfg: ClosedClawConfig) {
   const lines = warnings.length > 0 ? warnings : ["- No channel security warnings detected."];
   lines.push(auditHint);
   note(lines.join("\n"), "Security");
+
+  // ===========================================
+  // ENCRYPTION STATUS CHECK
+  // ===========================================
+  await noteEncryptionStatus(cfg);
+}
+
+/**
+ * Check encryption configuration and backup encryption status.
+ */
+async function noteEncryptionStatus(cfg: ClosedClawConfig) {
+  const configPath = resolveConfigPath();
+  const backupInfoLines: string[] = [];
+
+  // Check for unencrypted backup files
+  const backupBase = `${configPath}.bak`;
+  const backupPaths = [
+    backupBase,
+    ...Array.from({ length: 5 }, (_, i) => `${backupBase}.${i + 1}`),
+  ];
+
+  let plainTextBackups = 0;
+  let encryptedBackups = 0;
+  let missingBackups = 0;
+
+  for (const backupPath of backupPaths) {
+    try {
+      const content = await fs.readFile(backupPath, "utf-8");
+      const parsed = JSON.parse(content);
+      if (parsed.$encrypted === true) {
+        encryptedBackups += 1;
+      } else {
+        plainTextBackups += 1;
+      }
+    } catch (err) {
+      const error = err as { code?: string };
+      if (error.code === "ENOENT") {
+        missingBackups += 1;
+      }
+    }
+  }
+
+  const totalBackups = plainTextBackups + encryptedBackups;
+
+  if (plainTextBackups > 0) {
+    backupInfoLines.push(
+      `- WARNING: ${plainTextBackups} config backup(s) are unencrypted.`,
+      `  Backups may contain sensitive API keys and credentials.`,
+      `  Fix: Run ${formatCliCommand("ClosedClaw security encrypt-backups")}`,
+    );
+  }
+
+  if (encryptedBackups > 0) {
+    backupInfoLines.push(`- ${encryptedBackups}/${totalBackups} config backups are encrypted.`);
+  }
+
+  if (backupInfoLines.length === 0 && totalBackups === 0) {
+    backupInfoLines.push("- No config backups found (first write will create them).");
+  }
+
+  note(backupInfoLines.join("\n"), "Encryption");
 }

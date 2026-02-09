@@ -6,12 +6,12 @@ import { makeTempWorkspace, writeWorkspaceFile } from "../../../test-helpers/wor
 import { createHookEvent } from "../../hooks.js";
 import handler from "./handler.js";
 
-describe("soul-evil hook", () => {
+describe("soul-jester hook", () => {
   it("skips subagent sessions", async () => {
     const tempDir = await makeTempWorkspace("ClosedClaw-soul-");
     await writeWorkspaceFile({
       dir: tempDir,
-      name: "SOUL_EVIL.md",
+      name: "SOUL_JESTER.md",
       content: "chaotic",
     });
 
@@ -19,7 +19,7 @@ describe("soul-evil hook", () => {
       hooks: {
         internal: {
           entries: {
-            "soul-evil": { enabled: true, chance: 1 },
+            "soul-jester": { enabled: true, chance: 1 },
           },
         },
       },

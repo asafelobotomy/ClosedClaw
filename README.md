@@ -23,23 +23,23 @@ It answers you on the channels you already use (WhatsApp, Telegram, Slack, Disco
 
 If you want a personal, single-user assistant that feels local, fast, and always-on, this is it.
 
-[Website](https://ClosedClaw.ai) · [Docs](https://docs.ClosedClaw.ai) · [DeepWiki](https://deepwiki.com/ClosedClaw/ClosedClaw) · [Getting Started](https://docs.ClosedClaw.ai/start/getting-started) · [Updating](https://docs.ClosedClaw.ai/install/updating) · [Showcase](https://docs.ClosedClaw.ai/start/showcase) · [FAQ](https://docs.ClosedClaw.ai/start/faq) · [Wizard](https://docs.ClosedClaw.ai/start/wizard) · [Nix](https://github.com/ClosedClaw/nix-clawdbot) · [Docker](https://docs.ClosedClaw.ai/install/docker) · [Discord](https://discord.gg/clawd)
+[Website](https://ClosedClaw.ai) · [Docs](https://docs.OpenClaw.ai) · [DeepWiki](https://deepwiki.com/ClosedClaw/ClosedClaw) · [Getting Started](https://docs.OpenClaw.ai/start/getting-started) · [Updating](https://docs.OpenClaw.ai/install/updating) · [Showcase](https://docs.OpenClaw.ai/start/showcase) · [FAQ](https://docs.OpenClaw.ai/start/faq) · [Wizard](https://docs.OpenClaw.ai/start/wizard) · [Nix](https://github.com/ClosedClaw/nix-clawdbot) · [Docker](https://docs.OpenClaw.ai/install/docker) · [Discord](https://discord.gg/clawd)
 
 Preferred setup: run the onboarding wizard (`ClosedClaw onboard`). It walks through gateway, workspace, channels, and skills. The CLI wizard is the recommended path and works on **macOS, Linux, and Windows (via WSL2; strongly recommended)**.
 Works with npm, pnpm, or bun.
-New install? Start here: [Getting started](https://docs.ClosedClaw.ai/start/getting-started)
+New install? Start here: [Getting started](https://docs.OpenClaw.ai/start/getting-started)
 
 **Subscriptions (OAuth):**
 
 - **[Anthropic](https://www.anthropic.com/)** (Claude Pro/Max)
 - **[OpenAI](https://openai.com/)** (ChatGPT/Codex)
 
-Model note: while any model is supported, I strongly recommend **Anthropic Pro/Max (100/200) + Opus 4.5** for long‑context strength and better prompt‑injection resistance. See [Onboarding](https://docs.ClosedClaw.ai/start/onboarding).
+Model note: while any model is supported, I strongly recommend **Anthropic Pro/Max (100/200) + Opus 4.5** for long‑context strength and better prompt‑injection resistance. See [Onboarding](https://docs.OpenClaw.ai/start/onboarding).
 
 ## Models (selection + auth)
 
-- Models config + CLI: [Models](https://docs.ClosedClaw.ai/concepts/models)
-- Auth profile rotation (OAuth vs API keys) + fallbacks: [Model failover](https://docs.ClosedClaw.ai/concepts/model-failover)
+- Models config + CLI: [Models](https://docs.OpenClaw.ai/concepts/models)
+- Auth profile rotation (OAuth vs API keys) + fallbacks: [Model failover](https://docs.OpenClaw.ai/concepts/model-failover)
 
 ## Install (recommended)
 
@@ -58,7 +58,7 @@ The wizard installs the Gateway daemon (launchd/systemd user service) so it stay
 
 Runtime: **Node ≥22**.
 
-Full beginner guide (auth, pairing, channels): [Getting started](https://docs.ClosedClaw.ai/start/getting-started)
+Full beginner guide (auth, pairing, channels): [Getting started](https://docs.OpenClaw.ai/start/getting-started)
 
 ```bash
 ClosedClaw onboard --install-daemon
@@ -72,7 +72,7 @@ ClosedClaw message send --to +1234567890 --message "Hello from ClosedClaw"
 ClosedClaw agent --message "Ship checklist" --thinking high
 ```
 
-Upgrading? [Updating guide](https://docs.ClosedClaw.ai/install/updating) (and run `ClosedClaw doctor`).
+Upgrading? [Updating guide](https://docs.OpenClaw.ai/install/updating) (and run `ClosedClaw doctor`).
 
 ## Development channels
 
@@ -81,7 +81,7 @@ Upgrading? [Updating guide](https://docs.ClosedClaw.ai/install/updating) (and ru
 - **dev**: moving head of `main`, npm dist-tag `dev` (when published).
 
 Switch channels (git + npm): `ClosedClaw update --channel stable|beta|dev`.
-Details: [Development channels](https://docs.ClosedClaw.ai/install/development-channels).
+Details: [Development channels](https://docs.OpenClaw.ai/install/development-channels).
 
 ## From source (development)
 
@@ -107,7 +107,7 @@ Note: `pnpm ClosedClaw ...` runs TypeScript directly (via `tsx`). `pnpm build` p
 
 ClosedClaw connects to real messaging surfaces. Treat inbound DMs as **untrusted input**.
 
-Full security guide: [Security](https://docs.ClosedClaw.ai/gateway/security)
+Full security guide: [Security](https://docs.OpenClaw.ai/gateway/security)
 
 Default behavior on Telegram/WhatsApp/Signal/iMessage/Microsoft Teams/Discord/Google Chat/Slack:
 
@@ -119,14 +119,14 @@ Run `ClosedClaw doctor` to surface risky/misconfigured DM policies.
 
 ## Highlights
 
-- **[Local-first Gateway](https://docs.ClosedClaw.ai/gateway)** — single control plane for sessions, channels, tools, and events.
-- **[Multi-channel inbox](https://docs.ClosedClaw.ai/channels)** — WhatsApp, Telegram, Slack, Discord, Google Chat, Signal, iMessage, BlueBubbles, Microsoft Teams, Matrix, Zalo, Zalo Personal, WebChat, macOS, iOS/Android.
-- **[Multi-agent routing](https://docs.ClosedClaw.ai/gateway/configuration)** — route inbound channels/accounts/peers to isolated agents (workspaces + per-agent sessions).
-- **[Voice Wake](https://docs.ClosedClaw.ai/nodes/voicewake) + [Talk Mode](https://docs.ClosedClaw.ai/nodes/talk)** — always-on speech for macOS/iOS/Android with ElevenLabs.
-- **[Live Canvas](https://docs.ClosedClaw.ai/platforms/mac/canvas)** — agent-driven visual workspace with [A2UI](https://docs.ClosedClaw.ai/platforms/mac/canvas#canvas-a2ui).
-- **[First-class tools](https://docs.ClosedClaw.ai/tools)** — browser, canvas, nodes, cron, sessions, and Discord/Slack actions.
-- **[Companion apps](https://docs.ClosedClaw.ai/platforms/macos)** — macOS menu bar app + iOS/Android [nodes](https://docs.ClosedClaw.ai/nodes).
-- **[Onboarding](https://docs.ClosedClaw.ai/start/wizard) + [skills](https://docs.ClosedClaw.ai/tools/skills)** — wizard-driven setup with bundled/managed/workspace skills.
+- **[Local-first Gateway](https://docs.OpenClaw.ai/gateway)** — single control plane for sessions, channels, tools, and events.
+- **[Multi-channel inbox](https://docs.OpenClaw.ai/channels)** — WhatsApp, Telegram, Slack, Discord, Google Chat, Signal, iMessage, BlueBubbles, Microsoft Teams, Matrix, Zalo, Zalo Personal, WebChat, macOS, iOS/Android.
+- **[Multi-agent routing](https://docs.OpenClaw.ai/gateway/configuration)** — route inbound channels/accounts/peers to isolated agents (workspaces + per-agent sessions).
+- **[Voice Wake](https://docs.OpenClaw.ai/nodes/voicewake) + [Talk Mode](https://docs.OpenClaw.ai/nodes/talk)** — always-on speech for macOS/iOS/Android with ElevenLabs.
+- **[Live Canvas](https://docs.OpenClaw.ai/platforms/mac/canvas)** — agent-driven visual workspace with [A2UI](https://docs.OpenClaw.ai/platforms/mac/canvas#canvas-a2ui).
+- **[First-class tools](https://docs.OpenClaw.ai/tools)** — browser, canvas, nodes, cron, sessions, and Discord/Slack actions.
+- **[Companion apps](https://docs.OpenClaw.ai/platforms/macos)** — macOS menu bar app + iOS/Android [nodes](https://docs.OpenClaw.ai/nodes).
+- **[Onboarding](https://docs.OpenClaw.ai/start/wizard) + [skills](https://docs.OpenClaw.ai/tools/skills)** — wizard-driven setup with bundled/managed/workspace skills.
 
 ## Star History
 
@@ -136,45 +136,45 @@ Run `ClosedClaw doctor` to surface risky/misconfigured DM policies.
 
 ### Core platform
 
-- [Gateway WS control plane](https://docs.ClosedClaw.ai/gateway) with sessions, presence, config, cron, webhooks, [Control UI](https://docs.ClosedClaw.ai/web), and [Canvas host](https://docs.ClosedClaw.ai/platforms/mac/canvas#canvas-a2ui).
-- [CLI surface](https://docs.ClosedClaw.ai/tools/agent-send): gateway, agent, send, [wizard](https://docs.ClosedClaw.ai/start/wizard), and [doctor](https://docs.ClosedClaw.ai/gateway/doctor).
-- [Pi agent runtime](https://docs.ClosedClaw.ai/concepts/agent) in RPC mode with tool streaming and block streaming.
-- [Session model](https://docs.ClosedClaw.ai/concepts/session): `main` for direct chats, group isolation, activation modes, queue modes, reply-back. Group rules: [Groups](https://docs.ClosedClaw.ai/concepts/groups).
-- [Media pipeline](https://docs.ClosedClaw.ai/nodes/images): images/audio/video, transcription hooks, size caps, temp file lifecycle. Audio details: [Audio](https://docs.ClosedClaw.ai/nodes/audio).
+- [Gateway WS control plane](https://docs.OpenClaw.ai/gateway) with sessions, presence, config, cron, webhooks, [Control UI](https://docs.OpenClaw.ai/web), and [Canvas host](https://docs.OpenClaw.ai/platforms/mac/canvas#canvas-a2ui).
+- [CLI surface](https://docs.OpenClaw.ai/tools/agent-send): gateway, agent, send, [wizard](https://docs.OpenClaw.ai/start/wizard), and [doctor](https://docs.OpenClaw.ai/gateway/doctor).
+- [Pi agent runtime](https://docs.OpenClaw.ai/concepts/agent) in RPC mode with tool streaming and block streaming.
+- [Session model](https://docs.OpenClaw.ai/concepts/session): `main` for direct chats, group isolation, activation modes, queue modes, reply-back. Group rules: [Groups](https://docs.OpenClaw.ai/concepts/groups).
+- [Media pipeline](https://docs.OpenClaw.ai/nodes/images): images/audio/video, transcription hooks, size caps, temp file lifecycle. Audio details: [Audio](https://docs.OpenClaw.ai/nodes/audio).
 
 ### Channels
 
-- [Channels](https://docs.ClosedClaw.ai/channels): [WhatsApp](https://docs.ClosedClaw.ai/channels/whatsapp) (Baileys), [Telegram](https://docs.ClosedClaw.ai/channels/telegram) (grammY), [Slack](https://docs.ClosedClaw.ai/channels/slack) (Bolt), [Discord](https://docs.ClosedClaw.ai/channels/discord) (discord.js), [Google Chat](https://docs.ClosedClaw.ai/channels/googlechat) (Chat API), [Signal](https://docs.ClosedClaw.ai/channels/signal) (signal-cli), [iMessage](https://docs.ClosedClaw.ai/channels/imessage) (imsg), [BlueBubbles](https://docs.ClosedClaw.ai/channels/bluebubbles) (extension), [Microsoft Teams](https://docs.ClosedClaw.ai/channels/msteams) (extension), [Matrix](https://docs.ClosedClaw.ai/channels/matrix) (extension), [Zalo](https://docs.ClosedClaw.ai/channels/zalo) (extension), [Zalo Personal](https://docs.ClosedClaw.ai/channels/zalouser) (extension), [WebChat](https://docs.ClosedClaw.ai/web/webchat).
-- [Group routing](https://docs.ClosedClaw.ai/concepts/group-messages): mention gating, reply tags, per-channel chunking and routing. Channel rules: [Channels](https://docs.ClosedClaw.ai/channels).
+- [Channels](https://docs.OpenClaw.ai/channels): [WhatsApp](https://docs.OpenClaw.ai/channels/whatsapp) (Baileys), [Telegram](https://docs.OpenClaw.ai/channels/telegram) (grammY), [Slack](https://docs.OpenClaw.ai/channels/slack) (Bolt), [Discord](https://docs.OpenClaw.ai/channels/discord) (discord.js), [Google Chat](https://docs.OpenClaw.ai/channels/googlechat) (Chat API), [Signal](https://docs.OpenClaw.ai/channels/signal) (signal-cli), [iMessage](https://docs.OpenClaw.ai/channels/imessage) (imsg), [BlueBubbles](https://docs.OpenClaw.ai/channels/bluebubbles) (extension), [Microsoft Teams](https://docs.OpenClaw.ai/channels/msteams) (extension), [Matrix](https://docs.OpenClaw.ai/channels/matrix) (extension), [Zalo](https://docs.OpenClaw.ai/channels/zalo) (extension), [Zalo Personal](https://docs.OpenClaw.ai/channels/zalouser) (extension), [WebChat](https://docs.OpenClaw.ai/web/webchat).
+- [Group routing](https://docs.OpenClaw.ai/concepts/group-messages): mention gating, reply tags, per-channel chunking and routing. Channel rules: [Channels](https://docs.OpenClaw.ai/channels).
 
 ### Apps + nodes
 
-- [macOS app](https://docs.ClosedClaw.ai/platforms/macos): menu bar control plane, [Voice Wake](https://docs.ClosedClaw.ai/nodes/voicewake)/PTT, [Talk Mode](https://docs.ClosedClaw.ai/nodes/talk) overlay, [WebChat](https://docs.ClosedClaw.ai/web/webchat), debug tools, [remote gateway](https://docs.ClosedClaw.ai/gateway/remote) control.
-- [iOS node](https://docs.ClosedClaw.ai/platforms/ios): [Canvas](https://docs.ClosedClaw.ai/platforms/mac/canvas), [Voice Wake](https://docs.ClosedClaw.ai/nodes/voicewake), [Talk Mode](https://docs.ClosedClaw.ai/nodes/talk), camera, screen recording, Bonjour pairing.
-- [Android node](https://docs.ClosedClaw.ai/platforms/android): [Canvas](https://docs.ClosedClaw.ai/platforms/mac/canvas), [Talk Mode](https://docs.ClosedClaw.ai/nodes/talk), camera, screen recording, optional SMS.
-- [macOS node mode](https://docs.ClosedClaw.ai/nodes): system.run/notify + canvas/camera exposure.
+- [macOS app](https://docs.OpenClaw.ai/platforms/macos): menu bar control plane, [Voice Wake](https://docs.OpenClaw.ai/nodes/voicewake)/PTT, [Talk Mode](https://docs.OpenClaw.ai/nodes/talk) overlay, [WebChat](https://docs.OpenClaw.ai/web/webchat), debug tools, [remote gateway](https://docs.OpenClaw.ai/gateway/remote) control.
+- [iOS node](https://docs.OpenClaw.ai/platforms/ios): [Canvas](https://docs.OpenClaw.ai/platforms/mac/canvas), [Voice Wake](https://docs.OpenClaw.ai/nodes/voicewake), [Talk Mode](https://docs.OpenClaw.ai/nodes/talk), camera, screen recording, Bonjour pairing.
+- [Android node](https://docs.OpenClaw.ai/platforms/android): [Canvas](https://docs.OpenClaw.ai/platforms/mac/canvas), [Talk Mode](https://docs.OpenClaw.ai/nodes/talk), camera, screen recording, optional SMS.
+- [macOS node mode](https://docs.OpenClaw.ai/nodes): system.run/notify + canvas/camera exposure.
 
 ### Tools + automation
 
-- [Browser control](https://docs.ClosedClaw.ai/tools/browser): dedicated ClosedClaw Chrome/Chromium, snapshots, actions, uploads, profiles.
-- [Canvas](https://docs.ClosedClaw.ai/platforms/mac/canvas): [A2UI](https://docs.ClosedClaw.ai/platforms/mac/canvas#canvas-a2ui) push/reset, eval, snapshot.
-- [Nodes](https://docs.ClosedClaw.ai/nodes): camera snap/clip, screen record, [location.get](https://docs.ClosedClaw.ai/nodes/location-command), notifications.
-- [Cron + wakeups](https://docs.ClosedClaw.ai/automation/cron-jobs); [webhooks](https://docs.ClosedClaw.ai/automation/webhook); [Gmail Pub/Sub](https://docs.ClosedClaw.ai/automation/gmail-pubsub).
-- [Skills platform](https://docs.ClosedClaw.ai/tools/skills): bundled, managed, and workspace skills with install gating + UI.
+- [Browser control](https://docs.OpenClaw.ai/tools/browser): dedicated ClosedClaw Chrome/Chromium, snapshots, actions, uploads, profiles.
+- [Canvas](https://docs.OpenClaw.ai/platforms/mac/canvas): [A2UI](https://docs.OpenClaw.ai/platforms/mac/canvas#canvas-a2ui) push/reset, eval, snapshot.
+- [Nodes](https://docs.OpenClaw.ai/nodes): camera snap/clip, screen record, [location.get](https://docs.OpenClaw.ai/nodes/location-command), notifications.
+- [Cron + wakeups](https://docs.OpenClaw.ai/automation/cron-jobs); [webhooks](https://docs.OpenClaw.ai/automation/webhook); [Gmail Pub/Sub](https://docs.OpenClaw.ai/automation/gmail-pubsub).
+- [Skills platform](https://docs.OpenClaw.ai/tools/skills): bundled, managed, and workspace skills with install gating + UI.
 
 ### Runtime + safety
 
-- [Channel routing](https://docs.ClosedClaw.ai/concepts/channel-routing), [retry policy](https://docs.ClosedClaw.ai/concepts/retry), and [streaming/chunking](https://docs.ClosedClaw.ai/concepts/streaming).
-- [Presence](https://docs.ClosedClaw.ai/concepts/presence), [typing indicators](https://docs.ClosedClaw.ai/concepts/typing-indicators), and [usage tracking](https://docs.ClosedClaw.ai/concepts/usage-tracking).
-- [Models](https://docs.ClosedClaw.ai/concepts/models), [model failover](https://docs.ClosedClaw.ai/concepts/model-failover), and [session pruning](https://docs.ClosedClaw.ai/concepts/session-pruning).
-- [Security](https://docs.ClosedClaw.ai/gateway/security) and [troubleshooting](https://docs.ClosedClaw.ai/channels/troubleshooting).
+- [Channel routing](https://docs.OpenClaw.ai/concepts/channel-routing), [retry policy](https://docs.OpenClaw.ai/concepts/retry), and [streaming/chunking](https://docs.OpenClaw.ai/concepts/streaming).
+- [Presence](https://docs.OpenClaw.ai/concepts/presence), [typing indicators](https://docs.OpenClaw.ai/concepts/typing-indicators), and [usage tracking](https://docs.OpenClaw.ai/concepts/usage-tracking).
+- [Models](https://docs.OpenClaw.ai/concepts/models), [model failover](https://docs.OpenClaw.ai/concepts/model-failover), and [session pruning](https://docs.OpenClaw.ai/concepts/session-pruning).
+- [Security](https://docs.OpenClaw.ai/gateway/security) and [troubleshooting](https://docs.OpenClaw.ai/channels/troubleshooting).
 
 ### Ops + packaging
 
-- [Control UI](https://docs.ClosedClaw.ai/web) + [WebChat](https://docs.ClosedClaw.ai/web/webchat) served directly from the Gateway.
-- [Tailscale Serve/Funnel](https://docs.ClosedClaw.ai/gateway/tailscale) or [SSH tunnels](https://docs.ClosedClaw.ai/gateway/remote) with token/password auth.
-- [Nix mode](https://docs.ClosedClaw.ai/install/nix) for declarative config; [Docker](https://docs.ClosedClaw.ai/install/docker)-based installs.
-- [Doctor](https://docs.ClosedClaw.ai/gateway/doctor) migrations, [logging](https://docs.ClosedClaw.ai/logging).
+- [Control UI](https://docs.OpenClaw.ai/web) + [WebChat](https://docs.OpenClaw.ai/web/webchat) served directly from the Gateway.
+- [Tailscale Serve/Funnel](https://docs.OpenClaw.ai/gateway/tailscale) or [SSH tunnels](https://docs.OpenClaw.ai/gateway/remote) with token/password auth.
+- [Nix mode](https://docs.OpenClaw.ai/install/nix) for declarative config; [Docker](https://docs.OpenClaw.ai/install/docker)-based installs.
+- [Doctor](https://docs.OpenClaw.ai/gateway/doctor) migrations, [logging](https://docs.OpenClaw.ai/logging).
 
 ## How it works (short)
 
@@ -197,12 +197,12 @@ WhatsApp / Telegram / Slack / Discord / Google Chat / Signal / iMessage / BlueBu
 
 ## Key subsystems
 
-- **[Gateway WebSocket network](https://docs.ClosedClaw.ai/concepts/architecture)** — single WS control plane for clients, tools, and events (plus ops: [Gateway runbook](https://docs.ClosedClaw.ai/gateway)).
-- **[Tailscale exposure](https://docs.ClosedClaw.ai/gateway/tailscale)** — Serve/Funnel for the Gateway dashboard + WS (remote access: [Remote](https://docs.ClosedClaw.ai/gateway/remote)).
-- **[Browser control](https://docs.ClosedClaw.ai/tools/browser)** — ClosedClaw‑managed Chrome/Chromium with CDP control.
-- **[Canvas + A2UI](https://docs.ClosedClaw.ai/platforms/mac/canvas)** — agent‑driven visual workspace (A2UI host: [Canvas/A2UI](https://docs.ClosedClaw.ai/platforms/mac/canvas#canvas-a2ui)).
-- **[Voice Wake](https://docs.ClosedClaw.ai/nodes/voicewake) + [Talk Mode](https://docs.ClosedClaw.ai/nodes/talk)** — always‑on speech and continuous conversation.
-- **[Nodes](https://docs.ClosedClaw.ai/nodes)** — Canvas, camera snap/clip, screen record, `location.get`, notifications, plus macOS‑only `system.run`/`system.notify`.
+- **[Gateway WebSocket network](https://docs.OpenClaw.ai/concepts/architecture)** — single WS control plane for clients, tools, and events (plus ops: [Gateway runbook](https://docs.OpenClaw.ai/gateway)).
+- **[Tailscale exposure](https://docs.OpenClaw.ai/gateway/tailscale)** — Serve/Funnel for the Gateway dashboard + WS (remote access: [Remote](https://docs.OpenClaw.ai/gateway/remote)).
+- **[Browser control](https://docs.OpenClaw.ai/tools/browser)** — ClosedClaw‑managed Chrome/Chromium with CDP control.
+- **[Canvas + A2UI](https://docs.OpenClaw.ai/platforms/mac/canvas)** — agent‑driven visual workspace (A2UI host: [Canvas/A2UI](https://docs.OpenClaw.ai/platforms/mac/canvas#canvas-a2ui)).
+- **[Voice Wake](https://docs.OpenClaw.ai/nodes/voicewake) + [Talk Mode](https://docs.OpenClaw.ai/nodes/talk)** — always‑on speech and continuous conversation.
+- **[Nodes](https://docs.OpenClaw.ai/nodes)** — Canvas, camera snap/clip, screen record, `location.get`, notifications, plus macOS‑only `system.run`/`system.notify`.
 
 ## Tailscale access (Gateway dashboard)
 
@@ -219,7 +219,7 @@ Notes:
 - Funnel refuses to start unless `gateway.auth.mode: "password"` is set.
 - Optional: `gateway.tailscale.resetOnExit` to undo Serve/Funnel on shutdown.
 
-Details: [Tailscale guide](https://docs.ClosedClaw.ai/gateway/tailscale) · [Web surfaces](https://docs.ClosedClaw.ai/web)
+Details: [Tailscale guide](https://docs.OpenClaw.ai/gateway/tailscale) · [Web surfaces](https://docs.OpenClaw.ai/web)
 
 ## Remote Gateway (Linux is great)
 
@@ -229,7 +229,7 @@ It’s perfectly fine to run the Gateway on a small Linux instance. Clients (mac
 - **Device nodes** run device‑local actions (`system.run`, camera, screen recording, notifications) via `node.invoke`.
   In short: exec runs where the Gateway lives; device actions run where the device lives.
 
-Details: [Remote access](https://docs.ClosedClaw.ai/gateway/remote) · [Nodes](https://docs.ClosedClaw.ai/nodes) · [Security](https://docs.ClosedClaw.ai/gateway/security)
+Details: [Remote access](https://docs.OpenClaw.ai/gateway/remote) · [Nodes](https://docs.OpenClaw.ai/nodes) · [Security](https://docs.OpenClaw.ai/gateway/security)
 
 ## macOS permissions via the Gateway protocol
 
@@ -244,7 +244,7 @@ Elevated bash (host permissions) is separate from macOS TCC:
 - Use `/elevated on|off` to toggle per‑session elevated access when enabled + allowlisted.
 - Gateway persists the per‑session toggle via `sessions.patch` (WS method) alongside `thinkingLevel`, `verboseLevel`, `model`, `sendPolicy`, and `groupActivation`.
 
-Details: [Nodes](https://docs.ClosedClaw.ai/nodes) · [macOS app](https://docs.ClosedClaw.ai/platforms/macos) · [Gateway protocol](https://docs.ClosedClaw.ai/concepts/architecture)
+Details: [Nodes](https://docs.OpenClaw.ai/nodes) · [macOS app](https://docs.OpenClaw.ai/platforms/macos) · [Gateway protocol](https://docs.OpenClaw.ai/concepts/architecture)
 
 ## Agent to Agent (sessions\_\* tools)
 
@@ -253,7 +253,7 @@ Details: [Nodes](https://docs.ClosedClaw.ai/nodes) · [macOS app](https://docs.C
 - `sessions_history` — fetch transcript logs for a session.
 - `sessions_send` — message another session; optional reply‑back ping‑pong + announce step (`REPLY_SKIP`, `ANNOUNCE_SKIP`).
 
-Details: [Session tools](https://docs.ClosedClaw.ai/concepts/session-tool)
+Details: [Session tools](https://docs.OpenClaw.ai/concepts/session-tool)
 
 ## Skills registry (ClawHub)
 
@@ -295,13 +295,13 @@ Note: signed builds required for macOS permissions to stick across rebuilds (see
 - Voice trigger forwarding + Canvas surface.
 - Controlled via `ClosedClaw nodes …`.
 
-Runbook: [iOS connect](https://docs.ClosedClaw.ai/platforms/ios).
+Runbook: [iOS connect](https://docs.OpenClaw.ai/platforms/ios).
 
 ### Android node (optional)
 
 - Pairs via the same Bridge + pairing flow as iOS.
 - Exposes Canvas, Camera, and Screen capture commands.
-- Runbook: [Android connect](https://docs.ClosedClaw.ai/platforms/android).
+- Runbook: [Android connect](https://docs.OpenClaw.ai/platforms/android).
 
 ## Agent workspace + skills
 
@@ -321,7 +321,7 @@ Minimal `~/.ClosedClaw/ClosedClaw.json` (model + defaults):
 }
 ```
 
-[Full configuration reference (all keys + examples).](https://docs.ClosedClaw.ai/gateway/configuration)
+[Full configuration reference (all keys + examples).](https://docs.OpenClaw.ai/gateway/configuration)
 
 ## Security model (important)
 
@@ -329,15 +329,15 @@ Minimal `~/.ClosedClaw/ClosedClaw.json` (model + defaults):
 - **Group/channel safety:** set `agents.defaults.sandbox.mode: "non-main"` to run **non‑main sessions** (groups/channels) inside per‑session Docker sandboxes; bash then runs in Docker for those sessions.
 - **Sandbox defaults:** allowlist `bash`, `process`, `read`, `write`, `edit`, `sessions_list`, `sessions_history`, `sessions_send`, `sessions_spawn`; denylist `browser`, `canvas`, `nodes`, `cron`, `discord`, `gateway`.
 
-Details: [Security guide](https://docs.ClosedClaw.ai/gateway/security) · [Docker + sandboxing](https://docs.ClosedClaw.ai/install/docker) · [Sandbox config](https://docs.ClosedClaw.ai/gateway/configuration)
+Details: [Security guide](https://docs.OpenClaw.ai/gateway/security) · [Docker + sandboxing](https://docs.OpenClaw.ai/install/docker) · [Sandbox config](https://docs.OpenClaw.ai/gateway/configuration)
 
-### [WhatsApp](https://docs.ClosedClaw.ai/channels/whatsapp)
+### [WhatsApp](https://docs.OpenClaw.ai/channels/whatsapp)
 
 - Link the device: `pnpm ClosedClaw channels login` (stores creds in `~/.ClosedClaw/credentials`).
 - Allowlist who can talk to the assistant via `channels.whatsapp.allowFrom`.
 - If `channels.whatsapp.groups` is set, it becomes a group allowlist; include `"*"` to allow all.
 
-### [Telegram](https://docs.ClosedClaw.ai/channels/telegram)
+### [Telegram](https://docs.OpenClaw.ai/channels/telegram)
 
 - Set `TELEGRAM_BOT_TOKEN` or `channels.telegram.botToken` (env wins).
 - Optional: set `channels.telegram.groups` (with `channels.telegram.groups."*".requireMention`); when set, it is a group allowlist (include `"*"` to allow all). Also `channels.telegram.allowFrom` or `channels.telegram.webhookUrl` + `channels.telegram.webhookSecret` as needed.
@@ -352,11 +352,11 @@ Details: [Security guide](https://docs.ClosedClaw.ai/gateway/security) · [Docke
 }
 ```
 
-### [Slack](https://docs.ClosedClaw.ai/channels/slack)
+### [Slack](https://docs.OpenClaw.ai/channels/slack)
 
 - Set `SLACK_BOT_TOKEN` + `SLACK_APP_TOKEN` (or `channels.slack.botToken` + `channels.slack.appToken`).
 
-### [Discord](https://docs.ClosedClaw.ai/channels/discord)
+### [Discord](https://docs.OpenClaw.ai/channels/discord)
 
 - Set `DISCORD_BOT_TOKEN` or `channels.discord.token` (env wins).
 - Optional: set `commands.native`, `commands.text`, or `commands.useAccessGroups`, plus `channels.discord.dm.allowFrom`, `channels.discord.guilds`, or `channels.discord.mediaMaxMb` as needed.
@@ -371,21 +371,21 @@ Details: [Security guide](https://docs.ClosedClaw.ai/gateway/security) · [Docke
 }
 ```
 
-### [Signal](https://docs.ClosedClaw.ai/channels/signal)
+### [Signal](https://docs.OpenClaw.ai/channels/signal)
 
 - Requires `signal-cli` and a `channels.signal` config section.
 
-### [iMessage](https://docs.ClosedClaw.ai/channels/imessage)
+### [iMessage](https://docs.OpenClaw.ai/channels/imessage)
 
 - macOS only; Messages must be signed in.
 - If `channels.imessage.groups` is set, it becomes a group allowlist; include `"*"` to allow all.
 
-### [Microsoft Teams](https://docs.ClosedClaw.ai/channels/msteams)
+### [Microsoft Teams](https://docs.OpenClaw.ai/channels/msteams)
 
 - Configure a Teams app + Bot Framework, then add a `msteams` config section.
 - Allowlist who can talk via `msteams.allowFrom`; group access via `msteams.groupAllowFrom` or `msteams.groupPolicy: "open"`.
 
-### [WebChat](https://docs.ClosedClaw.ai/web/webchat)
+### [WebChat](https://docs.OpenClaw.ai/web/webchat)
 
 - Uses the Gateway WebSocket; no separate WebChat port/config.
 
@@ -404,69 +404,69 @@ Browser control (optional):
 
 Use these when you’re past the onboarding flow and want the deeper reference.
 
-- [Start with the docs index for navigation and “what’s where.”](https://docs.ClosedClaw.ai)
-- [Read the architecture overview for the gateway + protocol model.](https://docs.ClosedClaw.ai/concepts/architecture)
-- [Use the full configuration reference when you need every key and example.](https://docs.ClosedClaw.ai/gateway/configuration)
-- [Run the Gateway by the book with the operational runbook.](https://docs.ClosedClaw.ai/gateway)
-- [Learn how the Control UI/Web surfaces work and how to expose them safely.](https://docs.ClosedClaw.ai/web)
-- [Understand remote access over SSH tunnels or tailnets.](https://docs.ClosedClaw.ai/gateway/remote)
-- [Follow the onboarding wizard flow for a guided setup.](https://docs.ClosedClaw.ai/start/wizard)
-- [Wire external triggers via the webhook surface.](https://docs.ClosedClaw.ai/automation/webhook)
-- [Set up Gmail Pub/Sub triggers.](https://docs.ClosedClaw.ai/automation/gmail-pubsub)
-- [Learn the macOS menu bar companion details.](https://docs.ClosedClaw.ai/platforms/mac/menu-bar)
-- [Platform guides: Windows (WSL2)](https://docs.ClosedClaw.ai/platforms/windows), [Linux](https://docs.ClosedClaw.ai/platforms/linux), [macOS](https://docs.ClosedClaw.ai/platforms/macos), [iOS](https://docs.ClosedClaw.ai/platforms/ios), [Android](https://docs.ClosedClaw.ai/platforms/android)
-- [Debug common failures with the troubleshooting guide.](https://docs.ClosedClaw.ai/channels/troubleshooting)
-- [Review security guidance before exposing anything.](https://docs.ClosedClaw.ai/gateway/security)
+- [Start with the docs index for navigation and “what’s where.”](https://docs.OpenClaw.ai)
+- [Read the architecture overview for the gateway + protocol model.](https://docs.OpenClaw.ai/concepts/architecture)
+- [Use the full configuration reference when you need every key and example.](https://docs.OpenClaw.ai/gateway/configuration)
+- [Run the Gateway by the book with the operational runbook.](https://docs.OpenClaw.ai/gateway)
+- [Learn how the Control UI/Web surfaces work and how to expose them safely.](https://docs.OpenClaw.ai/web)
+- [Understand remote access over SSH tunnels or tailnets.](https://docs.OpenClaw.ai/gateway/remote)
+- [Follow the onboarding wizard flow for a guided setup.](https://docs.OpenClaw.ai/start/wizard)
+- [Wire external triggers via the webhook surface.](https://docs.OpenClaw.ai/automation/webhook)
+- [Set up Gmail Pub/Sub triggers.](https://docs.OpenClaw.ai/automation/gmail-pubsub)
+- [Learn the macOS menu bar companion details.](https://docs.OpenClaw.ai/platforms/mac/menu-bar)
+- [Platform guides: Windows (WSL2)](https://docs.OpenClaw.ai/platforms/windows), [Linux](https://docs.OpenClaw.ai/platforms/linux), [macOS](https://docs.OpenClaw.ai/platforms/macos), [iOS](https://docs.OpenClaw.ai/platforms/ios), [Android](https://docs.OpenClaw.ai/platforms/android)
+- [Debug common failures with the troubleshooting guide.](https://docs.OpenClaw.ai/channels/troubleshooting)
+- [Review security guidance before exposing anything.](https://docs.OpenClaw.ai/gateway/security)
 
 ## Advanced docs (discovery + control)
 
-- [Discovery + transports](https://docs.ClosedClaw.ai/gateway/discovery)
-- [Bonjour/mDNS](https://docs.ClosedClaw.ai/gateway/bonjour)
-- [Gateway pairing](https://docs.ClosedClaw.ai/gateway/pairing)
-- [Remote gateway README](https://docs.ClosedClaw.ai/gateway/remote-gateway-readme)
-- [Control UI](https://docs.ClosedClaw.ai/web/control-ui)
-- [Dashboard](https://docs.ClosedClaw.ai/web/dashboard)
+- [Discovery + transports](https://docs.OpenClaw.ai/gateway/discovery)
+- [Bonjour/mDNS](https://docs.OpenClaw.ai/gateway/bonjour)
+- [Gateway pairing](https://docs.OpenClaw.ai/gateway/pairing)
+- [Remote gateway README](https://docs.OpenClaw.ai/gateway/remote-gateway-readme)
+- [Control UI](https://docs.OpenClaw.ai/web/control-ui)
+- [Dashboard](https://docs.OpenClaw.ai/web/dashboard)
 
 ## Operations & troubleshooting
 
-- [Health checks](https://docs.ClosedClaw.ai/gateway/health)
-- [Gateway lock](https://docs.ClosedClaw.ai/gateway/gateway-lock)
-- [Background process](https://docs.ClosedClaw.ai/gateway/background-process)
-- [Browser troubleshooting (Linux)](https://docs.ClosedClaw.ai/tools/browser-linux-troubleshooting)
-- [Logging](https://docs.ClosedClaw.ai/logging)
+- [Health checks](https://docs.OpenClaw.ai/gateway/health)
+- [Gateway lock](https://docs.OpenClaw.ai/gateway/gateway-lock)
+- [Background process](https://docs.OpenClaw.ai/gateway/background-process)
+- [Browser troubleshooting (Linux)](https://docs.OpenClaw.ai/tools/browser-linux-troubleshooting)
+- [Logging](https://docs.OpenClaw.ai/logging)
 
 ## Deep dives
 
-- [Agent loop](https://docs.ClosedClaw.ai/concepts/agent-loop)
-- [Presence](https://docs.ClosedClaw.ai/concepts/presence)
-- [TypeBox schemas](https://docs.ClosedClaw.ai/concepts/typebox)
-- [RPC adapters](https://docs.ClosedClaw.ai/reference/rpc)
-- [Queue](https://docs.ClosedClaw.ai/concepts/queue)
+- [Agent loop](https://docs.OpenClaw.ai/concepts/agent-loop)
+- [Presence](https://docs.OpenClaw.ai/concepts/presence)
+- [TypeBox schemas](https://docs.OpenClaw.ai/concepts/typebox)
+- [RPC adapters](https://docs.OpenClaw.ai/reference/rpc)
+- [Queue](https://docs.OpenClaw.ai/concepts/queue)
 
 ## Workspace & skills
 
-- [Skills config](https://docs.ClosedClaw.ai/tools/skills-config)
-- [Default AGENTS](https://docs.ClosedClaw.ai/reference/AGENTS.default)
-- [Templates: AGENTS](https://docs.ClosedClaw.ai/reference/templates/AGENTS)
-- [Templates: BOOTSTRAP](https://docs.ClosedClaw.ai/reference/templates/BOOTSTRAP)
-- [Templates: IDENTITY](https://docs.ClosedClaw.ai/reference/templates/IDENTITY)
-- [Templates: SOUL](https://docs.ClosedClaw.ai/reference/templates/SOUL)
-- [Templates: TOOLS](https://docs.ClosedClaw.ai/reference/templates/TOOLS)
-- [Templates: USER](https://docs.ClosedClaw.ai/reference/templates/USER)
+- [Skills config](https://docs.OpenClaw.ai/tools/skills-config)
+- [Default AGENTS](https://docs.OpenClaw.ai/reference/AGENTS.default)
+- [Templates: AGENTS](https://docs.OpenClaw.ai/reference/templates/AGENTS)
+- [Templates: BOOTSTRAP](https://docs.OpenClaw.ai/reference/templates/BOOTSTRAP)
+- [Templates: IDENTITY](https://docs.OpenClaw.ai/reference/templates/IDENTITY)
+- [Templates: SOUL](https://docs.OpenClaw.ai/reference/templates/SOUL)
+- [Templates: TOOLS](https://docs.OpenClaw.ai/reference/templates/TOOLS)
+- [Templates: USER](https://docs.OpenClaw.ai/reference/templates/USER)
 
 ## Platform internals
 
-- [macOS dev setup](https://docs.ClosedClaw.ai/platforms/mac/dev-setup)
-- [macOS menu bar](https://docs.ClosedClaw.ai/platforms/mac/menu-bar)
-- [macOS voice wake](https://docs.ClosedClaw.ai/platforms/mac/voicewake)
-- [iOS node](https://docs.ClosedClaw.ai/platforms/ios)
-- [Android node](https://docs.ClosedClaw.ai/platforms/android)
-- [Windows (WSL2)](https://docs.ClosedClaw.ai/platforms/windows)
-- [Linux app](https://docs.ClosedClaw.ai/platforms/linux)
+- [macOS dev setup](https://docs.OpenClaw.ai/platforms/mac/dev-setup)
+- [macOS menu bar](https://docs.OpenClaw.ai/platforms/mac/menu-bar)
+- [macOS voice wake](https://docs.OpenClaw.ai/platforms/mac/voicewake)
+- [iOS node](https://docs.OpenClaw.ai/platforms/ios)
+- [Android node](https://docs.OpenClaw.ai/platforms/android)
+- [Windows (WSL2)](https://docs.OpenClaw.ai/platforms/windows)
+- [Linux app](https://docs.OpenClaw.ai/platforms/linux)
 
 ## Email hooks (Gmail)
 
-- [docs.ClosedClaw.ai/gmail-pubsub](https://docs.ClosedClaw.ai/automation/gmail-pubsub)
+- [docs.OpenClaw.ai/gmail-pubsub](https://docs.OpenClaw.ai/automation/gmail-pubsub)
 
 ## Molty
 
@@ -482,6 +482,13 @@ by Peter Steinberger and the community.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, maintainers, and how to submit PRs.
 AI/vibe-coded PRs welcome! 🤖
+
+**Development Updates**: Check out the [Priority 3-12.5 Implementation Summary](docs/development/priority-3-through-12.5-summary.md) for the latest development progress, including:
+- ✅ End-to-end encrypted memory storage (Priority 3)
+- ✅ Constants library consolidation (Priority 3.5)
+- ✅ DevOps subagent for meta-development (Priority 12.5)
+
+Meta-development in action: ClosedClaw maintaining and improving itself through specialized AI subagents.
 
 Special thanks to [Mario Zechner](https://mariozechner.at/) for his support and for
 [pi-mono](https://github.com/badlogic/pi-mono).

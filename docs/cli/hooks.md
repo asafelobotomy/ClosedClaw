@@ -38,7 +38,7 @@ Ready:
   🚀 boot-md ✓ - Run BOOT.md on gateway startup
   📝 command-logger ✓ - Log all command events to a centralized audit file
   💾 session-memory ✓ - Save session context to memory when /new command is issued
-  😈 soul-evil ✓ - Swap injected SOUL content during a purge window or by random chance
+  🎭 soul-jester ✓ - Swap injected SOUL content during a playful window or by random chance
 ```
 
 **Example (verbose):**
@@ -90,7 +90,7 @@ Details:
   Source: ClosedClaw-bundled
   Path: /path/to/ClosedClaw/hooks/bundled/session-memory/HOOK.md
   Handler: /path/to/ClosedClaw/hooks/bundled/session-memory/handler.ts
-  Homepage: https://docs.ClosedClaw.ai/hooks#session-memory
+  Homepage: https://docs.OpenClaw.ai/hooks#session-memory
   Events: command:new
 
 Requirements:
@@ -277,17 +277,17 @@ grep '"action":"new"' ~/.ClosedClaw/logs/commands.log | jq .
 
 **See:** [command-logger documentation](/hooks#command-logger)
 
-### soul-evil
+### soul-jester
 
-Swaps injected `SOUL.md` content with `SOUL_EVIL.md` during a purge window or by random chance.
+Swaps injected `SOUL.md` content with `SOUL_JESTER.md` during a playful window or by random chance.
 
 **Enable:**
 
 ```bash
-ClosedClaw hooks enable soul-evil
+ClosedClaw hooks enable soul-jester
 ```
 
-**See:** [SOUL Evil Hook](/hooks/soul-evil)
+**See:** [SOUL Jester Hook](/hooks/soul-jester)
 
 ### boot-md
 

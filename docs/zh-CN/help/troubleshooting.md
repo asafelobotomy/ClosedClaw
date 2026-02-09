@@ -67,10 +67,10 @@ curl -fsSL https://ClosedClaw.ai/install.sh | bash -s -- --beta --verbose
 - [Gateway网关故障排除](/gateway/troubleshooting)
 - [控制 UI](/web/control-ui#insecure-http)
 
-### `docs.ClosedClaw.ai` 显示 SSL 错误（Comcast/Xfinity）
+### `docs.OpenClaw.ai` 显示 SSL 错误（Comcast/Xfinity）
 
-某些 Comcast/Xfinity 连接通过 Xfinity Advanced Security 屏蔽 `docs.ClosedClaw.ai`。
-禁用 Advanced Security 或将 `docs.ClosedClaw.ai` 添加到允许列表，然后重试。
+某些 Comcast/Xfinity 连接通过 Xfinity Advanced Security 屏蔽 `docs.OpenClaw.ai`。
+禁用 Advanced Security 或将 `docs.OpenClaw.ai` 添加到允许列表，然后重试。
 
 - Xfinity Advanced Security 帮助：https://www.xfinity.com/support/articles/using-xfinity-xfi-advanced-security
 - 快速排查：尝试使用手机热点或 VPN 确认是否为 ISP 级别的过滤

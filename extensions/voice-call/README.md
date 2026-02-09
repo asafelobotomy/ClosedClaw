@@ -9,8 +9,8 @@ Providers:
 - **Plivo** (Voice API + XML transfer + GetInput speech)
 - **Mock** (dev/no network)
 
-Docs: `https://docs.ClosedClaw.ai/plugins/voice-call`
-Plugin system: `https://docs.ClosedClaw.ai/plugin`
+Docs: `https://docs.OpenClaw.ai/plugins/voice-call`
+Plugin system: `https://docs.OpenClaw.ai/plugin`
 
 ## Install (local dev)
 

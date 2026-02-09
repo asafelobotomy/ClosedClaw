@@ -32,19 +32,19 @@ Logs all command events to a centralized audit file.
 ClosedClaw hooks enable command-logger
 ```
 
-### 😈 soul-evil
+### 🎭 soul-jester
 
-Swaps injected `SOUL.md` content with `SOUL_EVIL.md` during a purge window or by random chance.
+Swaps injected `SOUL.md` content with `SOUL_JESTER.md` during a playful window or by random chance.
 
 **Events**: `agent:bootstrap`
-**What it does**: Overrides the injected SOUL content before the system prompt is built.
+**What it does**: Overrides the injected SOUL content before the system prompt is built for testing playful/mischievous personas.
 **Output**: No files written; swaps happen in-memory only.
-**Docs**: https://docs.ClosedClaw.ai/hooks/soul-evil
+**Docs**: https://docs.OpenClaw.ai/hooks/soul-jester
 
 **Enable**:
 
 ```bash
-ClosedClaw hooks enable soul-evil
+ClosedClaw hooks enable soul-jester
 ```
 
 ### 🚀 boot-md
@@ -82,7 +82,7 @@ session-memory/
 ---
 name: my-hook
 description: "Short description"
-homepage: https://docs.ClosedClaw.ai/hooks#my-hook
+homepage: https://docs.OpenClaw.ai/hooks#my-hook
 metadata:
   { "ClosedClaw": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
@@ -221,4 +221,4 @@ Test your hooks by:
 
 ## Documentation
 
-Full documentation: https://docs.ClosedClaw.ai/hooks
+Full documentation: https://docs.OpenClaw.ai/hooks

@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import { securityEncryptCommand } from "../commands/security-encrypt.js";
 import { loadConfig } from "../config/config.js";
 import { defaultRuntime } from "../runtime.js";
 import { runSecurityAudit } from "../security/audit.js";
@@ -33,7 +34,7 @@ export function registerSecurityCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/security", "docs.ClosedClaw.ai/cli/security")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/security", "docs.OpenClaw.ai/cli/security")}\n`,
     );
 
   security
@@ -154,5 +155,21 @@ export function registerSecurityCli(program: Command) {
       render("info");
 
       defaultRuntime.log(lines.join("\n"));
+    });
+
+  security
+    .command("encrypt")
+    .description("Manage encryption for data at rest")
+    .option("--status", "Check encryption status of stores", false)
+    .option("--migrate", "Migrate plaintext stores to encrypted storage", false)
+    .option("--backups", "Encrypt all config backup files", false)
+    .option("--json", "Print JSON output", false)
+    .action(async (opts) => {
+      await securityEncryptCommand(defaultRuntime, {
+        status: Boolean(opts.status),
+        migrate: Boolean(opts.migrate),
+        backups: Boolean(opts.backups),
+        json: Boolean(opts.json),
+      });
     });
 }
