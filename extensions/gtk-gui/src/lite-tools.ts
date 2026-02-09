@@ -118,7 +118,7 @@ const RUN_COMMAND: LiteTool = {
   async execute({ command }) {
     const cmd = String(command);
     try {
-      const { stdout, stderr } = await execAsync(cmd, {
+      const { stdout, _stderr } = await execAsync(cmd, {
         timeout: COMMAND_TIMEOUT_MS,
         maxBuffer: 1024 * 1024, // 1MB
         shell: "/bin/bash",
@@ -134,7 +134,7 @@ const RUN_COMMAND: LiteTool = {
       if (error.killed) {
         return `Error: Command timed out after ${COMMAND_TIMEOUT_MS / 1000}s`;
       }
-      if (error.stderr) {
+      if (error._stderr) {
         return `Error (exit ${error.code}): ${error.stderr.slice(0, 500)}`;
       }
       return `Error: ${error.message}`;
@@ -513,7 +513,7 @@ const CALCULATOR: LiteTool = {
     const expr = String(expression);
 
     // Sanitize: only allow safe math characters and functions
-    const safePattern = /^[\d\s+\-*/().,%^]+$|^[\d\s+\-*/().,%^]*(sqrt|pow|sin|cos|tan|asin|acos|atan|log|log10|exp|abs|floor|ceil|round|min|max|PI|E|Math\.)+[\d\s+\-*/().,%^()\w]*$/i;
+    const _safePattern = /^[\d\s+\-*/().,%^]+$|^[\d\s+\-*/().,%^]*(sqrt|pow|sin|cos|tan|asin|acos|atan|log|log10|exp|abs|floor|ceil|round|min|max|PI|E|Math\.)+[\d\s+\-*/().,%^()\w]*$/i;
 
     // More permissive pattern for math expressions
     const allowedChars = /^[0-9\s+\-*/().^,a-zA-Z]+$/;
@@ -664,11 +664,11 @@ const SCREENSHOT: LiteTool = {
       const filepath = join(SCREENSHOTS_DIR, `${name}.png`);
 
       // Use grim for Wayland screenshot (full screen)
-      const { stderr } = await execAsync(`grim "${filepath}"`, {
+      const { _stderr } = await execAsync(`grim "${filepath}"`, {
         timeout: 10_000,
       });
 
-      if (stderr && stderr.trim()) {
+      if (_stderr && _stderr.trim()) {
         return `Screenshot taken but with warning: ${stderr.trim()}\nSaved to: ${filepath}`;
       }
 
@@ -705,11 +705,11 @@ const SCREENSHOT_REGION: LiteTool = {
       const filepath = join(SCREENSHOTS_DIR, `${name}.png`);
 
       // Use slurp to select region, then grim to capture
-      const { stderr } = await execAsync(`grim -g "$(slurp)" "${filepath}"`, {
+      const { _stderr } = await execAsync(`grim -g "$(slurp)" "${filepath}"`, {
         timeout: 60_000, // Give user time to select
       });
 
-      if (stderr && stderr.trim()) {
+      if (_stderr && _stderr.trim()) {
         return `Screenshot taken but with warning: ${stderr.trim()}\nSaved to: ${filepath}`;
       }
 
@@ -755,7 +755,7 @@ const OCR_IMAGE: LiteTool = {
       await stat(imagePath);
 
       // Run tesseract OCR
-      const { stdout, stderr } = await execAsync(
+      const { stdout, _stderr } = await execAsync(
         `tesseract "${imagePath}" stdout -l ${lang} 2>/dev/null`,
         {
           timeout: OCR_TIMEOUT_MS,

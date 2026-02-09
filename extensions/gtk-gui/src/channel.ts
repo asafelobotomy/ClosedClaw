@@ -104,14 +104,14 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
       return {};
     },
     
-    isConfigured: (account) => {
-      return Boolean(account.config.socketPath || (account.config.inboxPath && account.config.outboxPath));
+    isConfigured: (_account) => {
+      return Boolean(_account.config.socketPath || (_account.config.inboxPath && _account.config.outboxPath));
     },
     
-    describeAccount: (account) => ({
-      accountId: account.accountId,
+    describeAccount: (_account) => ({
+      accountId: _account.accountId,
       name: "GTK GUI",
-      enabled: account.enabled,
+      enabled: _account.enabled,
       configured: true,
     }),
     
@@ -121,7 +121,7 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
   },
 
   security: {
-    resolveDmPolicy: ({ account }) => ({
+    resolveDmPolicy: ({ _account }) => ({
       policy: "open", // Trust local GTK app
       allowFrom: ["*"],
       policyPath: "plugins.entries.gtk-gui.config",

@@ -4,10 +4,10 @@
  * @module agents/squad/memory/long-term-memory.test
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { describe, it, expect, beforeEach, afterEach, _vi } from "vitest";
 import { AGENTS } from "../../../constants/index.js";
 import {
   EpisodicStore,
@@ -157,7 +157,10 @@ describe("EpisodicStore", () => {
     it("throws when store is full", async () => {
       // Temporarily mock the constant to a small number
       const origMax = AGENTS.MEMORY.LONG_TERM.MAX_EPISODIC_ENTRIES;
-      Object.defineProperty(AGENTS.MEMORY.LONG_TERM, "MAX_EPISODIC_ENTRIES", { value: 3, configurable: true });
+      Object.defineProperty(AGENTS.MEMORY.LONG_TERM, "MAX_EPISODIC_ENTRIES", {
+        value: 3,
+        configurable: true,
+      });
 
       try {
         await store.store(makeEpisode({ id: "1" }));
@@ -165,7 +168,10 @@ describe("EpisodicStore", () => {
         await store.store(makeEpisode({ id: "3" }));
         await expect(store.store(makeEpisode({ id: "4" }))).rejects.toThrow("Episodic store full");
       } finally {
-        Object.defineProperty(AGENTS.MEMORY.LONG_TERM, "MAX_EPISODIC_ENTRIES", { value: origMax, configurable: true });
+        Object.defineProperty(AGENTS.MEMORY.LONG_TERM, "MAX_EPISODIC_ENTRIES", {
+          value: origMax,
+          configurable: true,
+        });
       }
     });
   });
@@ -203,51 +209,64 @@ describe("EpisodicStore", () => {
     beforeEach(async () => {
       await store.storeBatch([
         makeEpisode({ id: "s1", taskDescription: "Audit security module", tags: ["security"] }),
-        makeEpisode({ id: "s2", taskDescription: "Fix memory leak in gateway", tags: ["perf", "gateway"] }),
+        makeEpisode({
+          id: "s2",
+          taskDescription: "Fix memory leak in gateway",
+          tags: ["perf", "gateway"],
+        }),
         makeEpisode({ id: "s3", taskDescription: "Update documentation for CLI", tags: ["docs"] }),
-        makeEpisode({ id: "s4", taskDescription: "Security patch for SSRF", tags: ["security", "networking"] }),
-        makeEpisode({ id: "s5", taskDescription: "Build agent spawner", squadId: "squad-alpha", agentsInvolved: ["coder"] }),
+        makeEpisode({
+          id: "s4",
+          taskDescription: "Security patch for SSRF",
+          tags: ["security", "networking"],
+        }),
+        makeEpisode({
+          id: "s5",
+          taskDescription: "Build agent spawner",
+          squadId: "squad-alpha",
+          agentsInvolved: ["coder"],
+        }),
       ]);
     });
 
     it("searches by task description", () => {
-      const result = store.search("security");
+      const _result = store.search("security");
       expect(result.totalMatches).toBe(2);
       expect(result.episodes.map((e) => e.id)).toContain("s1");
       expect(result.episodes.map((e) => e.id)).toContain("s4");
     });
 
     it("searches by tags", () => {
-      const result = store.search("gateway");
+      const _result = store.search("gateway");
       expect(result.totalMatches).toBe(1);
       expect(result.episodes[0]!.id).toBe("s2");
     });
 
     it("searches by squad ID", () => {
-      const result = store.search("squad-alpha");
+      const _result = store.search("squad-alpha");
       expect(result.totalMatches).toBe(1);
       expect(result.episodes[0]!.id).toBe("s5");
     });
 
     it("searches by agent name", () => {
-      const result = store.search("coder");
+      const _result = store.search("coder");
       expect(result.totalMatches).toBe(1);
       expect(result.episodes[0]!.id).toBe("s5");
     });
 
     it("is case-insensitive", () => {
-      const result = store.search("SECURITY");
+      const _result = store.search("SECURITY");
       expect(result.totalMatches).toBe(2);
     });
 
     it("returns empty for no matches", () => {
-      const result = store.search("nonexistent-query-xyz");
+      const _result = store.search("nonexistent-query-xyz");
       expect(result.totalMatches).toBe(0);
       expect(result.episodes).toEqual([]);
     });
 
     it("respects limit", () => {
-      const result = store.search("security", 1);
+      const _result = store.search("security", 1);
       expect(result.episodes.length).toBe(1);
       expect(result.totalMatches).toBe(2); // Total matches still reported
     });
@@ -357,7 +376,7 @@ describe("EpisodicStore", () => {
         makeEpisodeAt(5, { id: "recent-success", outcome: "success" }),
       ]);
 
-      const result = await store.cleanup();
+      const _result = await store.cleanup();
       expect(result.removed).toBe(1);
       expect(result.retained).toBe(1);
       expect(store.getById("recent-success")).toBeDefined();
@@ -378,7 +397,7 @@ describe("EpisodicStore", () => {
       // Both are `failRetention + 5` days old.
       // Failure retention < success retention, so failure gets cleaned but success stays.
       if (failRetention + 5 <= successRetention) {
-        const result = await store.cleanup();
+        const _result = await store.cleanup();
         expect(store.getById("old-fail")).toBeUndefined();
         expect(store.getById("old-success")).toBeDefined();
       }
@@ -391,7 +410,7 @@ describe("EpisodicStore", () => {
         makeEpisodeAt(retentionDays + 10, { id: "old-partial", outcome: "partial" }),
       );
 
-      const result = await store.cleanup();
+      const _result = await store.cleanup();
       expect(result.removed).toBe(1);
     });
 
@@ -402,7 +421,7 @@ describe("EpisodicStore", () => {
         makeEpisodeAt(retentionDays + 10, { id: "old-cancelled", outcome: "cancelled" }),
       );
 
-      const result = await store.cleanup();
+      const _result = await store.cleanup();
       expect(result.removed).toBe(1);
     });
 
@@ -415,23 +434,21 @@ describe("EpisodicStore", () => {
       });
       await store.store(ep);
 
-      const result = await store.cleanup(now);
+      const _result = await store.cleanup(now);
       // SUCCESS_DAYS is 90, so 100 days old should be removed
       expect(result.removed).toBe(1);
     });
 
     it("no-ops when nothing to clean", async () => {
       await store.store(makeEpisode({ id: "fresh" }));
-      const result = await store.cleanup();
+      const _result = await store.cleanup();
       expect(result.removed).toBe(0);
       expect(result.retained).toBe(1);
     });
 
     it("persists after cleanup", async () => {
       const retentionDays = AGENTS.MEMORY.LONG_TERM.RETENTION.SUCCESS_DAYS;
-      await store.store(
-        makeEpisodeAt(retentionDays + 10, { id: "to-remove", outcome: "success" }),
-      );
+      await store.store(makeEpisodeAt(retentionDays + 10, { id: "to-remove", outcome: "success" }));
       await store.store(makeEpisode({ id: "to-keep" }));
 
       await store.cleanup();
@@ -460,9 +477,24 @@ describe("EpisodicStore", () => {
 
     it("computes correct statistics", async () => {
       await store.storeBatch([
-        makeEpisode({ outcome: "success", durationMs: 1000, tokensUsed: 100, timestamp: new Date("2026-01-01") }),
-        makeEpisode({ outcome: "failure", durationMs: 2000, tokensUsed: 200, timestamp: new Date("2026-01-15") }),
-        makeEpisode({ outcome: "success", durationMs: 3000, tokensUsed: 300, timestamp: new Date("2026-02-01") }),
+        makeEpisode({
+          outcome: "success",
+          durationMs: 1000,
+          tokensUsed: 100,
+          timestamp: new Date("2026-01-01"),
+        }),
+        makeEpisode({
+          outcome: "failure",
+          durationMs: 2000,
+          tokensUsed: 200,
+          timestamp: new Date("2026-01-15"),
+        }),
+        makeEpisode({
+          outcome: "success",
+          durationMs: 3000,
+          tokensUsed: 300,
+          timestamp: new Date("2026-02-01"),
+        }),
       ]);
 
       const stats = store.getStats();
@@ -480,10 +512,7 @@ describe("EpisodicStore", () => {
 
   describe("clear", () => {
     it("removes all episodes", async () => {
-      await store.storeBatch([
-        makeEpisode({ id: "c1" }),
-        makeEpisode({ id: "c2" }),
-      ]);
+      await store.storeBatch([makeEpisode({ id: "c1" }), makeEpisode({ id: "c2" })]);
       expect(store.count()).toBe(2);
 
       await store.clear();

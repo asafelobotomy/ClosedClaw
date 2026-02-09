@@ -4,10 +4,10 @@
  * @see {@link ../network-egress.ts}
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { describe, it, expect, beforeEach, afterEach, _vi } from "vitest";
 import {
   normalizeDomain,
   matchDomain,

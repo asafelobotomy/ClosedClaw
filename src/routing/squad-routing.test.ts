@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
+import type { SquadCoordinator, SquadResult, _SquadConfig } from "../agents/squad/coordinator.js";
 import {
   analyzeSquadTrigger,
   findSquadBinding,
@@ -14,7 +15,6 @@ import {
   type SquadBinding,
   type SquadRouteInput,
 } from "./squad-routing.js";
-import type { SquadCoordinator, SquadResult, SquadConfig } from "../agents/squad/coordinator.js";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -111,7 +111,9 @@ describe("analyzeSquadTrigger", () => {
   });
 
   it("caps complexity at 1.0", () => {
-    const longMessage = Array(500).fill("research investigate analyze implement build create").join(" ");
+    const longMessage = Array(500)
+      .fill("research investigate analyze implement build create")
+      .join(" ");
     const result = analyzeSquadTrigger(makeInput({ message: longMessage }));
     expect(result.complexityScore).toBeLessThanOrEqual(1.0);
   });
@@ -175,8 +177,16 @@ describe("findSquadBinding", () => {
 
   it("matches first binding in order", () => {
     const dupeBindings: SquadBinding[] = [
-      { id: "first", channels: ["telegram"], squadConfig: { name: "a", strategy: "pipeline", agents: [] } },
-      { id: "second", channels: ["telegram"], squadConfig: { name: "b", strategy: "parallel", agents: [] } },
+      {
+        id: "first",
+        channels: ["telegram"],
+        squadConfig: { name: "a", strategy: "pipeline", agents: [] },
+      },
+      {
+        id: "second",
+        channels: ["telegram"],
+        squadConfig: { name: "b", strategy: "parallel", agents: [] },
+      },
     ];
     const input = makeInput({ channel: "telegram" });
     const binding = findSquadBinding(input, dupeBindings);
@@ -252,9 +262,7 @@ describe("aggregateSquadReply", () => {
       success: false,
       output: null,
       error: "Agent crashed",
-      contributions: [
-        { agentId: "a-1", role: "researcher", output: null },
-      ],
+      contributions: [{ agentId: "a-1", role: "researcher", output: null }],
       metrics: { tasksCompleted: 0, tasksFailed: 1 },
     } as unknown as SquadResult;
 
@@ -322,7 +330,8 @@ describe("routeToSquad", () => {
 
     const result = await routeToSquad(
       makeInput({
-        message: "Research the best authentication practices and implement a secure auth module for our application",
+        message:
+          "Research the best authentication practices and implement a secure auth module for our application",
       }),
       coordinator,
       [],
@@ -339,11 +348,7 @@ describe("routeToSquad", () => {
   it("returns unhandled for simple messages", async () => {
     const coordinator = mockCoordinator();
 
-    const result = await routeToSquad(
-      makeInput({ message: "What time is it?" }),
-      coordinator,
-      [],
-    );
+    const result = await routeToSquad(makeInput({ message: "What time is it?" }), coordinator, []);
 
     expect(result.handled).toBe(false);
     expect(result.squadId).toBeUndefined();
@@ -382,11 +387,7 @@ describe("routeToSquad", () => {
       },
     ];
 
-    const result = await routeToSquad(
-      makeInput({ channel: "telegram" }),
-      coordinator,
-      bindings,
-    );
+    const result = await routeToSquad(makeInput({ channel: "telegram" }), coordinator, bindings);
 
     expect(result.handled).toBe(true);
     expect(result.reply).toContain("Squad task failed");

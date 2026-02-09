@@ -208,7 +208,7 @@ async function noteEncryptionStatus(cfg: ClosedClawConfig) {
 
   let plainTextBackups = 0;
   let encryptedBackups = 0;
-  let missingBackups = 0;
+  let _missingBackups = 0;
 
   for (const backupPath of backupPaths) {
     try {
@@ -222,7 +222,7 @@ async function noteEncryptionStatus(cfg: ClosedClawConfig) {
     } catch (err) {
       const error = err as { code?: string };
       if (error.code === "ENOENT") {
-        missingBackups += 1;
+        _missingBackups += 1;
       }
     }
   }

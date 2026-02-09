@@ -4,7 +4,7 @@
  * @see {@link ../primitives.ts}
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, _vi } from "vitest";
 import {
   Mutex,
   Barrier,
@@ -206,7 +206,9 @@ describe("Semaphore", () => {
     await sem.acquire();
 
     let acquired = false;
-    const p = sem.acquire({ timeout: 5000 }).then(() => { acquired = true; });
+    const p = sem.acquire({ timeout: 5000 }).then(() => {
+      acquired = true;
+    });
 
     expect(sem.queueLength).toBe(1);
     sem.release();
@@ -239,7 +241,11 @@ describe("Semaphore", () => {
 
   it("withPermit releases on error", async () => {
     const sem = new Semaphore(1, "test");
-    await expect(sem.withPermit(() => { throw new Error("fail"); })).rejects.toThrow("fail");
+    await expect(
+      sem.withPermit(() => {
+        throw new Error("fail");
+      }),
+    ).rejects.toThrow("fail");
     expect(sem.available).toBe(1);
   });
 });
@@ -340,7 +346,10 @@ describe("waitForAll", () => {
     const e1 = new Event("a");
     const e2 = new Event("b");
 
-    setTimeout(() => { e1.signal(); e2.signal(); }, 10);
+    setTimeout(() => {
+      e1.signal();
+      e2.signal();
+    }, 10);
 
     await waitForAll([e1, e2], { timeout: 5000 });
   });

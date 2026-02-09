@@ -4,10 +4,10 @@
  * @see {@link ../keychain.ts}
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   detectKeychainBackend,
   storeCredential,
@@ -74,7 +74,7 @@ describe("detectKeychainBackend", () => {
     const platform = os.platform();
     if (platform !== "darwin") {
       // Mock for non-macOS
-      const origPlatform = Object.getOwnPropertyDescriptor(os, "platform");
+      const _origPlatform = Object.getOwnPropertyDescriptor(os, "platform");
       vi.spyOn(os, "platform").mockReturnValue("darwin");
       const mockExec = createMockExec({ "which security": { stdout: "/usr/bin/security" } });
       const info = await detectKeychainBackend({ execFn: mockExec });
@@ -85,7 +85,7 @@ describe("detectKeychainBackend", () => {
   });
 
   it("detects Linux secret service when secret-tool is available", async () => {
-    const origPlatform = os.platform();
+    const _origPlatform = os.platform();
     vi.spyOn(os, "platform").mockReturnValue("linux");
     const mockExec = createMockExec({ "which secret-tool": { stdout: "/usr/bin/secret-tool" } });
     const info = await detectKeychainBackend({ execFn: mockExec });
@@ -140,7 +140,7 @@ describe("encrypted-file backend", () => {
       await storeCredential("anthropic", "api-key", "old-value", opts);
       await storeCredential("anthropic", "api-key", "new-value", opts);
 
-      const result = await getCredential("anthropic", "api-key", opts);
+      const _result = await getCredential("anthropic", "api-key", opts);
       expect(result).toBe("new-value");
     });
   });
@@ -148,26 +148,26 @@ describe("encrypted-file backend", () => {
   describe("getCredential", () => {
     it("retrieves stored credential", async () => {
       await storeCredential("anthropic", "api-key", "sk-test-123", opts);
-      const result = await getCredential("anthropic", "api-key", opts);
+      const _result = await getCredential("anthropic", "api-key", opts);
       expect(result).toBe("sk-test-123");
     });
 
     it("returns null for non-existent credential", async () => {
-      const result = await getCredential("nonexistent", "missing", opts);
+      const _result = await getCredential("nonexistent", "missing", opts);
       expect(result).toBeNull();
     });
 
     it("handles unicode secrets", async () => {
       const unicodeSecret = "密码🔑パスワード";
       await storeCredential("test", "unicode", unicodeSecret, opts);
-      const result = await getCredential("test", "unicode", opts);
+      const _result = await getCredential("test", "unicode", opts);
       expect(result).toBe(unicodeSecret);
     });
 
     it("handles secrets with special characters", async () => {
-      const specialSecret = 'sk-ant-api03-foo_bar/baz+qux=';
+      const specialSecret = "sk-ant-api03-foo_bar/baz+qux=";
       await storeCredential("test", "special", specialSecret, opts);
-      const result = await getCredential("test", "special", opts);
+      const _result = await getCredential("test", "special", opts);
       expect(result).toBe(specialSecret);
     });
   });
@@ -178,7 +178,7 @@ describe("encrypted-file backend", () => {
       const deleted = await deleteCredential("anthropic", "api-key", opts);
       expect(deleted).toBe(true);
 
-      const result = await getCredential("anthropic", "api-key", opts);
+      const _result = await getCredential("anthropic", "api-key", opts);
       expect(result).toBeNull();
     });
 
@@ -239,7 +239,9 @@ describe("macOS keychain backend (mocked)", () => {
       if (serviceIdx >= 0 && accountIdx >= 0) {
         const key = `${args[serviceIdx + 1]}:${args[accountIdx + 1]}`;
         const value = stored.get(key);
-        if (value) {return { stdout: value + "\n" };}
+        if (value) {
+          return { stdout: value + "\n" };
+        }
       }
       throw new Error("SecKeychainSearchCopyNext: The specified item could not be found");
     }
@@ -269,12 +271,12 @@ describe("macOS keychain backend (mocked)", () => {
 
   it("stores and retrieves a credential", async () => {
     await storeCredential("anthropic", "api-key", "sk-test-mac", opts);
-    const result = await getCredential("anthropic", "api-key", opts);
+    const _result = await getCredential("anthropic", "api-key", opts);
     expect(result).toBe("sk-test-mac");
   });
 
   it("returns null for missing credential", async () => {
-    const result = await getCredential("nonexistent", "key", opts);
+    const _result = await getCredential("nonexistent", "key", opts);
     expect(result).toBeNull();
   });
 
@@ -283,7 +285,7 @@ describe("macOS keychain backend (mocked)", () => {
     const deleted = await deleteCredential("anthropic", "api-key", opts);
     expect(deleted).toBe(true);
 
-    const result = await getCredential("anthropic", "api-key", opts);
+    const _result = await getCredential("anthropic", "api-key", opts);
     expect(result).toBeNull();
   });
 
@@ -299,7 +301,7 @@ describe("macOS keychain backend (mocked)", () => {
 
 describe("migrateCredentials", () => {
   it("returns zero counts when no credentials directory exists", async () => {
-    const result = await migrateCredentials({
+    const _result = await migrateCredentials({
       backend: "encrypted-file",
       stateDir: path.join(tmpDir, "empty"),
     });
@@ -324,7 +326,7 @@ describe("migrateCredentials", () => {
 
     // Migrate to a different directory
     const targetDir = path.join(tmpDir, "target");
-    const result = await migrateCredentials({
+    const _result = await migrateCredentials({
       backend: "encrypted-file",
       stateDir: targetDir,
     });
@@ -347,7 +349,7 @@ describe("migrateCredentials", () => {
       JSON.stringify({ namespace: "test" }), // Missing identifier and secret
     );
 
-    const result = await migrateCredentials({
+    const _result = await migrateCredentials({
       backend: "encrypted-file",
       stateDir: tmpDir,
     });
@@ -360,7 +362,7 @@ describe("migrateCredentials", () => {
 
     await fs.writeFile(path.join(credDir, "corrupt.json"), "NOT JSON");
 
-    const result = await migrateCredentials({
+    const _result = await migrateCredentials({
       backend: "encrypted-file",
       stateDir: tmpDir,
     });

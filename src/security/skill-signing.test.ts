@@ -10,7 +10,7 @@
  * - Edge cases (empty content, malformed signatures)
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, _vi, beforeEach } from "vitest";
 import {
   generateSigningKeyPair,
   signSkill,

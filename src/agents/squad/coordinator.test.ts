@@ -4,15 +4,15 @@
  * @module agents/squad/coordinator.test
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AgentSpawner, type AgentTaskHandler } from "./spawner.js";
+import { afterEach, beforeEach, describe, expect, it, _vi } from "vitest";
+import type { TaskInput } from "./task-queue.js";
 import {
   SquadCoordinator,
   createSquadCoordinator,
   type SquadConfig,
   type ComplexTask,
 } from "./coordinator.js";
-import type { TaskInput } from "./task-queue.js";
+import { AgentSpawner, type AgentTaskHandler } from "./spawner.js";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -103,9 +103,7 @@ describe("SquadCoordinator", () => {
       const limited = new SquadCoordinator({ spawner, maxSquads: 1 });
       await limited.createSquad(makeSquadConfig());
 
-      await expect(limited.createSquad(makeSquadConfig())).rejects.toThrow(
-        /Max squads/,
-      );
+      await expect(limited.createSquad(makeSquadConfig())).rejects.toThrow(/Max squads/);
 
       await limited.shutdown();
     });
@@ -130,9 +128,7 @@ describe("SquadCoordinator", () => {
     });
 
     it("should throw for unknown squad", async () => {
-      await expect(coordinator.terminateSquad("nonexistent")).rejects.toThrow(
-        /not found/,
-      );
+      await expect(coordinator.terminateSquad("nonexistent")).rejects.toThrow(/not found/);
     });
   });
 
@@ -166,16 +162,11 @@ describe("SquadCoordinator", () => {
       const pipeSpawner = new AgentSpawner({ taskHandler: handler });
       const pipeCoordinator = new SquadCoordinator({ spawner: pipeSpawner });
 
-      const squadId = await pipeCoordinator.createSquad(
-        makeSquadConfig({ strategy: "pipeline" }),
-      );
+      const squadId = await pipeCoordinator.createSquad(makeSquadConfig({ strategy: "pipeline" }));
 
       const result = await pipeCoordinator.executeTask(squadId, {
         description: "Pipeline test",
-        subtasks: [
-          makeSubtask({ description: "Step 1" }),
-          makeSubtask({ description: "Step 2" }),
-        ],
+        subtasks: [makeSubtask({ description: "Step 1" }), makeSubtask({ description: "Step 2" })],
       });
 
       expect(result.success).toBe(true);
@@ -197,16 +188,11 @@ describe("SquadCoordinator", () => {
       const capSpawner = new AgentSpawner({ taskHandler: capturingHandler });
       const capCoordinator = new SquadCoordinator({ spawner: capSpawner });
 
-      const squadId = await capCoordinator.createSquad(
-        makeSquadConfig({ strategy: "pipeline" }),
-      );
+      const squadId = await capCoordinator.createSquad(makeSquadConfig({ strategy: "pipeline" }));
 
       await capCoordinator.executeTask(squadId, {
         description: "Pipeline chain",
-        subtasks: [
-          makeSubtask({ description: "A" }),
-          makeSubtask({ description: "B" }),
-        ],
+        subtasks: [makeSubtask({ description: "A" }), makeSubtask({ description: "B" })],
       });
 
       // Second task should receive first task's output
@@ -217,16 +203,11 @@ describe("SquadCoordinator", () => {
     });
 
     it("should report metrics", async () => {
-      const squadId = await coordinator.createSquad(
-        makeSquadConfig({ strategy: "pipeline" }),
-      );
+      const squadId = await coordinator.createSquad(makeSquadConfig({ strategy: "pipeline" }));
 
       const result = await coordinator.executeTask(squadId, {
         description: "Metric test",
-        subtasks: [
-          makeSubtask({ description: "T1" }),
-          makeSubtask({ description: "T2" }),
-        ],
+        subtasks: [makeSubtask({ description: "T1" }), makeSubtask({ description: "T2" })],
       });
 
       expect(result.metrics.tasksCompleted).toBe(2);
@@ -240,9 +221,7 @@ describe("SquadCoordinator", () => {
 
   describe("parallel strategy", () => {
     it("should execute all tasks concurrently", async () => {
-      const squadId = await coordinator.createSquad(
-        makeSquadConfig({ strategy: "parallel" }),
-      );
+      const squadId = await coordinator.createSquad(makeSquadConfig({ strategy: "parallel" }));
 
       const result = await coordinator.executeTask(squadId, {
         description: "Parallel test",
@@ -263,9 +242,7 @@ describe("SquadCoordinator", () => {
       const failSpawner = new AgentSpawner({ taskHandler: failingHandler });
       const failCoordinator = new SquadCoordinator({ spawner: failSpawner });
 
-      const squadId = await failCoordinator.createSquad(
-        makeSquadConfig({ strategy: "parallel" }),
-      );
+      const squadId = await failCoordinator.createSquad(makeSquadConfig({ strategy: "parallel" }));
 
       const result = await failCoordinator.executeTask(squadId, {
         description: "Fail test",
@@ -284,9 +261,7 @@ describe("SquadCoordinator", () => {
 
   describe("map-reduce strategy", () => {
     it("should map tasks then reduce results", async () => {
-      const squadId = await coordinator.createSquad(
-        makeSquadConfig({ strategy: "map-reduce" }),
-      );
+      const squadId = await coordinator.createSquad(makeSquadConfig({ strategy: "map-reduce" }));
 
       const result = await coordinator.executeTask(squadId, {
         description: "Map-reduce test",
@@ -303,9 +278,7 @@ describe("SquadCoordinator", () => {
     });
 
     it("should fall back to pipeline for single task", async () => {
-      const squadId = await coordinator.createSquad(
-        makeSquadConfig({ strategy: "map-reduce" }),
-      );
+      const squadId = await coordinator.createSquad(makeSquadConfig({ strategy: "map-reduce" }));
 
       const result = await coordinator.executeTask(squadId, {
         description: "Single task",
@@ -329,9 +302,7 @@ describe("SquadCoordinator", () => {
       const conSpawner = new AgentSpawner({ taskHandler: consensusHandler });
       const conCoordinator = new SquadCoordinator({ spawner: conSpawner });
 
-      const squadId = await conCoordinator.createSquad(
-        makeSquadConfig({ strategy: "consensus" }),
-      );
+      const squadId = await conCoordinator.createSquad(makeSquadConfig({ strategy: "consensus" }));
 
       const result = await conCoordinator.executeTask(squadId, {
         description: "Vote on this",
@@ -348,7 +319,7 @@ describe("SquadCoordinator", () => {
     });
 
     it("should pick majority output", async () => {
-      let callCount = 0;
+      let _callCount = 0;
       const mixedHandler: AgentTaskHandler = async () => {
         callCount++;
         // First agent says "A", second says "A" → majority is "A"
@@ -389,15 +360,13 @@ describe("SquadCoordinator", () => {
       await coordinator.terminateSquad(squadId);
 
       // Squad is gone, should throw
-      await expect(
-        coordinator.executeTask(squadId, { description: "Late task" }),
-      ).rejects.toThrow(/not found/);
+      await expect(coordinator.executeTask(squadId, { description: "Late task" })).rejects.toThrow(
+        /not found/,
+      );
     });
 
     it("should auto-create single task when no subtasks given", async () => {
-      const squadId = await coordinator.createSquad(
-        makeSquadConfig({ strategy: "pipeline" }),
-      );
+      const squadId = await coordinator.createSquad(makeSquadConfig({ strategy: "pipeline" }));
 
       const result = await coordinator.executeTask(squadId, {
         description: "Simple task with no subtasks",
@@ -426,9 +395,7 @@ describe("SquadCoordinator", () => {
     });
 
     it("should throw for unknown squad", () => {
-      expect(() => coordinator.getSquadStatus("nonexistent")).toThrow(
-        /not found/,
-      );
+      expect(() => coordinator.getSquadStatus("nonexistent")).toThrow(/not found/);
     });
   });
 });

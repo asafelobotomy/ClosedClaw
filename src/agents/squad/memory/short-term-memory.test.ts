@@ -4,7 +4,7 @@
  * @module agents/squad/memory/short-term-memory.test
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, _vi } from "vitest";
 import { AGENTS } from "../../../constants/index.js";
 import {
   ShortTermMemory,

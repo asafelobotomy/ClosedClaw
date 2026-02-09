@@ -242,11 +242,7 @@ class AgentHandleImpl implements AgentHandle {
   private readonly config: AgentSpawnConfig;
   private readonly spawner: AgentSpawner;
 
-  constructor(
-    id: string,
-    config: AgentSpawnConfig,
-    spawner: AgentSpawner,
-  ) {
+  constructor(id: string, config: AgentSpawnConfig, spawner: AgentSpawner) {
     this.id = id;
     this.role = config.role;
     this.squadId = config.squadId;
@@ -277,7 +273,7 @@ class AgentHandleImpl implements AgentHandle {
       return { success: false, error: `Agent ${this.id} is ${this.status.state}` };
     }
 
-    const previousState = this.status.state;
+    const _previousState = this.status.state;
     this.transition("working");
     this.setCurrentTask(message.taskId);
 
@@ -308,13 +304,15 @@ class AgentHandleImpl implements AgentHandle {
 
   transition(newState: AgentState): void {
     const currentState = this.status.state;
-    if (currentState === newState) {return;}
+    if (currentState === newState) {
+      return;
+    }
 
     const allowed = VALID_TRANSITIONS[currentState];
     if (!allowed.includes(newState)) {
       throw new Error(
         `Invalid state transition: ${currentState} → ${newState}. ` +
-        `Allowed: ${allowed.join(", ") || "none"}`,
+          `Allowed: ${allowed.join(", ") || "none"}`,
       );
     }
 
@@ -457,7 +455,7 @@ export class AgentSpawner {
     if (squadAgents.length >= this.config.maxAgentsPerSquad) {
       throw new Error(
         `Squad ${config.squadId} has reached max capacity ` +
-        `(${this.config.maxAgentsPerSquad} agents)`,
+          `(${this.config.maxAgentsPerSquad} agents)`,
       );
     }
 
@@ -488,7 +486,8 @@ export class AgentSpawner {
       this.agents.delete(id);
       throw new Error(
         `Failed to initialize agent ${id} (${config.role}): ` +
-        `${err instanceof Error ? err.message : String(err)}`, { cause: err },
+          `${err instanceof Error ? err.message : String(err)}`,
+        { cause: err },
       );
     }
   }
@@ -506,7 +505,9 @@ export class AgentSpawner {
     }
 
     const status = handle.getStatus();
-    if (status.state === "terminated") {return;}
+    if (status.state === "terminated") {
+      return;
+    }
 
     try {
       // Transition to terminating (skip if already there)
@@ -670,7 +671,9 @@ export class AgentSpawner {
    * Agents with too many missed heartbeats are terminated or restarted.
    */
   startHeartbeat(): void {
-    if (this.heartbeatTimer) {return;}
+    if (this.heartbeatTimer) {
+      return;
+    }
 
     this.heartbeatTimer = setInterval(() => {
       this.checkHeartbeats();
@@ -699,7 +702,9 @@ export class AgentSpawner {
   private checkHeartbeats(): void {
     for (const [agentId, handle] of this.agents) {
       const status = handle.getStatus();
-      if (status.state === "terminated" || status.state === "terminating") {continue;}
+      if (status.state === "terminated" || status.state === "terminating") {
+        continue;
+      }
 
       const missed = handle.incrementMissedHeartbeat();
 
@@ -729,7 +734,9 @@ export class AgentSpawner {
    */
   off(listener: SpawnerEventListener): void {
     const idx = this.listeners.indexOf(listener);
-    if (idx >= 0) {this.listeners.splice(idx, 1);}
+    if (idx >= 0) {
+      this.listeners.splice(idx, 1);
+    }
   }
 
   /**
