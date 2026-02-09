@@ -53,7 +53,7 @@ function createMockExec(responses: Record<string, { stdout: string; stderr?: str
     }
 
     return { stdout: "", stderr: "" };
-  }) as any;
+  }) as unknown as typeof execFileAsync;
 }
 
 // ---------------------------------------------------------------------------
@@ -259,7 +259,7 @@ describe("macOS keychain backend (mocked)", () => {
     }
 
     return { stdout: "" };
-  }) as any;
+  }) as unknown as typeof execFileAsync;
 
   const opts: KeychainOptions = { backend: "macos-keychain", execFn: mockExec };
 

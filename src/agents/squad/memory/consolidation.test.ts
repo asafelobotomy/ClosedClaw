@@ -4,19 +4,19 @@
  * @module agents/squad/memory/consolidation.test
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { AGENTS } from "../../../constants/index.js";
-import { ShortTermMemory } from "./short-term-memory.js";
-import { EpisodicStore } from "./long-term-memory.js";
 import {
   consolidateMemory,
   convertToEpisode,
   startConsolidationScheduler,
   type ConsolidationContext,
 } from "./consolidation.js";
+import { EpisodicStore } from "./long-term-memory.js";
+import { ShortTermMemory } from "./short-term-memory.js";
 
 // ─────────────────── Test helpers ───────────────────
 
@@ -244,7 +244,16 @@ describe("convertToEpisode", () => {
     idGenerator: () => "test-id",
   };
 
-  function makeEntry(value: any, overrides?: Partial<{ accessCount: number; createdAt: Date; lastAccessedAt: Date; ttl: number; flaggedImportant: boolean }>): any {
+  function makeEntry(
+    value: unknown,
+    overrides?: Partial<{
+      accessCount: number;
+      createdAt: Date;
+      lastAccessedAt: Date;
+      ttl: number;
+      flaggedImportant: boolean;
+    }>,
+  ) {
     return {
       value,
       createdAt: overrides?.createdAt ?? new Date("2026-02-09T00:00:00Z"),

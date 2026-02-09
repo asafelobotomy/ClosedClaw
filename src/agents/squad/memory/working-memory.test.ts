@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { AGENTS } from "../../../constants/index.js";
-import { WorkingMemory, createWorkingMemory } from "./working-memory.js";
+import { WorkingMemory, createWorkingMemory, type WorkingMemoryEntry } from "./working-memory.js";
 
 describe("WorkingMemory", () => {
   let wm: WorkingMemory;
@@ -77,7 +77,7 @@ describe("WorkingMemory", () => {
 
     it("updates lastAccessedAt on get", () => {
       wm.set("key", "value");
-      const entry1 = (wm as any).items.get("key");
+      const entry1 = (wm as unknown as { items: Map<string, WorkingMemoryEntry> }).items.get("key");
       const time1 = entry1.lastAccessedAt.getTime();
 
       // Wait a bit
@@ -87,7 +87,7 @@ describe("WorkingMemory", () => {
       }
 
       wm.get("key");
-      const entry2 = (wm as any).items.get("key");
+      const entry2 = (wm as unknown as { items: Map<string, WorkingMemoryEntry> }).items.get("key");
       const time2 = entry2.lastAccessedAt.getTime();
 
       expect(time2).toBeGreaterThan(time1);

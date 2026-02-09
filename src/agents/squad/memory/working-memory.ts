@@ -20,8 +20,8 @@ import { AGENTS } from "../../../constants/index.js";
  * Entry in working memory with access tracking
  */
 export interface WorkingMemoryEntry {
-  /** Stored value */
-  value: any;
+  /** Stored value (untyped - can be any serializable data) */
+  value: unknown;
   /** When entry was created */
   createdAt: Date;
   /** When entry was last accessed */
@@ -69,7 +69,7 @@ export class WorkingMemory {
    * @param key - Unique key
    * @param value - Any serializable value
    */
-  set(key: string, value: any): void {
+  set(key: string, value: unknown): void {
     // If at capacity and key is new, evict LRU
     if (!this.items.has(key) && this.items.size >= this.maxSize) {
       this.evictLeastRecentlyUsed();
@@ -90,9 +90,11 @@ export class WorkingMemory {
    * @param key - Key to retrieve
    * @returns Value or undefined if not found
    */
-  get(key: string): any | undefined {
+  get(key: string): unknown | undefined {
     const entry = this.items.get(key);
-    if (!entry) {return undefined;}
+    if (!entry) {
+      return undefined;
+    }
 
     // Update access time
     entry.lastAccessedAt = new Date();
@@ -173,8 +175,8 @@ export class WorkingMemory {
    *
    * @returns Object with all key-value pairs
    */
-  toObject(): Record<string, any> {
-    const result: Record<string, any> = {};
+  toObject(): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
     for (const [key, entry] of this.items) {
       result[key] = entry.value;
     }

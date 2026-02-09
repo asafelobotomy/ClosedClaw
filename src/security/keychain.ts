@@ -21,7 +21,7 @@
  * @see {@link ../security/encrypted-store.ts Encrypted Store Fallback}
  */
 
-import { execFile } from "node:child_process";
+import { execFile, type ExecFileOptions } from "node:child_process";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -36,7 +36,11 @@ const execFileAsync = promisify(execFile);
 /**
  * Supported keychain backends.
  */
-export type KeychainBackend = "macos-keychain" | "linux-secret-service" | "windows-credential" | "encrypted-file";
+export type KeychainBackend =
+  | "macos-keychain"
+  | "linux-secret-service"
+  | "windows-credential"
+  | "encrypted-file";
 
 /**
  * Information about the detected keychain backend.
@@ -263,17 +267,21 @@ async function linuxStore(
   exec: typeof execFileAsync,
 ): Promise<void> {
   // secret-tool reads password from stdin
-  await exec("secret-tool", [
-    "store",
-    "--label",
-    `${SERVICE_NAME} ${namespace}/${identifier}`,
-    "service",
-    SERVICE_NAME,
-    "namespace",
-    namespace,
-    "identifier",
-    identifier,
-  ], { input: secret } as any);
+  await exec(
+    "secret-tool",
+    [
+      "store",
+      "--label",
+      `${SERVICE_NAME} ${namespace}/${identifier}`,
+      "service",
+      SERVICE_NAME,
+      "namespace",
+      namespace,
+      "identifier",
+      identifier,
+    ],
+    { input: secret } as ExecFileOptions,
+  );
 }
 
 /**
@@ -342,11 +350,7 @@ async function windowsStore(
     // Not found, fine
   }
 
-  await exec("cmdkey", [
-    "/generic:" + target,
-    "/user:" + identifier,
-    "/pass:" + secret,
-  ]);
+  await exec("cmdkey", ["/generic:" + target, "/user:" + identifier, "/pass:" + secret]);
 }
 
 /**
@@ -470,10 +474,16 @@ async function fileList(stateDir?: string): Promise<StoredCredential[]> {
     const files = await fs.readdir(dir);
     const creds: StoredCredential[] = [];
     for (const file of files) {
-      if (!file.endsWith(".json")) {continue;}
+      if (!file.endsWith(".json")) {
+        continue;
+      }
       try {
         const raw = await fs.readFile(path.join(dir, file), "utf-8");
-        const parsed = JSON.parse(raw) as { namespace: string; identifier: string; storedAt?: string };
+        const parsed = JSON.parse(raw) as {
+          namespace: string;
+          identifier: string;
+          storedAt?: string;
+        };
         creds.push({
           namespace: parsed.namespace,
           identifier: parsed.identifier,
@@ -657,7 +667,9 @@ export async function migrateCredentials(opts?: KeychainOptions): Promise<{
   }
 
   for (const file of files) {
-    if (!file.endsWith(".json")) {continue;}
+    if (!file.endsWith(".json")) {
+      continue;
+    }
 
     const filePath = path.join(credDir, file);
     try {

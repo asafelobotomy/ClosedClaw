@@ -246,7 +246,7 @@ describe("AgentIPC", () => {
       ipc.register("a2");
 
       ipc.onRequest("a2", async (msg) => {
-        return { answer: (msg.payload as any).x * 2 };
+        return { answer: (msg.payload as { x: number }).x * 2 };
       });
 
       const result = await ipc.request("a1", "a2", { x: 21 });

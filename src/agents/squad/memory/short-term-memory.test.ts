@@ -6,7 +6,11 @@
 
 import { describe, it, expect, beforeEach, afterEach, _vi } from "vitest";
 import { AGENTS } from "../../../constants/index.js";
-import { ShortTermMemory, createShortTermMemory } from "./short-term-memory.js";
+import {
+  ShortTermMemory,
+  createShortTermMemory,
+  type ShortTermEntry,
+} from "./short-term-memory.js";
 
 describe("ShortTermMemory", () => {
   let stm: ShortTermMemory;
@@ -276,7 +280,9 @@ describe("ShortTermMemory", () => {
       stm.set("willExpire", "value", 50);
 
       // Manually increment access count without extending TTL (hack for test)
-      const entry = (stm as any).cache.get("willExpire");
+      const entry = (stm as unknown as { cache: Map<string, ShortTermEntry> }).cache.get(
+        "willExpire",
+      );
       if (entry) {
         entry.accessCount = 5; // Make it hot
       }

@@ -19,7 +19,7 @@ import { AGENTS } from "../../../constants/index.js";
 /**
  * Entry in short-term memory with TTL and access tracking
  */
-export interface ShortTermEntry<T = any> {
+export interface ShortTermEntry<T = unknown> {
   /** Stored value */
   value: T;
   /** When entry was created */
@@ -58,7 +58,7 @@ export interface ShortTermEntry<T = any> {
  * const hot = stm.getHotEntries(); // accessCount >= 5
  * ```
  */
-export class ShortTermMemory<T = any> {
+export class ShortTermMemory<T = unknown> {
   /** Internal storage */
   private cache: Map<string, ShortTermEntry<T>> = new Map();
 
@@ -127,7 +127,9 @@ export class ShortTermMemory<T = any> {
    */
   get(key: string): T | undefined {
     const entry = this.cache.get(key);
-    if (!entry) {return undefined;}
+    if (!entry) {
+      return undefined;
+    }
 
     // Check expiration
     if (this.isExpired(entry)) {
@@ -154,7 +156,9 @@ export class ShortTermMemory<T = any> {
    */
   has(key: string): boolean {
     const entry = this.cache.get(key);
-    if (!entry) {return false;}
+    if (!entry) {
+      return false;
+    }
 
     if (this.isExpired(entry)) {
       this.cache.delete(key);
@@ -338,6 +342,6 @@ export class ShortTermMemory<T = any> {
  * @param defaultTtl - Default TTL in milliseconds
  * @returns New ShortTermMemory instance
  */
-export function createShortTermMemory<T = any>(defaultTtl?: number): ShortTermMemory<T> {
+export function createShortTermMemory<T = unknown>(defaultTtl?: number): ShortTermMemory<T> {
   return new ShortTermMemory<T>(defaultTtl);
 }
