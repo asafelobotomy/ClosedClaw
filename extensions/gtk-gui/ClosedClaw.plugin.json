@@ -28,6 +28,18 @@
         "type": "boolean",
         "default": false,
         "description": "Enable lite mode for small local models (e.g., Ollama 1B/3B). Bypasses the full Pi agent system prompt for faster, simpler responses."
+      },
+      "liteModeTools": {
+        "type": "boolean",
+        "default": true,
+        "description": "Enable tool calling in lite mode (read_file, run_command, list_directory, etc.). Defaults to true."
+      },
+      "liteModeMaxIterations": {
+        "type": "integer",
+        "default": 8,
+        "minimum": 1,
+        "maximum": 20,
+        "description": "Maximum ReAct iterations for tool calling in lite mode."
       }
     }
   }
