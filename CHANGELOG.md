@@ -6,6 +6,24 @@ Docs: https://docs.OpenClaw.ai
 
 ### Code Quality & Architecture
 
+- **Agent Squad: Spawner + IPC** (Phase 1.2 complete): Agent lifecycle management and inter-agent communication
+  - **Agent Spawner** (`src/agents/squad/spawner.ts`): Creates and manages agent instances within squads
+    - `AgentSpawner` class: spawn, terminate, restartAgent, terminateSquad, shutdown
+    - Agent lifecycle state machine: INITIALIZING → READY → WORKING → IDLE → TERMINATING → TERMINATED
+    - Resource limits: max agents per squad, token budgets, restart attempts
+    - Heartbeat monitoring: detect hung/crashed agents, configurable intervals
+    - Event system: agent:spawned, state-changed, terminated, heartbeat-missed, restarted
+    - Custom init/terminate callbacks with grace period timeout
+  - **Inter-Agent Communication** (`src/agents/squad/ipc.ts`): Typed message passing between agents
+    - `AgentIPC` class: register, send, broadcast, request, publish, subscribe
+    - Direct messaging with inbox queuing (bounded, drops oldest on overflow)
+    - Broadcast to all squad members (excludes sender)
+    - Request-reply with configurable timeouts (prevents deadlocks)
+    - Publish-subscribe: topic-based loose coupling with subscription limits
+    - Stats tracking: messages sent/broadcast, requests, topic publishes
+  - **Squad Index** (`src/agents/squad/index.ts`): Barrel re-export for all squad subsystems
+  - Comprehensive test suites: spawner (30+ tests), IPC (30+ tests)
+
 - **Agent Squad: Three-Tier Memory System** (Phase 1 complete): Brain-inspired memory architecture for multi-agent collaboration
   - **Long-Term Memory** (`src/agents/squad/memory/long-term-memory.ts`): Persistent episodic store backed by EncryptedStore
     - `EpisodicStore` class: store, search, getRecent, getByOutcome, getBySquad, cleanup (retention-based)
