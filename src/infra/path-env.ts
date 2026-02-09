@@ -81,10 +81,6 @@ function candidateBinDirs(opts: EnsureClosedClawPathOpts): string[] {
 
   candidates.push(...resolveBrewPathDirs({ homeDir }));
 
-  // Common global install locations (macOS first).
-  if (platform === "darwin") {
-    candidates.push(path.join(homeDir, "Library", "pnpm"));
-  }
   if (process.env.XDG_BIN_HOME) {
     candidates.push(process.env.XDG_BIN_HOME);
   }

@@ -1,6 +1,5 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { resolveLaunchAgentPlistPath } from "./launchd.js";
 import {
   isSystemNodePath,
   isVersionManagedNodePath,
@@ -37,8 +36,6 @@ export const SERVICE_AUDIT_CODES = {
   gatewayRuntimeBun: "gateway-runtime-bun",
   gatewayRuntimeNodeVersionManager: "gateway-runtime-node-version-manager",
   gatewayRuntimeNodeSystemMissing: "gateway-runtime-node-system-missing",
-  launchdKeepAlive: "launchd-keep-alive",
-  launchdRunAtLoad: "launchd-run-at-load",
   systemdAfterNetworkOnline: "systemd-after-network-online",
   systemdRestartSec: "systemd-restart-sec",
   systemdWantsNetworkOnline: "systemd-wants-network-online",
@@ -155,39 +152,10 @@ async function auditSystemdUnit(
   }
 }
 
-async function auditLaunchdPlist(
-  env: Record<string, string | undefined>,
+function auditGatewayCommand(
+  programArguments: string[] | undefined,
   issues: ServiceConfigIssue[],
 ) {
-  const plistPath = resolveLaunchAgentPlistPath(env);
-  let content = "";
-  try {
-    content = await fs.readFile(plistPath, "utf8");
-  } catch {
-    return;
-  }
-
-  const hasRunAtLoad = /<key>RunAtLoad<\/key>\s*<true\s*\/>/i.test(content);
-  const hasKeepAlive = /<key>KeepAlive<\/key>\s*<true\s*\/>/i.test(content);
-  if (!hasRunAtLoad) {
-    issues.push({
-      code: SERVICE_AUDIT_CODES.launchdRunAtLoad,
-      message: "LaunchAgent is missing RunAtLoad=true",
-      detail: plistPath,
-      level: "recommended",
-    });
-  }
-  if (!hasKeepAlive) {
-    issues.push({
-      code: SERVICE_AUDIT_CODES.launchdKeepAlive,
-      message: "LaunchAgent is missing KeepAlive=true",
-      detail: plistPath,
-      level: "recommended",
-    });
-  }
-}
-
-function auditGatewayCommand(programArguments: string[] | undefined, issues: ServiceConfigIssue[]) {
   if (!programArguments || programArguments.length === 0) {
     return;
   }
@@ -210,28 +178,19 @@ function isBunRuntime(execPath: string): boolean {
   return base === "bun" || base === "bun.exe";
 }
 
-function getPathModule(platform: NodeJS.Platform) {
-  return platform === "win32" ? path.win32 : path.posix;
+function getPathModule() {
+  return path.posix;
 }
 
-function normalizePathEntry(entry: string, platform: NodeJS.Platform): string {
-  const pathModule = getPathModule(platform);
-  const normalized = pathModule.normalize(entry).replaceAll("\\", "/");
-  if (platform === "win32") {
-    return normalized.toLowerCase();
-  }
-  return normalized;
+function normalizePathEntry(entry: string): string {
+  return path.posix.normalize(entry).replaceAll("\\", "/");
 }
 
 function auditGatewayServicePath(
   command: GatewayServiceCommand,
   issues: ServiceConfigIssue[],
   env: Record<string, string | undefined>,
-  platform: NodeJS.Platform,
 ) {
-  if (platform === "win32") {
-    return;
-  }
   const servicePath = command?.environment?.PATH;
   if (!servicePath) {
     issues.push({
@@ -242,15 +201,15 @@ function auditGatewayServicePath(
     return;
   }
 
-  const expected = getMinimalServicePathPartsFromEnv({ platform, env });
+  const expected = getMinimalServicePathPartsFromEnv({ env });
   const parts = servicePath
-    .split(getPathModule(platform).delimiter)
+    .split(getPathModule().delimiter)
     .map((entry) => entry.trim())
     .filter(Boolean);
-  const normalizedParts = new Set(parts.map((entry) => normalizePathEntry(entry, platform)));
-  const normalizedExpected = new Set(expected.map((entry) => normalizePathEntry(entry, platform)));
+  const normalizedParts = new Set(parts.map((entry) => normalizePathEntry(entry)));
+  const normalizedExpected = new Set(expected.map((entry) => normalizePathEntry(entry)));
   const missing = expected.filter((entry) => {
-    const normalized = normalizePathEntry(entry, platform);
+    const normalized = normalizePathEntry(entry);
     return !normalizedParts.has(normalized);
   });
   if (missing.length > 0) {
@@ -262,7 +221,7 @@ function auditGatewayServicePath(
   }
 
   const nonMinimal = parts.filter((entry) => {
-    const normalized = normalizePathEntry(entry, platform);
+    const normalized = normalizePathEntry(entry);
     if (normalizedExpected.has(normalized)) {
       return false;
     }
@@ -295,7 +254,7 @@ async function auditGatewayRuntime(
   env: Record<string, string | undefined>,
   command: GatewayServiceCommand,
   issues: ServiceConfigIssue[],
-  platform: NodeJS.Platform,
+  platform: NodeJS.Platform = process.platform,
 ) {
   const execPath = command?.programArguments?.[0];
   if (!execPath) {
@@ -346,14 +305,9 @@ export async function auditGatewayServiceConfig(params: {
   const platform = params.platform ?? process.platform;
 
   auditGatewayCommand(params.command?.programArguments, issues);
-  auditGatewayServicePath(params.command, issues, params.env, platform);
+  auditGatewayServicePath(params.command, issues, params.env);
   await auditGatewayRuntime(params.env, params.command, issues, platform);
-
-  if (platform === "linux") {
-    await auditSystemdUnit(params.env, issues);
-  } else if (platform === "darwin") {
-    await auditLaunchdPlist(params.env, issues);
-  }
+  await auditSystemdUnit(params.env, issues);
 
   return { ok: issues.length === 0, issues };
 }

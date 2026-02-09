@@ -60,16 +60,7 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
     await handleReset("full", resolveUserPath(workspaceDefault), runtime);
   }
 
-  if (process.platform === "win32") {
-    runtime.log(
-      [
-        "Windows detected — ClosedClaw runs great on WSL2!",
-        "Native Windows might be trickier.",
-        "Quick setup: wsl --install (one command, one reboot)",
-        "Guide: https://docs.OpenClaw.ai/windows",
-      ].join("\n"),
-    );
-  }
+
 
   if (normalizedOpts.nonInteractive) {
     await runNonInteractiveOnboarding(normalizedOpts, runtime);

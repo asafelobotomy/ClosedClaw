@@ -504,7 +504,7 @@ async function runExecProcess(opts: {
         },
         end: () => {
           try {
-            const eof = process.platform === "win32" ? "\x1a" : "\x04";
+            const eof = "\x04";
             pty?.write(eof);
           } catch {
             // ignore EOF errors

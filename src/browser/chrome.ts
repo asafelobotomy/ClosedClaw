@@ -28,8 +28,6 @@ const log = createSubsystemLogger("browser").child("chrome");
 export type { BrowserExecutable } from "./chrome.executables.js";
 export {
   findChromeExecutableLinux,
-  findChromeExecutableMac,
-  findChromeExecutableWindows,
   resolveBrowserExecutableForPlatform,
 } from "./chrome.executables.js";
 export {

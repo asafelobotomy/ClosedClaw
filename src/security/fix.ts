@@ -462,7 +462,6 @@ export async function fixSecurityFootguns(opts?: {
   const env = opts?.env ?? process.env;
   const platform = opts?.platform ?? process.platform;
   const exec = opts?.exec ?? runExec;
-  const isWindows = platform === "win32";
   const stateDir = opts?.stateDir ?? resolveStateDir(env);
   const configPath = opts?.configPath ?? resolveConfigPath(env, stateDir);
   const actions: SecurityFixAction[] = [];
@@ -501,9 +500,7 @@ export async function fixSecurityFootguns(opts?: {
   }
 
   const applyPerms = (params: { path: string; mode: number; require: "dir" | "file" }) =>
-    isWindows
-      ? safeAclReset({ path: params.path, require: params.require, env, exec })
-      : safeChmod({ path: params.path, mode: params.mode, require: params.require });
+    safeChmod({ path: params.path, mode: params.mode, require: params.require });
 
   actions.push(await applyPerms({ path: stateDir, mode: 0o700, require: "dir" }));
   actions.push(await applyPerms({ path: configPath, mode: 0o600, require: "file" }));

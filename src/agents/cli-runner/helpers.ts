@@ -24,9 +24,6 @@ export async function cleanupResumeProcesses(
   backend: CliBackendConfig,
   sessionId: string,
 ): Promise<void> {
-  if (process.platform === "win32") {
-    return;
-  }
   const resumeArgs = backend.resumeArgs ?? [];
   if (resumeArgs.length === 0) {
     return;
@@ -108,9 +105,6 @@ export async function cleanupSuspendedCliProcesses(
   backend: CliBackendConfig,
   threshold = 10,
 ): Promise<void> {
-  if (process.platform === "win32") {
-    return;
-  }
   const matchers = buildSessionMatchers(backend);
   if (matchers.length === 0) {
     return;

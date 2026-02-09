@@ -1,6 +1,5 @@
 import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import type { ClosedClawConfig } from "../config/config.js";
@@ -58,35 +57,7 @@ function extractDetailPath(detail: string, prefix: string): string | null {
   return value.length > 0 ? value : null;
 }
 
-async function cleanupLegacyLaunchdService(params: {
-  label: string;
-  plistPath: string;
-}): Promise<string | null> {
-  const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-  await execFileAsync("launchctl", ["bootout", domain, params.plistPath]).catch(() => undefined);
-  await execFileAsync("launchctl", ["unload", params.plistPath]).catch(() => undefined);
-
-  const trashDir = path.join(os.homedir(), ".Trash");
-  try {
-    await fs.mkdir(trashDir, { recursive: true });
-  } catch {
-    // ignore
-  }
-
-  try {
-    await fs.access(params.plistPath);
-  } catch {
-    return null;
-  }
-
-  const dest = path.join(trashDir, `${params.label}-${Date.now()}.plist`);
-  try {
-    await fs.rename(params.plistPath, dest);
-    return dest;
-  } catch {
-    return null;
-  }
-}
+// Legacy systemd service cleanup is handled inline in maybeRepairExtraGatewayServices.
 
 export async function maybeRepairGatewayServiceConfig(
   cfg: ClosedClawConfig,
@@ -236,24 +207,24 @@ export async function maybeScanExtraGatewayServices(
       const removed: string[] = [];
       const failed: string[] = [];
       for (const svc of legacyServices) {
-        if (svc.platform !== "darwin") {
-          failed.push(`${svc.label} (${svc.platform})`);
-          continue;
-        }
         if (svc.scope !== "user") {
           failed.push(`${svc.label} (${svc.scope})`);
           continue;
         }
-        const plistPath = extractDetailPath(svc.detail, "plist:");
-        if (!plistPath) {
-          failed.push(`${svc.label} (missing plist path)`);
+        const unitPath = extractDetailPath(svc.detail, "unit:");
+        if (!unitPath) {
+          failed.push(`${svc.label} (missing unit path)`);
           continue;
         }
-        const dest = await cleanupLegacyLaunchdService({
-          label: svc.label,
-          plistPath,
-        });
-        removed.push(dest ? `${svc.label} -> ${dest}` : svc.label);
+        try {
+          await execFileAsync("systemctl", ["--user", "disable", "--now", svc.label]).catch(
+            () => undefined,
+          );
+          await fs.unlink(unitPath).catch(() => undefined);
+          removed.push(svc.label);
+        } catch {
+          failed.push(svc.label);
+        }
       }
       if (removed.length > 0) {
         note(removed.map((line) => `- ${line}`).join("\n"), "Legacy gateway removed");

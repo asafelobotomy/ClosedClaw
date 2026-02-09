@@ -1,18 +1,11 @@
 // Default service labels (canonical + legacy compatibility)
-export const GATEWAY_LAUNCH_AGENT_LABEL = "ai.ClosedClaw.gateway";
 export const GATEWAY_SYSTEMD_SERVICE_NAME = "ClosedClaw-gateway";
-export const GATEWAY_WINDOWS_TASK_NAME = "ClosedClaw Gateway";
 export const GATEWAY_SERVICE_MARKER = "ClosedClaw";
 export const GATEWAY_SERVICE_KIND = "gateway";
-export const NODE_LAUNCH_AGENT_LABEL = "ai.ClosedClaw.node";
 export const NODE_SYSTEMD_SERVICE_NAME = "ClosedClaw-node";
-export const NODE_WINDOWS_TASK_NAME = "ClosedClaw Node";
 export const NODE_SERVICE_MARKER = "ClosedClaw";
 export const NODE_SERVICE_KIND = "node";
-export const NODE_WINDOWS_TASK_SCRIPT_NAME = "node.cmd";
-export const LEGACY_GATEWAY_LAUNCH_AGENT_LABELS: string[] = [];
 export const LEGACY_GATEWAY_SYSTEMD_SERVICE_NAMES: string[] = [];
-export const LEGACY_GATEWAY_WINDOWS_TASK_NAMES: string[] = [];
 
 export function normalizeGatewayProfile(profile?: string): string | null {
   const trimmed = profile?.trim();
@@ -27,33 +20,12 @@ export function resolveGatewayProfileSuffix(profile?: string): string {
   return normalized ? `-${normalized}` : "";
 }
 
-export function resolveGatewayLaunchAgentLabel(profile?: string): string {
-  const normalized = normalizeGatewayProfile(profile);
-  if (!normalized) {
-    return GATEWAY_LAUNCH_AGENT_LABEL;
-  }
-  return `ai.ClosedClaw.${normalized}`;
-}
-
-export function resolveLegacyGatewayLaunchAgentLabels(profile?: string): string[] {
-  void profile;
-  return [];
-}
-
 export function resolveGatewaySystemdServiceName(profile?: string): string {
   const suffix = resolveGatewayProfileSuffix(profile);
   if (!suffix) {
     return GATEWAY_SYSTEMD_SERVICE_NAME;
   }
   return `ClosedClaw-gateway${suffix}`;
-}
-
-export function resolveGatewayWindowsTaskName(profile?: string): string {
-  const normalized = normalizeGatewayProfile(profile);
-  if (!normalized) {
-    return GATEWAY_WINDOWS_TASK_NAME;
-  }
-  return `ClosedClaw Gateway (${normalized})`;
 }
 
 export function formatGatewayServiceDescription(params?: {
@@ -75,16 +47,8 @@ export function formatGatewayServiceDescription(params?: {
   return `ClosedClaw Gateway (${parts.join(", ")})`;
 }
 
-export function resolveNodeLaunchAgentLabel(): string {
-  return NODE_LAUNCH_AGENT_LABEL;
-}
-
 export function resolveNodeSystemdServiceName(): string {
   return NODE_SYSTEMD_SERVICE_NAME;
-}
-
-export function resolveNodeWindowsTaskName(): string {
-  return NODE_WINDOWS_TASK_NAME;
 }
 
 export function formatNodeServiceDescription(params?: { version?: string }): string {

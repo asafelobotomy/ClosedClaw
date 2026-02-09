@@ -367,9 +367,7 @@ function isExecutableFile(filePath: string): boolean {
     if (!stat.isFile()) {
       return false;
     }
-    if (process.platform !== "win32") {
-      fs.accessSync(filePath, fs.constants.X_OK);
-    }
+    fs.accessSync(filePath, fs.constants.X_OK);
     return true;
   } catch {
     return false;
@@ -405,21 +403,7 @@ function resolveExecutablePath(rawExecutable: string, cwd?: string, env?: NodeJS
   }
   const envPath = env?.PATH ?? env?.Path ?? process.env.PATH ?? process.env.Path ?? "";
   const entries = envPath.split(path.delimiter).filter(Boolean);
-  const hasExtension = process.platform === "win32" && path.extname(expanded).length > 0;
-  const extensions =
-    process.platform === "win32"
-      ? hasExtension
-        ? [""]
-        : (
-            env?.PATHEXT ??
-            env?.Pathext ??
-            process.env.PATHEXT ??
-            process.env.Pathext ??
-            ".EXE;.CMD;.BAT;.COM"
-          )
-            .split(";")
-            .map((ext) => ext.toLowerCase())
-      : [""];
+  const extensions = [""];
   for (const entry of entries) {
     for (const ext of extensions) {
       const candidate = path.join(entry, expanded + ext);
@@ -460,10 +444,6 @@ export function resolveCommandResolutionFromArgv(
 }
 
 function normalizeMatchTarget(value: string): string {
-  if (process.platform === "win32") {
-    const stripped = value.replace(/^\\\\[?.]\\/, "");
-    return stripped.replace(/\\/g, "/").toLowerCase();
-  }
   return value.replace(/\\\\/g, "/").toLowerCase();
 }
 
@@ -512,10 +492,6 @@ function matchesPattern(pattern: string, target: string): boolean {
   const hasWildcard = /[*?]/.test(expanded);
   let normalizedPattern = expanded;
   let normalizedTarget = target;
-  if (process.platform === "win32" && !hasWildcard) {
-    normalizedPattern = tryRealpath(expanded) ?? expanded;
-    normalizedTarget = tryRealpath(target) ?? target;
-  }
   normalizedPattern = normalizeMatchTarget(normalizedPattern);
   normalizedTarget = normalizeMatchTarget(normalizedTarget);
   const regex = globToRegExp(normalizedPattern);
@@ -916,8 +892,7 @@ export function isSafeBinUsage(params: {
     return false;
   }
   const matchesSafeBin =
-    params.safeBins.has(execName) ||
-    (process.platform === "win32" && params.safeBins.has(path.parse(execName).name));
+    params.safeBins.has(execName);
   if (!matchesSafeBin) {
     return false;
   }

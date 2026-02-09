@@ -469,15 +469,7 @@ export async function autoMigrateLegacyStateDir(params: {
     changes.push(formatStateDirMigration(legacyDir, targetDir));
   } catch (err) {
     try {
-      if (process.platform === "win32") {
-        if (!legacyDir) {
-          throw new Error("Legacy state dir not found", { cause: err });
-        }
-        fs.symlinkSync(targetDir, legacyDir, "junction");
-        changes.push(formatStateDirMigration(legacyDir, targetDir));
-      } else {
-        throw err;
-      }
+      throw err;
     } catch (fallbackErr) {
       try {
         if (!legacyDir) {

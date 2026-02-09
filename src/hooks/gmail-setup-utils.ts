@@ -361,9 +361,7 @@ function gogCredentialsPaths(): string[] {
     paths.push(path.join(xdg, "gogcli", "credentials.json"));
   }
   paths.push(resolveUserPath("~/.config/gogcli/credentials.json"));
-  if (process.platform === "darwin") {
-    paths.push(resolveUserPath("~/Library/Application Support/gogcli/credentials.json"));
-  }
+
   return paths;
 }
 

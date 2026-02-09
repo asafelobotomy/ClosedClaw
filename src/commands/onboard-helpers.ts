@@ -131,44 +131,27 @@ export async function resolveBrowserOpenCommand(): Promise<BrowserOpenCommand> {
     Boolean(process.env.SSH_TTY) ||
     Boolean(process.env.SSH_CONNECTION);
 
-  if (isSsh && !hasDisplay && platform !== "win32") {
+  if (isSsh && !hasDisplay) {
     return { argv: null, reason: "ssh-no-display" };
   }
 
-  if (platform === "win32") {
-    return {
-      argv: ["cmd", "/c", "start", ""],
-      command: "cmd",
-      quoteUrl: true,
-    };
+  const wsl = await isWSL();
+  if (!hasDisplay && !wsl) {
+    return { argv: null, reason: "no-display" };
   }
-
-  if (platform === "darwin") {
-    const hasOpen = await detectBinary("open");
-    return hasOpen ? { argv: ["open"], command: "open" } : { argv: null, reason: "missing-open" };
-  }
-
-  if (platform === "linux") {
-    const wsl = await isWSL();
-    if (!hasDisplay && !wsl) {
-      return { argv: null, reason: "no-display" };
+  if (wsl) {
+    const hasWslview = await detectBinary("wslview");
+    if (hasWslview) {
+      return { argv: ["wslview"], command: "wslview" };
     }
-    if (wsl) {
-      const hasWslview = await detectBinary("wslview");
-      if (hasWslview) {
-        return { argv: ["wslview"], command: "wslview" };
-      }
-      if (!hasDisplay) {
-        return { argv: null, reason: "wsl-no-wslview" };
-      }
+    if (!hasDisplay) {
+      return { argv: null, reason: "wsl-no-wslview" };
     }
-    const hasXdgOpen = await detectBinary("xdg-open");
-    return hasXdgOpen
-      ? { argv: ["xdg-open"], command: "xdg-open" }
-      : { argv: null, reason: "missing-xdg-open" };
   }
-
-  return { argv: null, reason: "unsupported-platform" };
+  const hasXdgOpen = await detectBinary("xdg-open");
+  return hasXdgOpen
+    ? { argv: ["xdg-open"], command: "xdg-open" }
+    : { argv: null, reason: "missing-xdg-open" };
 }
 
 export async function detectBrowserOpenSupport(): Promise<BrowserOpenSupport> {
@@ -242,24 +225,8 @@ export async function openUrl(url: string): Promise<boolean> {
   }
 }
 
-export async function openUrlInBackground(url: string): Promise<boolean> {
-  if (shouldSkipBrowserOpenInTests()) {
-    return false;
-  }
-  if (process.platform !== "darwin") {
-    return false;
-  }
-  const resolved = await resolveBrowserOpenCommand();
-  if (!resolved.argv || resolved.command !== "open") {
-    return false;
-  }
-  const command = ["open", "-g", url];
-  try {
-    await runCommandWithTimeout(command, { timeoutMs: 5_000 });
-    return true;
-  } catch {
-    return false;
-  }
+export async function openUrlInBackground(_url: string): Promise<boolean> {
+  return false;
 }
 
 export async function ensureWorkspaceAndSessions(
@@ -339,7 +306,7 @@ export async function detectBinary(name: string): Promise<boolean> {
     }
   }
 
-  const command = process.platform === "win32" ? ["where", name] : ["/usr/bin/env", "which", name];
+  const command = ["/usr/bin/env", "which", name];
   try {
     const result = await runCommandWithTimeout(command, { timeoutMs: 2000 });
     return result.code === 0 && result.stdout.trim().length > 0;

@@ -83,37 +83,7 @@ export async function inspectPathPermissions(
   const bits = modeBits(st.mode);
   const platform = opts?.platform ?? process.platform;
 
-  if (platform === "win32") {
-    const acl = await inspectWindowsAcl(targetPath, { env: opts?.env, exec: opts?.exec });
-    if (!acl.ok) {
-      return {
-        ok: true,
-        isSymlink: st.isSymlink,
-        isDir: st.isDir,
-        mode: st.mode,
-        bits,
-        source: "unknown",
-        worldWritable: false,
-        groupWritable: false,
-        worldReadable: false,
-        groupReadable: false,
-        error: acl.error,
-      };
-    }
-    return {
-      ok: true,
-      isSymlink: st.isSymlink,
-      isDir: st.isDir,
-      mode: st.mode,
-      bits,
-      source: "windows-acl",
-      worldWritable: acl.untrustedWorld.some((entry) => entry.canWrite),
-      groupWritable: acl.untrustedGroup.some((entry) => entry.canWrite),
-      worldReadable: acl.untrustedWorld.some((entry) => entry.canRead),
-      groupReadable: acl.untrustedGroup.some((entry) => entry.canRead),
-      aclSummary: formatWindowsAclSummary(acl),
-    };
-  }
+  // Windows ACL inspection removed (Linux-only build).
 
   return {
     ok: true,

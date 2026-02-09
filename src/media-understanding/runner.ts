@@ -128,9 +128,6 @@ async function isExecutable(filePath: string): Promise<boolean> {
     if (!stat.isFile()) {
       return false;
     }
-    if (process.platform === "win32") {
-      return true;
-    }
     await fs.access(filePath, fsConstants.X_OK);
     return true;
   } catch {

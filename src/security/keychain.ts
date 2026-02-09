@@ -126,20 +126,6 @@ export async function detectKeychainBackend(opts?: KeychainOptions): Promise<Key
   const exec = opts?.execFn ?? execFileAsync;
   const platform = os.platform();
 
-  if (platform === "darwin") {
-    try {
-      await exec("which", ["security"]);
-      return {
-        backend: "macos-keychain",
-        available: true,
-        description: "macOS Keychain via `security` CLI",
-        toolPath: "/usr/bin/security",
-      };
-    } catch {
-      // security CLI not available
-    }
-  }
-
   if (platform === "linux") {
     try {
       await exec("which", ["secret-tool"]);
@@ -151,20 +137,6 @@ export async function detectKeychainBackend(opts?: KeychainOptions): Promise<Key
       };
     } catch {
       // secret-tool not available
-    }
-  }
-
-  if (platform === "win32") {
-    try {
-      await exec("where", ["cmdkey"]);
-      return {
-        backend: "windows-credential",
-        available: true,
-        description: "Windows Credential Manager via `cmdkey` CLI",
-        toolPath: "cmdkey",
-      };
-    } catch {
-      // cmdkey not available
     }
   }
 

@@ -15,10 +15,7 @@ function isBun(): boolean {
 }
 
 function prefersSips(): boolean {
-  return (
-    process.env.ClosedClaw_IMAGE_BACKEND === "sips" ||
-    (process.env.ClosedClaw_IMAGE_BACKEND !== "sharp" && isBun() && process.platform === "darwin")
-  );
+  return process.env.ClosedClaw_IMAGE_BACKEND === "sips";
 }
 
 async function loadSharp(): Promise<(buffer: Buffer) => ReturnType<Sharp>> {

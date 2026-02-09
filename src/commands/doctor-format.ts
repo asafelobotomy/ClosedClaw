@@ -1,11 +1,6 @@
 import type { GatewayServiceRuntime } from "../daemon/service-runtime.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import {
-  resolveGatewayLaunchAgentLabel,
-  resolveGatewaySystemdServiceName,
-  resolveGatewayWindowsTaskName,
-} from "../daemon/constants.js";
-import { resolveGatewayLogPaths } from "../daemon/launchd.js";
+import { resolveGatewaySystemdServiceName } from "../daemon/constants.js";
 import {
   isSystemdUnavailableDetail,
   renderSystemdUnavailableHints,
@@ -77,12 +72,10 @@ export function buildGatewayRuntimeHints(
     }
     return hints;
   }
-  if (runtime.cachedLabel && platform === "darwin") {
-    const label = resolveGatewayLaunchAgentLabel(env.ClosedClaw_PROFILE);
+  if (runtime.cachedLabel) {
     hints.push(
-      `LaunchAgent label cached but plist missing. Clear with: launchctl bootout gui/$UID/${label}`,
+      `Service not installed. Run: ${formatCliCommand("ClosedClaw gateway install", env)}`,
     );
-    hints.push(`Then reinstall: ${formatCliCommand("ClosedClaw gateway install", env)}`);
   }
   if (runtime.missingUnit) {
     hints.push(
@@ -98,17 +91,8 @@ export function buildGatewayRuntimeHints(
     if (fileLog) {
       hints.push(`File logs: ${fileLog}`);
     }
-    if (platform === "darwin") {
-      const logs = resolveGatewayLogPaths(env);
-      hints.push(`Launchd stdout (if installed): ${logs.stdoutPath}`);
-      hints.push(`Launchd stderr (if installed): ${logs.stderrPath}`);
-    } else if (platform === "linux") {
-      const unit = resolveGatewaySystemdServiceName(env.ClosedClaw_PROFILE);
-      hints.push(`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`);
-    } else if (platform === "win32") {
-      const task = resolveGatewayWindowsTaskName(env.ClosedClaw_PROFILE);
-      hints.push(`Logs: schtasks /Query /TN "${task}" /V /FO LIST`);
-    }
+    const unit = resolveGatewaySystemdServiceName(env.ClosedClaw_PROFILE);
+    hints.push(`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`);
   }
   return hints;
 }

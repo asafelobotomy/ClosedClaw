@@ -1,10 +1,8 @@
 import { resolveControlUiLinks } from "../../commands/onboard-helpers.js";
 import {
-  resolveGatewayLaunchAgentLabel,
   resolveGatewaySystemdServiceName,
 } from "../../daemon/constants.js";
 import { renderGatewayServiceCleanupHints } from "../../daemon/inspect.js";
-import { resolveGatewayLogPaths } from "../../daemon/launchd.js";
 import {
   isSystemdUnavailableDetail,
   renderSystemdUnavailableHints,
@@ -233,15 +231,10 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
   }
 
   if (service.runtime?.cachedLabel) {
-    const env = (service.command?.environment ?? process.env) as NodeJS.ProcessEnv;
-    const labelValue = resolveGatewayLaunchAgentLabel(env.ClosedClaw_PROFILE);
     defaultRuntime.error(
       errorText(
-        `LaunchAgent label cached but plist missing. Clear with: launchctl bootout gui/$UID/${labelValue}`,
+        `Service unit not found. Reinstall: ${formatCliCommand("ClosedClaw gateway install")}`,
       ),
-    );
-    defaultRuntime.error(
-      errorText(`Then reinstall: ${formatCliCommand("ClosedClaw gateway install")}`),
     );
     spacer();
   }
@@ -275,19 +268,11 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
     if (status.lastError) {
       defaultRuntime.error(`${errorText("Last gateway error:")} ${status.lastError}`);
     }
-    if (process.platform === "linux") {
-      const env = (service.command?.environment ?? process.env) as NodeJS.ProcessEnv;
-      const unit = resolveGatewaySystemdServiceName(env.ClosedClaw_PROFILE);
-      defaultRuntime.error(
-        errorText(`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`),
-      );
-    } else if (process.platform === "darwin") {
-      const logs = resolveGatewayLogPaths(
-        (service.command?.environment ?? process.env) as NodeJS.ProcessEnv,
-      );
-      defaultRuntime.error(`${errorText("Logs:")} ${shortenHomePath(logs.stdoutPath)}`);
-      defaultRuntime.error(`${errorText("Errors:")} ${shortenHomePath(logs.stderrPath)}`);
-    }
+    const env = (service.command?.environment ?? process.env) as NodeJS.ProcessEnv;
+    const unit = resolveGatewaySystemdServiceName(env.ClosedClaw_PROFILE);
+    defaultRuntime.error(
+      errorText(`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`),
+    );
     spacer();
   }
 

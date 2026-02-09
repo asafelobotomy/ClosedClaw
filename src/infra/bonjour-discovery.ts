@@ -274,27 +274,7 @@ function parseDnsSdResolve(stdout: string, instanceName: string): GatewayBonjour
   return beacon;
 }
 
-async function discoverViaDnsSd(
-  domain: string,
-  timeoutMs: number,
-  run: typeof runCommandWithTimeout,
-): Promise<GatewayBonjourBeacon[]> {
-  const browse = await run(["dns-sd", "-B", GATEWAY_SERVICE_TYPE, domain], {
-    timeoutMs,
-  });
-  const instances = parseDnsSdBrowse(browse.stdout);
-  const results: GatewayBonjourBeacon[] = [];
-  for (const instance of instances) {
-    const resolved = await run(["dns-sd", "-L", instance, GATEWAY_SERVICE_TYPE, domain], {
-      timeoutMs,
-    });
-    const parsed = parseDnsSdResolve(resolved.stdout, instance);
-    if (parsed) {
-      results.push({ ...parsed, domain });
-    }
-  }
-  return results;
-}
+// discoverViaDnsSd removed (macOS dns-sd, Linux-only build uses avahi).
 
 async function discoverWideAreaViaTailnetDns(
   domain: string,
@@ -307,7 +287,7 @@ async function discoverWideAreaViaTailnetDns(
   const startedAt = Date.now();
   const remainingMs = () => timeoutMs - (Date.now() - startedAt);
 
-  const tailscaleCandidates = ["tailscale", "/Applications/Tailscale.app/Contents/MacOS/Tailscale"];
+  const tailscaleCandidates = ["tailscale"];
   let ips: string[] = [];
   for (const candidate of tailscaleCandidates) {
     try {
@@ -570,26 +550,6 @@ export async function discoverGatewayBeacons(
     .map((d) => (d.endsWith(".") ? d : `${d}.`));
 
   try {
-    if (platform === "darwin") {
-      const perDomain = await Promise.allSettled(
-        domains.map(async (domain) => await discoverViaDnsSd(domain, timeoutMs, run)),
-      );
-      const discovered = perDomain.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
-
-      const wantsWideArea = wideAreaDomain ? domains.includes(wideAreaDomain) : false;
-      const hasWideArea = wideAreaDomain
-        ? discovered.some((b) => b.domain === wideAreaDomain)
-        : false;
-
-      if (wantsWideArea && !hasWideArea && wideAreaDomain) {
-        const fallback = await discoverWideAreaViaTailnetDns(wideAreaDomain, timeoutMs, run).catch(
-          () => [],
-        );
-        return [...discovered, ...fallback];
-      }
-
-      return discovered;
-    }
     if (platform === "linux") {
       const perDomain = await Promise.allSettled(
         domains.map(async (domain) => await discoverViaAvahi(domain, timeoutMs, run)),

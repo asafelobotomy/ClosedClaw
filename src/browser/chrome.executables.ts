@@ -158,96 +158,10 @@ function inferKindFromExecutableName(name: string): BrowserExecutable["kind"] {
 }
 
 function detectDefaultChromiumExecutable(platform: NodeJS.Platform): BrowserExecutable | null {
-  if (platform === "darwin") {
-    return detectDefaultChromiumExecutableMac();
-  }
   if (platform === "linux") {
     return detectDefaultChromiumExecutableLinux();
   }
-  if (platform === "win32") {
-    return detectDefaultChromiumExecutableWindows();
-  }
   return null;
-}
-
-function detectDefaultChromiumExecutableMac(): BrowserExecutable | null {
-  const bundleId = detectDefaultBrowserBundleIdMac();
-  if (!bundleId || !CHROMIUM_BUNDLE_IDS.has(bundleId)) {
-    return null;
-  }
-
-  const appPathRaw = execText("/usr/bin/osascript", [
-    "-e",
-    `POSIX path of (path to application id "${bundleId}")`,
-  ]);
-  if (!appPathRaw) {
-    return null;
-  }
-  const appPath = appPathRaw.trim().replace(/\/$/, "");
-  const exeName = execText("/usr/bin/defaults", [
-    "read",
-    path.join(appPath, "Contents", "Info"),
-    "CFBundleExecutable",
-  ]);
-  if (!exeName) {
-    return null;
-  }
-  const exePath = path.join(appPath, "Contents", "MacOS", exeName.trim());
-  if (!exists(exePath)) {
-    return null;
-  }
-  return { kind: inferKindFromIdentifier(bundleId), path: exePath };
-}
-
-function detectDefaultBrowserBundleIdMac(): string | null {
-  const plistPath = path.join(
-    os.homedir(),
-    "Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist",
-  );
-  if (!exists(plistPath)) {
-    return null;
-  }
-  const handlersRaw = execText(
-    "/usr/bin/plutil",
-    ["-extract", "LSHandlers", "json", "-o", "-", "--", plistPath],
-    2000,
-    5 * 1024 * 1024,
-  );
-  if (!handlersRaw) {
-    return null;
-  }
-  let handlers: unknown;
-  try {
-    handlers = JSON.parse(handlersRaw);
-  } catch {
-    return null;
-  }
-  if (!Array.isArray(handlers)) {
-    return null;
-  }
-
-  const resolveScheme = (scheme: string) => {
-    let candidate: string | null = null;
-    for (const entry of handlers) {
-      if (!entry || typeof entry !== "object") {
-        continue;
-      }
-      const record = entry as Record<string, unknown>;
-      if (record.LSHandlerURLScheme !== scheme) {
-        continue;
-      }
-      const role =
-        (typeof record.LSHandlerRoleAll === "string" && record.LSHandlerRoleAll) ||
-        (typeof record.LSHandlerRoleViewer === "string" && record.LSHandlerRoleViewer) ||
-        null;
-      if (role) {
-        candidate = role;
-      }
-    }
-    return candidate;
-  };
-
-  return resolveScheme("http") ?? resolveScheme("https");
 }
 
 function detectDefaultChromiumExecutableLinux(): BrowserExecutable | null {
@@ -284,27 +198,7 @@ function detectDefaultChromiumExecutableLinux(): BrowserExecutable | null {
   return { kind: inferKindFromExecutableName(exeName), path: resolved };
 }
 
-function detectDefaultChromiumExecutableWindows(): BrowserExecutable | null {
-  const progId = readWindowsProgId();
-  const command =
-    (progId ? readWindowsCommandForProgId(progId) : null) || readWindowsCommandForProgId("http");
-  if (!command) {
-    return null;
-  }
-  const expanded = expandWindowsEnvVars(command);
-  const exePath = extractWindowsExecutablePath(expanded);
-  if (!exePath) {
-    return null;
-  }
-  if (!exists(exePath)) {
-    return null;
-  }
-  const exeName = path.win32.basename(exePath).toLowerCase();
-  if (!CHROMIUM_EXE_NAMES.has(exeName)) {
-    return null;
-  }
-  return { kind: inferKindFromExecutableName(exeName), path: exePath };
-}
+// Windows Chrome detection removed (Linux-only build).
 
 function findDesktopFilePath(desktopId: string): string | null {
   const candidates = [
@@ -397,51 +291,7 @@ function resolveLinuxExecutablePath(command: string): string | null {
   return resolved ? resolved.trim() : null;
 }
 
-function readWindowsProgId(): string | null {
-  const output = execText("reg", [
-    "query",
-    "HKCU\\Software\\Microsoft\\Windows\\Shell\\Associations\\UrlAssociations\\http\\UserChoice",
-    "/v",
-    "ProgId",
-  ]);
-  if (!output) {
-    return null;
-  }
-  const match = output.match(/ProgId\s+REG_\w+\s+(.+)$/im);
-  return match?.[1]?.trim() || null;
-}
-
-function readWindowsCommandForProgId(progId: string): string | null {
-  const key =
-    progId === "http"
-      ? "HKCR\\http\\shell\\open\\command"
-      : `HKCR\\${progId}\\shell\\open\\command`;
-  const output = execText("reg", ["query", key, "/ve"]);
-  if (!output) {
-    return null;
-  }
-  const match = output.match(/REG_\w+\s+(.+)$/im);
-  return match?.[1]?.trim() || null;
-}
-
-function expandWindowsEnvVars(value: string): string {
-  return value.replace(/%([^%]+)%/g, (_match, name) => {
-    const key = String(name ?? "").trim();
-    return key ? (process.env[key] ?? `%${key}%`) : _match;
-  });
-}
-
-function extractWindowsExecutablePath(command: string): string | null {
-  const quoted = command.match(/"([^"]+\\.exe)"/i);
-  if (quoted?.[1]) {
-    return quoted[1];
-  }
-  const unquoted = command.match(/([^\\s]+\\.exe)/i);
-  if (unquoted?.[1]) {
-    return unquoted[1];
-  }
-  return null;
-}
+// Windows registry helpers removed (Linux-only build).
 
 function findFirstExecutable(candidates: Array<BrowserExecutable>): BrowserExecutable | null {
   for (const candidate of candidates) {
@@ -453,58 +303,7 @@ function findFirstExecutable(candidates: Array<BrowserExecutable>): BrowserExecu
   return null;
 }
 
-export function findChromeExecutableMac(): BrowserExecutable | null {
-  const candidates: Array<BrowserExecutable> = [
-    {
-      kind: "chrome",
-      path: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    },
-    {
-      kind: "chrome",
-      path: path.join(os.homedir(), "Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
-    },
-    {
-      kind: "brave",
-      path: "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
-    },
-    {
-      kind: "brave",
-      path: path.join(os.homedir(), "Applications/Brave Browser.app/Contents/MacOS/Brave Browser"),
-    },
-    {
-      kind: "edge",
-      path: "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
-    },
-    {
-      kind: "edge",
-      path: path.join(
-        os.homedir(),
-        "Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
-      ),
-    },
-    {
-      kind: "chromium",
-      path: "/Applications/Chromium.app/Contents/MacOS/Chromium",
-    },
-    {
-      kind: "chromium",
-      path: path.join(os.homedir(), "Applications/Chromium.app/Contents/MacOS/Chromium"),
-    },
-    {
-      kind: "canary",
-      path: "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
-    },
-    {
-      kind: "canary",
-      path: path.join(
-        os.homedir(),
-        "Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
-      ),
-    },
-  ];
-
-  return findFirstExecutable(candidates);
-}
+// macOS Chrome executable finder removed (Linux-only build).
 
 export function findChromeExecutableLinux(): BrowserExecutable | null {
   const candidates: Array<BrowserExecutable> = [
@@ -525,76 +324,7 @@ export function findChromeExecutableLinux(): BrowserExecutable | null {
   return findFirstExecutable(candidates);
 }
 
-export function findChromeExecutableWindows(): BrowserExecutable | null {
-  const localAppData = process.env.LOCALAPPDATA ?? "";
-  const programFiles = process.env.ProgramFiles ?? "C:\\Program Files";
-  // Must use bracket notation: variable name contains parentheses
-  const programFilesX86 = process.env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)";
-
-  const joinWin = path.win32.join;
-  const candidates: Array<BrowserExecutable> = [];
-
-  if (localAppData) {
-    // Chrome (user install)
-    candidates.push({
-      kind: "chrome",
-      path: joinWin(localAppData, "Google", "Chrome", "Application", "chrome.exe"),
-    });
-    // Brave (user install)
-    candidates.push({
-      kind: "brave",
-      path: joinWin(localAppData, "BraveSoftware", "Brave-Browser", "Application", "brave.exe"),
-    });
-    // Edge (user install)
-    candidates.push({
-      kind: "edge",
-      path: joinWin(localAppData, "Microsoft", "Edge", "Application", "msedge.exe"),
-    });
-    // Chromium (user install)
-    candidates.push({
-      kind: "chromium",
-      path: joinWin(localAppData, "Chromium", "Application", "chrome.exe"),
-    });
-    // Chrome Canary (user install)
-    candidates.push({
-      kind: "canary",
-      path: joinWin(localAppData, "Google", "Chrome SxS", "Application", "chrome.exe"),
-    });
-  }
-
-  // Chrome (system install, 64-bit)
-  candidates.push({
-    kind: "chrome",
-    path: joinWin(programFiles, "Google", "Chrome", "Application", "chrome.exe"),
-  });
-  // Chrome (system install, 32-bit on 64-bit Windows)
-  candidates.push({
-    kind: "chrome",
-    path: joinWin(programFilesX86, "Google", "Chrome", "Application", "chrome.exe"),
-  });
-  // Brave (system install, 64-bit)
-  candidates.push({
-    kind: "brave",
-    path: joinWin(programFiles, "BraveSoftware", "Brave-Browser", "Application", "brave.exe"),
-  });
-  // Brave (system install, 32-bit on 64-bit Windows)
-  candidates.push({
-    kind: "brave",
-    path: joinWin(programFilesX86, "BraveSoftware", "Brave-Browser", "Application", "brave.exe"),
-  });
-  // Edge (system install, 64-bit)
-  candidates.push({
-    kind: "edge",
-    path: joinWin(programFiles, "Microsoft", "Edge", "Application", "msedge.exe"),
-  });
-  // Edge (system install, 32-bit on 64-bit Windows)
-  candidates.push({
-    kind: "edge",
-    path: joinWin(programFilesX86, "Microsoft", "Edge", "Application", "msedge.exe"),
-  });
-
-  return findFirstExecutable(candidates);
-}
+// Windows Chrome executable finder removed (Linux-only build).
 
 export function resolveBrowserExecutableForPlatform(
   resolved: ResolvedBrowserConfig,
@@ -612,14 +342,5 @@ export function resolveBrowserExecutableForPlatform(
     return detected;
   }
 
-  if (platform === "darwin") {
-    return findChromeExecutableMac();
-  }
-  if (platform === "linux") {
-    return findChromeExecutableLinux();
-  }
-  if (platform === "win32") {
-    return findChromeExecutableWindows();
-  }
-  return null;
+  return findChromeExecutableLinux();
 }

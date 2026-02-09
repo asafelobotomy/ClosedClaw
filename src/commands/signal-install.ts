@@ -49,18 +49,7 @@ function pickAsset(assets: ReleaseAsset[], platform: NodeJS.Platform) {
     );
   }
 
-  if (platform === "darwin") {
-    return (
-      byName(/macos|osx|darwin/) ||
-      withName.find((asset) => looksLikeArchive(asset.name.toLowerCase()))
-    );
-  }
 
-  if (platform === "win32") {
-    return (
-      byName(/windows|win/) || withName.find((asset) => looksLikeArchive(asset.name.toLowerCase()))
-    );
-  }
 
   return withName.find((asset) => looksLikeArchive(asset.name.toLowerCase()));
 }
@@ -111,12 +100,7 @@ async function findSignalCliBinary(root: string): Promise<string | null> {
 }
 
 export async function installSignalCli(runtime: RuntimeEnv): Promise<SignalInstallResult> {
-  if (process.platform === "win32") {
-    return {
-      ok: false,
-      error: "Signal CLI auto-install is not supported on Windows yet.",
-    };
-  }
+
 
   const apiUrl = "https://api.github.com/repos/AsamK/signal-cli/releases/latest";
   const response = await fetch(apiUrl, {
