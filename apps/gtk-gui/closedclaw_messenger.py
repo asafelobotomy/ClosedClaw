@@ -38,18 +38,6 @@ DEFAULT_SOCKET_PATH = "/tmp/closedclaw-gtk.sock"
 APP_ID = "ai.closedclaw.messenger"
 APP_NAME = "ClosedClaw Messenger"
 
-# Colors for the UI
-COLORS = {
-    "user_bg": "#3584e4",
-    "user_fg": "#ffffff",
-    "assistant_bg": "#f6f5f4",
-    "assistant_fg": "#1e1e1e",
-    "system_bg": "#fdf6e3",
-    "system_fg": "#657b83",
-    "error_bg": "#e01b24",
-    "error_fg": "#ffffff",
-}
-
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DATA MODELS
@@ -199,54 +187,33 @@ class MessageBubble(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         self.message = message
         
-        # Determine alignment and colors
+        # Determine alignment
         is_user = message.msg_type == MessageType.USER
         
         if is_user:
             self.set_halign(Gtk.Align.END)
-            bg_color = COLORS["user_bg"]
-            fg_color = COLORS["user_fg"]
-        elif message.msg_type == MessageType.ERROR:
+        elif message.msg_type in (MessageType.ERROR, MessageType.SYSTEM):
             self.set_halign(Gtk.Align.CENTER)
-            bg_color = COLORS["error_bg"]
-            fg_color = COLORS["error_fg"]
-        elif message.msg_type == MessageType.SYSTEM:
-            self.set_halign(Gtk.Align.CENTER)
-            bg_color = COLORS["system_bg"]
-            fg_color = COLORS["system_fg"]
         else:
             self.set_halign(Gtk.Align.START)
-            bg_color = COLORS["assistant_bg"]
-            fg_color = COLORS["assistant_fg"]
+        
+        # Determine CSS class for message type
+        type_class_map = {
+            MessageType.USER: "message-user",
+            MessageType.ASSISTANT: "message-assistant",
+            MessageType.SYSTEM: "message-system",
+            MessageType.ERROR: "message-error",
+        }
+        type_class = type_class_map.get(message.msg_type, "message-assistant")
         
         # Create bubble container
         bubble = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         bubble.add_css_class("message-bubble")
+        bubble.add_css_class(type_class)
         bubble.set_margin_start(8 if is_user else 48)
         bubble.set_margin_end(48 if is_user else 8)
         bubble.set_margin_top(4)
         bubble.set_margin_bottom(4)
-        
-        # Apply custom CSS
-        css_provider = Gtk.CssProvider()
-        css = f"""
-            .message-bubble {{
-                background-color: {bg_color};
-                border-radius: 12px;
-                padding: 8px 12px;
-            }}
-            .message-text {{
-                color: {fg_color};
-            }}
-            .message-time {{
-                color: alpha({fg_color}, 0.7);
-                font-size: 0.8em;
-            }}
-        """
-        css_provider.load_from_data(css.encode())
-        bubble.get_style_context().add_provider(
-            css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
         
         # Message text
         text_label = Gtk.Label()
@@ -257,9 +224,6 @@ class MessageBubble(Gtk.Box):
         text_label.set_xalign(0 if not is_user else 1)
         text_label.set_selectable(True)
         text_label.add_css_class("message-text")
-        text_label.get_style_context().add_provider(
-            css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
         bubble.append(text_label)
         
         # Timestamp
@@ -267,9 +231,6 @@ class MessageBubble(Gtk.Box):
         time_label = Gtk.Label(label=time_str)
         time_label.set_xalign(1 if is_user else 0)
         time_label.add_css_class("message-time")
-        time_label.get_style_context().add_provider(
-            css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
         bubble.append(time_label)
         
         self.append(bubble)
@@ -318,18 +279,7 @@ class TypingIndicator(Gtk.Box):
             self.dots.append(dot)
             self.append(dot)
         
-        # Apply CSS
-        css_provider = Gtk.CssProvider()
-        css_provider.load_from_data(b"""
-            .typing-dot {
-                color: #888;
-                font-size: 8px;
-            }
-        """)
-        for dot in self.dots:
-            dot.get_style_context().add_provider(
-                css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-            )
+        # Typing dot styles are applied via the global CSS provider
         
         self.animation_step = 0
         self.timeout_id = None
@@ -502,9 +452,70 @@ class MessengerWindow(Adw.ApplicationWindow):
         return menu
     
     def _apply_css(self):
-        """Apply global CSS styles"""
+        """Apply global CSS styles (all message types + UI elements)"""
         css_provider = Gtk.CssProvider()
-        css_provider.load_from_data(b"""
+        css_provider.load_from_string("""
+            /* Message bubble base */
+            .message-bubble {
+                border-radius: 12px;
+                padding: 8px 12px;
+            }
+            
+            /* User messages */
+            .message-user {
+                background-color: #3584e4;
+            }
+            .message-user .message-text {
+                color: #ffffff;
+            }
+            .message-user .message-time {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 0.8em;
+            }
+            
+            /* Assistant messages */
+            .message-assistant {
+                background-color: #f6f5f4;
+            }
+            .message-assistant .message-text {
+                color: #1e1e1e;
+            }
+            .message-assistant .message-time {
+                color: rgba(30, 30, 30, 0.7);
+                font-size: 0.8em;
+            }
+            
+            /* System messages */
+            .message-system {
+                background-color: #fdf6e3;
+            }
+            .message-system .message-text {
+                color: #657b83;
+            }
+            .message-system .message-time {
+                color: rgba(101, 123, 131, 0.7);
+                font-size: 0.8em;
+            }
+            
+            /* Error messages */
+            .message-error {
+                background-color: #e01b24;
+            }
+            .message-error .message-text {
+                color: #ffffff;
+            }
+            .message-error .message-time {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 0.8em;
+            }
+            
+            /* Typing indicator */
+            .typing-dot {
+                color: #888;
+                font-size: 8px;
+            }
+            
+            /* Input area */
             .entry-scroll {
                 border-radius: 20px;
                 border: 1px solid #ccc;
@@ -701,6 +712,10 @@ class MessengerApp(Adw.Application):
     
     def do_activate(self):
         """Handle application activation"""
+        # Use AdwStyleManager for color scheme (suppresses deprecated GtkSettings warning)
+        style_manager = Adw.StyleManager.get_default()
+        style_manager.set_color_scheme(Adw.ColorScheme.PREFER_DARK)
+        
         if not self.window:
             self.window = MessengerWindow(self, self.socket_path)
         self.window.present()
