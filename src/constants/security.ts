@@ -186,6 +186,79 @@ export const SECURITY_AUDIT = {
 } as const;
 
 /**
+ * Network egress control constants.
+ *
+ * Configures domain-based allowlist/denylist filtering for outbound HTTP/HTTPS
+ * requests from sandboxed code and agent tools. Prevents data exfiltration and
+ * limits blast radius of compromised tools.
+ *
+ * **Modes**:
+ * - `allowlist`: Only explicitly allowed domains (default, most secure)
+ * - `denylist`: Allow all except blocked domains
+ * - `unrestricted`: No filtering (not recommended)
+ *
+ * Blocked domains always take priority regardless of mode.
+ *
+ * @see {@link /src/security/network-egress.ts Network Egress Implementation}
+ */
+export const SECURITY_EGRESS = {
+  /** Default egress mode */
+  DEFAULT_MODE: "allowlist" as const,
+
+  /** Policy persistence filename (relative to state dir) */
+  POLICY_FILENAME: "egress-policy.json",
+
+  /** Maximum in-memory log entries (circular buffer) */
+  MAX_LOG_ENTRIES: 1000,
+} as const;
+
+/**
+ * Immutable audit logging constants.
+ *
+ * Forensic-grade append-only audit log with SHA-256 hash chain for integrity
+ * verification. Each entry links to the previous via prevHash, enabling tamper
+ * detection across the entire log.
+ *
+ * **Format**: JSONL (one JSON object per line)
+ * **Integrity**: SHA-256 hash chain (genesis → entry₁ → entry₂ → ...)
+ *
+ * @see {@link /src/security/audit-logger.ts Audit Logger Implementation}
+ */
+export const SECURITY_AUDIT_LOG = {
+  /** Audit log filename (relative to state dir) */
+  FILENAME: "audit.log",
+
+  /** Genesis hash (chain start sentinel — 64 hex zeros) */
+  GENESIS_HASH: "0".repeat(64),
+
+  /** Hash algorithm for chain integrity */
+  HASH_ALGORITHM: "sha256" as const,
+} as const;
+
+/**
+ * OS keychain integration constants.
+ *
+ * Stores credentials in the native OS keychain when available, with encrypted
+ * file fallback. Platform detection order: macOS Keychain → Linux Secret
+ * Service → Windows Credential Manager → encrypted JSON files.
+ *
+ * @see {@link /src/security/keychain.ts Keychain Implementation}
+ */
+export const SECURITY_KEYCHAIN = {
+  /** Service name used in OS keychain entries */
+  SERVICE_NAME: "ClosedClaw",
+
+  /** Subdirectory for credential files (relative to state dir) */
+  CREDENTIALS_SUBDIR: "credentials",
+
+  /** File permissions for credential files (owner read/write only) */
+  FILE_MODE: 0o600,
+
+  /** Directory permissions for credentials directory */
+  DIR_MODE: 0o700,
+} as const;
+
+/**
  * Skill/Plugin signing and verification constants.
  *
  * **Algorithm**: Ed25519 (RFC 8032) — fast, deterministic, 64-byte signatures
@@ -228,5 +301,8 @@ export const SECURITY = {
   SANDBOX: SECURITY_SANDBOX,
   AUTH: SECURITY_AUTH,
   AUDIT: SECURITY_AUDIT,
+  AUDIT_LOG: SECURITY_AUDIT_LOG,
+  EGRESS: SECURITY_EGRESS,
+  KEYCHAIN: SECURITY_KEYCHAIN,
   SKILL_SIGNING: SECURITY_SKILL_SIGNING,
 } as const;

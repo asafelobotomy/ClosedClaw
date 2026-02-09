@@ -6,6 +6,46 @@ Docs: https://docs.OpenClaw.ai
 
 ### Security
 
+- **Network Egress Controls** (Priority 5 complete): Domain-based outbound traffic filtering
+  - **Egress policy engine** (`src/security/network-egress.ts`): Allowlist/denylist/unrestricted modes
+    - `evaluateEgress()`: Domain evaluation against policy with blocked-list priority
+    - `enforceEgress()`: URL parse → evaluate → log → throw `EgressBlockedError` if blocked
+    - Wildcard matching: `*.example.com` matches subdomains and base domain
+    - `DEFAULT_EGRESS_POLICY`: Allowlist with AI providers, dev tools, search, messaging
+    - In-memory circular buffer log (1000 entries) for egress audit trail
+    - `loadEgressPolicy()` / `saveEgressPolicy()`: JSON persistence at `~/.closedclaw/egress-policy.json`
+    - Policy helpers: add/remove allowed/blocked domains, `summarizePolicy()`
+  - **Constants** (`src/constants/security.ts`): `SECURITY.EGRESS` namespace
+  - Comprehensive test suite: 45+ tests covering domain matching, policy modes, persistence
+
+- **Immutable Audit Logging** (Priority 6 complete): Forensic-grade append-only audit log
+  - **Audit logger** (`src/security/audit-logger.ts`): JSONL format with SHA-256 hash chain
+    - `AuditLogger` class: append-only WriteStream, sequential write queue for thread safety
+    - Hash chain integrity: each entry links to previous via `prevHash` field
+    - `computeEntryHash()`: SHA-256 of canonical JSON (all fields except hash)
+    - 13 event types: tool_exec, config_change, skill_install/uninstall, credential_access,
+      channel_send, egress_blocked/allowed, auth_event, session_event, security_alert,
+      gateway_event, upstream_sync
+    - `queryAuditLog()`: Filter by types, severities, time range, actor, session, grep
+    - `verifyAuditLogIntegrity()`: Walk hash chain detecting tampering and broken links
+    - `getAuditLogStats()`: Count by type/severity, file size, integrity check
+    - `exportAuditLogAsCsv()`: CSV export with proper escaping
+  - **Constants** (`src/constants/security.ts`): `SECURITY.AUDIT_LOG` namespace
+  - Comprehensive test suite: 35+ tests covering hash chain, concurrent writes, integrity verification
+
+- **OS Keychain Integration** (Priority 7 complete): Native credential storage
+  - **Keychain abstraction** (`src/security/keychain.ts`): Platform-adaptive credential storage
+    - `detectKeychainBackend()`: macOS Keychain → Linux Secret Service → Windows Credential Manager → encrypted file fallback
+    - macOS: `security add-generic-password` / `find-generic-password` / `delete-generic-password`
+    - Linux: `secret-tool store` / `lookup` / `clear` with D-Bus Secret Service
+    - Windows: `cmdkey` / PowerShell `Get-StoredCredential`
+    - Encrypted file fallback: JSON in `~/.closedclaw/credentials/` with 0o600 permissions
+    - Unified API: `storeCredential()`, `getCredential()`, `deleteCredential()`, `listCredentials()`
+    - `migrateCredentials()`: Scan existing credential files and store in OS keychain
+    - Dependency-injectable `execFn` for testability
+  - **Constants** (`src/constants/security.ts`): `SECURITY.KEYCHAIN` namespace
+  - Comprehensive test suite: 30+ tests covering all backends (mocked), lifecycle, migration
+
 - **Skill/Plugin Signing & Verification** (Priority 4 complete): Cryptographic supply chain security
   - **Core signing** (`src/security/skill-signing.ts`): Ed25519 signing and verification
     - `generateSigningKeyPair()`: Generate Ed25519 key pairs for skill signing
