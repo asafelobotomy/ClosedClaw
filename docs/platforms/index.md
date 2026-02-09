@@ -11,17 +11,12 @@ title: "Platforms"
 ClosedClaw core is written in TypeScript. **Node is the recommended runtime**.
 Bun is not recommended for the Gateway (WhatsApp/Telegram bugs).
 
-Companion apps exist for macOS (menu bar app) and mobile nodes (iOS/Android). Windows and
-Linux companion apps are planned, but the Gateway is fully supported today.
-Native companion apps for Windows are also planned; the Gateway is recommended via WSL2.
+A companion app exists for Android. The Gateway is fully supported on Linux.
 
-## Choose your OS
+## Choose your platform
 
-- macOS: [macOS](/platforms/macos)
-- iOS: [iOS](/platforms/ios)
-- Android: [Android](/platforms/android)
-- Windows: [Windows](/platforms/windows)
 - Linux: [Linux](/platforms/linux)
+- Android: [Android](/platforms/android)
 
 ## VPS & hosting
 
@@ -49,5 +44,4 @@ Use one of these (all supported):
 
 The service target depends on OS:
 
-- macOS: LaunchAgent (`bot.molt.gateway` or `bot.molt.<profile>`; legacy `com.ClosedClaw.*`)
 - Linux/WSL2: systemd user service (`ClosedClaw-gateway[-<profile>].service`)

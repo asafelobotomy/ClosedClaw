@@ -99,17 +99,6 @@
       - any-glob-to-any-file:
           - "apps/android/**"
           - "docs/platforms/android.md"
-"app: ios":
-  - changed-files:
-      - any-glob-to-any-file:
-          - "apps/ios/**"
-          - "docs/platforms/ios.md"
-"app: macos":
-  - changed-files:
-      - any-glob-to-any-file:
-          - "apps/macos/**"
-          - "docs/platforms/macos.md"
-          - "docs/platforms/mac/**"
 "app: web-ui":
   - changed-files:
       - any-glob-to-any-file:
@@ -131,7 +120,6 @@
   - changed-files:
       - any-glob-to-any-file:
           - "docs/**"
-          - "docs.acp.md"
 
 "cli":
   - changed-files:
@@ -148,6 +136,11 @@
       - any-glob-to-any-file:
           - "scripts/**"
 
+"tools":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tools/**"
+
 "docker":
   - changed-files:
       - any-glob-to-any-file:
@@ -159,6 +152,9 @@
           - "scripts/**/*docker*"
           - "scripts/**/Dockerfile*"
           - "scripts/sandbox-*.sh"
+          - "tools/**/*docker*"
+          - "tools/**/Dockerfile*"
+          - "tools/docker/**"
           - "src/agents/sandbox*.ts"
           - "src/commands/sandbox*.ts"
           - "src/cli/sandbox-cli.ts"
