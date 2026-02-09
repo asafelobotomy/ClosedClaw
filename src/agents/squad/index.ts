@@ -7,6 +7,10 @@
  * - **IPC**: Inter-agent communication (direct, broadcast, request-reply, pub/sub)
  * - **Task Queue**: Priority queue with dependencies, claims, and retries
  * - **Coordinator**: Squad orchestration with multiple strategies
+ * - **Tools**: Squad-aware agent tools (delegate, memory, broadcast, status)
+ * - **Primitives**: Synchronization primitives (mutex, barrier, semaphore, event)
+ * - **Templates**: Pre-built agent profiles (researcher, coder, reviewer, etc.)
+ * - **Resources**: Token budgets, rate limiting, and resource monitoring
  *
  * @module agents/squad
  */
@@ -103,3 +107,60 @@ export {
   type AgentContribution,
   type CoordinatorConfig,
 } from "./coordinator.js";
+
+// ─── Squad Tools ──────────────────────────────────────────────────────────────
+
+export {
+  createDelegateToAgentTool,
+  createSquadMemoryReadTool,
+  createSquadMemoryWriteTool,
+  createSquadBroadcastTool,
+  createSquadStatusTool,
+  createWaitForTaskTool,
+  createSquadTools,
+  type SquadToolContext,
+  type SquadToolSet,
+} from "./tools.js";
+
+// ─── Coordination Primitives ──────────────────────────────────────────────────
+
+export {
+  Mutex,
+  Barrier,
+  Semaphore,
+  Event,
+  SyncTimeoutError,
+  waitForAny,
+  waitForAll,
+} from "./primitives.js";
+
+// ─── Agent Templates ──────────────────────────────────────────────────────────
+
+export {
+  getAgentTemplate,
+  listTemplateIds,
+  spawnConfigFromTemplate,
+  findTemplatesByCapability,
+  AGENT_TEMPLATES,
+  RESEARCHER_TEMPLATE,
+  CODER_TEMPLATE,
+  REVIEWER_TEMPLATE,
+  TESTER_TEMPLATE,
+  DOCUMENTER_TEMPLATE,
+  DEVOPS_TEMPLATE,
+  type AgentTemplate,
+  type TemplateSpawnOptions,
+} from "./templates.js";
+
+// ─── Resource Management ──────────────────────────────────────────────────────
+
+export {
+  TokenBudgetTracker,
+  RateLimiter,
+  ResourceManager,
+  type TokenBudget,
+  type RateLimitConfig,
+  type SquadResourceSnapshot,
+  type ResourceAlert,
+  type ResourceManagerConfig,
+} from "./resources.js";

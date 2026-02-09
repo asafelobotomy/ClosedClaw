@@ -4,6 +4,57 @@ Docs: https://docs.OpenClaw.ai
 
 ## Unreleased
 
+### Agent Squad System — Phases 3-5
+
+- **Squad-Aware Tools** (Phase 3): Agent collaboration tools for squad members
+  - **Tool factories** (`src/agents/squad/tools.ts`): 6 tools with access control
+    - `delegate_to_agent` (coordinator-only): Enqueue tasks with role/agent targeting
+    - `squad_memory_read/write`: Shared short-term memory access with TTL and importance flags
+    - `squad_broadcast`: IPC broadcast to all squad members (notification/result/question/error)
+    - `squad_status`: Squad health + task queue stats
+    - `wait_for_task`: Poll task completion by ID
+    - `createSquadTools()`: Factory returning `SquadToolSet` with coordinator gating
+  - Test suite: 23 tests covering all tool handlers, access control, edge cases
+
+- **Coordination Primitives** (Phase 3): Low-level synchronization for multi-agent work
+  - **Primitives** (`src/agents/squad/primitives.ts`): 4 synchronization primitives
+    - `Mutex`: Exclusive lock with FIFO queue, timeout, `withLock()` helper
+    - `Barrier`: N-party synchronization with auto-reset and generation counter
+    - `Semaphore`: Counting semaphore with `tryAcquire()`, `withPermit()` helper
+    - `Event`: One-shot (auto-reset) and persistent (manual-reset) with `pulse()`
+    - `waitForAny()`/`waitForAll()`: Multi-event coordination
+    - `SyncTimeoutError`: Custom error with primitive name and resource
+  - Test suite: 33 tests covering acquire/release, FIFO ordering, timeouts, multi-event
+
+- **Squad Routing Integration** (Phase 3): Connect squads to the routing layer
+  - **Routing** (`src/routing/squad-routing.ts`): Complexity detection and auto-squad creation
+    - `analyzeSquadTrigger()`: Keyword + pattern + length → complexity score (0-1)
+    - `findSquadBinding()`: Match channel/peer/guild against configured squad bindings
+    - `buildSquadConfig()`: Create squad config from detected task types
+    - `aggregateSquadReply()`: Strategy-aware output formatting (pipeline/parallel/map-reduce/consensus)
+    - `routeToSquad()`: Full flow — binding check → complexity analysis → auto squad → execute
+  - Test suite: 30 tests covering complexity detection, binding matching, reply aggregation
+
+- **Agent Templates** (Phase 4): Pre-built agent profiles for common squad roles
+  - **Templates** (`src/agents/squad/templates.ts`): 6 role templates
+    - `researcher`: web_search/web_fetch, 50k tokens, research/analysis capabilities
+    - `coder`: read_file/write_file/bash, 100k tokens, code/debugging capabilities
+    - `reviewer`: read_file/grep, 50k tokens, review/security/audit capabilities
+    - `tester`: read_file/write_file/bash, 50k tokens, test/validation capabilities
+    - `documenter`: read_file/write_file/grep, 50k tokens, documentation capabilities
+    - `devops`: bash/grep, 75k tokens, infrastructure/deployment capabilities
+    - `spawnConfigFromTemplate()`: Convert template to `AgentSpawnConfig` with overrides
+    - `findTemplatesByCapability()`: Match templates by capability requirements
+  - Test suite: 24 tests covering registry, individual templates, spawn config generation
+
+- **Resource Management** (Phase 4): Token budgets, rate limiting, and monitoring
+  - **Resources** (`src/agents/squad/resources.ts`): Unified resource management
+    - `TokenBudgetTracker`: Per-agent + squad-wide token tracking with alerts
+    - `RateLimiter`: Sliding-window RPM/TPM with request queuing and cleanup
+    - `ResourceManager`: Combined budget + rate limiting with `acquireSlot()` / `recordUsage()`
+    - Alert system: warning/critical severity for token and rate limit thresholds
+  - Test suite: 26 tests covering budget tracking, rate limiting, alerts, snapshots
+
 ### Security
 
 - **Network Egress Controls** (Priority 5 complete): Domain-based outbound traffic filtering
