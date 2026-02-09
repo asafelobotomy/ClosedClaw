@@ -4,6 +4,34 @@ Docs: https://docs.OpenClaw.ai
 
 ## Unreleased
 
+### Security
+
+- **Skill/Plugin Signing & Verification** (Priority 4 complete): Cryptographic supply chain security
+  - **Core signing** (`src/security/skill-signing.ts`): Ed25519 signing and verification
+    - `generateSigningKeyPair()`: Generate Ed25519 key pairs for skill signing
+    - `signSkill()`: Sign skill content with private key, producing structured signature
+    - `verifySkillSignature()`: Verify signature against content and public key
+    - `formatSignatureFile()` / `parseSignatureFile()`: PEM-like `.sig` file format
+    - Tamper detection, wrong-key detection, unicode/large content support
+  - **Trusted Keyring** (`src/security/trusted-keyring.ts`): Local key management
+    - Trust levels: `full` (unconditional), `marginal` (cautious), `none` (revoked)
+    - CRUD operations: add, remove, get, list, update trust level
+    - Verification integration: `getPublicKeyForVerification()` enforces trust policy
+    - Stored at `~/.closedclaw/trusted-keys.json` with 0o600 permissions
+  - **Constants** (`src/constants/security.ts`): `SECURITY.SKILL_SIGNING` namespace
+  - Comprehensive test suites: signing (30+ tests), keyring (25+ tests)
+
+### Code Quality & Architecture
+
+- **Upstream command tests** (`src/commands/upstream/upstream.git.test.ts`, `upstream.storage.test.ts`)
+  - `classifyCommit` heuristic tests: security, bugfix, feature, other with priority rules
+  - `GitService` method tests with mocked git commands
+  - Storage round-trip tests with temp directories, corrupt file handling
+- **Fork roadmap lint fixes** (`docs/refactor/closedclaw-fork-roadmap.md`)
+  - Fixed broken Risk Management tables (multi-row cells → single-row format)
+  - Updated checklist items to reflect completed Priority 1-4 status
+  - Updated "Immediate Next Steps" with current progress
+
 ### Code Quality & Architecture
 
 - **Agent Squad: Task Queue + Coordinator** (Phase 2 complete): Squad coordination and task distribution

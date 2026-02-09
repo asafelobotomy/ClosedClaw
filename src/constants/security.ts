@@ -186,6 +186,39 @@ export const SECURITY_AUDIT = {
 } as const;
 
 /**
+ * Skill/Plugin signing and verification constants.
+ *
+ * **Algorithm**: Ed25519 (RFC 8032) — fast, deterministic, 64-byte signatures
+ * - Key size: 256 bits (32-byte private key, 32-byte public key)
+ * - Signature size: 64 bytes
+ * - Deterministic: same message + key always produces same signature
+ *
+ * **Trust model**: Local keyring with trust levels (full / marginal / none).
+ * Future: web-of-trust for transitive trust.
+ *
+ * @see {@link https://datatracker.ietf.org/doc/html/rfc8032 RFC 8032 - Ed25519}
+ */
+export const SECURITY_SKILL_SIGNING = {
+  /** Signing algorithm */
+  ALGORITHM: "ed25519" as const,
+
+  /** Whether signatures are required by default (opt-in initially) */
+  REQUIRE_SIGNATURE: false,
+
+  /** Signature file extension convention */
+  SIGNATURE_EXTENSION: ".sig",
+
+  /** Keyring filename */
+  KEYRING_FILENAME: "trusted-keys.json",
+
+  /** Signing key filename (private key) */
+  SIGNING_KEY_FILENAME: "signing-key.pem",
+
+  /** File mode for private keys (owner read/write only) */
+  KEY_FILE_MODE: 0o600,
+} as const;
+
+/**
  * Master security configuration export.
  * Namespaced for IDE autocomplete and easy refactoring.
  */
@@ -195,4 +228,5 @@ export const SECURITY = {
   SANDBOX: SECURITY_SANDBOX,
   AUTH: SECURITY_AUTH,
   AUDIT: SECURITY_AUDIT,
+  SKILL_SIGNING: SECURITY_SKILL_SIGNING,
 } as const;

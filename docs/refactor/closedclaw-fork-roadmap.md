@@ -1416,26 +1416,21 @@ When user approves, generate a `git` command sequence or apply the patch program
 
 ### Merge Conflict Burden
 
-| Risk Level | Mitigation |
-|---|---|
-| **HIGH** | Upstream changes weekly; divergence → conflict debt | Keep changes modular (prefer extensions over core patches) |
-|  |  | Use plugin system for new features |
-|  |  | Regular rebases (weekly) |
-|  |  | Automated conflict detection in CI |
+| Risk Level | Risk | Mitigations |
+|---|---|---|
+| **HIGH** | Upstream changes weekly; divergence → conflict debt | Keep changes modular (prefer extensions over core patches). Use plugin system for new features. Regular rebases (weekly). Automated conflict detection in CI. |
 
 ### Security Scope Creep
 
-| Risk Level | Mitigation |
-|---|---|
-| **MEDIUM** | Perfect security impossible; diminishing returns | Prioritize high-impact defenses (sandbox, encryption, signing) |
-|  |  | Accept residual risk (e.g., sandbox escapes still possible) |
+| Risk Level | Risk | Mitigations |
+|---|---|---|
+| **MEDIUM** | Perfect security impossible; diminishing returns | Prioritize high-impact defenses (sandbox, encryption, signing). Accept residual risk (e.g., sandbox escapes still possible). |
 
 ### Upstream License Drift
 
-| Risk Level | Mitigation |
-|---|---|
-| **LOW** | OpenClaw stays MIT, but could change | Monitor LICENSE file in upstream-monitor workflow |
-|  |  | If license changes, fork becomes independent (no more sync) |
+| Risk Level | Risk | Mitigations |
+|---|---|---|
+| **LOW** | OpenClaw stays MIT, but could change | Monitor LICENSE file in upstream-monitor workflow. If license changes, fork becomes independent (no more sync). |
 
 ---
 
@@ -1454,14 +1449,14 @@ When user approves, generate a `git` command sequence or apply the patch program
 
 1. ✅ Read this document
 2. **Week 1**:
-   - [ ] Implement `closedclaw upstream status` (Priority 1)
-   - [ ] Set up git remote tracking
+   - [x] Implement `closedclaw upstream status` (Priority 1)
+   - [x] Set up git remote tracking
    - [ ] Run `closedclaw upstream diff --security` to see current gaps
 3. **Week 2**:
-   - [ ] Start sandbox implementation (Priority 2)
+   - [x] Start sandbox implementation (Priority 2)
    - [ ] Test with Docker, then nsjail
 4. **Week 3**:
-   - [ ] Add encrypted memory storage (Priority 3)
+   - [x] Add encrypted memory storage (Priority 3)
    - [ ] Migrate existing configs
 
 ---
@@ -1535,11 +1530,13 @@ User reviews → Merge → Repeat
 
 ### Immediate Next Steps (Updated)
 
-1. ✅ **Priority 2 Complete**: Mandatory sandboxing (2026-02-08)
-2. ✅ **Priority 3 Complete**: Encrypted memory storage (2026-02-08)  
-3. **Priority 3.5 Next**: Consolidate constants library (Week 4)
-4. **Priority 12.5 Next**: Build DevOps subagent, test self-audit (Week 7)
-5. **Priority 1 Parallel**: Implement `closedclaw upstream status` (Week 1-2)
+1. ✅ **Priority 1 Complete**: `closedclaw upstream` command suite (2026-02-08)
+2. ✅ **Priority 2 Complete**: Mandatory sandboxing (2026-02-08)
+3. ✅ **Priority 3 Complete**: Encrypted memory storage (2026-02-08)
+4. ✅ **Priority 3.5 Complete**: Consolidate constants library (2026-02-09)
+5. ✅ **Priority 4 Complete**: Skill/plugin signing & verification (2026-02-09)
+6. ✅ **Priority 12.5-12.6 In Progress**: Agent squad system — memory, spawner, IPC, task queue, coordinator (2026-02-09)
+7. **Next**: Network egress controls (Priority 5), Immutable audit logging (Priority 6)
 
 ### Long-Term Vision  
 
@@ -1551,8 +1548,9 @@ User reviews → Merge → Repeat
 
 ### Success Criteria
 
-- [ ] Upstream patches applied within 24 hours of OpenClaw release
-- [ ] Zero credential exposure incidents with encryption + keychain
+- [x] Upstream status and sync commands operational
+- [ ] Upstream patches applied within 24 hours of OpenClaw release (needs automated monitoring)
+- [x] Zero credential exposure incidents with encryption + keychain
 - [ ] DevOps subagent catches 90%+ of security issues before human review
 - [ ] 50%+ of code refactorings initiated by AI (Coder subagent)
 - [ ] Users report "ClosedClaw feels like it understands me" (personalization)
