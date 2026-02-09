@@ -5,6 +5,8 @@
  * - **Memory**: Three-tier brain-inspired memory (working, short-term, long-term)
  * - **Spawner**: Agent lifecycle management (spawn, terminate, restart)
  * - **IPC**: Inter-agent communication (direct, broadcast, request-reply, pub/sub)
+ * - **Task Queue**: Priority queue with dependencies, claims, and retries
+ * - **Coordinator**: Squad orchestration with multiple strategies
  *
  * @module agents/squad
  */
@@ -73,3 +75,31 @@ export {
   type IPCConfig,
   type IPCStats,
 } from "./ipc.js";
+
+// ─── Task Queue ───────────────────────────────────────────────────────────────
+
+export {
+  TaskQueue,
+  createTaskQueue,
+  type Task,
+  type TaskInput,
+  type TaskPriority,
+  type TaskStatus,
+  type TaskInfo,
+  type QueueStats,
+  type TaskQueueConfig,
+} from "./task-queue.js";
+
+// ─── Squad Coordinator ────────────────────────────────────────────────────────
+
+export {
+  SquadCoordinator,
+  createSquadCoordinator,
+  type CoordinationStrategy,
+  type SquadConfig,
+  type ComplexTask,
+  type SquadResult,
+  type SquadStatus,
+  type AgentContribution,
+  type CoordinatorConfig,
+} from "./coordinator.js";

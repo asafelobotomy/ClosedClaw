@@ -6,6 +6,23 @@ Docs: https://docs.OpenClaw.ai
 
 ### Code Quality & Architecture
 
+- **Agent Squad: Task Queue + Coordinator** (Phase 2 complete): Squad coordination and task distribution
+  - **Task Queue** (`src/agents/squad/task-queue.ts`): Priority queue with dependencies and retries
+    - `TaskQueue` class: enqueue, claim, complete, fail, cancel, release, purge
+    - Priority ordering (high > normal > low) with FIFO within same level
+    - Atomic task claims (no double-assignment), capability-based matching
+    - Task dependencies (B waits for A to complete before becoming claimable)
+    - Retry with exponential backoff, timeout enforcement, agent crash recovery
+  - **Squad Coordinator** (`src/agents/squad/coordinator.ts`): Multi-strategy task orchestration
+    - `SquadCoordinator` class: createSquad, executeTask, terminateSquad, shutdown
+    - **Pipeline strategy**: Sequential chain passing output forward (A → B → C)
+    - **Parallel strategy**: Concurrent execution with result array aggregation
+    - **Map-Reduce strategy**: Parallel map phase + sequential reduce phase
+    - **Consensus strategy**: All agents vote, majority output wins
+    - Squad lifecycle with max duration timers and auto-termination
+    - Detailed metrics: duration, tasks completed/failed, total tokens
+  - Comprehensive test suites: task queue (25+ tests), coordinator (20+ tests)
+
 - **Agent Squad: Spawner + IPC** (Phase 1.2 complete): Agent lifecycle management and inter-agent communication
   - **Agent Spawner** (`src/agents/squad/spawner.ts`): Creates and manages agent instances within squads
     - `AgentSpawner` class: spawn, terminate, restartAgent, terminateSquad, shutdown
