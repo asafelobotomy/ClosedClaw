@@ -14,6 +14,8 @@
  * @module agents/squad/memory/working-memory
  */
 
+import { AGENTS } from "../../../constants/index.js";
+
 /**
  * Entry in working memory with access tracking
  */
@@ -51,9 +53,12 @@ export class WorkingMemory {
    *
    * @param maxSize - Maximum items (default: 10, aligned with 7±2 items)
    */
-  constructor(private readonly maxSize: number = 10) {
-    if (maxSize < 1) {
-      throw new Error("Working memory maxSize must be >= 1");
+  constructor(private readonly maxSize: number = AGENTS.MEMORY.WORKING.DEFAULT_CAPACITY) {
+    if (maxSize < AGENTS.MEMORY.WORKING.MIN_CAPACITY) {
+      throw new Error(`Working memory maxSize must be >= ${AGENTS.MEMORY.WORKING.MIN_CAPACITY}`);
+    }
+    if (maxSize > AGENTS.MEMORY.WORKING.MAX_CAPACITY) {
+      throw new Error(`Working memory maxSize must be <= ${AGENTS.MEMORY.WORKING.MAX_CAPACITY}`);
     }
   }
 

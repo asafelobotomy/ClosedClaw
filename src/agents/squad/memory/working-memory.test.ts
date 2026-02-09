@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
+import { AGENTS } from "../../../constants/index.js";
 import { WorkingMemory, createWorkingMemory } from "./working-memory.js";
 
 describe("WorkingMemory", () => {
@@ -17,7 +18,7 @@ describe("WorkingMemory", () => {
   describe("constructor", () => {
     it("creates with default max size 10", () => {
       const defaultWm = new WorkingMemory();
-      expect(defaultWm.capacity()).toBe(10);
+      expect(defaultWm.capacity()).toBe(AGENTS.MEMORY.WORKING.DEFAULT_CAPACITY);
     });
 
     it("creates with custom max size", () => {
@@ -26,8 +27,13 @@ describe("WorkingMemory", () => {
     });
 
     it("throws if max size < 1", () => {
-      expect(() => new WorkingMemory(0)).toThrow("maxSize must be >= 1");
-      expect(() => new WorkingMemory(-5)).toThrow("maxSize must be >= 1");
+      expect(() => new WorkingMemory(0)).toThrow("maxSize must be >=");
+      expect(() => new WorkingMemory(-5)).toThrow("maxSize must be >=");
+    });
+
+    it("throws if max size > MAX_CAPACITY", () => {
+      const tooLarge = AGENTS.MEMORY.WORKING.MAX_CAPACITY + 1;
+      expect(() => new WorkingMemory(tooLarge)).toThrow("maxSize must be <=");
     });
   });
 
