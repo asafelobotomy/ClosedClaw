@@ -4,6 +4,44 @@ Docs: https://docs.OpenClaw.ai
 
 ## Unreleased
 
+### Phase 2 — Agent Profiles, Multi-Model Orchestration, Workflow Engine
+
+- **Agent Profile System** (P12.5): Markdown-based agent profiles with registry
+  - **Types** (`src/agents/profiles/types.ts`): `AgentProfile`, `ProfileToolAccess`, `ProfileSchedule`, `ProfileRegistryConfig`, `ProfileRegistrySnapshot`, `DEVOPS_SCHEDULES` (3 cron presets)
+  - **Registry** (`src/agents/profiles/registry.ts`): Profile discovery, markdown frontmatter parsing, template-to-profile conversion, composite merging, capability search, validation
+  - Functions: `parseProfileMarkdown()`, `parseSimpleYaml()`, `templateToProfile()`, `builtinProfiles()`, `fileToProfile()`, `mergeWithTemplate()`, `loadProfileRegistry()`, `resolveProfile()`, `findProfilesByCapability()`, `validateProfile()`
+  - Test suite: 33 tests
+
+- **Squad Integration Glue** (P12.6): Bridge profiles → templates → squad coordinator
+  - **Integration** (`src/agents/squad/integration.ts`): Keyword-based task analysis, capability scoring, strategy detection, profile-to-spawn-config conversion
+  - Types: `SquadFormationRequest`, `TaskAnalysis`, `SquadBuildResult`
+  - Functions: `analyzeTaskForSquad()`, `buildSquadFromProfiles()`, `formSquadForTask()`, `buildComplexTask()`
+  - Test suite: 19 tests
+
+- **Intent Classifier & Router** (P8): Heuristic-based message classification for model routing
+  - **Router** (`src/agents/intent-router.ts`): 6 intent categories (triage/reasoning/creative/sensitive/code/general), weighted pattern matching, length-based adjustments, question-mark boost
+  - Types: `IntentCategory`, `ModelRoutingConfig`, `IntentClassification`, `IntentSignal`
+  - Functions: `classifyIntent()`, `describeClassification()`
+  - Test suite: 27 tests
+
+- **Fallback Chain Handler** (P8): Ordered model failover with circuit breaker
+  - **FallbackChain** (`src/agents/fallback-chain.ts`): Sequential chain execution, cooldown tracking, circuit breaker with auto-reset, reason-aware immediate fallback, event logging, health summary
+  - Types: `FallbackChainConfig`, `ModelState`, `FallbackEvent`, `FallbackResult<T>`
+  - Integrates with existing `FailoverReason` system
+  - Test suite: 19 tests
+
+- **Cost Tracker** (P8): Token usage and cost tracking per model/agent
+  - **CostTracker** (`src/agents/cost-tracker.ts`): Per-model cost rates, usage recording, time-windowed summaries, budget alerts (warning/exceeded), per-model and per-agent costs, intent-based tracking
+  - Types: `ModelCostRates`, `UsageRecord`, `UsageSummary`, `BudgetAlert`, `BudgetConfig`
+  - Functions: `computeCost()`, `formatUsageSummary()`
+  - Test suite: 22 tests
+
+- **Declarative Workflow Engine** (P10): YAML/JSON5 workflow schema + DAG executor
+  - **Schema** (`src/workflows/schema.ts`): Workflow parsing, validation (cycles, missing deps, duplicates), topological sort into parallel batches, template interpolation (`{{steps.name.output}}`, `{{variables.*}}`, `{{env.*}}`)
+  - **Executor** (`src/workflows/executor.ts`): DAG-based execution, parallel batch scheduling, per-step retry with exponential backoff, per-step and per-workflow timeouts, cancellation via AbortSignal, event emission, state serialization for crash recovery
+  - Types: `WorkflowDefinition`, `WorkflowStep`, `WorkflowTrigger`, `RetryPolicy`, `WorkflowExecutionResult`, `WorkflowExecutionContext`
+  - Test suites: 28 + 12 = 40 tests
+
 ### Agent Squad System — Phases 3-5
 
 - **Squad-Aware Tools** (Phase 3): Agent collaboration tools for squad members

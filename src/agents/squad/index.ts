@@ -164,3 +164,15 @@ export {
   type ResourceAlert,
   type ResourceManagerConfig,
 } from "./resources.js";
+
+// ─── Squad Integration ────────────────────────────────────────────────────────
+
+export {
+  analyzeTaskForSquad,
+  buildSquadFromProfiles,
+  formSquadForTask,
+  buildComplexTask,
+  type SquadFormationRequest,
+  type TaskAnalysis,
+  type SquadBuildResult,
+} from "./integration.js";
