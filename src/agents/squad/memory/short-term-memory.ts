@@ -127,7 +127,7 @@ export class ShortTermMemory<T = any> {
    */
   get(key: string): T | undefined {
     const entry = this.cache.get(key);
-    if (!entry) return undefined;
+    if (!entry) {return undefined;}
 
     // Check expiration
     if (this.isExpired(entry)) {
@@ -154,7 +154,7 @@ export class ShortTermMemory<T = any> {
    */
   has(key: string): boolean {
     const entry = this.cache.get(key);
-    if (!entry) return false;
+    if (!entry) {return false;}
 
     if (this.isExpired(entry)) {
       this.cache.delete(key);

@@ -248,7 +248,7 @@ async function executeParallel(
 
   for (const taskId of taskIds) {
     const task = squad.taskQueue.claim("coordinator");
-    if (!task) continue;
+    if (!task) {continue;}
 
     const agent = findAgentForTask(squad.agents, task) ?? squad.agents[assignments.length % squad.agents.length];
 
@@ -693,7 +693,7 @@ function findAgentForTask(agents: AgentHandle[], task: Task): AgentHandle | unde
     return a.role === task.type && status.state !== "terminated" && status.state !== "terminating";
   });
 
-  if (roleMatch) return roleMatch;
+  if (roleMatch) {return roleMatch;}
 
   // Fall back to first non-terminated agent
   return agents.find((a) => {
@@ -707,7 +707,7 @@ function findAgentForTask(agents: AgentHandle[], task: Task): AgentHandle | unde
  * Uses JSON serialization for deep comparison.
  */
 function findMajority(values: unknown[]): unknown {
-  if (values.length === 0) return null;
+  if (values.length === 0) {return null;}
 
   const counts = new Map<string, { value: unknown; count: number }>();
 

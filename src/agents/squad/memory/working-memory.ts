@@ -92,7 +92,7 @@ export class WorkingMemory {
    */
   get(key: string): any | undefined {
     const entry = this.items.get(key);
-    if (!entry) return undefined;
+    if (!entry) {return undefined;}
 
     // Update access time
     entry.lastAccessedAt = new Date();

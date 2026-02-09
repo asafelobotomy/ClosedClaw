@@ -96,7 +96,7 @@ export async function upstreamSyncCommand(opts: SyncOptions, runtime: RuntimeEnv
   let appliedCount = 0;
   let failedCount = 0;
 
-  for (const commit of commitsToApply.reverse()) {
+  for (const commit of commitsToApply.toReversed()) {
     // Reverse to apply in chronological order
     try {
       console.log(chalk.dim(`Applying ${commit.sha.slice(0, 7)}: ${commit.message}`));

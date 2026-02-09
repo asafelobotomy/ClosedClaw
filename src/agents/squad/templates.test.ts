@@ -24,7 +24,7 @@ import {
 describe("AGENT_TEMPLATES", () => {
   it("has all 6 built-in templates", () => {
     expect(Object.keys(AGENT_TEMPLATES)).toHaveLength(6);
-    expect(Object.keys(AGENT_TEMPLATES).sort()).toEqual([
+    expect(Object.keys(AGENT_TEMPLATES).toSorted()).toEqual([
       "coder",
       "devops",
       "documenter",
@@ -210,7 +210,7 @@ describe("findTemplatesByCapability", () => {
 
   it("finds templates by multiple capabilities", () => {
     const results = findTemplatesByCapability(["code", "review"]);
-    expect(results.map((t) => t.id).sort()).toEqual(["coder", "reviewer"]);
+    expect(results.map((t) => t.id).toSorted()).toEqual(["coder", "reviewer"]);
   });
 
   it("returns empty array for unknown capability", () => {
@@ -227,7 +227,7 @@ describe("findTemplatesByCapability", () => {
 
   it("security capability matches both reviewer and devops", () => {
     const results = findTemplatesByCapability(["security"]);
-    const ids = results.map((t) => t.id).sort();
+    const ids = results.map((t) => t.id).toSorted();
     expect(ids).toContain("devops");
     expect(ids).toContain("reviewer");
   });

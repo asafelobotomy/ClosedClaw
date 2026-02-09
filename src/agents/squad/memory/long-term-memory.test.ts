@@ -325,7 +325,7 @@ describe("EpisodicStore", () => {
 
       const alpha = store.getBySquad("alpha");
       expect(alpha.length).toBe(2);
-      expect(alpha.map((e) => e.id).sort()).toEqual(["sq1", "sq3"]);
+      expect(alpha.map((e) => e.id).toSorted()).toEqual(["sq1", "sq3"]);
     });
   });
 

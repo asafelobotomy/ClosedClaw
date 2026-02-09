@@ -339,7 +339,7 @@ function logEgressEvent(entry: EgressLogEntry): void {
  * @returns Recent egress log entries (newest first)
  */
 export function getEgressLog(limit = 100): readonly EgressLogEntry[] {
-  return egressLog.slice(-limit).reverse();
+  return egressLog.slice(-limit).toReversed();
 }
 
 /**

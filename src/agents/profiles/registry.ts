@@ -89,15 +89,15 @@ export function parseSimpleYaml(text: string): Record<string, unknown> {
 
   for (const line of text.split("\n")) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
+    if (!trimmed || trimmed.startsWith("#")) {continue;}
 
     const colonIdx = trimmed.indexOf(":");
-    if (colonIdx === -1) continue;
+    if (colonIdx === -1) {continue;}
 
     const key = trimmed.slice(0, colonIdx).trim();
     const rawValue = trimmed.slice(colonIdx + 1).trim();
 
-    if (!key) continue;
+    if (!key) {continue;}
     result[key] = parseYamlValue(rawValue);
   }
 
@@ -109,16 +109,16 @@ export function parseSimpleYaml(text: string): Record<string, unknown> {
  */
 function parseYamlValue(raw: string): unknown {
   // Boolean
-  if (raw === "true") return true;
-  if (raw === "false") return false;
+  if (raw === "true") {return true;}
+  if (raw === "false") {return false;}
 
   // Number
-  if (/^-?\d+(\.\d+)?$/.test(raw)) return Number(raw);
+  if (/^-?\d+(\.\d+)?$/.test(raw)) {return Number(raw);}
 
   // Array: [a, b, c]
   if (raw.startsWith("[") && raw.endsWith("]")) {
     const inner = raw.slice(1, -1).trim();
-    if (!inner) return [];
+    if (!inner) {return [];}
     return inner.split(",").map((s) => {
       const trimmed = s.trim();
       // Strip quotes
@@ -378,9 +378,9 @@ export function findProfilesByCapability(
 export function validateProfile(profile: AgentProfile): string[] {
   const issues: string[] = [];
 
-  if (!profile.id) issues.push("Missing profile ID");
-  if (!profile.name) issues.push("Missing profile name");
-  if (!profile.systemPrompt) issues.push("Missing system prompt");
+  if (!profile.id) {issues.push("Missing profile ID");}
+  if (!profile.name) {issues.push("Missing profile name");}
+  if (!profile.systemPrompt) {issues.push("Missing system prompt");}
   if (profile.tools.allow.length === 0) {
     issues.push("No tools allowed — agent will be unable to perform actions");
   }
@@ -417,7 +417,7 @@ function parseSchedule(obj: Record<string, unknown>): ProfileSchedule | null {
 
   const task = typeof obj.task === "string" ? obj.task : null;
 
-  if (!expression || !task) return null;
+  if (!expression || !task) {return null;}
 
   return {
     expression,

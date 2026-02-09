@@ -202,7 +202,7 @@ export function classifyIntent(
 
   // Score each intent category by matching patterns
   for (const [category, patterns] of Object.entries(INTENT_PATTERNS) as Array<[IntentCategory, typeof INTENT_PATTERNS.triage]>) {
-    if (category === "general") continue; // General is the baseline fallback
+    if (category === "general") {continue;} // General is the baseline fallback
 
     let categoryScore = 0;
 
@@ -287,7 +287,7 @@ export function classifyIntent(
  * Resolve the model to use for a given intent.
  */
 function resolveModel(intent: IntentCategory, routing?: ModelRoutingConfig): string {
-  if (!routing) return "default";
+  if (!routing) {return "default";}
 
   switch (intent) {
     case "triage":
@@ -312,7 +312,7 @@ function resolveModel(intent: IntentCategory, routing?: ModelRoutingConfig): str
 export function describeClassification(result: IntentClassification): string {
   const topSignals = result.signals
     .filter((s) => s.intent === result.intent)
-    .sort((a, b) => b.score - a.score)
+    .toSorted((a, b) => b.score - a.score)
     .slice(0, 3);
 
   const reasons = topSignals.map((s) => s.reason).join("; ");

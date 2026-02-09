@@ -194,7 +194,7 @@ export function analyzeTaskForSquad(
 
   // Sort by score, take top profiles (min 2 for a squad)
   const sorted = [...matchedProfiles.entries()]
-    .sort((a, b) => b[1] - a[1]);
+    .toSorted((a, b) => b[1] - a[1]);
 
   const recommendedProfiles = sorted.length >= 2
     ? sorted.map(([id]) => id)

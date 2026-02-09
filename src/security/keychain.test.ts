@@ -202,7 +202,7 @@ describe("encrypted-file backend", () => {
       const creds = await listCredentials(opts);
       expect(creds).toHaveLength(3);
 
-      const namespaces = creds.map((c) => c.namespace).sort();
+      const namespaces = creds.map((c) => c.namespace).toSorted();
       expect(namespaces).toEqual(["anthropic", "openai", "slack"]);
     });
 
@@ -239,7 +239,7 @@ describe("macOS keychain backend (mocked)", () => {
       if (serviceIdx >= 0 && accountIdx >= 0) {
         const key = `${args[serviceIdx + 1]}:${args[accountIdx + 1]}`;
         const value = stored.get(key);
-        if (value) return { stdout: value + "\n" };
+        if (value) {return { stdout: value + "\n" };}
       }
       throw new Error("SecKeychainSearchCopyNext: The specified item could not be found");
     }

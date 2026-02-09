@@ -377,7 +377,7 @@ function detectCycles(steps: WorkflowStep[]): void {
       );
     }
 
-    if (visited.has(node)) return;
+    if (visited.has(node)) {return;}
 
     inStack.add(node);
     path.push(node);
@@ -422,7 +422,7 @@ export function interpolate(
 ): string {
   return template.replace(TEMPLATE_PATTERN, (match, expr: string) => {
     const resolved = resolveExpression(expr.trim(), context);
-    if (resolved === undefined) return match; // Leave unresolved as-is
+    if (resolved === undefined) {return match;} // Leave unresolved as-is
     return typeof resolved === "string" ? resolved : JSON.stringify(resolved);
   });
 }
@@ -483,8 +483,8 @@ function resolveExpression(expr: string, context: InterpolationContext): unknown
 
   // Walk the dotted path
   for (let i = 1; i < parts.length; i++) {
-    if (current === null || current === undefined) return undefined;
-    if (typeof current !== "object") return undefined;
+    if (current === null || current === undefined) {return undefined;}
+    if (typeof current !== "object") {return undefined;}
     current = (current as Record<string, unknown>)[parts[i]];
   }
 

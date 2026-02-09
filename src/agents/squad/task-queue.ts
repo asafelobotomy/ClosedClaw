@@ -265,12 +265,12 @@ export class TaskQueue {
   claim(agentId: string, capabilities?: string[]): Task | null {
     const candidates = this.getClaimable(capabilities);
 
-    if (candidates.length === 0) return null;
+    if (candidates.length === 0) {return null;}
 
     // Sort by priority (high first), then by creation time (oldest first)
     candidates.sort((a, b) => {
       const pw = PRIORITY_WEIGHT[b.task.priority] - PRIORITY_WEIGHT[a.task.priority];
-      if (pw !== 0) return pw;
+      if (pw !== 0) {return pw;}
       return a.createdAt.getTime() - b.createdAt.getTime();
     });
 
@@ -388,9 +388,9 @@ export class TaskQueue {
     const results: TaskInfo[] = [];
 
     for (const record of this.records.values()) {
-      if (filter?.status && record.status !== filter.status) continue;
-      if (filter?.type && record.task.type !== filter.type) continue;
-      if (filter?.claimedBy && record.claimedBy !== filter.claimedBy) continue;
+      if (filter?.status && record.status !== filter.status) {continue;}
+      if (filter?.type && record.task.type !== filter.type) {continue;}
+      if (filter?.claimedBy && record.claimedBy !== filter.claimedBy) {continue;}
       results.push(this.toTaskInfo(record));
     }
 
@@ -480,7 +480,7 @@ export class TaskQueue {
     let count = 0;
 
     for (const record of this.records.values()) {
-      if (record.status !== "claimed" || !record.claimedAt) continue;
+      if (record.status !== "claimed" || !record.claimedAt) {continue;}
 
       const elapsed = now - record.claimedAt.getTime();
       const timeout = record.task.timeout ?? this.config.maxExecutionTime;
@@ -550,11 +550,11 @@ export class TaskQueue {
 
   /** Check if all dependencies of a task are completed. */
   private areDependenciesMet(task: Task): boolean {
-    if (!task.dependsOn || task.dependsOn.length === 0) return true;
+    if (!task.dependsOn || task.dependsOn.length === 0) {return true;}
 
     for (const depId of task.dependsOn) {
       const dep = this.records.get(depId);
-      if (!dep || dep.status !== "completed") return false;
+      if (!dep || dep.status !== "completed") {return false;}
     }
 
     return true;
@@ -562,8 +562,8 @@ export class TaskQueue {
 
   /** Check if agent capabilities satisfy task requirements. */
   private hasCapabilities(task: Task, capabilities?: string[]): boolean {
-    if (!task.requiredCapabilities || task.requiredCapabilities.length === 0) return true;
-    if (!capabilities) return false;
+    if (!task.requiredCapabilities || task.requiredCapabilities.length === 0) {return true;}
+    if (!capabilities) {return false;}
 
     return task.requiredCapabilities.every((req) => capabilities.includes(req));
   }
@@ -573,9 +573,9 @@ export class TaskQueue {
     const results: TaskRecord[] = [];
 
     for (const record of this.records.values()) {
-      if (record.status !== "pending") continue;
-      if (!this.areDependenciesMet(record.task)) continue;
-      if (!this.hasCapabilities(record.task, capabilities)) continue;
+      if (record.status !== "pending") {continue;}
+      if (!this.areDependenciesMet(record.task)) {continue;}
+      if (!this.hasCapabilities(record.task, capabilities)) {continue;}
       results.push(record);
     }
 

@@ -999,11 +999,11 @@ export async function executePatterns(text: string): Promise<string> {
 export function hasPatterns(text: string): boolean {
   // Check WRITE pattern
   WRITE_PATTERN.lastIndex = 0;
-  if (WRITE_PATTERN.test(text)) return true;
+  if (WRITE_PATTERN.test(text)) {return true;}
 
   // Check REMIND pattern
   REMIND_PATTERN.lastIndex = 0;
-  if (REMIND_PATTERN.test(text)) return true;
+  if (REMIND_PATTERN.test(text)) {return true;}
 
   return PATTERNS.some(({ regex }) => {
     regex.lastIndex = 0;

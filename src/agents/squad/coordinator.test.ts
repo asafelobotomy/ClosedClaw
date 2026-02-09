@@ -154,7 +154,7 @@ describe("SquadCoordinator", () => {
 
       const list = coordinator.listSquads();
       expect(list).toHaveLength(2);
-      expect(list.map((s) => s.name).sort()).toEqual(["alpha", "beta"]);
+      expect(list.map((s) => s.name).toSorted()).toEqual(["alpha", "beta"]);
     });
   });
 

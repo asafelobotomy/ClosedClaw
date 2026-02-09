@@ -178,7 +178,7 @@ describe("createSquadMemoryReadTool", () => {
     ) as { keys: Array<{ key: string; found: boolean }>; count: number };
 
     expect(result.count).toBe(2);
-    expect(result.keys.map((k) => k.key).sort()).toEqual(["key1", "key2"]);
+    expect(result.keys.map((k) => k.key).toSorted()).toEqual(["key1", "key2"]);
   });
 
   it("reads a specific key", async () => {

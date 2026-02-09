@@ -302,8 +302,8 @@ export class AuditLogger {
               return;
             }
             this.writeStream.write(line, (err) => {
-              if (err) rej(err);
-              else res();
+              if (err) {rej(err);}
+              else {res();}
             });
           });
 
@@ -325,8 +325,8 @@ export class AuditLogger {
     if (this.writeStream) {
       await new Promise<void>((resolve, reject) => {
         this.writeStream!.end((err: Error | undefined) => {
-          if (err) reject(err);
-          else resolve();
+          if (err) {reject(err);}
+          else {resolve();}
         });
       });
       this.writeStream = null;

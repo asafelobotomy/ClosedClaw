@@ -133,7 +133,7 @@ export class GtkIpcBridge extends EventEmitter {
             try {
               const message = JSON.parse(line) as GtkMessage;
               this.handleIncomingMessage(message);
-            } catch (err) {
+            } catch  {
               this.emit("error", new Error(`Invalid JSON: ${line}`));
             }
           }
@@ -199,7 +199,7 @@ export class GtkIpcBridge extends EventEmitter {
         try {
           const message = JSON.parse(line) as GtkMessage;
           this.handleIncomingMessage(message);
-        } catch (err) {
+        } catch  {
           this.emit("error", new Error(`Invalid JSON in inbox: ${line}`));
         }
       }

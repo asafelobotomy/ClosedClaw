@@ -220,7 +220,7 @@ export function startConsolidationScheduler(
   let lastResult: ConsolidationResult | null = null;
 
   const timer = setInterval(async () => {
-    if (!running) return;
+    if (!running) {return;}
 
     try {
       lastResult = await consolidateMemory(ctx, options);
@@ -299,12 +299,12 @@ export function convertToEpisode(
 function extractTaskDescription(key: string, value: unknown): string {
   if (typeof value === "object" && value !== null) {
     const obj = value as Record<string, unknown>;
-    if (typeof obj.taskDescription === "string") return obj.taskDescription;
-    if (typeof obj.task === "string") return obj.task;
-    if (typeof obj.description === "string") return obj.description;
-    if (typeof obj.message === "string") return obj.message;
+    if (typeof obj.taskDescription === "string") {return obj.taskDescription;}
+    if (typeof obj.task === "string") {return obj.task;}
+    if (typeof obj.description === "string") {return obj.description;}
+    if (typeof obj.message === "string") {return obj.message;}
   }
-  if (typeof value === "string") return value;
+  if (typeof value === "string") {return value;}
   return `Memory entry: ${key}`;
 }
 
@@ -318,8 +318,8 @@ function extractOutcome(value: unknown): EpisodeOutcome {
     if (raw === "success" || raw === "failure" || raw === "partial" || raw === "cancelled") {
       return raw;
     }
-    if (raw === "error" || raw === "failed") return "failure";
-    if (raw === "ok" || raw === "completed" || raw === "done") return "success";
+    if (raw === "error" || raw === "failed") {return "failure";}
+    if (raw === "ok" || raw === "completed" || raw === "done") {return "success";}
   }
   return "success"; // Default: assume success for hot entries
 }
@@ -330,8 +330,8 @@ function extractOutcome(value: unknown): EpisodeOutcome {
 function extractDuration(entry: ShortTermEntry): number {
   if (typeof entry.value === "object" && entry.value !== null) {
     const obj = entry.value as Record<string, unknown>;
-    if (typeof obj.durationMs === "number") return obj.durationMs;
-    if (typeof obj.duration === "number") return obj.duration;
+    if (typeof obj.durationMs === "number") {return obj.durationMs;}
+    if (typeof obj.duration === "number") {return obj.duration;}
   }
   // Fall back to time between creation and last access
   return entry.lastAccessedAt.getTime() - entry.createdAt.getTime();
@@ -343,9 +343,9 @@ function extractDuration(entry: ShortTermEntry): number {
 function extractTokens(value: unknown): number {
   if (typeof value === "object" && value !== null) {
     const obj = value as Record<string, unknown>;
-    if (typeof obj.tokensUsed === "number") return obj.tokensUsed;
-    if (typeof obj.tokens === "number") return obj.tokens;
-    if (typeof obj.tokenCount === "number") return obj.tokenCount;
+    if (typeof obj.tokensUsed === "number") {return obj.tokensUsed;}
+    if (typeof obj.tokens === "number") {return obj.tokens;}
+    if (typeof obj.tokenCount === "number") {return obj.tokenCount;}
   }
   return 0; // Unknown token usage
 }

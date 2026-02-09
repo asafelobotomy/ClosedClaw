@@ -328,7 +328,7 @@ export class AgentIPC {
     return {
       unsubscribe: () => {
         const idx = handlers.indexOf(handler);
-        if (idx >= 0) handlers.splice(idx, 1);
+        if (idx >= 0) {handlers.splice(idx, 1);}
       },
     };
   }
@@ -357,7 +357,7 @@ export class AgentIPC {
 
     const messages: AgentMessage[] = [];
     for (const agentId of this.agents) {
-      if (agentId === from) continue;
+      if (agentId === from) {continue;}
 
       const msg = this.send(from, agentId, options);
       messages.push(msg);
@@ -510,7 +510,7 @@ export class AgentIPC {
     return {
       unsubscribe: () => {
         const idx = handlers.indexOf(handler);
-        if (idx >= 0) handlers.splice(idx, 1);
+        if (idx >= 0) {handlers.splice(idx, 1);}
         // Clean up empty entries
         if (handlers.length === 0) {
           topicSubs.delete(agentId);
@@ -536,7 +536,7 @@ export class AgentIPC {
     this.assertRegistered(from, "publisher");
 
     const topicSubs = this.topicSubscriptions.get(topic);
-    if (!topicSubs || topicSubs.size === 0) return 0;
+    if (!topicSubs || topicSubs.size === 0) {return 0;}
 
     const message: AgentMessage = {
       id: crypto.randomUUID(),
@@ -549,7 +549,7 @@ export class AgentIPC {
 
     let recipientCount = 0;
     for (const [agentId, handlers] of topicSubs) {
-      if (agentId === from) continue; // Don't send to self
+      if (agentId === from) {continue;} // Don't send to self
 
       for (const handler of handlers) {
         try {
@@ -646,7 +646,7 @@ export class AgentIPC {
    */
   private enqueueInbox(agentId: string, message: AgentMessage): void {
     const inbox = this.inboxes.get(agentId);
-    if (!inbox) return;
+    if (!inbox) {return;}
 
     if (inbox.length >= this.maxInboxSize) {
       inbox.shift(); // Drop oldest

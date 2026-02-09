@@ -470,7 +470,7 @@ async function fileList(stateDir?: string): Promise<StoredCredential[]> {
     const files = await fs.readdir(dir);
     const creds: StoredCredential[] = [];
     for (const file of files) {
-      if (!file.endsWith(".json")) continue;
+      if (!file.endsWith(".json")) {continue;}
       try {
         const raw = await fs.readFile(path.join(dir, file), "utf-8");
         const parsed = JSON.parse(raw) as { namespace: string; identifier: string; storedAt?: string };
@@ -657,7 +657,7 @@ export async function migrateCredentials(opts?: KeychainOptions): Promise<{
   }
 
   for (const file of files) {
-    if (!file.endsWith(".json")) continue;
+    if (!file.endsWith(".json")) {continue;}
 
     const filePath = path.join(credDir, file);
     try {

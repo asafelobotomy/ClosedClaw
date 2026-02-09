@@ -247,7 +247,7 @@ export async function executeWorkflow(
     // Execute batches
     for (let batchIdx = 0; batchIdx < batches.length; batchIdx++) {
       // Check cancellation
-      if (ctx.signal?.aborted || timeoutReached) break;
+      if (ctx.signal?.aborted || timeoutReached) {break;}
 
       const batch = batches[batchIdx];
       emit({ type: "batch:start", batchIndex: batchIdx });

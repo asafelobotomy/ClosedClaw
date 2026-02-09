@@ -381,7 +381,7 @@ export class FallbackChain {
    */
   resetModel(modelId: string): boolean {
     const state = this.states.get(modelId);
-    if (!state) return false;
+    if (!state) {return false;}
 
     Object.assign(state, createInitialState(modelId));
     return true;
@@ -414,8 +414,8 @@ export class FallbackChain {
     let totalFailures = 0;
 
     for (const state of this.states.values()) {
-      if (state.available && !state.circuitBroken) available++;
-      if (state.circuitBroken) circuitBroken.push(state.modelId);
+      if (state.available && !state.circuitBroken) {available++;}
+      if (state.circuitBroken) {circuitBroken.push(state.modelId);}
       totalSuccesses += state.totalSuccesses;
       totalFailures += state.totalFailures;
     }
@@ -455,7 +455,7 @@ function findNextAvailable(
 ): number {
   for (let i = startIndex; i < chain.length; i++) {
     const state = states.get(chain[i]);
-    if (!state) continue;
+    if (!state) {continue;}
 
     // Skip circuit-broken (unless reset time elapsed)
     if (state.circuitBroken && now - state.circuitBrokenAt < config.circuitBreakerResetMs) {

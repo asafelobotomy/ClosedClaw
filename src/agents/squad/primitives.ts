@@ -141,7 +141,7 @@ export class Mutex {
       const timer = setTimeout(() => {
         // Remove from queue on timeout
         const idx = this.queue.findIndex((w) => w.resolve === resolve);
-        if (idx >= 0) this.queue.splice(idx, 1);
+        if (idx >= 0) {this.queue.splice(idx, 1);}
         reject(new SyncTimeoutError("Mutex", this.name, timeout));
       }, timeout);
 
@@ -269,7 +269,7 @@ export class Barrier {
     return new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => {
         const idx = this.waiters.findIndex((w) => w.resolve === resolve);
-        if (idx >= 0) this.waiters.splice(idx, 1);
+        if (idx >= 0) {this.waiters.splice(idx, 1);}
         this.arrived.delete(participantId);
         reject(new SyncTimeoutError("Barrier", this.name, timeout));
       }, timeout);
@@ -355,7 +355,7 @@ export class Semaphore {
     return new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => {
         const idx = this.queue.findIndex((w) => w.resolve === resolve);
-        if (idx >= 0) this.queue.splice(idx, 1);
+        if (idx >= 0) {this.queue.splice(idx, 1);}
         reject(new SyncTimeoutError("Semaphore", this.name, timeout));
       }, timeout);
 
@@ -472,7 +472,7 @@ export class Event {
     return new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => {
         const idx = this.waiters.findIndex((w) => w.resolve === resolve);
-        if (idx >= 0) this.waiters.splice(idx, 1);
+        if (idx >= 0) {this.waiters.splice(idx, 1);}
         reject(new SyncTimeoutError("Event", this.name, timeout));
       }, timeout);
 

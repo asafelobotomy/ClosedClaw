@@ -122,7 +122,7 @@ describe("executeWorkflow - errors", () => {
 
     const ctx = makeContext({
       toolHandler: vi.fn(async (tool) => {
-        if (tool === "bad_tool") throw new Error("Tool failed!");
+        if (tool === "bad_tool") {throw new Error("Tool failed!");}
         return "ok";
       }),
     });
@@ -147,7 +147,7 @@ describe("executeWorkflow - errors", () => {
 
     const ctx = makeContext({
       toolHandler: vi.fn(async (tool) => {
-        if (tool === "bad_tool") throw new Error("Expected failure");
+        if (tool === "bad_tool") {throw new Error("Expected failure");}
         return "ok";
       }),
     });
@@ -272,7 +272,7 @@ describe("executeWorkflow - retry", () => {
     const ctx = makeContext({
       toolHandler: vi.fn(async () => {
         callCount++;
-        if (callCount < 3) throw new Error("Transient error");
+        if (callCount < 3) {throw new Error("Transient error");}
         return "success";
       }),
     });

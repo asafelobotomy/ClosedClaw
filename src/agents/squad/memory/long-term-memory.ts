@@ -177,7 +177,7 @@ export class EpisodicStore {
    * Safe to call multiple times (no-op after first load).
    */
   async load(): Promise<void> {
-    if (this.loaded) return;
+    if (this.loaded) {return;}
 
     const data = await readEncryptedStore<SerializedEpisode[]>(this.storeOptions);
 
@@ -258,10 +258,10 @@ export class EpisodicStore {
     const lowerQuery = query.toLowerCase();
 
     const matches = this.episodes.filter((ep) => {
-      if (ep.taskDescription.toLowerCase().includes(lowerQuery)) return true;
-      if (ep.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery))) return true;
-      if (ep.squadId.toLowerCase().includes(lowerQuery)) return true;
-      if (ep.agentsInvolved.some((a) => a.toLowerCase().includes(lowerQuery))) return true;
+      if (ep.taskDescription.toLowerCase().includes(lowerQuery)) {return true;}
+      if (ep.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery))) {return true;}
+      if (ep.squadId.toLowerCase().includes(lowerQuery)) {return true;}
+      if (ep.agentsInvolved.some((a) => a.toLowerCase().includes(lowerQuery))) {return true;}
       return false;
     });
 
@@ -375,8 +375,8 @@ export class EpisodicStore {
     let totalTokens = 0;
 
     for (const ep of this.episodes) {
-      if (ep.outcome === "success") successCount++;
-      if (ep.outcome === "failure") failureCount++;
+      if (ep.outcome === "success") {successCount++;}
+      if (ep.outcome === "failure") {failureCount++;}
       totalDuration += ep.durationMs;
       totalTokens += ep.tokensUsed;
     }

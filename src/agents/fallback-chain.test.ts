@@ -33,7 +33,7 @@ describe("FallbackChain - basic execution", () => {
     });
 
     const result = await chain.execute(async (modelId) => {
-      if (modelId === "model-a") throw new Error("rate limit 429");
+      if (modelId === "model-a") {throw new Error("rate limit 429");}
       return `response from ${modelId}`;
     });
 
@@ -50,7 +50,7 @@ describe("FallbackChain - basic execution", () => {
     });
 
     const result = await chain.execute(async (modelId) => {
-      if (modelId !== "model-c") throw new Error("unavailable");
+      if (modelId !== "model-c") {throw new Error("unavailable");}
       return `response from ${modelId}`;
     });
 
@@ -96,7 +96,7 @@ describe("FallbackChain - events", () => {
     });
 
     const result = await chain.execute(async (modelId) => {
-      if (modelId === "model-a") throw new Error("rate limit");
+      if (modelId === "model-a") {throw new Error("rate limit");}
       return "ok";
     });
 
@@ -144,13 +144,13 @@ describe("FallbackChain - circuit breaker", () => {
 
     // First call: model-a fails, model-b succeeds
     await chain.execute(async (modelId) => {
-      if (modelId === "model-a") throw new Error("fail");
+      if (modelId === "model-a") {throw new Error("fail");}
       return "ok";
     });
 
     // Second call: model-a fails again (2nd consecutive failure → circuit break)
     await chain.execute(async (modelId) => {
-      if (modelId === "model-a") throw new Error("fail again");
+      if (modelId === "model-a") {throw new Error("fail again");}
       return "ok";
     });
 
@@ -170,7 +170,7 @@ describe("FallbackChain - circuit breaker", () => {
 
     // Trip circuit breaker on model-a
     await chain.execute(async (modelId) => {
-      if (modelId === "model-a") throw new Error("fail");
+      if (modelId === "model-a") {throw new Error("fail");}
       return "ok";
     });
 
@@ -194,7 +194,7 @@ describe("FallbackChain - circuit breaker", () => {
 
     // Trip circuit breaker
     await chain.execute(async (modelId) => {
-      if (modelId === "model-a") throw new Error("fail");
+      if (modelId === "model-a") {throw new Error("fail");}
       return "ok";
     });
 
@@ -221,7 +221,7 @@ describe("FallbackChain - error classification", () => {
     });
 
     const result = await chain.execute(async (modelId) => {
-      if (modelId === "model-a") throw new Error("429 too many requests rate limit");
+      if (modelId === "model-a") {throw new Error("429 too many requests rate limit");}
       return "ok";
     });
 
@@ -235,7 +235,7 @@ describe("FallbackChain - error classification", () => {
     });
 
     const result = await chain.execute(async (modelId) => {
-      if (modelId === "model-a") throw new Error("401 unauthorized");
+      if (modelId === "model-a") {throw new Error("401 unauthorized");}
       return "ok";
     });
 
@@ -250,7 +250,7 @@ describe("FallbackChain - error classification", () => {
 
     const result = await chain.execute(
       async (modelId) => {
-        if (modelId === "model-a") throw new Error("custom error");
+        if (modelId === "model-a") {throw new Error("custom error");}
         return "ok";
       },
       () => "billing",
@@ -286,7 +286,7 @@ describe("FallbackChain - health", () => {
     });
 
     await chain.execute(async (modelId) => {
-      if (modelId === "model-a") throw new Error("fail");
+      if (modelId === "model-a") {throw new Error("fail");}
       return "ok";
     });
 
@@ -304,7 +304,7 @@ describe("FallbackChain - health", () => {
 
     // Trip circuit breaker
     await chain.execute(async (modelId) => {
-      if (modelId === "model-a") throw new Error("fail");
+      if (modelId === "model-a") {throw new Error("fail");}
       return "ok";
     });
 
@@ -324,7 +324,7 @@ describe("FallbackChain - health", () => {
 
     // Trip circuit breaker
     await chain.execute(async (modelId) => {
-      if (modelId === "model-a") throw new Error("fail");
+      if (modelId === "model-a") {throw new Error("fail");}
       return "ok";
     });
 
