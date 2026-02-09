@@ -154,7 +154,7 @@ describe("Barrier", () => {
   it("throws on duplicate participant", async () => {
     const barrier = new Barrier(3);
     await expect(async () => {
-      barrier.arrive("a", { timeout: 5000 });
+      void barrier.arrive("a", { timeout: 5000 });
       await barrier.arrive("a", { timeout: 5000 });
     }).rejects.toThrow("already arrived");
   });

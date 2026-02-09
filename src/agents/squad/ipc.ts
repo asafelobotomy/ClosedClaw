@@ -285,7 +285,7 @@ export class AgentIPC {
     if (handlers.length > 0) {
       for (const handler of handlers) {
         try {
-          handler(message);
+          void handler(message);
         } catch {
           // Don't let handler errors break messaging
         }
@@ -318,7 +318,7 @@ export class AgentIPC {
       const messages = inbox.splice(0);
       for (const msg of messages) {
         try {
-          handler(msg);
+          void handler(msg);
         } catch {
           // Swallow handler errors on drain
         }
@@ -553,7 +553,7 @@ export class AgentIPC {
 
       for (const handler of handlers) {
         try {
-          handler(message);
+          void handler(message);
         } catch {
           // Don't let handler errors break publishing
         }

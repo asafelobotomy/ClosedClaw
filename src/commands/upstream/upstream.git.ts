@@ -22,7 +22,7 @@ export class GitService {
       const { stdout } = await execFileAsync("git", args, { cwd: this.repoPath });
       return stdout.trim();
     } catch (error) {
-      throw new Error(`Git command failed: ${error}`);
+      throw new Error(`Git command failed: ${error}`, { cause: error });
     }
   }
 
