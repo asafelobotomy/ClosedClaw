@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { TIMEOUT_HTTP_DEFAULT_MS, TIMEOUT_HTTP_SHORT_MS, secondsToMs } from "../../config/constants/index.js";
 import type { SubagentRunRecord } from "../../agents/subagent-registry.js";
 import type { CommandHandler } from "./commands-types.js";
 import { AGENT_LANE_SUBAGENT } from "../../agents/lanes.js";
@@ -380,7 +381,7 @@ export const handleSubagentsCommand: CommandHandler = async (params, allowTextCo
           channel: INTERNAL_MESSAGE_CHANNEL,
           lane: AGENT_LANE_SUBAGENT,
         },
-        timeoutMs: 10_000,
+        timeoutMs: TIMEOUT_HTTP_SHORT_MS,
       });
       const responseRunId = typeof response?.runId === "string" ? response.runId : undefined;
       if (responseRunId) {
@@ -392,11 +393,11 @@ export const handleSubagentsCommand: CommandHandler = async (params, allowTextCo
       return { shouldContinue: false, reply: { text: `⚠️ Send failed: ${messageText}` } };
     }
 
-    const waitMs = 30_000;
+    const waitMs = TIMEOUT_HTTP_DEFAULT_MS;
     const wait = await callGateway<{ status?: string; error?: string }>({
       method: "agent.wait",
       params: { runId, timeoutMs: waitMs },
-      timeoutMs: waitMs + 2000,
+      timeoutMs: waitMs + secondsToMs(2),
     });
     if (wait?.status === "timeout") {
       return {

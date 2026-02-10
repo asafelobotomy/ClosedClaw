@@ -1,4 +1,5 @@
 import type { ClosedClawConfig } from "../../config/config.js";
+import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../../config/constants/index.js";
 import type { CommandHandler } from "./commands-types.js";
 import { callGateway, randomIdempotencyKey } from "../../gateway/call.js";
 import { logVerbose } from "../../globals.js";
@@ -175,7 +176,7 @@ export const handlePTTCommand: CommandHandler = async (params, allowTextCommands
       command: commandId,
       params: {},
       idempotencyKey: randomIdempotencyKey(),
-      timeoutMs: 15_000,
+      timeoutMs: TIMEOUT_TEST_SUITE_MEDIUM_MS,
     };
     const res = await callGateway<{
       ok?: boolean;

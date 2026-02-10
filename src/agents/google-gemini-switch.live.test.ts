@@ -1,5 +1,6 @@
 import { completeSimple, getModel } from "@mariozechner/pi-ai";
 import { describe, expect, it } from "vitest";
+import { TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY ?? "";
@@ -75,5 +76,5 @@ describeLive("gemini live switch", () => {
     );
 
     expect(res.stopReason).not.toBe("error");
-  }, 20000);
+  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
 });

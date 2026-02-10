@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import { TIMEOUT_HTTP_LONG_MS, minutesToMs } from "../../config/constants/index.js";
 import type { NodesRpcOpts } from "./types.js";
 import { randomIdempotencyKey } from "../../gateway/call.js";
 import { defaultRuntime } from "../../runtime.js";
@@ -82,7 +83,7 @@ export function registerNodesCameraCommands(nodes: Command) {
           );
         });
       }),
-    { timeoutMs: 60_000 },
+    { timeoutMs: TIMEOUT_HTTP_LONG_MS },
   );
 
   nodesCallOpts(
@@ -171,7 +172,7 @@ export function registerNodesCameraCommands(nodes: Command) {
           defaultRuntime.log(results.map((r) => `MEDIA:${shortenHomePath(r.path)}`).join("\n"));
         });
       }),
-    { timeoutMs: 60_000 },
+    { timeoutMs: TIMEOUT_HTTP_LONG_MS },
   );
 
   nodesCallOpts(
@@ -245,6 +246,6 @@ export function registerNodesCameraCommands(nodes: Command) {
           defaultRuntime.log(`MEDIA:${shortenHomePath(filePath)}`);
         });
       }),
-    { timeoutMs: 90_000 },
+    { timeoutMs: minutesToMs(1.5) },
   );
 }

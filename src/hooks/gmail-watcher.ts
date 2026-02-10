@@ -7,6 +7,7 @@
 
 import { type ChildProcess, spawn } from "node:child_process";
 import type { ClosedClawConfig } from "../config/config.js";
+import { TIMEOUT_TEST_SUITE_SHORT_MS, minutesToMs } from "../config/constants/index.js";
 import { hasBinary } from "../agents/skills.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { runCommandWithTimeout } from "../process/exec.js";
@@ -46,7 +47,7 @@ async function startGmailWatch(
 ): Promise<boolean> {
   const args = ["gog", ...buildGogWatchStartArgs(cfg)];
   try {
-    const result = await runCommandWithTimeout(args, { timeoutMs: 120_000 });
+    const result = await runCommandWithTimeout(args, { timeoutMs: minutesToMs(2) });
     if (result.code !== 0) {
       const message = result.stderr || result.stdout || "gog watch start failed";
       log.error(`watch start failed: ${message}`);
@@ -114,7 +115,7 @@ function spawnGogServe(cfg: GmailHookRuntimeConfig): ChildProcess {
         return;
       }
       watcherProcess = spawnGogServe(currentConfig);
-    }, 5000);
+    }, TIMEOUT_TEST_SUITE_SHORT_MS);
   });
 
   return child;
@@ -186,7 +187,7 @@ export async function startGmailWatcher(cfg: ClosedClawConfig): Promise<GmailWat
   watcherProcess = spawnGogServe(runtimeConfig);
 
   // Set up renewal interval
-  const renewMs = runtimeConfig.renewEveryMinutes * 60_000;
+  const renewMs = minutesToMs(runtimeConfig.renewEveryMinutes);
   renewInterval = setInterval(() => {
     if (shuttingDown) {
       return;

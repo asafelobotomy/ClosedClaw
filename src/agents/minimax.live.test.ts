@@ -1,5 +1,6 @@
 import { completeSimple, type Model } from "@mariozechner/pi-ai";
 import { describe, expect, it } from "vitest";
+import { TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 
 const MINIMAX_KEY = process.env.MINIMAX_API_KEY ?? "";
@@ -42,5 +43,5 @@ describeLive("minimax live", () => {
       .map((block) => block.text.trim())
       .join(" ");
     expect(text.length).toBeGreaterThan(0);
-  }, 20000);
+  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
 });

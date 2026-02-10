@@ -23,6 +23,7 @@ import {
   modelSupportsVision,
 } from "../agents/model-catalog.js";
 import { applyTemplate } from "../auto-reply/templating.js";
+import { secondsToMs } from "../config/constants/index.js";
 import { logVerbose, shouldLogVerbose } from "../globals.js";
 import { runExec } from "../process/exec.js";
 import { MediaAttachmentCache, normalizeAttachments, selectAttachments } from "./attachments.js";
@@ -272,7 +273,7 @@ async function probeGeminiCli(): Promise<boolean> {
     }
     try {
       const { stdout } = await runExec("gemini", ["--output-format", "json", "ok"], {
-        timeoutMs: 8000,
+        timeoutMs: secondsToMs(8),
       });
       return Boolean(extractGeminiResponse(stdout) ?? stdout.toLowerCase().includes("ok"));
     } catch {

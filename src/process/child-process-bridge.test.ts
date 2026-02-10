@@ -3,9 +3,10 @@ import net from "node:net";
 import path from "node:path";
 import process from "node:process";
 import { afterEach, describe, expect, it } from "vitest";
+import { TIMEOUT_TEST_SUITE_DEFAULT_MS, TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 import { attachChildProcessBridge } from "./child-process-bridge.js";
 
-function waitForLine(stream: NodeJS.ReadableStream, timeoutMs = 10_000): Promise<string> {
+function waitForLine(stream: NodeJS.ReadableStream, timeoutMs = TIMEOUT_TEST_SUITE_DEFAULT_MS): Promise<string> {
   return new Promise((resolve, reject) => {
     let buffer = "";
 
@@ -104,7 +105,10 @@ describe("attachChildProcessBridge", () => {
     addedSigterm();
 
     await new Promise<void>((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error("timeout waiting for child exit")), 10_000);
+      const timeout = setTimeout(
+        () => reject(new Error("timeout waiting for child exit")),
+        TIMEOUT_TEST_SUITE_DEFAULT_MS,
+      );
       child.once("exit", () => {
         clearTimeout(timeout);
         resolve();
@@ -113,5 +117,5 @@ describe("attachChildProcessBridge", () => {
 
     await new Promise((r) => setTimeout(r, 250));
     expect(await canConnect(port)).toBe(false);
-  }, 20_000);
+  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
 });

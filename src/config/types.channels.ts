@@ -1,5 +1,4 @@
 import type { GroupPolicy } from "./types.base.js";
-import type { DiscordConfig } from "./types.discord.js";
 import type { GoogleChatConfig } from "./types.googlechat.js";
 import type { IMessageConfig } from "./types.imessage.js";
 import type { MSTeamsConfig } from "./types.msteams.js";
@@ -24,10 +23,16 @@ export type ChannelDefaultsConfig = {
 };
 
 export type ChannelsConfig = {
+  /**
+   * Channel routing mode.
+   * - `"auto"` (default): auto-detects GTK-only when no other channels have enabled accounts.
+   * - `"gtk-only"`: forces all communication through the GTK GUI desktop channel.
+   */
+  mode?: "gtk-only" | "auto";
   defaults?: ChannelDefaultsConfig;
   whatsapp?: WhatsAppConfig;
   telegram?: TelegramConfig;
-  discord?: DiscordConfig;
+  discord?: Record<string, unknown>;
   googlechat?: GoogleChatConfig;
   slack?: SlackConfig;
   signal?: SignalConfig;

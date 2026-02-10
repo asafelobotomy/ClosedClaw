@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import { TIMEOUT_HTTP_DEFAULT_MS, minutesToMs, secondsToMs } from "../../config/constants/index.js";
 import path from "node:path";
 import type { NodesRpcOpts } from "./types.js";
 import { resolveAgentConfig, resolveDefaultAgentId } from "../../agents/agent-scope.js";
@@ -170,7 +171,7 @@ export function registerNodesInvokeCommands(nodes: Command) {
           defaultRuntime.log(JSON.stringify(result, null, 2));
         });
       }),
-    { timeoutMs: 30_000 },
+    { timeoutMs: TIMEOUT_HTTP_DEFAULT_MS },
   );
 
   nodesCallOpts(
@@ -279,7 +280,7 @@ export function registerNodesInvokeCommands(nodes: Command) {
               agentId,
               resolvedPath: undefined,
               sessionKey: undefined,
-              timeoutMs: 120_000,
+              timeoutMs: minutesToMs(2),
             })) as { decision?: string } | null;
             const decision =
               decisionResult && typeof decisionResult === "object"
@@ -378,6 +379,6 @@ export function registerNodesInvokeCommands(nodes: Command) {
           }
         });
       }),
-    { timeoutMs: 35_000 },
+    { timeoutMs: secondsToMs(35) },
   );
 }

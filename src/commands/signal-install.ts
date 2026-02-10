@@ -1,4 +1,5 @@
 import { createWriteStream } from "node:fs";
+import { TIMEOUT_HTTP_LONG_MS } from "../config/constants/index.js";
 import fs from "node:fs/promises";
 import { request } from "node:https";
 import os from "node:os";
@@ -142,11 +143,11 @@ export async function installSignalCli(runtime: RuntimeEnv): Promise<SignalInsta
 
   if (assetName.endsWith(".zip")) {
     await runCommandWithTimeout(["unzip", "-q", archivePath, "-d", installRoot], {
-      timeoutMs: 60_000,
+      timeoutMs: TIMEOUT_HTTP_LONG_MS,
     });
   } else if (assetName.endsWith(".tar.gz") || assetName.endsWith(".tgz")) {
     await runCommandWithTimeout(["tar", "-xzf", archivePath, "-C", installRoot], {
-      timeoutMs: 60_000,
+      timeoutMs: TIMEOUT_HTTP_LONG_MS,
     });
   } else {
     return { ok: false, error: `Unsupported archive type: ${assetName}` };

@@ -22,10 +22,45 @@ export type SkillsInstallConfig = {
   nodeManager?: "npm" | "pnpm" | "yarn" | "bun";
 };
 
+export type SkillsSecurityConfig = {
+  /**
+   * Require cryptographic signatures for skill installation.
+   *
+   * When enabled:
+   * - Skills must have a valid `.sig` file signed by a trusted key
+   * - Installation fails if signature is missing or invalid
+   * - Protects against supply chain attacks
+   *
+   * Default: false (for backward compatibility; will be true in future versions)
+   */
+  requireSignature?: boolean;
+
+  /**
+   * Prompt for confirmation when installing unsigned skills.
+   * Only relevant if requireSignature is false.
+   *
+   * Default: true
+   */
+  promptOnUnsigned?: boolean;
+
+  /**
+   * Minimum trust level required for skill signatures.
+   * Keys with lower trust levels will be rejected.
+   *
+   * Options:
+   * - "full": Only fully trusted keys accepted
+   * - "marginal": Both full and marginal trust accepted
+   *
+   * Default: "marginal"
+   */
+  minTrustLevel?: "full" | "marginal";
+};
+
 export type SkillsConfig = {
   /** Optional bundled-skill allowlist (only affects bundled skills). */
   allowBundled?: string[];
   load?: SkillsLoadConfig;
   install?: SkillsInstallConfig;
+  security?: SkillsSecurityConfig;
   entries?: Record<string, SkillConfig>;
 };

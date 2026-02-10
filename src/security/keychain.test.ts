@@ -139,7 +139,7 @@ describe("encrypted-file backend", () => {
       await storeCredential("anthropic", "api-key", "old-value", opts);
       await storeCredential("anthropic", "api-key", "new-value", opts);
 
-      const _result = await getCredential("anthropic", "api-key", opts);
+      const result = await getCredential("anthropic", "api-key", opts);
       expect(result).toBe("new-value");
     });
   });
@@ -147,26 +147,26 @@ describe("encrypted-file backend", () => {
   describe("getCredential", () => {
     it("retrieves stored credential", async () => {
       await storeCredential("anthropic", "api-key", "sk-test-123", opts);
-      const _result = await getCredential("anthropic", "api-key", opts);
+      const result = await getCredential("anthropic", "api-key", opts);
       expect(result).toBe("sk-test-123");
     });
 
     it("returns null for non-existent credential", async () => {
-      const _result = await getCredential("nonexistent", "missing", opts);
+      const result = await getCredential("nonexistent", "missing", opts);
       expect(result).toBeNull();
     });
 
     it("handles unicode secrets", async () => {
       const unicodeSecret = "密码🔑パスワード";
       await storeCredential("test", "unicode", unicodeSecret, opts);
-      const _result = await getCredential("test", "unicode", opts);
+      const result = await getCredential("test", "unicode", opts);
       expect(result).toBe(unicodeSecret);
     });
 
     it("handles secrets with special characters", async () => {
       const specialSecret = "sk-ant-api03-foo_bar/baz+qux=";
       await storeCredential("test", "special", specialSecret, opts);
-      const _result = await getCredential("test", "special", opts);
+      const result = await getCredential("test", "special", opts);
       expect(result).toBe(specialSecret);
     });
   });
@@ -177,7 +177,7 @@ describe("encrypted-file backend", () => {
       const deleted = await deleteCredential("anthropic", "api-key", opts);
       expect(deleted).toBe(true);
 
-      const _result = await getCredential("anthropic", "api-key", opts);
+      const result = await getCredential("anthropic", "api-key", opts);
       expect(result).toBeNull();
     });
 
@@ -270,12 +270,12 @@ describe("macOS keychain backend (mocked)", () => {
 
   it("stores and retrieves a credential", async () => {
     await storeCredential("anthropic", "api-key", "sk-test-mac", opts);
-    const _result = await getCredential("anthropic", "api-key", opts);
+    const result = await getCredential("anthropic", "api-key", opts);
     expect(result).toBe("sk-test-mac");
   });
 
   it("returns null for missing credential", async () => {
-    const _result = await getCredential("nonexistent", "key", opts);
+    const result = await getCredential("nonexistent", "key", opts);
     expect(result).toBeNull();
   });
 
@@ -284,7 +284,7 @@ describe("macOS keychain backend (mocked)", () => {
     const deleted = await deleteCredential("anthropic", "api-key", opts);
     expect(deleted).toBe(true);
 
-    const _result = await getCredential("anthropic", "api-key", opts);
+    const result = await getCredential("anthropic", "api-key", opts);
     expect(result).toBeNull();
   });
 
@@ -300,7 +300,7 @@ describe("macOS keychain backend (mocked)", () => {
 
 describe("migrateCredentials", () => {
   it("returns zero counts when no credentials directory exists", async () => {
-    const _result = await migrateCredentials({
+    const result = await migrateCredentials({
       backend: "encrypted-file",
       stateDir: path.join(tmpDir, "empty"),
     });
@@ -325,7 +325,7 @@ describe("migrateCredentials", () => {
 
     // Migrate to a different directory
     const targetDir = path.join(tmpDir, "target");
-    const _result = await migrateCredentials({
+    const result = await migrateCredentials({
       backend: "encrypted-file",
       stateDir: targetDir,
     });
@@ -348,7 +348,7 @@ describe("migrateCredentials", () => {
       JSON.stringify({ namespace: "test" }), // Missing identifier and secret
     );
 
-    const _result = await migrateCredentials({
+    const result = await migrateCredentials({
       backend: "encrypted-file",
       stateDir: tmpDir,
     });
@@ -361,7 +361,7 @@ describe("migrateCredentials", () => {
 
     await fs.writeFile(path.join(credDir, "corrupt.json"), "NOT JSON");
 
-    const _result = await migrateCredentials({
+    const result = await migrateCredentials({
       backend: "encrypted-file",
       stateDir: tmpDir,
     });

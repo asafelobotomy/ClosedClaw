@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 
 describe("sandbox config merges", () => {
-  it("resolves sandbox scope deterministically", { timeout: 60_000 }, async () => {
+  it("resolves sandbox scope deterministically", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     const { resolveSandboxScope } = await import("./sandbox.js");
 
     expect(resolveSandboxScope({})).toBe("agent");

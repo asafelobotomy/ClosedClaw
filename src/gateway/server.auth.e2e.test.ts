@@ -1,4 +1,6 @@
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import { WebSocket } from "ws";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import { buildDeviceAuthPayload } from "./device-auth.js";
@@ -49,7 +51,7 @@ describe("gateway server auth/connect", () => {
       await server.close();
     });
 
-    test("closes silent handshakes after timeout", { timeout: 60_000 }, async () => {
+    test("closes silent handshakes after timeout", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
       vi.useRealTimers();
       const prevHandshakeTimeout = process.env.ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS;
       process.env.ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS = "50";
@@ -138,7 +140,7 @@ describe("gateway server auth/connect", () => {
 
     test(
       "invalid connect params surface in response and close reason",
-      { timeout: 60_000 },
+      { timeout: TIMEOUT_TEST_SUITE_LONG_MS },
       async () => {
         const ws = await openWs(port);
         const closeInfoPromise = new Promise<{ code: number; reason: string }>((resolve) => {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
 import { runCommandWithTimeout } from "./exec.js";
 
 describe("runCommandWithTimeout", () => {
@@ -6,7 +7,7 @@ describe("runCommandWithTimeout", () => {
     const result = await runCommandWithTimeout(
       [process.execPath, "-e", 'process.stdout.write(process.env.ClosedClaw_TEST_ENV ?? "")'],
       {
-        timeoutMs: 5_000,
+        timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
         env: { ClosedClaw_TEST_ENV: "ok" },
       },
     );
@@ -26,7 +27,7 @@ describe("runCommandWithTimeout", () => {
           'process.stdout.write((process.env.ClosedClaw_BASE_ENV ?? "") + "|" + (process.env.ClosedClaw_TEST_ENV ?? ""))',
         ],
         {
-          timeoutMs: 5_000,
+          timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
           env: { ClosedClaw_TEST_ENV: "ok" },
         },
       );

@@ -3,6 +3,7 @@ import { danger } from "../../globals.js";
 import { defaultRuntime } from "../../runtime.js";
 import { callBrowserRequest, type BrowserParentOpts } from "../browser-cli-shared.js";
 import { requireRef, resolveBrowserActionContext } from "./shared.js";
+import { TIMEOUT_BROWSER_PAGE_MS } from "../../config/constants/index.js";
 
 export function registerBrowserNavigationCommands(
   browser: Command,
@@ -27,7 +28,7 @@ export function registerBrowserNavigationCommands(
               targetId: opts.targetId?.trim() || undefined,
             },
           },
-          { timeoutMs: 20000 },
+          { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));
@@ -67,7 +68,7 @@ export function registerBrowserNavigationCommands(
               targetId: opts.targetId?.trim() || undefined,
             },
           },
-          { timeoutMs: 20000 },
+          { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));

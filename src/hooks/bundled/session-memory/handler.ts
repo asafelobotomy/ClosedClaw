@@ -14,6 +14,7 @@ import type { HookHandler } from "../../hooks.js";
 import { resolveAgentWorkspaceDir } from "../../../agents/agent-scope.js";
 import { resolveAgentIdFromSessionKey } from "../../../routing/session-key.js";
 import { resolveHookConfig } from "../../config.js";
+import { getWorkspaceDir } from "../../../config/constants/index.js";
 
 /**
  * Read recent messages from session file for slug generation
@@ -76,7 +77,7 @@ const saveSessionToMemory: HookHandler = async (event) => {
     const agentId = resolveAgentIdFromSessionKey(event.sessionKey);
     const workspaceDir = cfg
       ? resolveAgentWorkspaceDir(cfg, agentId)
-      : path.join(os.homedir(), ".ClosedClaw", "workspace");
+      : getWorkspaceDir();
     const memoryDir = path.join(workspaceDir, "memory");
     await fs.mkdir(memoryDir, { recursive: true });
 

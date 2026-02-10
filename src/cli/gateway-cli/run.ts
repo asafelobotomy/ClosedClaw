@@ -14,6 +14,7 @@ import { setGatewayWsLogStyle } from "../../gateway/ws-logging.js";
 import { setVerbose } from "../../globals.js";
 import { GatewayLockError } from "../../infra/gateway-lock.js";
 import { formatPortDiagnostics, inspectPortUsage } from "../../infra/ports.js";
+import { secondsToMs } from "../../config/constants/index.js";
 import { setConsoleSubsystemFilter, setConsoleTimestampPrefix } from "../../logging/console.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import { defaultRuntime } from "../../runtime.js";
@@ -106,7 +107,7 @@ async function runGatewayCommand(opts: GatewayRunOpts) {
   if (opts.force) {
     try {
       const { killed, waitedMs, escalatedToSigkill } = await forceFreePortAndWait(port, {
-        timeoutMs: 2000,
+        timeoutMs: secondsToMs(2),
         intervalMs: 100,
         sigtermTimeoutMs: 700,
       });

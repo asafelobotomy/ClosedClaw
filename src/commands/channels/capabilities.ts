@@ -2,12 +2,8 @@ import type { ChannelCapabilities, ChannelPlugin } from "../../channels/plugins/
 import type { ClosedClawConfig } from "../../config/config.js";
 import { resolveChannelDefaultAccountId } from "../../channels/plugins/helpers.js";
 import { getChannelPlugin, listChannelPlugins } from "../../channels/plugins/index.js";
-import { fetchChannelPermissionsDiscord } from "../../discord/send.js";
-import { parseDiscordTarget } from "../../discord/targets.js";
-import { danger } from "../../globals.js";
-import { defaultRuntime, type RuntimeEnv } from "../../runtime.js";
-import { fetchSlackScopes, type SlackScopesResult } from "../../slack/scopes.js";
-import { theme } from "../../terminal/theme.js";
+// Discord/Slack-specific imports removed \u2014 channels archived.
+import { danger } from "../../globals.js";import { defaultRuntime, type RuntimeEnv } from "../../runtime.js";import { theme } from "../../terminal/theme.js";
 import { formatChannelAccountLabel, requireValidConfig } from "./shared.js";
 
 export type ChannelsCapabilitiesOptions = {
@@ -35,6 +31,9 @@ type DiscordPermissionsReport = {
   raw?: string;
   error?: string;
 };
+
+// Stub types for archived channels
+type SlackScopesResult = { scopes?: string[]; missing?: string[]; ok?: boolean; error?: string; source?: string };
 
 type ChannelCapabilitiesReport = {
   channel: string;
@@ -121,26 +120,8 @@ function summarizeDiscordTarget(raw?: string): DiscordTargetSummary | undefined 
   if (!raw) {
     return undefined;
   }
-  const target = parseDiscordTarget(raw, { defaultKind: "channel" });
-  if (!target) {
-    return { raw };
-  }
-  if (target.kind === "channel") {
-    return {
-      raw,
-      normalized: target.normalized,
-      kind: "channel",
-      channelId: target.id,
-    };
-  }
-  if (target.kind === "user") {
-    return {
-      raw,
-      normalized: target.normalized,
-      kind: "user",
-    };
-  }
-  return { raw, normalized: target.normalized };
+  // Discord channel archived — parseDiscordTarget no longer available.
+  return { raw };
 }
 
 function formatDiscordIntents(intents?: {
@@ -305,23 +286,12 @@ async function buildDiscordPermissions(params: {
     };
   }
   try {
-    const perms = await fetchChannelPermissionsDiscord(target.channelId, {
-      token,
-      accountId: params.account.accountId ?? undefined,
-    });
-    const missing = REQUIRED_DISCORD_PERMISSIONS.filter(
-      (permission) => !perms.permissions.includes(permission),
-    );
+    // Discord channel archived — fetchChannelPermissionsDiscord no longer available.
     return {
       target,
       report: {
-        channelId: perms.channelId,
-        guildId: perms.guildId,
-        isDm: perms.isDm,
-        channelType: perms.channelType,
-        permissions: perms.permissions,
-        missingRequired: missing.length ? missing : [],
-        raw: perms.raw,
+        channelId: target.channelId,
+        error: "Discord channel has been archived.",
       },
     };
   } catch (err) {
@@ -379,31 +349,7 @@ async function resolveChannelReports(params: {
     }
 
     let slackScopes: ChannelCapabilitiesReport["slackScopes"];
-    if (plugin.id === "slack" && configured && enabled) {
-      const botToken = (resolvedAccount as { botToken?: string }).botToken?.trim();
-      const userToken = (
-        resolvedAccount as { config?: { userToken?: string } }
-      ).config?.userToken?.trim();
-      const scopeReports: NonNullable<ChannelCapabilitiesReport["slackScopes"]> = [];
-      if (botToken) {
-        scopeReports.push({
-          tokenType: "bot",
-          result: await fetchSlackScopes(botToken, timeoutMs),
-        });
-      } else {
-        scopeReports.push({
-          tokenType: "bot",
-          result: { ok: false, error: "Slack bot token missing." },
-        });
-      }
-      if (userToken) {
-        scopeReports.push({
-          tokenType: "user",
-          result: await fetchSlackScopes(userToken, timeoutMs),
-        });
-      }
-      slackScopes = scopeReports;
-    }
+    // Slack channel archived — fetchSlackScopes no longer available.
 
     let discordTarget: DiscordTargetSummary | undefined;
     let discordPermissions: DiscordPermissionsReport | undefined;

@@ -1,12 +1,12 @@
-import type { PluginRuntimeApi } from "ClosedClaw/plugin-sdk";
+import type { PluginRuntime } from "ClosedClaw/plugin-sdk";
 
-let gtkRuntime: PluginRuntimeApi | undefined;
+let gtkRuntime: PluginRuntime | undefined;
 
-export function setGtkRuntime(runtime: PluginRuntimeApi): void {
+export function setGtkRuntime(runtime: PluginRuntime): void {
   gtkRuntime = runtime;
 }
 
-export function getGtkRuntime(): PluginRuntimeApi {
+export function getGtkRuntime(): PluginRuntime {
   if (!gtkRuntime) {
     throw new Error("GTK GUI runtime not initialized");
   }

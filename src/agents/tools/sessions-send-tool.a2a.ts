@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { TIMEOUT_HTTP_LONG_MS, TIMEOUT_HTTP_SHORT_MS, secondsToMs } from "../../config/constants/index.js";
 import type { GatewayMessageChannel } from "../../utils/message-channel.js";
 import { callGateway } from "../../gateway/call.js";
 import { formatErrorMessage } from "../../infra/errors.js";
@@ -31,14 +32,14 @@ export async function runSessionsSendA2AFlow(params: {
     let primaryReply = params.roundOneReply;
     let latestReply = params.roundOneReply;
     if (!primaryReply && params.waitRunId) {
-      const waitMs = Math.min(params.announceTimeoutMs, 60_000);
+      const waitMs = Math.min(params.announceTimeoutMs, TIMEOUT_HTTP_LONG_MS);
       const wait = await callGateway<{ status: string }>({
         method: "agent.wait",
         params: {
           runId: params.waitRunId,
           timeoutMs: waitMs,
         },
-        timeoutMs: waitMs + 2000,
+        timeoutMs: waitMs + secondsToMs(2),
       });
       if (wait?.status === "ok") {
         primaryReply = await readLatestAssistantReply({
@@ -122,7 +123,7 @@ export async function runSessionsSendA2AFlow(params: {
             accountId: announceTarget.accountId,
             idempotencyKey: crypto.randomUUID(),
           },
-          timeoutMs: 10_000,
+          timeoutMs: TIMEOUT_HTTP_SHORT_MS,
         });
       } catch (err) {
         log.warn("sessions_send announce delivery failed", {

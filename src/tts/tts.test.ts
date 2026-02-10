@@ -2,6 +2,7 @@ import { completeSimple } from "@mariozechner/pi-ai";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { getApiKeyForModel } from "../agents/model-auth.js";
 import { resolveModel } from "../agents/pi-embedded-runner/model.js";
+import { TIMEOUT_HTTP_DEFAULT_MS } from "../config/constants/index.js";
 import * as tts from "./tts.js";
 
 vi.mock("@mariozechner/pi-ai", () => ({
@@ -229,7 +230,7 @@ describe("tts", () => {
         targetLength: 1500,
         cfg: baseCfg,
         config: baseConfig,
-        timeoutMs: 30_000,
+        timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
       });
 
       expect(result.summary).toBe(mockSummary);
@@ -245,7 +246,7 @@ describe("tts", () => {
         targetLength: 500,
         cfg: baseCfg,
         config: baseConfig,
-        timeoutMs: 30_000,
+        timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
       });
 
       const callArgs = vi.mocked(completeSimple).mock.calls[0];
@@ -266,7 +267,7 @@ describe("tts", () => {
         targetLength: 500,
         cfg,
         config,
-        timeoutMs: 30_000,
+        timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
       });
 
       expect(resolveModel).toHaveBeenCalledWith("openai", "gpt-4.1-mini", undefined, cfg);
@@ -279,7 +280,7 @@ describe("tts", () => {
           targetLength: 99,
           cfg: baseCfg,
           config: baseConfig,
-          timeoutMs: 30_000,
+          timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
         }),
       ).rejects.toThrow("Invalid targetLength: 99");
     });
@@ -291,7 +292,7 @@ describe("tts", () => {
           targetLength: 10001,
           cfg: baseCfg,
           config: baseConfig,
-          timeoutMs: 30_000,
+          timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
         }),
       ).rejects.toThrow("Invalid targetLength: 10001");
     });
@@ -303,7 +304,7 @@ describe("tts", () => {
           targetLength: 100,
           cfg: baseCfg,
           config: baseConfig,
-          timeoutMs: 30_000,
+          timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
         }),
       ).resolves.toBeDefined();
       await expect(
@@ -312,7 +313,7 @@ describe("tts", () => {
           targetLength: 10000,
           cfg: baseCfg,
           config: baseConfig,
-          timeoutMs: 30_000,
+          timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
         }),
       ).resolves.toBeDefined();
     });
@@ -328,7 +329,7 @@ describe("tts", () => {
           targetLength: 500,
           cfg: baseCfg,
           config: baseConfig,
-          timeoutMs: 30_000,
+          timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
         }),
       ).rejects.toThrow("No summary returned");
     });
@@ -344,7 +345,7 @@ describe("tts", () => {
           targetLength: 500,
           cfg: baseCfg,
           config: baseConfig,
-          timeoutMs: 30_000,
+          timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
         }),
       ).rejects.toThrow("No summary returned");
     });

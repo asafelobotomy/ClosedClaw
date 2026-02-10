@@ -1,4 +1,5 @@
 import type { AgentTool, AgentToolResult } from "@mariozechner/pi-agent-core";
+import { TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
 import type { ChildProcessWithoutNullStreams } from "node:child_process";
 import { Type } from "@sinclair/typebox";
 import crypto from "node:crypto";
@@ -122,7 +123,7 @@ const DEFAULT_PATH =
 const DEFAULT_NOTIFY_TAIL_CHARS = 400;
 const DEFAULT_APPROVAL_TIMEOUT_MS = 120_000;
 const DEFAULT_APPROVAL_REQUEST_TIMEOUT_MS = 130_000;
-const DEFAULT_APPROVAL_RUNNING_NOTICE_MS = 10_000;
+const DEFAULT_APPROVAL_RUNNING_NOTICE_MS = TIMEOUT_HTTP_SHORT_MS;
 const APPROVAL_SLUG_LENGTH = 8;
 
 type PtyExitEvent = { exitCode: number; signal?: number };
@@ -1053,7 +1054,7 @@ export function createExecTool(
           try {
             const approvalsSnapshot = await callGatewayTool<{ file: string }>(
               "exec.approvals.node.get",
-              { timeoutMs: 10_000 },
+              { timeoutMs: TIMEOUT_HTTP_SHORT_MS },
               { nodeId },
             );
             const approvalsFile =

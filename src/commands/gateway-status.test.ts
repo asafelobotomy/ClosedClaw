@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
 
 const loadConfig = vi.fn(() => ({
   gateway: {
@@ -63,7 +64,7 @@ const probeGateway = vi.fn(async ({ url }: { url: string }) => {
         id: "whatsapp",
         label: "WhatsApp",
         linked: true,
-        authAgeMs: 5_000,
+        authAgeMs: TIMEOUT_TEST_SUITE_SHORT_MS,
       },
       sessions: { count: 2 },
     },

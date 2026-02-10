@@ -1,6 +1,7 @@
 import type { Model } from "@mariozechner/pi-ai";
 import { getModel, streamSimple } from "@mariozechner/pi-ai";
 import { describe, expect, it } from "vitest";
+import { TIMEOUT_HTTP_DEFAULT_MS } from "../config/constants/index.js";
 import type { ClosedClawConfig } from "../config/config.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { applyExtraParamsToAgent } from "./pi-embedded-runner.js";
@@ -60,5 +61,5 @@ describeLive("pi embedded extra params (live)", () => {
     expect(outputTokens).toBeDefined();
     // Should respect maxTokens from config (16) — allow a small buffer for provider rounding.
     expect(outputTokens ?? 0).toBeLessThanOrEqual(20);
-  }, 30_000);
+  }, TIMEOUT_HTTP_DEFAULT_MS);
 });

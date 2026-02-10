@@ -12,6 +12,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../../src/config/constants/index.js";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY ?? "test-key";
 const HAS_OPENAI_KEY = Boolean(process.env.OPENAI_API_KEY);
@@ -291,5 +292,5 @@ describeLive("memory plugin live tests", () => {
     });
 
     expect(recallAfterForget.details?.count).toBe(0);
-  }, 60000); // 60s timeout for live API calls
+  }, TIMEOUT_TEST_SUITE_LONG_MS); // 60s timeout for live API calls
 });

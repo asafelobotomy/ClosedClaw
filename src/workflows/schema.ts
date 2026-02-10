@@ -133,10 +133,12 @@ export interface WorkflowDefinition {
 const DEFAULT_STEP_TIMEOUT_MS = 300_000;    // 5 minutes
 const DEFAULT_WORKFLOW_TIMEOUT_MS = 1_800_000; // 30 minutes
 
+import { DELAY_RETRY_BASE_MS, DELAY_RETRY_MAX_MS } from "../config/constants/index.js";
+
 export const DEFAULT_RETRY_POLICY: RetryPolicy = {
   maxRetries: 0,
-  baseDelayMs: 1_000,
-  maxDelayMs: 60_000,
+  baseDelayMs: DELAY_RETRY_BASE_MS,
+  maxDelayMs: DELAY_RETRY_MAX_MS,
   backoffMultiplier: 2,
 };
 

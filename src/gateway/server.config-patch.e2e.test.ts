@@ -188,7 +188,7 @@ describe("gateway config.patch", () => {
     );
     expect(patchRes.ok).toBe(true);
 
-    const sentinelPath = path.join(os.homedir(), ".ClosedClaw", "restart-sentinel.json");
+    const sentinelPath = path.join(getStateDir(), "restart-sentinel.json");
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     try {

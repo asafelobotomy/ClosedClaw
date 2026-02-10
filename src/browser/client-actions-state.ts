@@ -1,4 +1,5 @@
 import type { BrowserActionOk, BrowserActionTargetOk } from "./client-actions-types.js";
+import { TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import { fetchBrowserJson } from "./client-fetch.js";
 
 function buildProfileQuery(profile?: string): string {
@@ -29,7 +30,7 @@ export async function browserCookies(
     ok: true;
     targetId: string;
     cookies: unknown[];
-  }>(withBaseUrl(baseUrl, `/cookies${suffix}`), { timeoutMs: 20000 });
+  }>(withBaseUrl(baseUrl, `/cookies${suffix}`), { timeoutMs: TIMEOUT_BROWSER_PAGE_MS });
 }
 
 export async function browserCookiesSet(
@@ -45,7 +46,7 @@ export async function browserCookiesSet(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ targetId: opts.targetId, cookie: opts.cookie }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -58,7 +59,7 @@ export async function browserCookiesClear(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ targetId: opts.targetId }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -86,7 +87,7 @@ export async function browserStorageGet(
     ok: true;
     targetId: string;
     values: Record<string, string>;
-  }>(withBaseUrl(baseUrl, `/storage/${opts.kind}${suffix}`), { timeoutMs: 20000 });
+  }>(withBaseUrl(baseUrl, `/storage/${opts.kind}${suffix}`), { timeoutMs: TIMEOUT_BROWSER_PAGE_MS });
 }
 
 export async function browserStorageSet(
@@ -110,7 +111,7 @@ export async function browserStorageSet(
         key: opts.key,
         value: opts.value,
       }),
-      timeoutMs: 20000,
+      timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
     },
   );
 }
@@ -126,7 +127,7 @@ export async function browserStorageClear(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ targetId: opts.targetId }),
-      timeoutMs: 20000,
+      timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
     },
   );
 }
@@ -140,7 +141,7 @@ export async function browserSetOffline(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ targetId: opts.targetId, offline: opts.offline }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -157,7 +158,7 @@ export async function browserSetHeaders(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ targetId: opts.targetId, headers: opts.headers }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -183,7 +184,7 @@ export async function browserSetHttpCredentials(
         password: opts.password,
         clear: opts.clear,
       }),
-      timeoutMs: 20000,
+      timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
     },
   );
 }
@@ -214,7 +215,7 @@ export async function browserSetGeolocation(
         origin: opts.origin,
         clear: opts.clear,
       }),
-      timeoutMs: 20000,
+      timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
     },
   );
 }
@@ -235,7 +236,7 @@ export async function browserSetMedia(
       targetId: opts.targetId,
       colorScheme: opts.colorScheme,
     }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -251,7 +252,7 @@ export async function browserSetTimezone(
       targetId: opts.targetId,
       timezoneId: opts.timezoneId,
     }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -264,7 +265,7 @@ export async function browserSetLocale(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ targetId: opts.targetId, locale: opts.locale }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -277,7 +278,7 @@ export async function browserSetDevice(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ targetId: opts.targetId, name: opts.name }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -290,6 +291,6 @@ export async function browserClearPermissions(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ targetId: opts.targetId, clear: true }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }

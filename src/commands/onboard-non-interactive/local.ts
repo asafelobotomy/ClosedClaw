@@ -1,4 +1,5 @@
 import type { ClosedClawConfig } from "../../config/config.js";
+import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../../config/constants/index.js";
 import type { RuntimeEnv } from "../../runtime.js";
 import type { OnboardOptions } from "../onboard-types.js";
 import { formatCliCommand } from "../../cli/command-format.js";
@@ -103,9 +104,9 @@ export async function runNonInteractiveOnboardingLocal(params: {
     await waitForGatewayReachable({
       url: links.wsUrl,
       token: gatewayResult.gatewayToken,
-      deadlineMs: 15_000,
+      deadlineMs: TIMEOUT_TEST_SUITE_MEDIUM_MS,
     });
-    await healthCommand({ json: false, timeoutMs: 10_000 }, runtime);
+    await healthCommand({ json: false, timeoutMs: TIMEOUT_HTTP_SHORT_MS }, runtime);
   }
 
   logNonInteractiveOnboardingJson({

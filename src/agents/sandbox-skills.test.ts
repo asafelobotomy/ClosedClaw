@@ -5,6 +5,7 @@ import path from "node:path";
 import { Readable } from "node:stream";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ClosedClawConfig } from "../config/config.js";
+import { TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 
 type SpawnCall = {
   command: string;
@@ -129,7 +130,7 @@ describe("sandbox skill mirroring", () => {
     expect(context?.enabled).toBe(true);
     const skillPath = path.join(context?.workspaceDir ?? "", "skills", "demo-skill", "SKILL.md");
     await expect(fs.readFile(skillPath, "utf-8")).resolves.toContain("demo-skill");
-  }, 20_000);
+  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
 
   it("copies skills into the sandbox when workspaceAccess is none", async () => {
     const { context } = await runContext("none");
@@ -137,5 +138,5 @@ describe("sandbox skill mirroring", () => {
     expect(context?.enabled).toBe(true);
     const skillPath = path.join(context?.workspaceDir ?? "", "skills", "demo-skill", "SKILL.md");
     await expect(fs.readFile(skillPath, "utf-8")).resolves.toContain("demo-skill");
-  }, 20_000);
+  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
 });

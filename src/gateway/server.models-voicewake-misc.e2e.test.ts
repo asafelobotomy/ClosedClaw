@@ -3,6 +3,8 @@ import { createServer } from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import { WebSocket } from "ws";
 import type { ChannelOutboundAdapter } from "../channels/plugins/types.js";
 import type { PluginRegistry } from "../plugins/registry.js";
@@ -137,7 +139,7 @@ describe("gateway server models + voicewake", () => {
 
   test(
     "voicewake.get returns defaults and voicewake.set broadcasts",
-    { timeout: 60_000 },
+    { timeout: TIMEOUT_TEST_SUITE_LONG_MS },
     async () => {
       const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "ClosedClaw-home-"));
       const restoreHome = setTempHome(homeDir);
@@ -342,7 +344,7 @@ describe("gateway server misc", () => {
     }
   });
 
-  test("send dedupes by idempotencyKey", { timeout: 60_000 }, async () => {
+  test("send dedupes by idempotencyKey", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     const prevRegistry = getActivePluginRegistry() ?? emptyRegistry;
     try {
       setActivePluginRegistry(whatsappRegistry);

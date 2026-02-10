@@ -10,6 +10,7 @@ import type {
 import { danger, info } from "../globals.js";
 import { defaultRuntime } from "../runtime.js";
 import { shortenHomePath } from "../utils.js";
+import { TIMEOUT_BROWSER_PAGE_MS, TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SHORT_MS, TIMEOUT_TEST_SUITE_MEDIUM_MS, TIMEOUT_TEST_SUITE_SHORT_MS, secondsToMs } from "../config/constants/index.js";
 import { callBrowserRequest, type BrowserParentOpts } from "./browser-cli-shared.js";
 import { runCommandWithRuntime } from "./cli-utils.js";
 
@@ -38,7 +39,7 @@ export function registerBrowserManageCommands(
             query: parent?.browserProfile ? { profile: parent.browserProfile } : undefined,
           },
           {
-            timeoutMs: 1500,
+            timeoutMs: TIMEOUT_TEST_SHORT_MS,
           },
         );
         if (parent?.json) {
@@ -78,7 +79,7 @@ export function registerBrowserManageCommands(
             path: "/start",
             query: profile ? { profile } : undefined,
           },
-          { timeoutMs: 15000 },
+          { timeoutMs: TIMEOUT_TEST_SUITE_MEDIUM_MS },
         );
         const status = await callBrowserRequest<BrowserStatus>(
           parent,
@@ -87,7 +88,7 @@ export function registerBrowserManageCommands(
             path: "/",
             query: profile ? { profile } : undefined,
           },
-          { timeoutMs: 1500 },
+          { timeoutMs: TIMEOUT_TEST_SHORT_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(status, null, 2));
@@ -112,7 +113,7 @@ export function registerBrowserManageCommands(
             path: "/stop",
             query: profile ? { profile } : undefined,
           },
-          { timeoutMs: 15000 },
+          { timeoutMs: TIMEOUT_TEST_SUITE_MEDIUM_MS },
         );
         const status = await callBrowserRequest<BrowserStatus>(
           parent,
@@ -121,7 +122,7 @@ export function registerBrowserManageCommands(
             path: "/",
             query: profile ? { profile } : undefined,
           },
-          { timeoutMs: 1500 },
+          { timeoutMs: TIMEOUT_TEST_SHORT_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(status, null, 2));
@@ -146,7 +147,7 @@ export function registerBrowserManageCommands(
             path: "/reset-profile",
             query: profile ? { profile } : undefined,
           },
-          { timeoutMs: 20000 },
+          { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));
@@ -175,7 +176,7 @@ export function registerBrowserManageCommands(
             path: "/tabs",
             query: profile ? { profile } : undefined,
           },
-          { timeoutMs: 3000 },
+          { timeoutMs: secondsToMs(3) },
         );
         const tabs = result.tabs ?? [];
         if (parent?.json) {
@@ -213,7 +214,7 @@ export function registerBrowserManageCommands(
               action: "list",
             },
           },
-          { timeoutMs: 10_000 },
+          { timeoutMs: TIMEOUT_HTTP_SHORT_MS },
         );
         const tabs = result.tabs ?? [];
         if (parent?.json) {
@@ -249,7 +250,7 @@ export function registerBrowserManageCommands(
             query: profile ? { profile } : undefined,
             body: { action: "new" },
           },
-          { timeoutMs: 10_000 },
+          { timeoutMs: TIMEOUT_HTTP_SHORT_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));
@@ -280,7 +281,7 @@ export function registerBrowserManageCommands(
             query: profile ? { profile } : undefined,
             body: { action: "select", index: Math.floor(index) - 1 },
           },
-          { timeoutMs: 10_000 },
+          { timeoutMs: TIMEOUT_HTTP_SHORT_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));
@@ -313,7 +314,7 @@ export function registerBrowserManageCommands(
             query: profile ? { profile } : undefined,
             body: { action: "close", index: idx },
           },
-          { timeoutMs: 10_000 },
+          { timeoutMs: TIMEOUT_HTTP_SHORT_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));
@@ -339,7 +340,7 @@ export function registerBrowserManageCommands(
             query: profile ? { profile } : undefined,
             body: { url },
           },
-          { timeoutMs: 15000 },
+          { timeoutMs: TIMEOUT_TEST_SUITE_MEDIUM_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(tab, null, 2));
@@ -365,7 +366,7 @@ export function registerBrowserManageCommands(
             query: profile ? { profile } : undefined,
             body: { targetId },
           },
-          { timeoutMs: 5000 },
+          { timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify({ ok: true }, null, 2));
@@ -391,7 +392,7 @@ export function registerBrowserManageCommands(
               path: `/tabs/${encodeURIComponent(targetId.trim())}`,
               query: profile ? { profile } : undefined,
             },
-            { timeoutMs: 5000 },
+            { timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS },
           );
         } else {
           await callBrowserRequest(
@@ -402,7 +403,7 @@ export function registerBrowserManageCommands(
               query: profile ? { profile } : undefined,
               body: { kind: "close" },
             },
-            { timeoutMs: 20000 },
+            { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
           );
         }
         if (parent?.json) {
@@ -426,7 +427,7 @@ export function registerBrowserManageCommands(
             method: "GET",
             path: "/profiles",
           },
-          { timeoutMs: 3000 },
+          { timeoutMs: secondsToMs(3) },
         );
         const profiles = result.profiles ?? [];
         if (parent?.json) {
@@ -475,7 +476,7 @@ export function registerBrowserManageCommands(
                 driver: opts.driver === "extension" ? "extension" : undefined,
               },
             },
-            { timeoutMs: 10_000 },
+            { timeoutMs: TIMEOUT_HTTP_SHORT_MS },
           );
           if (parent?.json) {
             defaultRuntime.log(JSON.stringify(result, null, 2));
@@ -506,7 +507,7 @@ export function registerBrowserManageCommands(
             method: "DELETE",
             path: `/profiles/${encodeURIComponent(opts.name)}`,
           },
-          { timeoutMs: 20_000 },
+          { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));

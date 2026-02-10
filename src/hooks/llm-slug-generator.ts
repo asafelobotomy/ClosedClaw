@@ -1,4 +1,5 @@
 /**
+import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
  * LLM-based slug generator for session memory filenames
  */
 
@@ -46,7 +47,7 @@ Reply with ONLY the slug, nothing else. Examples: "vendor-pitch", "api-design", 
       agentDir,
       config: params.cfg,
       prompt,
-      timeoutMs: 15_000, // 15 second timeout
+      timeoutMs: TIMEOUT_TEST_SUITE_MEDIUM_MS, // 15 second timeout
       runId: `slug-gen-${Date.now()}`,
     });
 

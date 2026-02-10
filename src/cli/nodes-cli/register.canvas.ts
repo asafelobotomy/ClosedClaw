@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import { TIMEOUT_HTTP_LONG_MS } from "../../config/constants/index.js";
 import fs from "node:fs/promises";
 import type { NodesRpcOpts } from "./types.js";
 import { randomIdempotencyKey } from "../../gateway/call.js";
@@ -89,7 +90,7 @@ export function registerNodesCanvasCommands(nodes: Command) {
           defaultRuntime.log(`MEDIA:${shortenHomePath(filePath)}`);
         });
       }),
-    { timeoutMs: 60_000 },
+    { timeoutMs: TIMEOUT_HTTP_LONG_MS },
   );
 
   nodesCallOpts(

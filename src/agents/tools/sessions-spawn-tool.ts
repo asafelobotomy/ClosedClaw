@@ -1,4 +1,5 @@
 import { Type } from "@sinclair/typebox";
+import { TIMEOUT_HTTP_SHORT_MS } from "../../config/constants/index.js";
 import crypto from "node:crypto";
 import type { GatewayMessageChannel } from "../../utils/message-channel.js";
 import type { AnyAgentTool } from "./common.js";
@@ -196,7 +197,7 @@ export function createSessionsSpawnTool(opts?: {
           await callGateway({
             method: "sessions.patch",
             params: { key: childSessionKey, model: resolvedModel },
-            timeoutMs: 10_000,
+            timeoutMs: TIMEOUT_HTTP_SHORT_MS,
           });
           modelApplied = true;
         } catch (err) {
@@ -243,7 +244,7 @@ export function createSessionsSpawnTool(opts?: {
             groupChannel: opts?.agentGroupChannel ?? undefined,
             groupSpace: opts?.agentGroupSpace ?? undefined,
           },
-          timeoutMs: 10_000,
+          timeoutMs: TIMEOUT_HTTP_SHORT_MS,
         });
         if (typeof response?.runId === "string" && response.runId) {
           childRunId = response.runId;

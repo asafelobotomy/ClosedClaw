@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { TIMEOUT_HTTP_DEFAULT_MS } from "../../../config/constants/index.js";
 import { isTruthyEnvValue } from "../../../infra/env.js";
 import { transcribeDeepgramAudio } from "./audio.js";
 
@@ -43,5 +44,5 @@ describeLive("deepgram live", () => {
       timeoutMs: 20000,
     });
     expect(result.text.trim().length).toBeGreaterThan(0);
-  }, 30000);
+  }, TIMEOUT_HTTP_DEFAULT_MS);
 });

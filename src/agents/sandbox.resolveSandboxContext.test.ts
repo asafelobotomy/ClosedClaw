@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import type { ClosedClawConfig } from "../config/config.js";
 
 describe("resolveSandboxContext", () => {
@@ -34,7 +35,7 @@ describe("resolveSandboxContext", () => {
     expect(spawn).not.toHaveBeenCalled();
 
     vi.doUnmock("node:child_process");
-  }, 15_000);
+  }, TIMEOUT_TEST_SUITE_MEDIUM_MS);
 
   it("does not create a sandbox workspace for the agent main session in non-main mode", async () => {
     vi.resetModules();
@@ -68,7 +69,7 @@ describe("resolveSandboxContext", () => {
     expect(spawn).not.toHaveBeenCalled();
 
     vi.doUnmock("node:child_process");
-  }, 15_000);
+  }, TIMEOUT_TEST_SUITE_MEDIUM_MS);
 
   it("treats main session aliases as main in non-main mode", async () => {
     vi.resetModules();
@@ -129,5 +130,5 @@ describe("resolveSandboxContext", () => {
     expect(spawn).not.toHaveBeenCalled();
 
     vi.doUnmock("node:child_process");
-  }, 15_000);
+  }, TIMEOUT_TEST_SUITE_MEDIUM_MS);
 });

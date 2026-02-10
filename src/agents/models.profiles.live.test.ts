@@ -2,6 +2,14 @@ import { type Api, completeSimple, type Model } from "@mariozechner/pi-ai";
 import { Type } from "@sinclair/typebox";
 import { describe, expect, it } from "vitest";
 import { loadConfig } from "../config/config.js";
+import {
+  ENV_CLOSEDCLAW_LIVE_MODEL_TIMEOUT_MS,
+  ENV_CLOSEDCLAW_LIVE_MODELS,
+  ENV_CLOSEDCLAW_LIVE_PROVIDERS,
+  ENV_CLOSEDCLAW_LIVE_REQUIRE_PROFILE_KEYS,
+  ENV_CLOSEDCLAW_LIVE_TEST,
+  ENV_LIVE,
+} from "../config/constants/index.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { resolveClosedClawAgentDir } from "./agent-paths.js";
 import {
@@ -16,9 +24,9 @@ import { isRateLimitErrorMessage } from "./pi-embedded-helpers/errors.js";
 import { discoverAuthStorage, discoverModels } from "./pi-model-discovery.js";
 
 const LIVE =
-  isTruthyEnvValue(process.env.LIVE) || isTruthyEnvValue(process.env.ClosedClaw_LIVE_TEST);
-const DIRECT_ENABLED = Boolean(process.env.ClosedClaw_LIVE_MODELS?.trim());
-const REQUIRE_PROFILE_KEYS = isTruthyEnvValue(process.env.ClosedClaw_LIVE_REQUIRE_PROFILE_KEYS);
+  isTruthyEnvValue(process.env[ENV_LIVE]) || isTruthyEnvValue(process.env[ENV_CLOSEDCLAW_LIVE_TEST]);
+const DIRECT_ENABLED = Boolean(process.env[ENV_CLOSEDCLAW_LIVE_MODELS]?.trim());
+const REQUIRE_PROFILE_KEYS = isTruthyEnvValue(process.env[ENV_CLOSEDCLAW_LIVE_REQUIRE_PROFILE_KEYS]);
 
 const describeLive = LIVE ? describe : describe.skip;
 
@@ -198,13 +206,13 @@ describeLive("live models (profile keys)", () => {
       const modelRegistry = discoverModels(authStorage, agentDir);
       const models = modelRegistry.getAll();
 
-      const rawModels = process.env.ClosedClaw_LIVE_MODELS?.trim();
+      const rawModels = process.env[ENV_CLOSEDCLAW_LIVE_MODELS]?.trim();
       const useModern = rawModels === "modern" || rawModels === "all";
       const useExplicit = Boolean(rawModels) && !useModern;
       const filter = useExplicit ? parseModelFilter(rawModels) : null;
       const allowNotFoundSkip = useModern;
-      const providers = parseProviderFilter(process.env.ClosedClaw_LIVE_PROVIDERS);
-      const perModelTimeoutMs = toInt(process.env.ClosedClaw_LIVE_MODEL_TIMEOUT_MS, 30_000);
+      const providers = parseProviderFilter(process.env[ENV_CLOSEDCLAW_LIVE_PROVIDERS]);
+      const perModelTimeoutMs = toInt(process.env[ENV_CLOSEDCLAW_LIVE_MODEL_TIMEOUT_MS], 30_000);
 
       const failures: Array<{ model: string; error: string }> = [];
       const skipped: Array<{ model: string; reason: string }> = [];

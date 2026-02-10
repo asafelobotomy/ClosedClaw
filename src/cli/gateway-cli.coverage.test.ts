@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { describe, expect, it, vi } from "vitest";
+import { TIMEOUT_HTTP_DEFAULT_MS } from "../config/constants/index.js";
 
 const callGateway = vi.fn(async () => ({ ok: true }));
 const startGatewayServer = vi.fn(async () => ({
@@ -122,7 +123,7 @@ describe("gateway-cli coverage", () => {
 
     expect(callGateway).toHaveBeenCalledTimes(1);
     expect(runtimeLogs.join("\n")).toContain('"ok": true');
-  }, 30_000);
+  }, TIMEOUT_HTTP_DEFAULT_MS);
 
   it("registers gateway probe and routes to gatewayStatusCommand", async () => {
     runtimeLogs.length = 0;
@@ -137,7 +138,7 @@ describe("gateway-cli coverage", () => {
     await program.parseAsync(["gateway", "probe", "--json"], { from: "user" });
 
     expect(gatewayStatusCommand).toHaveBeenCalledTimes(1);
-  }, 30_000);
+  }, TIMEOUT_HTTP_DEFAULT_MS);
 
   it("registers gateway discover and prints JSON", async () => {
     runtimeLogs.length = 0;

@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import type { NodesRpcOpts } from "./types.js";
+import { minutesToMs } from "../../config/constants/index.js";
 import { randomIdempotencyKey } from "../../gateway/call.js";
 import { defaultRuntime } from "../../runtime.js";
 import { shortenHomePath } from "../../utils.js";
@@ -81,6 +82,6 @@ export function registerNodesScreenCommands(nodes: Command) {
           defaultRuntime.log(`MEDIA:${shortenHomePath(written.path)}`);
         });
       }),
-    { timeoutMs: 180_000 },
+    { timeoutMs: minutesToMs(3) },
   );
 }

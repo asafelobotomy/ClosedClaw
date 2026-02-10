@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runGatewayUpdate } from "./update-runner.js";
+import { TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
 
 type CommandResult = { stdout?: string; stderr?: string; code?: number };
 
@@ -58,7 +59,7 @@ describe("runGatewayUpdate", () => {
     const result = await runGatewayUpdate({
       cwd: tempDir,
       runCommand: async (argv, _options) => runner(argv),
-      timeoutMs: 5000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
     });
 
     expect(result.status).toBe("skipped");
@@ -91,7 +92,7 @@ describe("runGatewayUpdate", () => {
     const result = await runGatewayUpdate({
       cwd: tempDir,
       runCommand: async (argv, _options) => runner(argv),
-      timeoutMs: 5000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
     });
 
     expect(result.status).toBe("error");
@@ -127,7 +128,7 @@ describe("runGatewayUpdate", () => {
     const result = await runGatewayUpdate({
       cwd: tempDir,
       runCommand: async (argv, _options) => runner(argv),
-      timeoutMs: 5000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
       channel: "beta",
     });
 
@@ -152,7 +153,7 @@ describe("runGatewayUpdate", () => {
     const result = await runGatewayUpdate({
       cwd: tempDir,
       runCommand: async (argv, _options) => runner(argv),
-      timeoutMs: 5000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
     });
 
     expect(result.status).toBe("skipped");
@@ -198,7 +199,7 @@ describe("runGatewayUpdate", () => {
     const result = await runGatewayUpdate({
       cwd: pkgRoot,
       runCommand: async (argv, _options) => runCommand(argv),
-      timeoutMs: 5000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
     });
 
     expect(result.status).toBe("ok");
@@ -242,7 +243,7 @@ describe("runGatewayUpdate", () => {
     const result = await runGatewayUpdate({
       cwd: pkgRoot,
       runCommand: async (argv, _options) => runCommand(argv),
-      timeoutMs: 5000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
     });
 
     expect(result.status).toBe("ok");
@@ -287,7 +288,7 @@ describe("runGatewayUpdate", () => {
     const result = await runGatewayUpdate({
       cwd: pkgRoot,
       runCommand: async (argv, _options) => runCommand(argv),
-      timeoutMs: 5000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
       tag: "beta",
     });
 
@@ -340,7 +341,7 @@ describe("runGatewayUpdate", () => {
       const result = await runGatewayUpdate({
         cwd: pkgRoot,
         runCommand: async (argv, _options) => runCommand(argv),
-        timeoutMs: 5000,
+        timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
       });
 
       expect(result.status).toBe("ok");
@@ -367,7 +368,7 @@ describe("runGatewayUpdate", () => {
     const result = await runGatewayUpdate({
       cwd: tempDir,
       runCommand: async (argv, _options) => runner(argv),
-      timeoutMs: 5000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
     });
 
     cwdSpy.mockRestore();

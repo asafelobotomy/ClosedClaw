@@ -5,6 +5,7 @@ import path from "node:path";
 import { Readable } from "node:stream";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ClosedClawConfig } from "../config/config.js";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 
 // We need to test the internal defaultSandboxConfig function, but it's not exported.
 // Instead, we test the behavior through resolveSandboxContext which uses it.
@@ -74,7 +75,7 @@ describe("Agent-specific sandbox config", () => {
 
   it(
     "should use global sandbox config when no agent-specific config exists",
-    { timeout: 60_000 },
+    { timeout: TIMEOUT_TEST_SUITE_LONG_MS },
     async () => {
       const { resolveSandboxContext } = await import("./sandbox.js");
 

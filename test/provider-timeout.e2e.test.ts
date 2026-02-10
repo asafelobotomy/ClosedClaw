@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../src/config/constants/index.js";
 import { GatewayClient } from "../src/gateway/client.js";
 import { startGatewayServer } from "../src/gateway/server.js";
 import { getDeterministicFreePortBlock } from "./helpers/ports.js";
@@ -117,7 +118,7 @@ async function getFreeGatewayPort(): Promise<number> {
 describe("provider timeouts (e2e)", () => {
   it(
     "falls back when the primary provider aborts with a timeout-like AbortError",
-    { timeout: 60_000 },
+    { timeout: TIMEOUT_TEST_SUITE_LONG_MS },
     async () => {
       const prev = {
         home: process.env.HOME,

@@ -24,9 +24,9 @@
  */
 
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 import type { HookHandler } from "../../hooks.js";
+import { getLogsDir } from "../../../config/constants/index.js";
 
 /**
  * Log all command events to a file
@@ -39,9 +39,7 @@ const logCommand: HookHandler = async (event) => {
 
   try {
     // Create log directory
-    const stateDir =
-      process.env.ClosedClaw_STATE_DIR?.trim() || path.join(os.homedir(), ".ClosedClaw");
-    const logDir = path.join(stateDir, "logs");
+    const logDir = getLogsDir();
     await fs.mkdir(logDir, { recursive: true });
 
     // Append to command log file

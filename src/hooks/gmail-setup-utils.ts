@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { TIMEOUT_HTTP_DEFAULT_MS, secondsToMs, minutesToMs } from "../config/constants/index.js";
 import path from "node:path";
 import { hasBinary } from "../agents/skills.js";
 import { runCommandWithTimeout, type SpawnResult } from "../process/exec.js";
@@ -123,7 +124,7 @@ export async function resolvePythonExecutablePath(): Promise<string | undefined>
   for (const candidate of candidates) {
     const res = await runCommandWithTimeout(
       [candidate, "-c", "import os, sys; print(os.path.realpath(sys.executable))"],
-      { timeoutMs: 2_000 },
+      { timeoutMs: secondsToMs(2) },
     );
     if (res.code !== 0) {
       continue;
@@ -180,7 +181,7 @@ export async function ensureDependency(bin: string, brewArgs: string[]) {
   }
   const brewEnv = bin === "gcloud" ? await gcloudEnv() : undefined;
   const result = await runCommandWithTimeout(["brew", "install", ...brewArgs], {
-    timeoutMs: 600_000,
+    timeoutMs: minutesToMs(10),
     env: brewEnv,
   });
   if (result.code !== 0) {
@@ -194,7 +195,7 @@ export async function ensureDependency(bin: string, brewArgs: string[]) {
 export async function ensureGcloudAuth() {
   const res = await runGcloudCommand(
     ["auth", "list", "--filter", "status:ACTIVE", "--format", "value(account)"],
-    30_000,
+    TIMEOUT_HTTP_DEFAULT_MS,
   );
   if (res.code === 0 && res.stdout.trim()) {
     return;
@@ -216,7 +217,7 @@ export async function runGcloud(args: string[]) {
 export async function ensureTopic(projectId: string, topicName: string) {
   const describe = await runGcloudCommand(
     ["pubsub", "topics", "describe", topicName, "--project", projectId],
-    30_000,
+    TIMEOUT_HTTP_DEFAULT_MS,
   );
   if (describe.code === 0) {
     return;
@@ -232,7 +233,7 @@ export async function ensureSubscription(
 ) {
   const describe = await runGcloudCommand(
     ["pubsub", "subscriptions", "describe", subscription, "--project", projectId],
-    30_000,
+    TIMEOUT_HTTP_DEFAULT_MS,
   );
   if (describe.code === 0) {
     await runGcloud([
@@ -275,7 +276,7 @@ export async function ensureTailscaleEndpoint(params: {
   const statusArgs = ["status", "--json"];
   const statusCommand = formatCommand("tailscale", statusArgs);
   const status = await runCommandWithTimeout(["tailscale", ...statusArgs], {
-    timeoutMs: 30_000,
+    timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
   });
   if (status.code !== 0) {
     throw new Error(formatCommandFailure(statusCommand, status));
@@ -304,7 +305,7 @@ export async function ensureTailscaleEndpoint(params: {
   const funnelArgs = [params.mode, "--bg", "--set-path", pathArg, "--yes", target];
   const funnelCommand = formatCommand("tailscale", funnelArgs);
   const funnelResult = await runCommandWithTimeout(["tailscale", ...funnelArgs], {
-    timeoutMs: 30_000,
+    timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
   });
   if (funnelResult.code !== 0) {
     throw new Error(formatCommandFailure(funnelCommand, funnelResult));
@@ -338,7 +339,7 @@ export async function resolveProjectIdFromGogCredentials(): Promise<string | nul
           "--format",
           "value(projectId)",
         ],
-        30_000,
+        TIMEOUT_HTTP_DEFAULT_MS,
       );
       if (res.code !== 0) {
         continue;

@@ -131,6 +131,8 @@ ClosedClaw health
 ClosedClaw security audit --deep
 ```
 
+**Skill signatures (optional):** ClosedClaw supports cryptographic verification of agent skills to prevent tampering. By default, unsigned skills install with a prompt. For production environments, enable `skills.security.requireSignature` in your config to enforce signature checks. See [Skill Signing](/security/skill-signing) for the full guide.
+
 ## 4) Pair + connect your first chat surface
 
 ### WhatsApp (QR login)

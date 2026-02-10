@@ -113,10 +113,13 @@ export async function startGatewaySidecars(params: {
 
   // Launch configured channels so gateway replies via the surface the message came from.
   // Tests can opt out via ClosedClaw_SKIP_CHANNELS (or legacy ClosedClaw_SKIP_PROVIDERS).
+  // GTK-only mode auto-filters to GTK GUI when no other channels are configured.
   const skipChannels =
     isTruthyEnvValue(process.env.ClosedClaw_SKIP_CHANNELS) ||
     isTruthyEnvValue(process.env.ClosedClaw_SKIP_PROVIDERS);
   if (!skipChannels) {
+    const { formatGtkOnlyModeStatus } = await import("../config/gtk-only-mode.js");
+    params.logChannels.info(formatGtkOnlyModeStatus(params.cfg));
     try {
       await params.startChannels();
     } catch (err) {

@@ -26,6 +26,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import { getStateDir, getCredentialsDir } from "@/config/constants";
 
 const execFileAsync = promisify(execFile);
 
@@ -109,9 +110,6 @@ export class KeychainError extends Error {
 /** Service name prefix for all ClosedClaw entries in the keychain */
 const SERVICE_NAME = "ClosedClaw";
 
-/** Credentials subdirectory for encrypted file fallback */
-const CREDENTIALS_SUBDIR = "credentials";
-
 // ---------------------------------------------------------------------------
 // Backend Detection
 // ---------------------------------------------------------------------------
@@ -125,6 +123,34 @@ const CREDENTIALS_SUBDIR = "credentials";
 export async function detectKeychainBackend(opts?: KeychainOptions): Promise<KeychainInfo> {
   const exec = opts?.execFn ?? execFileAsync;
   const platform = os.platform();
+
+  if (platform === "darwin") {
+    try {
+      await exec("which", ["security"]);
+      return {
+        backend: "macos-keychain",
+        available: true,
+        description: "macOS Keychain via `security` CLI",
+        toolPath: "security",
+      };
+    } catch {
+      // security not available
+    }
+  }
+
+  if (platform === "win32") {
+    try {
+      await exec("where", ["cmdkey"]);
+      return {
+        backend: "windows-credential",
+        available: true,
+        description: "Windows Credential Manager via `cmdkey` CLI",
+        toolPath: "cmdkey",
+      };
+    } catch {
+      // cmdkey not available
+    }
+  }
 
   if (platform === "linux") {
     try {
@@ -374,9 +400,9 @@ async function windowsDelete(
  * Get the path for a credential in the encrypted file store.
  */
 function getCredentialFilePath(namespace: string, identifier: string, stateDir?: string): string {
-  const dir = stateDir ?? path.join(os.homedir(), ".closedclaw");
+  const dir = stateDir ?? getStateDir();
   const safeName = `${namespace}--${identifier}.json`.replace(/[^a-zA-Z0-9._-]/g, "_");
-  return path.join(dir, CREDENTIALS_SUBDIR, safeName);
+  return path.join(dir, "credentials", safeName);
 }
 
 /**
@@ -441,7 +467,7 @@ async function fileDelete(
  * List all credentials in the encrypted file store.
  */
 async function fileList(stateDir?: string): Promise<StoredCredential[]> {
-  const dir = path.join(stateDir ?? path.join(os.homedir(), ".closedclaw"), CREDENTIALS_SUBDIR);
+  const dir = stateDir ? path.join(stateDir, "credentials") : getCredentialsDir();
   try {
     const files = await fs.readdir(dir);
     const creds: StoredCredential[] = [];
@@ -627,8 +653,8 @@ export async function migrateCredentials(opts?: KeychainOptions): Promise<{
   failed: number;
   errors: string[];
 }> {
-  const stateDir = opts?.stateDir ?? path.join(os.homedir(), ".closedclaw");
-  const credDir = path.join(stateDir, CREDENTIALS_SUBDIR);
+  const stateDir = opts?.stateDir ?? getStateDir();
+  const credDir = path.join(stateDir, "credentials");
   const result = { migrated: 0, skipped: 0, failed: 0, errors: [] as string[] };
 
   let files: string[];

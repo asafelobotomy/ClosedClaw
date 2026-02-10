@@ -2,6 +2,8 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
+import { TIMEOUT_TEST_LONG_MS, TIMEOUT_TEST_SUITE_EXTENDED_MS, TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
+import { TIMEOUT_TEST_LONG_MS, TIMEOUT_TEST_SUITE_EXTENDED_MS, TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 import {
   connectOk,
   installGatewayTestHooks,
@@ -51,7 +53,7 @@ async function waitForNonEmptyFile(pathname: string, timeoutMs = 2000) {
 }
 
 describe("gateway server cron", () => {
-  test("handles cron CRUD, normalization, and patch semantics", { timeout: 120_000 }, async () => {
+  test("handles cron CRUD, normalization, and patch semantics", { timeout: TIMEOUT_TEST_LONG_MS }, async () => {
     const prevSkipCron = process.env.ClosedClaw_SKIP_CRON;
     process.env.ClosedClaw_SKIP_CRON = "0";
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "ClosedClaw-gw-cron-"));
@@ -99,7 +101,7 @@ describe("gateway server cron", () => {
       const routeJobId = typeof routeJobIdValue === "string" ? routeJobIdValue : "";
       expect(routeJobId.length > 0).toBe(true);
 
-      const runRes = await rpcReq(ws, "cron.run", { id: routeJobId, mode: "force" }, 20_000);
+      const runRes = await rpcReq(ws, "cron.run", { id: routeJobId, mode: "force" }, TIMEOUT_TEST_SUITE_STANDARD_MS);
       expect(runRes.ok).toBe(true);
       const events = await waitForSystemEvent();
       expect(events.some((event) => event.includes("cron route check"))).toBe(true);
@@ -292,7 +294,7 @@ describe("gateway server cron", () => {
       const jobId = typeof jobIdValue === "string" ? jobIdValue : "";
       expect(jobId.length > 0).toBe(true);
 
-      const runRes = await rpcReq(ws, "cron.run", { id: jobId, mode: "force" }, 20_000);
+      const runRes = await rpcReq(ws, "cron.run", { id: jobId, mode: "force" }, TIMEOUT_TEST_SUITE_STANDARD_MS);
       expect(runRes.ok).toBe(true);
       const logPath = path.join(dir, "cron", "runs", `${jobId}.jsonl`);
       const raw = await waitForNonEmptyFile(logPath, 5000);
@@ -360,5 +362,5 @@ describe("gateway server cron", () => {
         process.env.ClosedClaw_SKIP_CRON = prevSkipCron;
       }
     }
-  }, 45_000);
+  }, TIMEOUT_TEST_SUITE_EXTENDED_MS);
 });

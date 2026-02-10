@@ -88,6 +88,40 @@ export function generateSigningKeyPair(): SigningKeyPair {
 }
 
 /**
+ * Backwards-compatible wrapper for tests and CLI helpers.
+ */
+export async function generateKeyPair(signerName: string): Promise<{
+  publicKey: string;
+  privateKey: string;
+  keyId: string;
+  signer: string;
+}> {
+  const { publicKeyPem, privateKeyPem, keyId } = generateSigningKeyPair();
+  return {
+    publicKey: publicKeyPem,
+    privateKey: privateKeyPem,
+    keyId,
+    signer: signerName,
+  };
+}
+
+/**
+ * Ensure a public key is PEM-encoded.
+ */
+export function formatPublicKeyPem(publicKey: string): string {
+  const trimmed = publicKey.trim();
+  if (trimmed.includes("BEGIN PUBLIC KEY")) {
+    return trimmed + "\n";
+  }
+  return [
+    "-----BEGIN PUBLIC KEY-----",
+    trimmed,
+    "-----END PUBLIC KEY-----",
+    "",
+  ].join("\n");
+}
+
+/**
  * Derive a hex key ID (SHA-256 fingerprint) from a PEM public key.
  *
  * @param publicKeyPem - PEM-encoded SPKI public key.
@@ -121,7 +155,23 @@ export function signSkill(
   skillContent: string,
   privateKeyPem: string,
   signerInfo: SignerInfo,
+): SkillSignature;
+export function signSkill(
+  skillContent: string,
+  privateKeyPem: string,
+  keyId: string,
+  signerName: string,
+): SkillSignature;
+export function signSkill(
+  skillContent: string,
+  privateKeyPem: string,
+  signerOrKeyId: SignerInfo | string,
+  signerName?: string,
 ): SkillSignature {
+  const signerInfo: SignerInfo =
+    typeof signerOrKeyId === "string"
+      ? { name: signerName ?? "Unknown Signer", keyId: signerOrKeyId }
+      : signerOrKeyId;
   const key = crypto.createPrivateKey(privateKeyPem);
   const signature = crypto.sign(null, Buffer.from(skillContent, "utf-8"), key);
 

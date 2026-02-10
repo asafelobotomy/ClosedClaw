@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { TIMEOUT_HTTP_DEFAULT_MS } from "../config/constants/index.js";
 
 let originalIsTTY: boolean | undefined;
 let originalStateDir: string | undefined;
@@ -383,5 +384,5 @@ describe("doctor command", () => {
 
     expect(runLegacyStateMigrations).toHaveBeenCalledTimes(1);
     expect(confirm).not.toHaveBeenCalled();
-  }, 30_000);
+  }, TIMEOUT_HTTP_DEFAULT_MS);
 });

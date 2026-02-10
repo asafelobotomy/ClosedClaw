@@ -5,6 +5,7 @@ import { loadConfig } from "../config/config.js";
 import { buildGatewayConnectionDetails, callGateway } from "../gateway/call.js";
 import { normalizeControlUiBasePath } from "../gateway/control-ui-shared.js";
 import { probeGateway } from "../gateway/probe.js";
+import { secondsToMs, TIMEOUT_TEST_SUITE_SHORT_MS, TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
 import { collectChannelStatusIssues } from "../infra/channels-status-issues.js";
 import { resolveOsSummary } from "../infra/os-summary.js";
 import { getTailnetHostname } from "../infra/tailscale.js";
@@ -84,7 +85,7 @@ export async function scanStatus(
         tailscaleMode === "off"
           ? null
           : await getTailnetHostname((cmd, args) =>
-              runExec(cmd, args, { timeoutMs: 1200, maxBuffer: 200_000 }),
+              runExec(cmd, args, { timeoutMs: secondsToMs(1.2), maxBuffer: 200_000 }),
             ).catch(() => null);
       const tailscaleHttpsUrl =
         tailscaleMode !== "off" && tailscaleDns
@@ -93,7 +94,7 @@ export async function scanStatus(
       progress.tick();
 
       progress.setLabel("Checking for updates…");
-      const updateTimeoutMs = opts.all ? 6500 : 2500;
+      const updateTimeoutMs = opts.all ? secondsToMs(6.5) : secondsToMs(2.5);
       const update = await getUpdateCheckResult({
         timeoutMs: updateTimeoutMs,
         fetchGit: true,
@@ -117,7 +118,7 @@ export async function scanStatus(
         : await probeGateway({
             url: gatewayConnection.url,
             auth: resolveGatewayProbeAuth(cfg),
-            timeoutMs: Math.min(opts.all ? 5000 : 2500, opts.timeoutMs ?? 10_000),
+            timeoutMs: Math.min(opts.all ? TIMEOUT_TEST_SUITE_SHORT_MS : secondsToMs(2.5), opts.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS),
           }).catch(() => null);
       const gatewayReachable = gatewayProbe?.ok === true;
       const gatewaySelf = gatewayProbe?.presence
@@ -131,9 +132,9 @@ export async function scanStatus(
             method: "channels.status",
             params: {
               probe: false,
-              timeoutMs: Math.min(8000, opts.timeoutMs ?? 10_000),
+              timeoutMs: Math.min(secondsToMs(8), opts.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS),
             },
-            timeoutMs: Math.min(opts.all ? 5000 : 2500, opts.timeoutMs ?? 10_000),
+            timeoutMs: Math.min(opts.all ? TIMEOUT_TEST_SUITE_SHORT_MS : secondsToMs(2.5), opts.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS),
           }).catch(() => null)
         : null;
       const channelIssues = channelsStatus ? collectChannelStatusIssues(channelsStatus) : [];

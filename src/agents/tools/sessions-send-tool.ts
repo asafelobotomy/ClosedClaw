@@ -1,4 +1,5 @@
 import { Type } from "@sinclair/typebox";
+import { TIMEOUT_HTTP_SHORT_MS } from "../../config/constants/index.js";
 import crypto from "node:crypto";
 import type { AnyAgentTool } from "./common.js";
 import { loadConfig } from "../../config/config.js";
@@ -82,7 +83,7 @@ export function createSessionsSendTool(opts?: {
         const result = await callGateway<{ sessions: Array<{ key: string }> }>({
           method: "sessions.list",
           params: listParams,
-          timeoutMs: 10_000,
+          timeoutMs: TIMEOUT_HTTP_SHORT_MS,
         });
         return Array.isArray(result?.sessions) ? result.sessions : [];
       };
@@ -137,7 +138,7 @@ export function createSessionsSendTool(opts?: {
           const resolved = await callGateway<{ key: string }>({
             method: "sessions.resolve",
             params: resolveParams,
-            timeoutMs: 10_000,
+            timeoutMs: TIMEOUT_HTTP_SHORT_MS,
           });
           resolvedKey = typeof resolved?.key === "string" ? resolved.key.trim() : "";
         } catch (err) {
@@ -284,7 +285,7 @@ export function createSessionsSendTool(opts?: {
           const response = await callGateway<{ runId: string }>({
             method: "agent",
             params: sendParams,
-            timeoutMs: 10_000,
+            timeoutMs: TIMEOUT_HTTP_SHORT_MS,
           });
           if (typeof response?.runId === "string" && response.runId) {
             runId = response.runId;
@@ -312,7 +313,7 @@ export function createSessionsSendTool(opts?: {
         const response = await callGateway<{ runId: string }>({
           method: "agent",
           params: sendParams,
-          timeoutMs: 10_000,
+          timeoutMs: TIMEOUT_HTTP_SHORT_MS,
         });
         if (typeof response?.runId === "string" && response.runId) {
           runId = response.runId;

@@ -1,4 +1,5 @@
 import type { ClosedClawConfig } from "../config/config.js";
+import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type {
   ChannelsWizardMode,
@@ -384,10 +385,10 @@ export async function runConfigureWizard(
           url: wsUrl,
           token,
           password,
-          deadlineMs: 15_000,
+          deadlineMs: TIMEOUT_TEST_SUITE_MEDIUM_MS,
         });
         try {
-          await healthCommand({ json: false, timeoutMs: 10_000 }, runtime);
+          await healthCommand({ json: false, timeoutMs: TIMEOUT_HTTP_SHORT_MS }, runtime);
         } catch (err) {
           runtime.error(formatHealthCheckFailure(err));
           note(
@@ -511,10 +512,10 @@ export async function runConfigureWizard(
             url: wsUrl,
             token,
             password,
-            deadlineMs: 15_000,
+            deadlineMs: TIMEOUT_TEST_SUITE_MEDIUM_MS,
           });
           try {
-            await healthCommand({ json: false, timeoutMs: 10_000 }, runtime);
+            await healthCommand({ json: false, timeoutMs: TIMEOUT_HTTP_SHORT_MS }, runtime);
           } catch (err) {
             runtime.error(formatHealthCheckFailure(err));
             note(

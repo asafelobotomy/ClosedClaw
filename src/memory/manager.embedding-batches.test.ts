@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { TIMEOUT_TEST_SUITE_DEFAULT_MS } from "../config/constants/index.js";
 import { getMemorySearchManager, type MemoryIndexManager } from "./index.js";
 
 const embedBatch = vi.fn(async (texts: string[]) => texts.map(() => [0, 1, 0]));
@@ -209,7 +210,7 @@ describe("memory embedding batches", () => {
     }
 
     expect(calls).toBe(3);
-  }, 10000);
+  }, TIMEOUT_TEST_SUITE_DEFAULT_MS);
 
   it("retries embeddings on transient 5xx errors", async () => {
     const line = "e".repeat(120);
@@ -268,7 +269,7 @@ describe("memory embedding batches", () => {
     }
 
     expect(calls).toBe(3);
-  }, 10000);
+  }, TIMEOUT_TEST_SUITE_DEFAULT_MS);
 
   it("skips empty chunks so embeddings input stays valid", async () => {
     await fs.writeFile(path.join(workspaceDir, "memory", "2026-01-07.md"), "\n\n\n");

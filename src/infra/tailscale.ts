@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { formatCliCommand } from "../cli/command-format.js";
 import { promptYesNo } from "../cli/prompt.js";
+import { secondsToMs, TIMEOUT_TEST_SUITE_MEDIUM_MS, TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
 import { danger, info, logVerbose, shouldLogVerbose, warn } from "../globals.js";
 import { runExec } from "../process/exec.js";
 import { defaultRuntime, type RuntimeEnv } from "../runtime.js";
@@ -35,7 +36,7 @@ export async function findTailscaleBinary(): Promise<string | null> {
     try {
       // Use Promise.race with runExec to implement timeout
       await Promise.race([
-        runExec(path, ["--version"], { timeoutMs: 3000 }),
+        runExec(path, ["--version"], { timeoutMs: secondsToMs(3) }),
         new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), 3000)),
       ]);
       return true;
@@ -74,7 +75,7 @@ export async function findTailscaleBinary(): Promise<string | null> {
         "-path",
         "*/Tailscale.app/Contents/MacOS/Tailscale",
       ],
-      { timeoutMs: 5000 },
+      { timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS },
     );
     const found = stdout.trim().split("\n")[0];
     if (found && (await checkBinary(found))) {
@@ -116,7 +117,7 @@ export async function getTailnetHostname(exec: typeof runExec = runExec, detecte
     }
     try {
       const { stdout } = await exec(candidate, ["status", "--json"], {
-        timeoutMs: 5000,
+        timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
         maxBuffer: 400_000,
       });
       const parsed = stdout ? parsePossiblyNoisyJsonObject(stdout) : {};
@@ -163,7 +164,7 @@ export async function readTailscaleStatusJson(
 ): Promise<Record<string, unknown>> {
   const tailscaleBin = await getTailscaleBinary();
   const { stdout } = await exec(tailscaleBin, ["status", "--json"], {
-    timeoutMs: opts?.timeoutMs ?? 5000,
+    timeoutMs: opts?.timeoutMs ?? TIMEOUT_TEST_SUITE_SHORT_MS,
     maxBuffer: 400_000,
   });
   return stdout ? parsePossiblyNoisyJsonObject(stdout) : {};
@@ -334,7 +335,7 @@ export async function ensureFunnel(
       ["funnel", "--yes", "--bg", `${port}`],
       {
         maxBuffer: 200_000,
-        timeoutMs: 15_000,
+        timeoutMs: TIMEOUT_TEST_SUITE_MEDIUM_MS,
       },
     );
     if (stdout.trim()) {
@@ -388,7 +389,7 @@ export async function enableTailscaleServe(port: number, exec: typeof runExec = 
   const tailscaleBin = await getTailscaleBinary();
   await execWithSudoFallback(exec, tailscaleBin, ["serve", "--bg", "--yes", `${port}`], {
     maxBuffer: 200_000,
-    timeoutMs: 15_000,
+    timeoutMs: TIMEOUT_TEST_SUITE_MEDIUM_MS,
   });
 }
 
@@ -396,7 +397,7 @@ export async function disableTailscaleServe(exec: typeof runExec = runExec) {
   const tailscaleBin = await getTailscaleBinary();
   await execWithSudoFallback(exec, tailscaleBin, ["serve", "reset"], {
     maxBuffer: 200_000,
-    timeoutMs: 15_000,
+    timeoutMs: TIMEOUT_TEST_SUITE_MEDIUM_MS,
   });
 }
 
@@ -404,7 +405,7 @@ export async function enableTailscaleFunnel(port: number, exec: typeof runExec =
   const tailscaleBin = await getTailscaleBinary();
   await execWithSudoFallback(exec, tailscaleBin, ["funnel", "--bg", "--yes", `${port}`], {
     maxBuffer: 200_000,
-    timeoutMs: 15_000,
+    timeoutMs: TIMEOUT_TEST_SUITE_MEDIUM_MS,
   });
 }
 
@@ -412,7 +413,7 @@ export async function disableTailscaleFunnel(exec: typeof runExec = runExec) {
   const tailscaleBin = await getTailscaleBinary();
   await execWithSudoFallback(exec, tailscaleBin, ["funnel", "reset"], {
     maxBuffer: 200_000,
-    timeoutMs: 15_000,
+    timeoutMs: TIMEOUT_TEST_SUITE_MEDIUM_MS,
   });
 }
 
@@ -481,7 +482,7 @@ export async function readTailscaleWhoisIdentity(
   try {
     const tailscaleBin = await getTailscaleBinary();
     const { stdout } = await exec(tailscaleBin, ["whois", "--json", normalized], {
-      timeoutMs: opts?.timeoutMs ?? 5_000,
+      timeoutMs: opts?.timeoutMs ?? TIMEOUT_TEST_SUITE_SHORT_MS,
       maxBuffer: 200_000,
     });
     const parsed = stdout ? parsePossiblyNoisyJsonObject(stdout) : {};

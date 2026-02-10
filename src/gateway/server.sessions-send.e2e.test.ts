@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { ENV_CLOSEDCLAW_GATEWAY_PORT, ENV_CLOSEDCLAW_GATEWAY_TOKEN, TIMEOUT_TEST_SUITE_LONG_MS, TIMEOUT_TEST_SUITE_SHORT_MS } from "@/config/constants";
 import { createClosedClawTools } from "../agents/openclaw-tools.js";
 import { resolveSessionTranscriptPath } from "../config/sessions.js";
 import { emitAgentEvent } from "../infra/agent-events.js";
@@ -19,25 +20,25 @@ let prevGatewayPort: string | undefined;
 let prevGatewayToken: string | undefined;
 
 beforeAll(async () => {
-  prevGatewayPort = process.env.ClosedClaw_GATEWAY_PORT;
-  prevGatewayToken = process.env.ClosedClaw_GATEWAY_TOKEN;
+  prevGatewayPort = process.env[ENV_CLOSEDCLAW_GATEWAY_PORT];
+  prevGatewayToken = process.env[ENV_CLOSEDCLAW_GATEWAY_TOKEN];
   gatewayPort = await getFreePort();
-  process.env.ClosedClaw_GATEWAY_PORT = String(gatewayPort);
-  process.env.ClosedClaw_GATEWAY_TOKEN = "test-token";
+  process.env[ENV_CLOSEDCLAW_GATEWAY_PORT] = String(gatewayPort);
+  process.env[ENV_CLOSEDCLAW_GATEWAY_TOKEN] = "test-token";
   server = await startGatewayServer(gatewayPort);
 });
 
 afterAll(async () => {
   await server.close();
   if (prevGatewayPort === undefined) {
-    delete process.env.ClosedClaw_GATEWAY_PORT;
+    delete process.env[ENV_CLOSEDCLAW_GATEWAY_PORT];
   } else {
-    process.env.ClosedClaw_GATEWAY_PORT = prevGatewayPort;
+    process.env[ENV_CLOSEDCLAW_GATEWAY_PORT] = prevGatewayPort;
   }
   if (prevGatewayToken === undefined) {
-    delete process.env.ClosedClaw_GATEWAY_TOKEN;
+    delete process.env[ENV_CLOSEDCLAW_GATEWAY_TOKEN];
   } else {
-    process.env.ClosedClaw_GATEWAY_TOKEN = prevGatewayToken;
+    process.env[ENV_CLOSEDCLAW_GATEWAY_TOKEN] = prevGatewayToken;
   }
 });
 
@@ -111,7 +112,7 @@ describe("sessions_send gateway loopback", () => {
 });
 
 describe("sessions_send label lookup", () => {
-  it("finds session by label and sends message", { timeout: 60_000 }, async () => {
+  it("finds session by label and sends message", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     const spy = vi.mocked(agentCommand);
     spy.mockImplementation(async (opts) => {
       const params = opts as {
@@ -150,7 +151,7 @@ describe("sessions_send label lookup", () => {
     await callGateway({
       method: "sessions.patch",
       params: { key: "test-labeled-session", label: "my-test-worker" },
-      timeoutMs: 5000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
     });
 
     const tool = createClosedClawTools().find((candidate) => candidate.name === "sessions_send");
@@ -174,7 +175,7 @@ describe("sessions_send label lookup", () => {
     expect(details.sessionKey).toBe("agent:main:test-labeled-session");
   });
 
-  it("returns error when label not found", { timeout: 60_000 }, async () => {
+  it("returns error when label not found", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     const tool = createClosedClawTools().find((candidate) => candidate.name === "sessions_send");
     if (!tool) {
       throw new Error("missing sessions_send tool");
@@ -190,7 +191,7 @@ describe("sessions_send label lookup", () => {
     expect(details.error).toContain("No session found with label");
   });
 
-  it("returns error when neither sessionKey nor label provided", { timeout: 60_000 }, async () => {
+  it("returns error when neither sessionKey nor label provided", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     const tool = createClosedClawTools().find((candidate) => candidate.name === "sessions_send");
     if (!tool) {
       throw new Error("missing sessions_send tool");

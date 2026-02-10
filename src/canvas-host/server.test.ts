@@ -1,4 +1,5 @@
 import type { AddressInfo } from "node:net";
+import { TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 import fs from "node:fs/promises";
 import { createServer } from "node:http";
 import os from "node:os";
@@ -202,7 +203,7 @@ describe("canvas host", () => {
       await server.close();
       await fs.rm(dir, { recursive: true, force: true });
     }
-  }, 20_000);
+  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
 
   it("serves the gateway-hosted A2UI scaffold", async () => {
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "ClosedClaw-canvas-"));

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { HealthSummary } from "./health.js";
 import { formatHealthChannelLines, healthCommand } from "./health.js";
+import { TIMEOUT_TEST_SUITE_SHORT_MS, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 
 const runtime = {
   log: vi.fn(),
@@ -29,7 +30,7 @@ describe("healthCommand", () => {
       ts: Date.now(),
       durationMs: 5,
       channels: {
-        whatsapp: { accountId: "default", linked: true, authAgeMs: 5000 },
+        whatsapp: { accountId: "default", linked: true, authAgeMs: TIMEOUT_TEST_SUITE_SHORT_MS },
         telegram: {
           accountId: "default",
           configured: true,
@@ -52,7 +53,7 @@ describe("healthCommand", () => {
           heartbeat: {
             enabled: true,
             every: "1m",
-            everyMs: 60_000,
+            everyMs: TIMEOUT_TEST_SUITE_LONG_MS,
             prompt: "hi",
             target: "last",
             ackMaxChars: 160,
@@ -64,7 +65,7 @@ describe("healthCommand", () => {
     };
     callGatewayMock.mockResolvedValueOnce(snapshot);
 
-    await healthCommand({ json: true, timeoutMs: 5000 }, runtime as never);
+    await healthCommand({ json: true, timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS }, runtime as never);
 
     expect(runtime.exit).not.toHaveBeenCalled();
     const logged = runtime.log.mock.calls[0]?.[0] as string;
@@ -99,7 +100,7 @@ describe("healthCommand", () => {
           heartbeat: {
             enabled: true,
             every: "1m",
-            everyMs: 60_000,
+            everyMs: TIMEOUT_TEST_SUITE_LONG_MS,
             prompt: "hi",
             target: "last",
             ackMaxChars: 160,
@@ -156,7 +157,7 @@ describe("healthCommand", () => {
           heartbeat: {
             enabled: true,
             every: "1m",
-            everyMs: 60_000,
+            everyMs: TIMEOUT_TEST_SUITE_LONG_MS,
             prompt: "hi",
             target: "last",
             ackMaxChars: 160,

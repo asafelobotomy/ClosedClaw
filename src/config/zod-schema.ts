@@ -466,6 +466,14 @@ export const ClosedClawSchema = z
           })
           .strict()
           .optional(),
+        security: z
+          .object({
+            requireSignature: z.boolean().optional(),
+            promptOnUnsigned: z.boolean().optional(),
+            minTrustLevel: z.union([z.literal("full"), z.literal("marginal")]).optional(),
+          })
+          .strict()
+          .optional(),
         entries: z
           .record(
             z.string(),

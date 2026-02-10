@@ -18,14 +18,13 @@ import {
 import { parseReplyDirectives } from "../../auto-reply/reply/reply-directives.js";
 import { dispatchChannelMessageAction } from "../../channels/plugins/message-actions.js";
 import { extensionForMime } from "../../media/mime.js";
-import { parseSlackTarget } from "../../slack/targets.js";
 import {
   isDeliverableMessageChannel,
   normalizeMessageChannel,
   type GatewayClientMode,
   type GatewayClientName,
 } from "../../utils/message-channel.js";
-import { loadWebMedia } from "../../web/media.js";
+import { loadWebMedia } from "../../media/load-web-media.js";
 import {
   listConfiguredMessageChannels,
   resolveMessageChannelSelection,
@@ -217,30 +216,7 @@ function readBooleanParam(params: Record<string, unknown>, key: string): boolean
   return undefined;
 }
 
-function resolveSlackAutoThreadId(params: {
-  to: string;
-  toolContext?: ChannelThreadingToolContext;
-}): string | undefined {
-  const context = params.toolContext;
-  if (!context?.currentThreadTs || !context.currentChannelId) {
-    return undefined;
-  }
-  // Only mirror auto-threading when Slack would reply in the active thread for this channel.
-  if (context.replyToMode !== "all" && context.replyToMode !== "first") {
-    return undefined;
-  }
-  const parsedTarget = parseSlackTarget(params.to, { defaultKind: "channel" });
-  if (!parsedTarget || parsedTarget.kind !== "channel") {
-    return undefined;
-  }
-  if (parsedTarget.id.toLowerCase() !== context.currentChannelId.toLowerCase()) {
-    return undefined;
-  }
-  if (context.replyToMode === "first" && context.hasRepliedRef?.value) {
-    return undefined;
-  }
-  return context.currentThreadTs;
-}
+// Slack auto-thread resolver removed (Slack channel archived).
 
 function resolveAttachmentMaxBytes(params: {
   cfg: ClosedClawConfig;
@@ -727,11 +703,7 @@ async function handleSendAction(ctx: ResolvedActionContext): Promise<MessageActi
 
   const replyToId = readStringParam(params, "replyTo");
   const threadId = readStringParam(params, "threadId");
-  // Slack auto-threading can inject threadTs without explicit params; mirror to that session key.
-  const slackAutoThreadId =
-    channel === "slack" && !replyToId && !threadId
-      ? resolveSlackAutoThreadId({ to, toolContext: input.toolContext })
-      : undefined;
+  const slackAutoThreadId: string | undefined = undefined;
   const outboundRoute =
     agentId && !dryRun
       ? await resolveOutboundSessionRoute({

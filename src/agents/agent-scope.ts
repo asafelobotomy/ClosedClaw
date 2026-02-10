@@ -2,6 +2,7 @@ import os from "node:os";
 import path from "node:path";
 import type { ClosedClawConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
+import { getStateDir } from "../config/constants/index.js";
 import {
   DEFAULT_AGENT_ID,
   normalizeAgentId,
@@ -170,7 +171,7 @@ export function resolveAgentWorkspaceDir(cfg: ClosedClawConfig, agentId: string)
     }
     return DEFAULT_AGENT_WORKSPACE_DIR;
   }
-  return path.join(os.homedir(), ".ClosedClaw", `workspace-${id}`);
+  return path.join(getStateDir(), `workspace-${id}`);
 }
 
 export function resolveAgentDir(cfg: ClosedClawConfig, agentId: string) {

@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { TIMEOUT_TEST_SUITE_SHORT_MS, minutesToMs } from "../config/constants/index.js";
 import path from "node:path";
 import type { ClosedClawConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
@@ -46,7 +47,7 @@ async function runSandboxScript(scriptRel: string, runtime: RuntimeEnv): Promise
 
   runtime.log(`Running ${scriptRel}...`);
   const result = await runCommandWithTimeout(["bash", script.scriptPath], {
-    timeoutMs: 20 * 60 * 1000,
+    timeoutMs: minutesToMs(20),
     cwd: script.cwd,
   });
   if (result.code !== 0) {
@@ -65,7 +66,7 @@ async function runSandboxScript(scriptRel: string, runtime: RuntimeEnv): Promise
 async function isDockerAvailable(): Promise<boolean> {
   try {
     await runExec("docker", ["version", "--format", "{{.Server.Version}}"], {
-      timeoutMs: 5_000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
     });
     return true;
   } catch {
@@ -75,7 +76,7 @@ async function isDockerAvailable(): Promise<boolean> {
 
 async function dockerImageExists(image: string): Promise<boolean> {
   try {
-    await runExec("docker", ["image", "inspect", image], { timeoutMs: 5_000 });
+    await runExec("docker", ["image", "inspect", image], { timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS });
     return true;
   } catch (error) {
     const stderr =

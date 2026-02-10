@@ -4,6 +4,7 @@ import type { RuntimeEnv } from "../runtime.js";
 import type { DoctorPrompter } from "./doctor-prompter.js";
 import { resolveClosedClawPackageRoot } from "../infra/openclaw-root.js";
 import { runCommandWithTimeout } from "../process/exec.js";
+import { TIMEOUT_TEST_SUITE_SHORT_MS, minutesToMs } from "../config/constants/index.js";
 import { note } from "../terminal/note.js";
 
 export async function maybeRepairUiProtocolFreshness(
@@ -51,7 +52,7 @@ export async function maybeRepairUiProtocolFreshness(
         const uiScriptPath = path.join(root, "scripts/ui.js");
         const buildResult = await runCommandWithTimeout([process.execPath, uiScriptPath, "build"], {
           cwd: root,
-          timeoutMs: 120_000,
+          timeoutMs: minutesToMs(2),
           env: { ...process.env, FORCE_COLOR: "1" },
         });
         if (buildResult.code === 0) {
@@ -86,7 +87,7 @@ export async function maybeRepairUiProtocolFreshness(
           "--format=%h %s",
           "src/gateway/protocol/schema.ts",
         ],
-        { timeoutMs: 5000 },
+        { timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS },
       ).catch(() => null);
 
       if (gitLog && gitLog.code === 0 && gitLog.stdout.trim()) {
@@ -120,7 +121,7 @@ export async function maybeRepairUiProtocolFreshness(
             [process.execPath, uiScriptPath, "build"],
             {
               cwd: root,
-              timeoutMs: 120_000,
+              timeoutMs: minutesToMs(2),
               env: { ...process.env, FORCE_COLOR: "1" },
             },
           );

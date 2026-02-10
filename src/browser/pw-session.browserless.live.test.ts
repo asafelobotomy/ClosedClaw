@@ -1,4 +1,5 @@
 import { describe, it } from "vitest";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 
 const LIVE =
@@ -21,7 +22,7 @@ async function waitFor(
 }
 
 describeLive("browser (live): remote CDP tab persistence", () => {
-  it("creates, lists, focuses, and closes tabs via Playwright", { timeout: 60_000 }, async () => {
+  it("creates, lists, focuses, and closes tabs via Playwright", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     const pw = await import("./pw-ai.js");
     await pw.closePlaywrightBrowserConnection().catch(() => {});
 

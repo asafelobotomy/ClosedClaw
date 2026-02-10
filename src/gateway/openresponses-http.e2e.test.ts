@@ -1,4 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { TIMEOUT_TEST_LONG_MS } from "../config/constants/index.js";
+import { TIMEOUT_TEST_LONG_MS } from "../config/constants/index.js";
 import { HISTORY_CONTEXT_MARKER } from "../auto-reply/reply/history.js";
 import { CURRENT_MESSAGE_MARKER } from "../auto-reply/reply/mentions.js";
 import { emitAgentEvent } from "../infra/agent-events.js";
@@ -83,7 +85,7 @@ async function ensureResponseConsumed(res: Response) {
 }
 
 describe("OpenResponses HTTP API (e2e)", () => {
-  it("rejects when disabled (default + config)", { timeout: 120_000 }, async () => {
+  it("rejects when disabled (default + config)", { timeout: TIMEOUT_TEST_LONG_MS }, async () => {
     const port = await getFreePort();
     const _server = await startServerWithDefaultConfig(port);
     try {

@@ -5,6 +5,7 @@ import path from "node:path";
 import * as tar from "tar";
 import { afterEach, describe, expect, it } from "vitest";
 import { extractArchive, resolveArchiveKind, resolvePackedRootDir } from "./archive.js";
+import { TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
 
 const tempDirs: string[] = [];
 
@@ -43,7 +44,7 @@ describe("archive utils", () => {
     await fs.writeFile(archivePath, await zip.generateAsync({ type: "nodebuffer" }));
 
     await fs.mkdir(extractDir, { recursive: true });
-    await extractArchive({ archivePath, destDir: extractDir, timeoutMs: 5_000 });
+    await extractArchive({ archivePath, destDir: extractDir, timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS });
     const rootDir = await resolvePackedRootDir(extractDir);
     const content = await fs.readFile(path.join(rootDir, "hello.txt"), "utf-8");
     expect(content).toBe("hi");
@@ -60,7 +61,7 @@ describe("archive utils", () => {
     await tar.c({ cwd: workDir, file: archivePath }, ["package"]);
 
     await fs.mkdir(extractDir, { recursive: true });
-    await extractArchive({ archivePath, destDir: extractDir, timeoutMs: 5_000 });
+    await extractArchive({ archivePath, destDir: extractDir, timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS });
     const rootDir = await resolvePackedRootDir(extractDir);
     const content = await fs.readFile(path.join(rootDir, "hello.txt"), "utf-8");
     expect(content).toBe("yo");

@@ -1,4 +1,5 @@
 import { loadConfig } from "../config/config.js";
+import { INTERVAL_HEALTH_REFRESH_MS, TIMEOUT_HTTP_DEFAULT_MS, TIMEOUT_HTTP_SHORT_MS, minutesToMs } from "../config/constants/index.js";
 import { callGateway } from "../gateway/call.js";
 import { onAgentEvent } from "../infra/agent-events.js";
 import { type DeliveryContext, normalizeDeliveryContext } from "../utils/delivery-context.js";
@@ -68,7 +69,7 @@ function resumeSubagentRun(runId: string) {
       requesterOrigin,
       requesterDisplayKey: entry.requesterDisplayKey,
       task: entry.task,
-      timeoutMs: 30_000,
+      timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
       cleanup: entry.cleanup,
       waitForCompletion: false,
       startedAt: entry.startedAt,
@@ -144,7 +145,7 @@ function startSweeper() {
   }
   sweeper = setInterval(() => {
     void sweepSubagentRuns();
-  }, 60_000);
+  }, INTERVAL_HEALTH_REFRESH_MS);
   sweeper.unref?.();
 }
 
@@ -169,7 +170,7 @@ async function sweepSubagentRuns() {
       await callGateway({
         method: "sessions.delete",
         params: { key: entry.childSessionKey, deleteTranscript: true },
-        timeoutMs: 10_000,
+        timeoutMs: TIMEOUT_HTTP_SHORT_MS,
       });
     } catch {
       // ignore
@@ -229,7 +230,7 @@ function ensureListener() {
       requesterOrigin,
       requesterDisplayKey: entry.requesterDisplayKey,
       task: entry.task,
-      timeoutMs: 30_000,
+      timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
       cleanup: entry.cleanup,
       waitForCompletion: false,
       startedAt: entry.startedAt,
@@ -333,7 +334,7 @@ async function waitForSubagentCompletion(runId: string, waitTimeoutMs: number) {
         runId,
         timeoutMs,
       },
-      timeoutMs: timeoutMs + 10_000,
+      timeoutMs: timeoutMs + TIMEOUT_HTTP_SHORT_MS,
     });
     if (wait?.status !== "ok" && wait?.status !== "error") {
       return;
@@ -373,7 +374,7 @@ async function waitForSubagentCompletion(runId: string, waitTimeoutMs: number) {
       requesterOrigin,
       requesterDisplayKey: entry.requesterDisplayKey,
       task: entry.task,
-      timeoutMs: 30_000,
+      timeoutMs: TIMEOUT_HTTP_DEFAULT_MS,
       cleanup: entry.cleanup,
       waitForCompletion: false,
       startedAt: entry.startedAt,

@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { UpdateRunResult } from "../infra/update-runner.js";
 
@@ -144,7 +145,7 @@ describe("update-cli", () => {
     expect(typeof updateCommand).toBe("function");
     expect(typeof registerUpdateCli).toBe("function");
     expect(typeof updateWizardCommand).toBe("function");
-  }, 20_000);
+  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
 
   it("updateCommand runs update and outputs result", async () => {
     const { runGatewayUpdate } = await import("../infra/update-runner.js");

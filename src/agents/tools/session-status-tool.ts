@@ -1,4 +1,5 @@
 import { Type } from "@sinclair/typebox";
+import { secondsToMs } from "../../config/constants/index.js";
 import type { ClosedClawConfig } from "../../config/config.js";
 import type { AnyAgentTool } from "./common.js";
 import { resolveAgentDir } from "../../agents/agent-scope.js";
@@ -377,7 +378,7 @@ export function createSessionStatusTool(opts?: {
       if (usageProvider) {
         try {
           const usageSummary = await loadProviderUsageSummary({
-            timeoutMs: 3500,
+            timeoutMs: secondsToMs(3.5),
             providers: [usageProvider],
             agentDir,
           });

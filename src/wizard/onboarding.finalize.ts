@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import path from "node:path";
 import type { OnboardOptions } from "../commands/onboard-types.js";
 import type { ClosedClawConfig } from "../config/config.js";
@@ -203,10 +204,10 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     await waitForGatewayReachable({
       url: probeLinks.wsUrl,
       token: settings.gatewayToken,
-      deadlineMs: 15_000,
+      deadlineMs: TIMEOUT_TEST_SUITE_MEDIUM_MS,
     });
     try {
-      await healthCommand({ json: false, timeoutMs: 10_000 }, runtime);
+      await healthCommand({ json: false, timeoutMs: TIMEOUT_HTTP_SHORT_MS }, runtime);
     } catch (err) {
       runtime.error(formatHealthCheckFailure(err));
       await prompter.note(

@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { ENV_CLOSEDCLAW_BUNDLED_SKILLS_DIR } from "../../config/constants/index.js";
 
 export function resolveBundledSkillsDir(): string | undefined {
-  const override = process.env.ClosedClaw_BUNDLED_SKILLS_DIR?.trim();
+  const override = process.env[ENV_CLOSEDCLAW_BUNDLED_SKILLS_DIR]?.trim();
   if (override) {
     return override;
   }

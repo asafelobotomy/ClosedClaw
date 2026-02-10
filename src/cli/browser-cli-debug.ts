@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import { TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import { danger } from "../globals.js";
 import { defaultRuntime } from "../runtime.js";
 import { shortenHomePath } from "../utils.js";
@@ -36,7 +37,7 @@ export function registerBrowserDebugCommands(
               targetId: opts.targetId?.trim() || undefined,
             },
           },
-          { timeoutMs: 20000 },
+          { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));
@@ -68,7 +69,7 @@ export function registerBrowserDebugCommands(
               profile,
             },
           },
-          { timeoutMs: 20000 },
+          { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));
@@ -117,7 +118,7 @@ export function registerBrowserDebugCommands(
               profile,
             },
           },
-          { timeoutMs: 20000 },
+          { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));
@@ -166,7 +167,7 @@ export function registerBrowserDebugCommands(
               sources: Boolean(opts.sources),
             },
           },
-          { timeoutMs: 20000 },
+          { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));
@@ -196,7 +197,7 @@ export function registerBrowserDebugCommands(
               path: opts.out?.trim() || undefined,
             },
           },
-          { timeoutMs: 20000 },
+          { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));

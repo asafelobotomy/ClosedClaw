@@ -3,6 +3,7 @@ import type {
   BrowserActionPathResult,
   BrowserActionTabResult,
 } from "./client-actions-types.js";
+import { TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import { fetchBrowserJson } from "./client-fetch.js";
 
 function buildProfileQuery(profile?: string): string {
@@ -112,7 +113,7 @@ export async function browserNavigate(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ url: opts.url, targetId: opts.targetId }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -136,7 +137,7 @@ export async function browserArmDialog(
       targetId: opts.targetId,
       timeoutMs: opts.timeoutMs,
     }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -164,7 +165,7 @@ export async function browserArmFileChooser(
       targetId: opts.targetId,
       timeoutMs: opts.timeoutMs,
     }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -190,7 +191,7 @@ export async function browserWaitForDownload(
       path: opts.path,
       timeoutMs: opts.timeoutMs,
     }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -218,7 +219,7 @@ export async function browserDownload(
       path: opts.path,
       timeoutMs: opts.timeoutMs,
     }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -232,7 +233,7 @@ export async function browserAct(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(req),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }
 
@@ -258,6 +259,6 @@ export async function browserScreenshotAction(
       element: opts.element,
       type: opts.type,
     }),
-    timeoutMs: 20000,
+    timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
   });
 }

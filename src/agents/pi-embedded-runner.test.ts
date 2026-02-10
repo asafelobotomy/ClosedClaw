@@ -5,6 +5,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import "./test-helpers/fast-coding-tools.js";
 import type { ClosedClawConfig } from "../config/config.js";
 import { ensureClosedClawModelsJson } from "./models-config.js";
+import { TIMEOUT_TEST_LONG_MS, TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 
 vi.mock("@mariozechner/pi-ai", async () => {
   const actual = await vi.importActual<typeof import("@mariozechner/pi-ai")>("@mariozechner/pi-ai");
@@ -104,7 +105,7 @@ beforeAll(async () => {
   workspaceDir = path.join(tempRoot, "workspace");
   await fs.mkdir(agentDir, { recursive: true });
   await fs.mkdir(workspaceDir, { recursive: true });
-}, 20_000);
+}, TIMEOUT_TEST_SUITE_STANDARD_MS);
 
 afterAll(async () => {
   if (!tempRoot) {
@@ -222,7 +223,7 @@ describe("runEmbeddedPiAgent", () => {
 
   itIfNotWin32(
     "persists the first user message before assistant output",
-    { timeout: 120_000 },
+    { timeout: TIMEOUT_TEST_LONG_MS },
     async () => {
       const sessionFile = nextSessionFile();
       const cfg = makeOpenAiConfig(["mock-1"]);

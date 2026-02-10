@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { TIMEOUT_HTTP_LONG_MS, TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
 import path from "node:path";
 import { resolveQueueSettings } from "../auto-reply/reply/queue.js";
 import { loadConfig } from "../config/config.js";
@@ -141,7 +142,7 @@ async function sendAnnounce(item: AnnounceQueueItem) {
       idempotencyKey: crypto.randomUUID(),
     },
     expectFinal: true,
-    timeoutMs: 60_000,
+    timeoutMs: TIMEOUT_HTTP_LONG_MS,
   });
 }
 
@@ -367,7 +368,7 @@ export async function runSubagentAnnounceFlow(params: {
     let reply = params.roundOneReply;
     let outcome: SubagentRunOutcome | undefined = params.outcome;
     if (!reply && params.waitForCompletion !== false) {
-      const waitMs = Math.min(params.timeoutMs, 60_000);
+      const waitMs = Math.min(params.timeoutMs, TIMEOUT_HTTP_LONG_MS);
       const wait = await callGateway<{
         status?: string;
         startedAt?: number;
@@ -484,7 +485,7 @@ export async function runSubagentAnnounceFlow(params: {
         idempotencyKey: crypto.randomUUID(),
       },
       expectFinal: true,
-      timeoutMs: 60_000,
+      timeoutMs: TIMEOUT_HTTP_LONG_MS,
     });
 
     didAnnounce = true;
@@ -498,7 +499,7 @@ export async function runSubagentAnnounceFlow(params: {
         await callGateway({
           method: "sessions.patch",
           params: { key: params.childSessionKey, label: params.label },
-          timeoutMs: 10_000,
+          timeoutMs: TIMEOUT_HTTP_SHORT_MS,
         });
       } catch {
         // Best-effort
@@ -509,7 +510,7 @@ export async function runSubagentAnnounceFlow(params: {
         await callGateway({
           method: "sessions.delete",
           params: { key: params.childSessionKey, deleteTranscript: true },
-          timeoutMs: 10_000,
+          timeoutMs: TIMEOUT_HTTP_SHORT_MS,
         });
       } catch {
         // ignore

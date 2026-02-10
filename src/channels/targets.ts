@@ -1,4 +1,9 @@
-export type { DirectoryConfigParams } from "./plugins/directory-config.js";
+// DirectoryConfigParams removed — directory-config.ts archived.
+export type DirectoryConfigParams = {
+  cfg: import("../config/config.js").ClosedClawConfig;
+  channelId: string;
+  accountId?: string;
+};
 export type { ChannelDirectoryEntry } from "./plugins/types.js";
 
 export type MessagingTargetKind = "user" | "channel";

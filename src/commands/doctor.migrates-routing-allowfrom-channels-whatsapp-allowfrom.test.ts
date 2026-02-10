@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 
 let originalIsTTY: boolean | undefined;
 let originalStateDir: string | undefined;
@@ -326,7 +327,7 @@ vi.mock("./doctor-state-migrations.js", () => ({
 }));
 
 describe("doctor command", () => {
-  it("migrates routing.allowFrom to channels.whatsapp.allowFrom", { timeout: 60_000 }, async () => {
+  it("migrates routing.allowFrom to channels.whatsapp.allowFrom", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     readConfigFileSnapshot.mockResolvedValue({
       path: "/tmp/ClosedClaw.json",
       exists: true,
@@ -370,7 +371,7 @@ describe("doctor command", () => {
     expect(written.routing).toBeUndefined();
   });
 
-  it("skips legacy gateway services migration", { timeout: 60_000 }, async () => {
+  it("skips legacy gateway services migration", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     readConfigFileSnapshot.mockResolvedValue({
       path: "/tmp/ClosedClaw.json",
       exists: true,

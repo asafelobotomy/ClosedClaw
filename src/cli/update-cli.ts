@@ -1,7 +1,6 @@
 import type { Command } from "commander";
 import { confirm, isCancel, select, spinner } from "@clack/prompts";
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 import {
   formatUpdateAvailableHint,
@@ -34,6 +33,7 @@ import {
   resolveGlobalPackageRoot,
   type GlobalInstallManager,
 } from "../infra/update-global.js";
+import { getStateDir } from "../config/constants/index.js";
 import {
   runGatewayUpdate,
   type UpdateRunResult,
@@ -115,7 +115,7 @@ const DEFAULT_PACKAGE_NAME = "ClosedClaw";
 const CORE_PACKAGE_NAMES = new Set([DEFAULT_PACKAGE_NAME]);
 const CLI_NAME = resolveCliName();
 const ClosedClaw_REPO_URL = "https://github.com/ClosedClaw/ClosedClaw.git";
-const DEFAULT_GIT_DIR = path.join(os.homedir(), ".ClosedClaw");
+const DEFAULT_GIT_DIR = getStateDir();
 
 function normalizeTag(value?: string | null): string | null {
   if (!value) {

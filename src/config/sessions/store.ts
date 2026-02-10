@@ -159,6 +159,15 @@ export function loadSessionStore(
     } else if ("room" in rec) {
       delete rec.room;
     }
+
+    // Best-effort migration: GTK-only mode — rewrite non-GTK channel references
+    // to "gtk-gui" so sessions route through the GTK channel by default.
+    if (typeof rec.channel === "string" && rec.channel !== "gtk-gui" && rec.channel !== "webchat") {
+      rec.channel = "gtk-gui";
+    }
+    if (typeof rec.lastChannel === "string" && rec.lastChannel !== "gtk-gui" && rec.lastChannel !== "webchat") {
+      rec.lastChannel = "gtk-gui";
+    }
   }
 
   // Cache the result if caching is enabled

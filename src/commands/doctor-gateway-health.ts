@@ -5,6 +5,7 @@ import { collectChannelStatusIssues } from "../infra/channels-status-issues.js";
 import { note } from "../terminal/note.js";
 import { formatHealthCheckFailure } from "./health-format.js";
 import { healthCommand } from "./health.js";
+import { TIMEOUT_TEST_SUITE_SHORT_MS, secondsToMs } from "../config/constants/index.js";
 
 export async function checkGatewayHealth(params: {
   runtime: RuntimeEnv;
@@ -32,8 +33,8 @@ export async function checkGatewayHealth(params: {
     try {
       const status = await callGateway({
         method: "channels.status",
-        params: { probe: true, timeoutMs: 5000 },
-        timeoutMs: 6000,
+        params: { probe: true, timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS },
+        timeoutMs: secondsToMs(6),
       });
       const issues = collectChannelStatusIssues(status);
       if (issues.length > 0) {

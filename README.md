@@ -167,7 +167,7 @@ Run `ClosedClaw doctor` to surface risky/misconfigured DM policies.
 - [Channel routing](https://docs.OpenClaw.ai/concepts/channel-routing), [retry policy](https://docs.OpenClaw.ai/concepts/retry), and [streaming/chunking](https://docs.OpenClaw.ai/concepts/streaming).
 - [Presence](https://docs.OpenClaw.ai/concepts/presence), [typing indicators](https://docs.OpenClaw.ai/concepts/typing-indicators), and [usage tracking](https://docs.OpenClaw.ai/concepts/usage-tracking).
 - [Models](https://docs.OpenClaw.ai/concepts/models), [model failover](https://docs.OpenClaw.ai/concepts/model-failover), and [session pruning](https://docs.OpenClaw.ai/concepts/session-pruning).
-- [Security](https://docs.OpenClaw.ai/gateway/security) and [troubleshooting](https://docs.OpenClaw.ai/channels/troubleshooting).
+- [Security](https://docs.OpenClaw.ai/gateway/security): DM pairing, [skill signing](https://docs.OpenClaw.ai/security/skill-signing), [trusted keyring](https://docs.OpenClaw.ai/security/trusted-keyring), and [troubleshooting](https://docs.OpenClaw.ai/channels/troubleshooting).
 
 ### Ops + packaging
 

@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 
 describe("onboard (non-interactive): token auth", () => {
   it("writes token profile config and stores the token", async () => {
@@ -88,5 +89,5 @@ describe("onboard (non-interactive): token auth", () => {
       process.env.ClosedClaw_GATEWAY_TOKEN = prev.token;
       process.env.ClosedClaw_GATEWAY_PASSWORD = prev.password;
     }
-  }, 60_000);
+  }, TIMEOUT_TEST_SUITE_LONG_MS);
 });

@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { TIMEOUT_TEST_LONG_MS } from "../config/constants/index.js";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 import { normalizeBrowserScreenshot } from "./screenshot.js";
@@ -23,7 +24,7 @@ describe("browser screenshot normalization", () => {
     expect(Number(meta.height)).toBeLessThanOrEqual(2000);
     expect(normalized.buffer[0]).toBe(0xff);
     expect(normalized.buffer[1]).toBe(0xd8);
-  }, 120_000);
+  }, TIMEOUT_TEST_LONG_MS);
 
   it("keeps already-small screenshots unchanged", async () => {
     const jpeg = await sharp({

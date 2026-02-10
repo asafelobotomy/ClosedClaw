@@ -3,6 +3,8 @@ import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { WebSocket } from "ws";
+import { secondsToMs, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
+import { secondsToMs, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import { emitAgentEvent } from "../infra/agent-events.js";
 import {
   loadOrCreateDeviceIdentity,
@@ -51,7 +53,7 @@ const openClient = async (opts?: Parameters<typeof connectOk>[1]) => {
 };
 
 describe("gateway server health/presence", () => {
-  test("connect + health + presence + status succeed", { timeout: 60_000 }, async () => {
+  test("connect + health + presence + status succeed", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     const ws = await openClient();
 
     const healthP = onceMessage(ws, (o) => o.type === "res" && o.id === "health1");
@@ -143,7 +145,7 @@ describe("gateway server health/presence", () => {
     ws.close();
   });
 
-  test("presence events carry seq + stateVersion", { timeout: 8000 }, async () => {
+  test("presence events carry seq + stateVersion", { timeout: secondsToMs(8) }, async () => {
     const ws = await openClient();
 
     const presenceEventP = onceMessage(ws, (o) => o.type === "event" && o.event === "presence");
@@ -164,7 +166,7 @@ describe("gateway server health/presence", () => {
     ws.close();
   });
 
-  test("agent events stream with seq", { timeout: 8000 }, async () => {
+  test("agent events stream with seq", { timeout: secondsToMs(8) }, async () => {
     const ws = await openClient();
 
     const runId = randomUUID();
@@ -185,7 +187,7 @@ describe("gateway server health/presence", () => {
     ws.close();
   });
 
-  test("shutdown event is broadcast on close", { timeout: 8000 }, async () => {
+  test("shutdown event is broadcast on close", { timeout: secondsToMs(8) }, async () => {
     const { server, ws } = await startServerWithClient();
     await connectOk(ws);
 
@@ -195,7 +197,7 @@ describe("gateway server health/presence", () => {
     expect(evt.payload?.reason).toBeDefined();
   });
 
-  test("presence broadcast reaches multiple clients", { timeout: 8000 }, async () => {
+  test("presence broadcast reaches multiple clients", { timeout: secondsToMs(8) }, async () => {
     const clients = await Promise.all([openClient(), openClient(), openClient()]);
     const waits = clients.map((c) =>
       onceMessage(c, (o) => o.type === "event" && o.event === "presence"),

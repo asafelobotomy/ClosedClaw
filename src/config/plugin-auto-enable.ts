@@ -9,7 +9,7 @@ import {
   listChatChannels,
   normalizeChatChannelId,
 } from "../channels/registry.js";
-import { hasAnyWhatsAppAuth } from "../web/accounts.js";
+// hasAnyWhatsAppAuth removed — web/ archived.
 
 type PluginEnableChange = {
   pluginId: string;
@@ -165,9 +165,6 @@ function isIMessageConfigured(cfg: ClosedClawConfig): boolean {
 }
 
 function isWhatsAppConfigured(cfg: ClosedClawConfig): boolean {
-  if (hasAnyWhatsAppAuth(cfg)) {
-    return true;
-  }
   const entry = resolveChannelConfig(cfg, "whatsapp");
   if (!entry) {
     return false;

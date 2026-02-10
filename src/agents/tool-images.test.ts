@@ -1,5 +1,6 @@
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
+import { TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 import { sanitizeContentBlocksImages, sanitizeImageBlocks } from "./tool-images.js";
 
 describe("tool image sanitizing", () => {
@@ -30,7 +31,7 @@ describe("tool image sanitizing", () => {
     const size = Buffer.from(image.data, "base64").byteLength;
     expect(size).toBeLessThanOrEqual(5 * 1024 * 1024);
     expect(image.mimeType).toBe("image/jpeg");
-  }, 20_000);
+  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
 
   it("sanitizes image arrays and reports drops", async () => {
     const width = 2600;
@@ -51,7 +52,7 @@ describe("tool image sanitizing", () => {
     const meta = await sharp(Buffer.from(out[0].data, "base64")).metadata();
     expect(meta.width).toBeLessThanOrEqual(2000);
     expect(meta.height).toBeLessThanOrEqual(2000);
-  }, 20_000);
+  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
 
   it("shrinks images that exceed max dimension even if size is small", async () => {
     const width = 2600;
@@ -80,7 +81,7 @@ describe("tool image sanitizing", () => {
     expect(meta.width).toBeLessThanOrEqual(2000);
     expect(meta.height).toBeLessThanOrEqual(2000);
     expect(image.mimeType).toBe("image/jpeg");
-  }, 20_000);
+  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
 
   it("corrects mismatched jpeg mimeType", async () => {
     const jpeg = await sharp({

@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { describe, expect, it, vi } from "vitest";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 
 const callGatewayFromCli = vi.fn(async (method: string, _opts: unknown, params?: unknown) => {
   if (method === "cron.status") {
@@ -28,7 +29,7 @@ vi.mock("../runtime.js", () => ({
 }));
 
 describe("cron cli", () => {
-  it("trims model and thinking on cron add", { timeout: 60_000 }, async () => {
+  it("trims model and thinking on cron add", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     callGatewayFromCli.mockClear();
 
     const { registerCronCli } = await import("./cron-cli.js");

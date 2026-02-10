@@ -2820,8 +2820,78 @@ Example:
       peekaboo: { enabled: true },
       sag: { enabled: false },
     },
+    security: {
+      requireSignature: false,    // Block unsigned skills (default: false for backward compat)
+      promptOnUnsigned: true,     // Warn before installing unsigned (default: true)
+      minTrustLevel: "marginal",  // Minimum trust level: "full" or "marginal" (default: marginal)
+    },
   },
 }
+```
+
+#### Skills Security
+
+The `skills.security` field controls cryptographic signature verification for skill installation.
+
+Fields:
+
+- `requireSignature` (boolean, default: false): Block installation of unsigned skills. When enabled, all skills must have valid signatures from trusted keys.
+- `promptOnUnsigned` (boolean, default: true): Prompt user before installing unsigned skills (if `requireSignature` is false). Provides a warning with option to proceed.
+- `minTrustLevel` ("full" | "marginal", default: "marginal"): Minimum trust level required for signing keys. Skills signed by keys below this level are rejected.
+
+**Trust Levels**:
+- **full**: Fully trusted publisher (official ClosedClaw skills, verified organizations)
+- **marginal**: Partially trusted publisher (community contributors, individual users)
+
+**Verification Process**:
+1. Check if `.sig` file exists alongside `SKILL.md`
+2. Parse signature and extract key ID
+3. Look up key in trusted keyring (`~/.ClosedClaw/security/trusted-keyring.json`)
+4. Verify trust level meets `minTrustLevel`
+5. Cryptographically verify Ed25519 signature
+6. Allow or block installation based on results
+
+**Security Policies**:
+
+*Permissive* (default, backward compatible):
+```json5
+{
+  skills: {
+    security: {
+      requireSignature: false,
+      promptOnUnsigned: true,
+      minTrustLevel: "marginal"
+    }
+  }
+}
+```
+
+*Balanced* (recommended for most users):
+```json5
+{
+  skills: {
+    security: {
+      requireSignature: false,
+      promptOnUnsigned: true,
+      minTrustLevel: "full"
+    }
+  }
+}
+```
+
+*Strict* (recommended for production):
+```json5
+{
+  skills: {
+    security: {
+      requireSignature: true,
+      minTrustLevel: "full"
+    }
+  }
+}
+```
+
+See [Skill Signing Guide](/security/skill-signing) for complete documentation on signing skills and managing trusted keys.
 ```
 
 ### `plugins` (extensions)

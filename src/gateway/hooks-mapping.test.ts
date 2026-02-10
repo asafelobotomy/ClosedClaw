@@ -2,9 +2,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { buildGatewayHttpUrl } from "@/config/constants";
 import { applyHookMappings, resolveHookMappings } from "./hooks-mapping.js";
 
-const baseUrl = new URL("http://127.0.0.1:18789/hooks/gmail");
+const baseUrl = new URL(`${buildGatewayHttpUrl()}/hooks/gmail`);
 
 describe("hooks mapping", () => {
   it("resolves gmail preset", () => {
@@ -84,7 +85,7 @@ describe("hooks mapping", () => {
     const result = await applyHookMappings(mappings, {
       payload: { name: "Ada" },
       headers: {},
-      url: new URL("http://127.0.0.1:18789/hooks/custom"),
+      url: new URL(`${buildGatewayHttpUrl()}/hooks/custom`),
       path: "custom",
     });
 
@@ -116,7 +117,7 @@ describe("hooks mapping", () => {
     const result = await applyHookMappings(mappings, {
       payload: {},
       headers: {},
-      url: new URL("http://127.0.0.1:18789/hooks/skip"),
+      url: new URL(`${buildGatewayHttpUrl()}/hooks/skip`),
       path: "skip",
     });
 
@@ -159,7 +160,7 @@ describe("hooks mapping", () => {
     const result = await applyHookMappings(mappings, {
       payload: {},
       headers: {},
-      url: new URL("http://127.0.0.1:18789/hooks/noop"),
+      url: new URL(`${buildGatewayHttpUrl()}/hooks/noop`),
       path: "noop",
     });
     expect(result?.ok).toBe(false);

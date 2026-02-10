@@ -1,4 +1,5 @@
 import type { AddressInfo } from "node:net";
+import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import { createServer } from "node:http";
 import { afterEach, describe, expect, it } from "vitest";
 import WebSocket from "ws";
@@ -296,7 +297,7 @@ describe("chrome extension relay server", () => {
 
     cdp.close();
     ext.close();
-  }, 15_000);
+  }, TIMEOUT_TEST_SUITE_MEDIUM_MS);
 
   it("rebroadcasts attach when a session id is reused for a new target", async () => {
     const port = await getFreePort();

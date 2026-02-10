@@ -14,7 +14,12 @@
     "rootDir": "src",
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2023"
+    "target": "es2023",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@test/*": ["./test/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": [

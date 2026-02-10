@@ -3,6 +3,7 @@ import type { GatewayBonjourBeacon } from "../infra/bonjour-discovery.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 import { discoverGatewayBeacons } from "../infra/bonjour-discovery.js";
 import { resolveWideAreaDiscoveryDomain } from "../infra/widearea-dns.js";
+import { secondsToMs } from "../config/constants/index.js";
 import { detectBinary } from "./onboard-helpers.js";
 
 const DEFAULT_GATEWAY_URL = "ws://127.0.0.1:18789";
@@ -57,7 +58,7 @@ export async function promptRemoteGatewayConfig(
       configDomain: cfg.discovery?.wideArea?.domain,
     });
     const spin = prompter.progress("Searching for gateways…");
-    const beacons = await discoverGatewayBeacons({ timeoutMs: 2000, wideAreaDomain });
+    const beacons = await discoverGatewayBeacons({ timeoutMs: secondsToMs(2), wideAreaDomain });
     spin.stop(beacons.length > 0 ? `Found ${beacons.length} gateway(s)` : "No gateways found");
 
     if (beacons.length > 0) {

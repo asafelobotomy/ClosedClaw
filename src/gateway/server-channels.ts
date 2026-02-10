@@ -4,6 +4,7 @@ import type { createSubsystemLogger } from "../logging/subsystem.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { resolveChannelDefaultAccountId } from "../channels/plugins/helpers.js";
 import { type ChannelId, getChannelPlugin, listChannelPlugins } from "../channels/plugins/index.js";
+import { filterChannelsForGtkOnlyMode, formatGtkOnlyModeStatus } from "../config/gtk-only-mode.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { resetDirectoryCache } from "../infra/outbound/target-resolver.js";
 import { DEFAULT_ACCOUNT_ID } from "../routing/session-key.js";
@@ -94,12 +95,17 @@ export function createChannelManager(opts: ChannelManagerOptions): ChannelManage
   };
 
   const startChannel = async (channelId: ChannelId, accountId?: string) => {
+    // GTK-only mode guard: block non-GTK channel starts
+    const cfg = loadConfig();
+    const allowedPlugins = filterChannelsForGtkOnlyMode(listChannelPlugins(), cfg);
+    if (!allowedPlugins.some((p) => p.id === channelId)) {
+      return;
+    }
     const plugin = getChannelPlugin(channelId);
     const startAccount = plugin?.gateway?.startAccount;
     if (!startAccount) {
       return;
     }
-    const cfg = loadConfig();
     resetDirectoryCache({ channel: channelId, accountId });
     const store = getStore(channelId);
     const accountIds = accountId ? [accountId] : plugin.config.listAccountIds(cfg);
@@ -230,7 +236,9 @@ export function createChannelManager(opts: ChannelManagerOptions): ChannelManage
   };
 
   const startChannels = async () => {
-    for (const plugin of listChannelPlugins()) {
+    const cfg = loadConfig();
+    const plugins = filterChannelsForGtkOnlyMode(listChannelPlugins(), cfg);
+    for (const plugin of plugins) {
       await startChannel(plugin.id);
     }
   };
@@ -261,9 +269,10 @@ export function createChannelManager(opts: ChannelManagerOptions): ChannelManage
 
   const getRuntimeSnapshot = (): ChannelRuntimeSnapshot => {
     const cfg = loadConfig();
+    const allowedPlugins = filterChannelsForGtkOnlyMode(listChannelPlugins(), cfg);
     const channels: ChannelRuntimeSnapshot["channels"] = {};
     const channelAccounts: ChannelRuntimeSnapshot["channelAccounts"] = {};
-    for (const plugin of listChannelPlugins()) {
+    for (const plugin of allowedPlugins) {
       const store = getStore(plugin.id);
       const accountIds = plugin.config.listAccountIds(cfg);
       const defaultAccountId = resolveChannelDefaultAccountId({

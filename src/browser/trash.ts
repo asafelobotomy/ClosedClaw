@@ -2,10 +2,11 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { runExec } from "../process/exec.js";
+import { TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
 
 export async function movePathToTrash(targetPath: string): Promise<string> {
   try {
-    await runExec("trash", [targetPath], { timeoutMs: 10_000 });
+    await runExec("trash", [targetPath], { timeoutMs: TIMEOUT_HTTP_SHORT_MS });
     return targetPath;
   } catch {
     const trashDir = path.join(os.homedir(), ".Trash");

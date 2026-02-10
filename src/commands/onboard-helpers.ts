@@ -15,6 +15,7 @@ import { isSafeExecutableValue } from "../infra/exec-safety.js";
 import { pickPrimaryTailnetIPv4 } from "../infra/tailnet.js";
 import { isWSL } from "../infra/wsl.js";
 import { runCommandWithTimeout } from "../process/exec.js";
+import { secondsToMs, TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
 import { stylePromptTitle } from "../terminal/prompt-style.js";
 import {
   CONFIG_DIR,
@@ -215,7 +216,7 @@ export async function openUrl(url: string): Promise<boolean> {
   }
   try {
     await runCommandWithTimeout(command, {
-      timeoutMs: 5_000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
       windowsVerbatimArguments: quoteUrl,
     });
     return true;
@@ -265,7 +266,7 @@ export async function moveToTrash(pathname: string, runtime: RuntimeEnv): Promis
     return;
   }
   try {
-    await runCommandWithTimeout(["trash", pathname], { timeoutMs: 5000 });
+    await runCommandWithTimeout(["trash", pathname], { timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS });
     runtime.log(`Moved to Trash: ${shortenHomePath(pathname)}`);
   } catch {
     runtime.log(`Failed to move to Trash (manual delete): ${shortenHomePath(pathname)}`);
@@ -308,7 +309,7 @@ export async function detectBinary(name: string): Promise<boolean> {
 
   const command = ["/usr/bin/env", "which", name];
   try {
-    const result = await runCommandWithTimeout(command, { timeoutMs: 2000 });
+    const result = await runCommandWithTimeout(command, { timeoutMs: secondsToMs(2) });
     return result.code === 0 && result.stdout.trim().length > 0;
   } catch {
     return false;

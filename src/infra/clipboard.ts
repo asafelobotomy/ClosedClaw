@@ -1,4 +1,5 @@
 import { runCommandWithTimeout } from "../process/exec.js";
+import { secondsToMs } from "../config/constants/index.js";
 
 export async function copyToClipboard(value: string): Promise<boolean> {
   const attempts: Array<{ argv: string[] }> = [
@@ -11,7 +12,7 @@ export async function copyToClipboard(value: string): Promise<boolean> {
   for (const attempt of attempts) {
     try {
       const result = await runCommandWithTimeout(attempt.argv, {
-        timeoutMs: 3_000,
+        timeoutMs: secondsToMs(3),
         input: value,
       });
       if (result.code === 0 && !result.killed) {

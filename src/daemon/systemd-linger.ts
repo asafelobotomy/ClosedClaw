@@ -1,4 +1,5 @@
 import os from "node:os";
+import { TIMEOUT_HTTP_DEFAULT_MS, TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
 import { runCommandWithTimeout, runExec } from "../process/exec.js";
 
 function resolveLoginctlUser(env: Record<string, string | undefined>): string | null {
@@ -27,7 +28,7 @@ export async function readSystemdUserLingerStatus(
   }
   try {
     const { stdout } = await runExec("loginctl", ["show-user", user, "-p", "Linger"], {
-      timeoutMs: 5_000,
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
     });
     const line = stdout
       .split("\n")
@@ -59,7 +60,7 @@ export async function enableSystemdUserLinger(params: {
       : [];
   const argv = [...sudoArgs, "loginctl", "enable-linger", user];
   try {
-    const result = await runCommandWithTimeout(argv, { timeoutMs: 30_000 });
+    const result = await runCommandWithTimeout(argv, { timeoutMs: TIMEOUT_HTTP_DEFAULT_MS });
     return {
       ok: result.code === 0,
       stdout: result.stdout,

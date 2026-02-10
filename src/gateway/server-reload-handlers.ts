@@ -3,6 +3,7 @@ import type { loadConfig } from "../config/config.js";
 import type { HeartbeatRunner } from "../infra/heartbeat-runner.js";
 import type { ChannelKind, GatewayReloadPlan } from "./config-reload.js";
 import { resolveAgentMaxConcurrent, resolveSubagentMaxConcurrent } from "../config/agent-limits.js";
+import { isGtkOnlyMode } from "../config/gtk-only-mode.js";
 import { startGmailWatcher, stopGmailWatcher } from "../hooks/gmail-watcher.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { resetDirectoryCache } from "../infra/outbound/target-resolver.js";
@@ -116,7 +117,12 @@ export function createGatewayReloadHandlers(params: {
           "skipping channel reload (ClosedClaw_SKIP_CHANNELS=1 or ClosedClaw_SKIP_PROVIDERS=1)",
         );
       } else {
+        const gtkOnly = isGtkOnlyMode(nextConfig);
         const restartChannel = async (name: ChannelKind) => {
+          if (gtkOnly && name !== "gtk-gui") {
+            params.logChannels.info(`skipping ${name} restart (GTK-only mode)`);
+            return;
+          }
           params.logChannels.info(`restarting ${name} channel`);
           await params.stopChannel(name);
           await params.startChannel(name);

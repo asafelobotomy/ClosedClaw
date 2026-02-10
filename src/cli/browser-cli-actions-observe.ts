@@ -3,6 +3,7 @@ import { danger } from "../globals.js";
 import { defaultRuntime } from "../runtime.js";
 import { shortenHomePath } from "../utils.js";
 import { callBrowserRequest, type BrowserParentOpts } from "./browser-cli-shared.js";
+import { TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import { runCommandWithRuntime } from "./cli-utils.js";
 
 function runBrowserObserve(action: () => Promise<void>) {
@@ -36,7 +37,7 @@ export function registerBrowserActionObserveCommands(
               profile,
             },
           },
-          { timeoutMs: 20000 },
+          { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));
@@ -62,7 +63,7 @@ export function registerBrowserActionObserveCommands(
             query: profile ? { profile } : undefined,
             body: { targetId: opts.targetId?.trim() || undefined },
           },
-          { timeoutMs: 20000 },
+          { timeoutMs: TIMEOUT_BROWSER_PAGE_MS },
         );
         if (parent?.json) {
           defaultRuntime.log(JSON.stringify(result, null, 2));

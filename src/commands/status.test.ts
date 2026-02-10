@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { TIMEOUT_TEST_SUITE_SHORT_MS, minutesToMs } from "../config/constants/index.js";
 
 let previousProfile: string | undefined;
 
@@ -18,7 +19,7 @@ afterAll(() => {
 const mocks = vi.hoisted(() => ({
   loadSessionStore: vi.fn().mockReturnValue({
     "+1000": {
-      updatedAt: Date.now() - 60_000,
+      updatedAt: Date.now() - 60_000, // 1 minute
       verboseLevel: "on",
       thinkingLevel: "low",
       inputTokens: 2_000,
@@ -32,7 +33,7 @@ const mocks = vi.hoisted(() => ({
   resolveMainSessionKey: vi.fn().mockReturnValue("agent:main:main"),
   resolveStorePath: vi.fn().mockReturnValue("/tmp/sessions.json"),
   webAuthExists: vi.fn().mockResolvedValue(true),
-  getWebAuthAgeMs: vi.fn().mockReturnValue(5000),
+  getWebAuthAgeMs: vi.fn().mockReturnValue(5_000), // SHORT timeout
   readWebSelfId: vi.fn().mockReturnValue({ e164: "+1999" }),
   logWebSelfId: vi.fn(),
   probeGateway: vi.fn().mockResolvedValue({

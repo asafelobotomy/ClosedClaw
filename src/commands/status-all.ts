@@ -24,6 +24,7 @@ import {
 } from "../infra/update-channels.js";
 import { checkUpdateStatus, compareSemverStrings } from "../infra/update-check.js";
 import { runExec } from "../process/exec.js";
+import { secondsToMs, TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
 import { VERSION } from "../version.js";
 import { resolveControlUiLinks } from "./onboard-helpers.js";
 import { getAgentLocalStatuses } from "./status-all/agents.js";
@@ -48,7 +49,7 @@ export async function statusAllCommand(
     const tailscale = await (async () => {
       try {
         const parsed = await readTailscaleStatusJson(runExec, {
-          timeoutMs: 1200,
+          timeoutMs: secondsToMs(1.2),
         });
         const backendState = typeof parsed.BackendState === "string" ? parsed.BackendState : null;
         const self =
@@ -88,7 +89,7 @@ export async function statusAllCommand(
     });
     const update = await checkUpdateStatus({
       root,
-      timeoutMs: 6500,
+      timeoutMs: secondsToMs(6.5),
       fetchGit: true,
       includeRegistry: true,
     });
@@ -159,7 +160,7 @@ export async function statusAllCommand(
     const gatewayProbe = await probeGateway({
       url: connection.url,
       auth: probeAuth,
-      timeoutMs: Math.min(5000, opts?.timeoutMs ?? 10_000),
+      timeoutMs: Math.min(TIMEOUT_TEST_SUITE_SHORT_MS, opts?.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS),
     }).catch(() => null);
     const gatewayReachable = gatewayProbe?.ok === true;
     const gatewaySelf = pickGatewaySelfPresence(gatewayProbe?.presence ?? null);
@@ -224,7 +225,7 @@ export async function statusAllCommand(
     const health = gatewayReachable
       ? await callGateway({
           method: "health",
-          timeoutMs: Math.min(8000, opts?.timeoutMs ?? 10_000),
+          timeoutMs: Math.min(secondsToMs(8), opts?.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS),
           ...callOverrides,
         }).catch((err) => ({ error: String(err) }))
       : { error: gatewayProbe?.error ?? "gateway unreachable" };
@@ -232,8 +233,8 @@ export async function statusAllCommand(
     const channelsStatus = gatewayReachable
       ? await callGateway({
           method: "channels.status",
-          params: { probe: false, timeoutMs: opts?.timeoutMs ?? 10_000 },
-          timeoutMs: Math.min(8000, opts?.timeoutMs ?? 10_000),
+          params: { probe: false, timeoutMs: opts?.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS },
+          timeoutMs: Math.min(secondsToMs(8), opts?.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS),
           ...callOverrides,
         }).catch(() => null)
       : null;

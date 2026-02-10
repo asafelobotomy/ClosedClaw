@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { loadConfig } from "../config/config.js";
 import { formatCliCommand } from "../cli/command-format.js";
+import { secondsToMs } from "../config/constants/index.js";
 import { resolveStateDir } from "../config/paths.js";
 import { VERSION } from "../version.js";
 import { resolveClosedClawPackageRoot } from "./openclaw-root.js";
@@ -75,7 +76,7 @@ export async function runGatewayUpdateCheck(params: {
   });
   const status = await checkUpdateStatus({
     root,
-    timeoutMs: 2500,
+    timeoutMs: secondsToMs(2.5),
     fetchGit: false,
     includeRegistry: false,
   });
@@ -91,7 +92,7 @@ export async function runGatewayUpdateCheck(params: {
   }
 
   const channel = normalizeUpdateChannel(params.cfg.update?.channel) ?? DEFAULT_PACKAGE_CHANNEL;
-  const resolved = await resolveNpmChannelTag({ channel, timeoutMs: 2500 });
+  const resolved = await resolveNpmChannelTag({ channel, timeoutMs: secondsToMs(2.5) });
   const tag = resolved.tag;
   if (!resolved.version) {
     await writeState(statePath, nextState);

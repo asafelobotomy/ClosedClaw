@@ -17,6 +17,8 @@ import {
   type SkillsInstallPreferences,
 } from "./skills.js";
 import { resolveSkillKey } from "./skills/frontmatter.js";
+import { verifySkillSignatureForInstall } from "./skill-verification.js";
+import { logSkillInstall } from "../security/audit-hooks.js";
 
 export type SkillInstallRequest = {
   workspaceDir: string;
@@ -355,6 +357,38 @@ export async function installSkill(params: SkillInstallRequest): Promise<SkillIn
     };
   }
 
+  // Verify skill signature if security config requires it
+  const skillFilePath = path.join(entry.skill.baseDir, "SKILL.md");
+  const verification = await verifySkillSignatureForInstall(skillFilePath, params.config);
+
+  // Handle verification failure
+  if (!verification.allowed) {
+    let errorMessage = `Skill installation blocked: ${verification.message}`;
+    
+    if (verification.requiresConfirmation) {
+      errorMessage += "\n\nTo proceed without signature verification, update security config:\n" +
+        "  skills.security.promptOnUnsigned = false\n" +
+        "Or add --force flag if supported by your installation method.";
+    }
+    
+    return {
+      ok: false,
+      message: errorMessage,
+      stdout: "",
+      stderr: verification.message,
+      code: null,
+    };
+  }
+
+  // Log verification result if signature was checked
+  if (verification.hasSignature && verification.signatureValid) {
+    // Signature verified successfully - log for audit trail
+    console.log(`✓ Signature verified for '${params.skillName}': ${verification.message}`);
+  } else if (!verification.hasSignature && verification.allowed) {
+    // Unsigned but allowed - log warning
+    console.warn(`⚠ Installing unsigned skill '${params.skillName}' (signatures not enforced)`);
+  }
+
   const spec = findInstallSpec(entry, params.installId);
   if (!spec) {
     return {
@@ -479,6 +513,19 @@ export async function installSkill(params: SkillInstallRequest): Promise<SkillIn
   })();
 
   const success = result.code === 0;
+  
+  // Log installation event to audit log
+  await logSkillInstall({
+    skillId: resolveSkillKey(entry.skill),
+    skillPath: skillFilePath,
+    action: "install",
+    verified: verification.hasSignature && verification.signatureValid,
+    signer: verification.signer,
+  }).catch((err) => {
+    // Don't fail installation if audit logging fails
+    console.warn(`Failed to log skill installation: ${(err as Error).message}`);
+  });
+  
   return {
     ok: success,
     message: success ? "Installed" : formatInstallFailureMessage(result),

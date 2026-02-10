@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { runCommandWithTimeout } from "../process/exec.js";
+import { secondsToMs } from "../config/constants/index.js";
 import { parseSemver } from "./runtime-guard.js";
 import { channelToNpmTag, type UpdateChannel } from "./update-channels.js";
 
@@ -83,7 +84,7 @@ async function detectPackageManager(root: string): Promise<PackageManager> {
 
 async function detectGitRoot(root: string): Promise<string | null> {
   const res = await runCommandWithTimeout(["git", "-C", root, "rev-parse", "--show-toplevel"], {
-    timeoutMs: 4000,
+    timeoutMs: secondsToMs(4),
   }).catch(() => null);
   if (!res || res.code !== 0) {
     return null;

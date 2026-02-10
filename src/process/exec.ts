@@ -1,6 +1,7 @@
 import { execFile, spawn } from "node:child_process";
 import path from "node:path";
 import { promisify } from "node:util";
+import { TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
 import { danger, shouldLogVerbose } from "../globals.js";
 import { logDebug, logError } from "../logger.js";
 import { resolveCommandStdio } from "./spawn-utils.js";
@@ -13,10 +14,12 @@ function resolveCommand(command: string): string {
 }
 
 // Simple promise-wrapped execFile with optional verbosity logging.
+import { TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
+
 export async function runExec(
   command: string,
   args: string[],
-  opts: number | { timeoutMs?: number; maxBuffer?: number } = 10_000,
+  opts: number | { timeoutMs?: number; maxBuffer?: number } = TIMEOUT_HTTP_SHORT_MS,
 ): Promise<{ stdout: string; stderr: string }> {
   const options =
     typeof opts === "number"

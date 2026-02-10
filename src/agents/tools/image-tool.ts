@@ -5,7 +5,7 @@ import path from "node:path";
 import type { ClosedClawConfig } from "../../config/config.js";
 import type { AnyAgentTool } from "./common.js";
 import { resolveUserPath } from "../../utils.js";
-import { loadWebMedia } from "../../web/media.js";
+import { loadWebMedia } from "../../media/load-web-media.js";
 import { ensureAuthProfileStore, listProfilesForProvider } from "../auth-profiles.js";
 import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "../defaults.js";
 import { minimaxUnderstandImage } from "../minimax-vlm.js";

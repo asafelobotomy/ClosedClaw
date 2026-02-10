@@ -484,7 +484,7 @@ describe("getAuditLogStats", () => {
 describe("getAuditLogPath", () => {
   it("uses default state directory", () => {
     const p = getAuditLogPath();
-    expect(p).toContain(".closedclaw");
+    expect(p).toContain(".ClosedClaw");
     expect(p).toContain("audit.log");
   });
 

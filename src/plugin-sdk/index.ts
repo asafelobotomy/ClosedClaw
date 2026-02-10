@@ -73,6 +73,7 @@ export { normalizePluginHttpPath } from "../plugins/http-path.js";
 export { registerPluginHttpRoute } from "../plugins/http-registry.js";
 export { emptyPluginConfigSchema } from "../plugins/config-schema.js";
 export type { ClosedClawConfig } from "../config/config.js";
+export { getVoiceCallsDir } from "../config/constants/path-constants.js";
 export type { ChannelDock } from "../channels/dock.js";
 export { getChatChannelMeta } from "../channels/registry.js";
 export type {
@@ -154,22 +155,8 @@ export { resolveChannelMediaMaxBytes } from "../channels/plugins/media-limits.js
 export type { NormalizedLocation } from "../channels/location.js";
 export { formatLocationText, toLocationContext } from "../channels/location.js";
 export { resolveControlCommandGate } from "../channels/command-gating.js";
-export {
-  resolveBlueBubblesGroupRequireMention,
-  resolveDiscordGroupRequireMention,
-  resolveGoogleChatGroupRequireMention,
-  resolveIMessageGroupRequireMention,
-  resolveSlackGroupRequireMention,
-  resolveTelegramGroupRequireMention,
-  resolveWhatsAppGroupRequireMention,
-  resolveBlueBubblesGroupToolPolicy,
-  resolveDiscordGroupToolPolicy,
-  resolveGoogleChatGroupToolPolicy,
-  resolveIMessageGroupToolPolicy,
-  resolveSlackGroupToolPolicy,
-  resolveTelegramGroupToolPolicy,
-  resolveWhatsAppGroupToolPolicy,
-} from "../channels/plugins/group-mentions.js";
+// Channel: group mentions — archived. GTK-only mode.
+// All channel-specific group mention/tool policy re-exports removed.
 export { recordInboundSession } from "../channels/session.js";
 export {
   buildChannelKeyCandidates,
@@ -178,16 +165,8 @@ export {
   resolveChannelEntryMatchWithFallback,
   resolveNestedAllowlistDecision,
 } from "../channels/plugins/channel-config.js";
-export {
-  listDiscordDirectoryGroupsFromConfig,
-  listDiscordDirectoryPeersFromConfig,
-  listSlackDirectoryGroupsFromConfig,
-  listSlackDirectoryPeersFromConfig,
-  listTelegramDirectoryGroupsFromConfig,
-  listTelegramDirectoryPeersFromConfig,
-  listWhatsAppDirectoryGroupsFromConfig,
-  listWhatsAppDirectoryPeersFromConfig,
-} from "../channels/plugins/directory-config.js";
+// Channel: directory config — archived.
+// All directory config re-exports removed.
 export type { AllowlistMatch } from "../channels/plugins/allowlist-match.js";
 export { formatAllowlistMatchMeta } from "../channels/plugins/allowlist-match.js";
 export { optionalStringEnum, stringEnum } from "../agents/schema/typebox.js";
@@ -249,125 +228,10 @@ export type {
 export { detectMime, extensionForMime, getFileExtension } from "../media/mime.js";
 export { extractOriginalFilename } from "../media/store.js";
 
-// Channel: Discord
-export {
-  listDiscordAccountIds,
-  resolveDefaultDiscordAccountId,
-  resolveDiscordAccount,
-  type ResolvedDiscordAccount,
-} from "../discord/accounts.js";
-export { collectDiscordAuditChannelIds } from "../discord/audit.js";
-export { discordOnboardingAdapter } from "../channels/plugins/onboarding/discord.js";
-export {
-  looksLikeDiscordTargetId,
-  normalizeDiscordMessagingTarget,
-} from "../channels/plugins/normalize/discord.js";
-export { collectDiscordStatusIssues } from "../channels/plugins/status-issues/discord.js";
+// Third-party channel re-exports removed — channels archived.
+// GTK GUI uses the plugin outbound adapter pipeline.
+// Channel: Discord, iMessage, Slack, Telegram, Signal, WhatsApp, LINE, and
+// web media utilities were all removed.
 
-// Channel: iMessage
-export {
-  listIMessageAccountIds,
-  resolveDefaultIMessageAccountId,
-  resolveIMessageAccount,
-  type ResolvedIMessageAccount,
-} from "../imessage/accounts.js";
-export { imessageOnboardingAdapter } from "../channels/plugins/onboarding/imessage.js";
-export {
-  looksLikeIMessageTargetId,
-  normalizeIMessageMessagingTarget,
-} from "../channels/plugins/normalize/imessage.js";
-
-// Channel: Slack
-export {
-  listEnabledSlackAccounts,
-  listSlackAccountIds,
-  resolveDefaultSlackAccountId,
-  resolveSlackAccount,
-  resolveSlackReplyToMode,
-  type ResolvedSlackAccount,
-} from "../slack/accounts.js";
-export { slackOnboardingAdapter } from "../channels/plugins/onboarding/slack.js";
-export {
-  looksLikeSlackTargetId,
-  normalizeSlackMessagingTarget,
-} from "../channels/plugins/normalize/slack.js";
-export { buildSlackThreadingToolContext } from "../slack/threading-tool-context.js";
-
-// Channel: Telegram
-export {
-  listTelegramAccountIds,
-  resolveDefaultTelegramAccountId,
-  resolveTelegramAccount,
-  type ResolvedTelegramAccount,
-} from "../telegram/accounts.js";
-export { telegramOnboardingAdapter } from "../channels/plugins/onboarding/telegram.js";
-export {
-  looksLikeTelegramTargetId,
-  normalizeTelegramMessagingTarget,
-} from "../channels/plugins/normalize/telegram.js";
-export { collectTelegramStatusIssues } from "../channels/plugins/status-issues/telegram.js";
-
-// Channel: Signal
-export {
-  listSignalAccountIds,
-  resolveDefaultSignalAccountId,
-  resolveSignalAccount,
-  type ResolvedSignalAccount,
-} from "../signal/accounts.js";
-export { signalOnboardingAdapter } from "../channels/plugins/onboarding/signal.js";
-export {
-  looksLikeSignalTargetId,
-  normalizeSignalMessagingTarget,
-} from "../channels/plugins/normalize/signal.js";
-
-// Channel: WhatsApp
-export {
-  listWhatsAppAccountIds,
-  resolveDefaultWhatsAppAccountId,
-  resolveWhatsAppAccount,
-  type ResolvedWhatsAppAccount,
-} from "../web/accounts.js";
-export { isWhatsAppGroupJid, normalizeWhatsAppTarget } from "../whatsapp/normalize.js";
-export { whatsappOnboardingAdapter } from "../channels/plugins/onboarding/whatsapp.js";
-export { resolveWhatsAppHeartbeatRecipients } from "../channels/plugins/whatsapp-heartbeat.js";
-export {
-  looksLikeWhatsAppTargetId,
-  normalizeWhatsAppMessagingTarget,
-} from "../channels/plugins/normalize/whatsapp.js";
-export { collectWhatsAppStatusIssues } from "../channels/plugins/status-issues/whatsapp.js";
-
-// Channel: BlueBubbles
+// Channel: BlueBubbles (status issues only — no broken imports)
 export { collectBlueBubblesStatusIssues } from "../channels/plugins/status-issues/bluebubbles.js";
-
-// Channel: LINE
-export {
-  listLineAccountIds,
-  normalizeAccountId as normalizeLineAccountId,
-  resolveDefaultLineAccountId,
-  resolveLineAccount,
-} from "../line/accounts.js";
-export { LineConfigSchema } from "../line/config-schema.js";
-export type {
-  LineConfig,
-  LineAccountConfig,
-  ResolvedLineAccount,
-  LineChannelData,
-} from "../line/types.js";
-export {
-  createInfoCard,
-  createListCard,
-  createImageCard,
-  createActionCard,
-  createReceiptCard,
-  type CardAction,
-  type ListItem,
-} from "../line/flex-templates.js";
-export {
-  processLineMessage,
-  hasMarkdownToConvert,
-  stripMarkdown,
-} from "../line/markdown-to-line.js";
-export type { ProcessedLineMessage } from "../line/markdown-to-line.js";
-
-// Media utilities
-export { loadWebMedia, type WebMediaResult } from "../web/media.js";

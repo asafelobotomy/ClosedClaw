@@ -4,6 +4,7 @@ import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { stripAnsi } from "../terminal/ansi.js";
 import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
 import { healthCommand } from "./health.js";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 
 const callGatewayMock = vi.fn();
 const logWebSelfIdMock = vi.fn();
@@ -64,7 +65,7 @@ describe("healthCommand (coverage)", () => {
         whatsapp: {
           accountId: "default",
           linked: true,
-          authAgeMs: 5 * 60_000,
+          authAgeMs: 5 * 60_000, // 5 minutes
         },
         telegram: {
           accountId: "default",
@@ -96,7 +97,7 @@ describe("healthCommand (coverage)", () => {
           heartbeat: {
             enabled: true,
             every: "1m",
-            everyMs: 60_000,
+            everyMs: TIMEOUT_TEST_SUITE_LONG_MS,
             prompt: "hi",
             target: "last",
             ackMaxChars: 160,
@@ -105,7 +106,7 @@ describe("healthCommand (coverage)", () => {
             path: "/tmp/sessions.json",
             count: 2,
             recent: [
-              { key: "main", updatedAt: Date.now() - 60_000, age: 60_000 },
+              { key: "main", updatedAt: Date.now() - TIMEOUT_TEST_SUITE_LONG_MS, age: TIMEOUT_TEST_SUITE_LONG_MS },
               { key: "foo", updatedAt: null, age: null },
             ],
           },
@@ -115,7 +116,7 @@ describe("healthCommand (coverage)", () => {
         path: "/tmp/sessions.json",
         count: 2,
         recent: [
-          { key: "main", updatedAt: Date.now() - 60_000, age: 60_000 },
+          { key: "main", updatedAt: Date.now() - TIMEOUT_TEST_SUITE_LONG_MS, age: TIMEOUT_TEST_SUITE_LONG_MS },
           { key: "foo", updatedAt: null, age: null },
         ],
       },

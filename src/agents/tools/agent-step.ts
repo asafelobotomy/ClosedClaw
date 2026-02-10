@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { TIMEOUT_HTTP_LONG_MS, TIMEOUT_HTTP_SHORT_MS } from "../../config/constants/index.js";
 import { callGateway } from "../../gateway/call.js";
 import { INTERNAL_MESSAGE_CHANNEL } from "../../utils/message-channel.js";
 import { AGENT_LANE_NESTED } from "../lanes.js";
@@ -37,12 +38,12 @@ export async function runAgentStep(params: {
       lane: params.lane ?? AGENT_LANE_NESTED,
       extraSystemPrompt: params.extraSystemPrompt,
     },
-    timeoutMs: 10_000,
+    timeoutMs: TIMEOUT_HTTP_SHORT_MS,
   });
 
   const stepRunId = typeof response?.runId === "string" && response.runId ? response.runId : "";
   const resolvedRunId = stepRunId || stepIdem;
-  const stepWaitMs = Math.min(params.timeoutMs, 60_000);
+  const stepWaitMs = Math.min(params.timeoutMs, TIMEOUT_HTTP_LONG_MS);
   const wait = await callGateway<{ status?: string }>({
     method: "agent.wait",
     params: {

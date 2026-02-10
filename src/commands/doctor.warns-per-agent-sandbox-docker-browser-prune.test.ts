@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { TIMEOUT_HTTP_DEFAULT_MS } from "../config/constants/index.js";
 
 let originalIsTTY: boolean | undefined;
 let originalStateDir: string | undefined;
@@ -383,7 +384,7 @@ describe("doctor command", () => {
         );
       }),
     ).toBe(true);
-  }, 30_000);
+  }, TIMEOUT_HTTP_DEFAULT_MS);
 
   it("does not warn when only the active workspace is present", async () => {
     readConfigFileSnapshot.mockResolvedValue({

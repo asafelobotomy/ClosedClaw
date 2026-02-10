@@ -9,6 +9,7 @@ import {
   listChannelPlugins,
   normalizeChannelId,
 } from "../../channels/plugins/index.js";
+import { filterChannelsForGtkOnlyMode } from "../../config/gtk-only-mode.js";
 import { buildChannelAccountSnapshot } from "../../channels/plugins/status.js";
 import { loadConfig, readConfigFileSnapshot } from "../../config/config.js";
 import { getChannelActivity } from "../../infra/channel-activity.js";
@@ -84,7 +85,7 @@ export const channelsHandlers: GatewayRequestHandlers = {
     const timeoutMs = typeof timeoutMsRaw === "number" ? Math.max(1000, timeoutMsRaw) : 10_000;
     const cfg = loadConfig();
     const runtime = context.getRuntimeSnapshot();
-    const plugins = listChannelPlugins();
+    const plugins = filterChannelsForGtkOnlyMode(listChannelPlugins(), cfg);
     const pluginMap = new Map<ChannelId, ChannelPlugin>(
       plugins.map((plugin) => [plugin.id, plugin]),
     );

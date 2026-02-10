@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import os from "node:os";
 import path from "node:path";
 import { runExec } from "../process/exec.js";
@@ -138,7 +139,7 @@ async function sipsMetadataFromBuffer(buffer: Buffer): Promise<ImageMetadata | n
       "/usr/bin/sips",
       ["-g", "pixelWidth", "-g", "pixelHeight", input],
       {
-        timeoutMs: 10_000,
+        timeoutMs: TIMEOUT_HTTP_SHORT_MS,
         maxBuffer: 512 * 1024,
       },
     );
@@ -183,7 +184,7 @@ async function sipsResizeToJpeg(params: {
         "--out",
         output,
       ],
-      { timeoutMs: 20_000, maxBuffer: 1024 * 1024 },
+      { timeoutMs: TIMEOUT_BROWSER_PAGE_MS, maxBuffer: 1024 * 1024 },
     );
     return await fs.readFile(output);
   });
@@ -195,7 +196,7 @@ async function sipsConvertToJpeg(buffer: Buffer): Promise<Buffer> {
     const output = path.join(dir, "out.jpg");
     await fs.writeFile(input, buffer);
     await runExec("/usr/bin/sips", ["-s", "format", "jpeg", input, "--out", output], {
-      timeoutMs: 20_000,
+      timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
       maxBuffer: 1024 * 1024,
     });
     return await fs.readFile(output);
@@ -263,7 +264,7 @@ async function sipsApplyOrientation(buffer: Buffer, orientation: number): Promis
     const output = path.join(dir, "out.jpg");
     await fs.writeFile(input, buffer);
     await runExec("/usr/bin/sips", [...ops, input, "--out", output], {
-      timeoutMs: 20_000,
+      timeoutMs: TIMEOUT_BROWSER_PAGE_MS,
       maxBuffer: 1024 * 1024,
     });
     return await fs.readFile(output);

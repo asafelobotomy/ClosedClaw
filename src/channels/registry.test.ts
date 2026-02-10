@@ -13,9 +13,9 @@ describe("channel registry", () => {
     expect(normalizeChatChannelId("web")).toBeNull();
   });
 
-  it("keeps Telegram first in the default order", () => {
+  it("keeps GTK GUI first in the default order", () => {
     const channels = listChatChannels();
-    expect(channels[0]?.id).toBe("telegram");
+    expect(channels[0]?.id).toBe("gtk-gui");
   });
 
   it("does not include MS Teams by default", () => {
@@ -25,11 +25,12 @@ describe("channel registry", () => {
 
   it("formats selection lines with docs labels", () => {
     const channels = listChatChannels();
-    const first = channels[0];
-    if (!first) {
-      throw new Error("Missing channel metadata.");
+    // Find Telegram to test doc link formatting (gtk-gui may not have an external docs URL)
+    const telegram = channels.find((c) => c.id === "telegram");
+    if (!telegram) {
+      throw new Error("Missing Telegram channel metadata.");
     }
-    const line = formatChannelSelectionLine(first, (path, label) =>
+    const line = formatChannelSelectionLine(telegram, (path, label) =>
       [label, path].filter(Boolean).join(":"),
     );
     expect(line).not.toContain("Docs:");

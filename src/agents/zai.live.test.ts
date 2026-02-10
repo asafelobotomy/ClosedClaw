@@ -1,5 +1,6 @@
 import { completeSimple, getModel } from "@mariozechner/pi-ai";
 import { describe, expect, it } from "vitest";
+import { TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 
 const ZAI_KEY = process.env.ZAI_API_KEY ?? process.env.Z_AI_API_KEY ?? "";
@@ -28,5 +29,5 @@ describeLive("zai live", () => {
       .map((block) => block.text.trim())
       .join(" ");
     expect(text.length).toBeGreaterThan(0);
-  }, 20000);
+  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
 });

@@ -1,4 +1,5 @@
 import type { ClosedClawConfig } from "../config/config.js";
+import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SHORT_MS } from "../config/constants/index.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { DoctorOptions, DoctorPrompter } from "./doctor-prompter.js";
 import { formatCliCommand } from "../cli/command-format.js";
@@ -132,7 +133,7 @@ export async function maybeRepairGatewayDaemon(params: {
         env: process.env,
         stdout: process.stdout,
       });
-      await sleep(1500);
+      await sleep(TIMEOUT_TEST_SHORT_MS);
     }
   }
 
@@ -146,9 +147,9 @@ export async function maybeRepairGatewayDaemon(params: {
         env: process.env,
         stdout: process.stdout,
       });
-      await sleep(1500);
+      await sleep(TIMEOUT_TEST_SHORT_MS);
       try {
-        await healthCommand({ json: false, timeoutMs: 10_000 }, params.runtime);
+        await healthCommand({ json: false, timeoutMs: TIMEOUT_HTTP_SHORT_MS }, params.runtime);
       } catch (err) {
         const message = String(err);
         if (message.includes("gateway closed")) {

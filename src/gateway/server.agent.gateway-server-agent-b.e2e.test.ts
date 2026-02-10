@@ -3,6 +3,8 @@ import os from "node:os";
 import path from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { WebSocket } from "ws";
+import { secondsToMs, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
+import { secondsToMs, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
 import type { PluginRegistry } from "../plugins/registry.js";
 import { whatsappPlugin } from "../../extensions/whatsapp/src/channel.js";
@@ -292,7 +294,7 @@ describe("gateway server agent", () => {
     expect(call.sessionId).toBe("sess-main-webchat-internal");
   });
 
-  test("agent ack response then final response", { timeout: 8000 }, async () => {
+  test("agent ack response then final response", { timeout: secondsToMs(8) }, async () => {
     const ackP = onceMessage(
       ws,
       (o) => o.type === "res" && o.id === "ag1" && o.payload?.status === "accepted",
@@ -345,7 +347,7 @@ describe("gateway server agent", () => {
     expect(second.payload).toEqual(firstFinal.payload);
   });
 
-  test("agent dedupe survives reconnect", { timeout: 60_000 }, async () => {
+  test("agent dedupe survives reconnect", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     const port = await getFreePort();
     const server = await startGatewayServer(port);
 

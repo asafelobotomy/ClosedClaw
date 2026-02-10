@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import { TIMEOUT_HTTP_DEFAULT_MS } from "../../config/constants/index.js";
 import type { NodesRpcOpts } from "./types.js";
 import { randomIdempotencyKey } from "../../gateway/call.js";
 import { defaultRuntime } from "../../runtime.js";
@@ -76,6 +77,6 @@ export function registerNodesLocationCommands(nodes: Command) {
           defaultRuntime.log(JSON.stringify(payload));
         });
       }),
-    { timeoutMs: 30_000 },
+    { timeoutMs: TIMEOUT_HTTP_DEFAULT_MS },
   );
 }

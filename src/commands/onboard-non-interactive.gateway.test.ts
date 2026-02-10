@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { getDeterministicFreePortBlock } from "../../test/helpers/ports.js";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 
 const gatewayClientCalls: Array<{
   url?: string;
@@ -191,7 +192,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
     expect(resToken.ok).toBe(true);
 
     await fs.rm(stateDir, { recursive: true, force: true });
-  }, 60_000);
+  }, TIMEOUT_TEST_SUITE_LONG_MS);
 
   it("writes gateway.remote url/token and callGateway uses them", async () => {
     const stateDir = await initStateDir("state-remote-");
@@ -228,7 +229,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
     expect(lastCall?.token).toBe(token);
 
     await fs.rm(stateDir, { recursive: true, force: true });
-  }, 60_000);
+  }, TIMEOUT_TEST_SUITE_LONG_MS);
 
   it("auto-generates token auth when binding LAN and persists the token", async () => {
     if (process.platform === "win32") {
@@ -290,5 +291,5 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
     expect(resToken.ok).toBe(true);
 
     await fs.rm(stateDir, { recursive: true, force: true });
-  }, 60_000);
+  }, TIMEOUT_TEST_SUITE_LONG_MS);
 });

@@ -17,6 +17,7 @@ import {
   resolveProfileUnusableUntilForDisplay,
 } from "../../agents/auth-profiles.js";
 import { resolveEnvApiKey } from "../../agents/model-auth.js";
+import { secondsToMs } from "../../config/constants/index.js";
 import {
   buildModelAliasIndex,
   parseModelRef,
@@ -566,7 +567,7 @@ export async function modelsStatusCommand(
         const usageSummary = await loadProviderUsageSummary({
           providers: usageProviders,
           agentDir,
-          timeoutMs: 3500,
+          timeoutMs: secondsToMs(3.5),
         });
         for (const snapshot of usageSummary.providers) {
           const formatted = formatUsageWindowSummary(snapshot, {

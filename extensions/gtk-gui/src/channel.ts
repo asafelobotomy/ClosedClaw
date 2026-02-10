@@ -46,12 +46,16 @@ function getIpcBridge(cfg: ClosedClawConfig): GtkIpcBridge {
 }
 
 const gtkChannelMeta: ChannelMeta = {
-  name: "GTK GUI",
-  displayName: "GTK GUI",
+  id: "gtk-gui",
+  label: "GTK GUI",
+  selectionLabel: "GTK GUI (Desktop)",
+  detailLabel: "GTK Desktop",
+  docsPath: "/channels/gtk-gui",
+  docsLabel: "gtk-gui",
+  blurb: "native Linux desktop GUI — the primary interface for ClosedClaw.",
+  systemImage: "desktopcomputer",
   order: 1,
-  icon: "desktop",
-  description: "Custom GTK desktop GUI for Linux",
-  color: "#4a86cf", // GTK blue
+  aliases: ["gtk", "gui", "desktop"],
 };
 
 const gtkCapabilities: ChannelCapabilities = {
@@ -138,37 +142,57 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
   },
 
   outbound: {
-    normalizeTarget: (target) => {
-      const trimmed = target.trim();
-      return trimmed || DEFAULT_USER_ID;
+    deliveryMode: "direct" as const,
+    textChunkLimit: 16_000,
+
+    resolveTarget: (params: { to?: string }) => {
+      const to = params.to?.trim() || DEFAULT_USER_ID;
+      return { ok: true as const, to };
     },
-    
-    looksLikeTarget: (target) => {
-      return Boolean(target?.trim());
-    },
-    
-    async send(ctx) {
-      const { cfg, to, text, attachments } = ctx;
-      const bridge = getIpcBridge(cfg);
-      const config = resolveGtkConfig(cfg);
+
+    sendText: async (ctx: { cfg: ClosedClawConfig; to: string; text: string; accountId?: string | null }) => {
+      const bridge = getIpcBridge(ctx.cfg);
+      const config = resolveGtkConfig(ctx.cfg);
+      const target = ctx.to?.trim() || config.userId || DEFAULT_USER_ID;
 
       const message: GtkMessage = {
         id: generateMessageId(),
         type: "response",
         from: "assistant",
-        to: to ?? config.userId ?? DEFAULT_USER_ID,
-        text: text ?? "",
+        to: target,
+        text: ctx.text ?? "",
         timestamp: Date.now(),
-        attachments: attachments?.map((att) => ({
-          path: att.path ?? "",
-          mimeType: att.mimetype ?? "application/octet-stream",
-        })),
       };
 
       await bridge.send(message);
 
       return {
-        success: true,
+        channel: CHANNEL_ID as string,
+        messageId: message.id,
+      };
+    },
+
+    sendMedia: async (ctx: { cfg: ClosedClawConfig; to: string; text: string; mediaUrl?: string; accountId?: string | null }) => {
+      const bridge = getIpcBridge(ctx.cfg);
+      const config = resolveGtkConfig(ctx.cfg);
+      const target = ctx.to?.trim() || config.userId || DEFAULT_USER_ID;
+
+      const message: GtkMessage = {
+        id: generateMessageId(),
+        type: "response",
+        from: "assistant",
+        to: target,
+        text: ctx.text ?? "",
+        timestamp: Date.now(),
+        attachments: ctx.mediaUrl
+          ? [{ path: ctx.mediaUrl, mimeType: "application/octet-stream" }]
+          : undefined,
+      };
+
+      await bridge.send(message);
+
+      return {
+        channel: CHANNEL_ID as string,
         messageId: message.id,
       };
     },

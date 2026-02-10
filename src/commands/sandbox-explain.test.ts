@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 
 let mockCfg: unknown = {};
 
@@ -42,5 +43,5 @@ describe("sandbox explain command", () => {
     expect(Array.isArray(parsed.fixIt)).toBe(true);
     expect(parsed.fixIt).toContain("agents.defaults.sandbox.mode=off");
     expect(parsed.fixIt).toContain("tools.sandbox.tools.deny");
-  }, 15_000);
+  }, TIMEOUT_TEST_SUITE_MEDIUM_MS);
 });

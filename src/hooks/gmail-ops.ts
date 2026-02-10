@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { minutesToMs, secondsToMs } from "../config/constants/index.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import {
   type ClosedClawConfig,
@@ -325,7 +326,7 @@ export async function runGmailService(opts: GmailRunOptions) {
   let shuttingDown = false;
   let child = spawnGogServe(runtimeConfig);
 
-  const renewMs = runtimeConfig.renewEveryMinutes * 60_000;
+  const renewMs = minutesToMs(runtimeConfig.renewEveryMinutes);
   const renewTimer = setInterval(() => {
     void startGmailWatch(runtimeConfig);
   }, renewMs);
@@ -352,7 +353,7 @@ export async function runGmailService(opts: GmailRunOptions) {
         return;
       }
       child = spawnGogServe(runtimeConfig);
-    }, 2000);
+    }, secondsToMs(2));
   });
 }
 
@@ -367,7 +368,7 @@ async function startGmailWatch(
   fatal = false,
 ) {
   const args = ["gog", ...buildGogWatchStartArgs(cfg)];
-  const result = await runCommandWithTimeout(args, { timeoutMs: 120_000 });
+  const result = await runCommandWithTimeout(args, { timeoutMs: minutesToMs(2) });
   if (result.code !== 0) {
     const message = result.stderr || result.stdout || "gog watch start failed";
     if (fatal) {

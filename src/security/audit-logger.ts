@@ -21,6 +21,7 @@ import fs from "node:fs/promises";
 import { createWriteStream, type WriteStream } from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { getStateDir } from "@/config/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -542,7 +543,7 @@ export async function getAuditLogStats(logPath: string): Promise<AuditLogStats> 
  * Get the default audit log path.
  */
 export function getAuditLogPath(stateDir?: string): string {
-  const dir = stateDir ?? path.join(os.homedir(), ".closedclaw");
+  const dir = stateDir ?? getStateDir();
   return path.join(dir, "audit.log");
 }
 

@@ -1,0 +1,46 @@
+{
+  "id": "extension-template",
+  "version": "0.1.0",
+  "name": "Extension Template",
+  "description": "A template for creating new ClosedClaw extensions",
+  "author": "Your Name",
+  "license": "MIT",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true,
+        "description": "Enable this extension"
+      },
+      "setting1": {
+        "type": "string",
+        "default": "default-value",
+        "description": "Example configuration setting"
+      },
+      "apiKey": {
+        "type": "string",
+        "description": "API key for the service (if needed)"
+      }
+    }
+  },
+  "uiHints": {
+    "apiKey": {
+      "sensitive": true,
+      "label": "API Key",
+      "placeholder": "Enter your API key"
+    },
+    "setting1": {
+      "label": "Setting 1",
+      "placeholder": "Enter value"
+    }
+  },
+  "capabilities": [
+    "tools",
+    "hooks",
+    "channels",
+    "providers"
+  ],
+  "homepage": "https://github.com/ClosedClaw/ClosedClaw/tree/main/extensions/extension-template",
+  "repository": "https://github.com/ClosedClaw/ClosedClaw"
+}

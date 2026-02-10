@@ -212,7 +212,7 @@ export function registerChannelsCli(program: Command) {
   channels
     .command("login")
     .description("Link a channel account (if supported)")
-    .option("--channel <channel>", "Channel alias (default: whatsapp)")
+    .option("--channel <channel>", "Channel alias (default: gtk-gui)")
     .option("--account <id>", "Account id (accountId)")
     .option("--verbose", "Verbose connection logs", false)
     .action(async (opts) => {
@@ -231,7 +231,7 @@ export function registerChannelsCli(program: Command) {
   channels
     .command("logout")
     .description("Log out of a channel session (if supported)")
-    .option("--channel <channel>", "Channel alias (default: whatsapp)")
+    .option("--channel <channel>", "Channel alias (default: gtk-gui)")
     .option("--account <id>", "Account id (accountId)")
     .action(async (opts) => {
       await runChannelsCommandWithDanger(async () => {

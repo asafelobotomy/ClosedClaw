@@ -22,6 +22,7 @@
 import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
+import { getStateDir } from "@/config/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -399,7 +400,7 @@ export function enforceEgress(url: string, policy: EgressPolicy): EgressCheckRes
  * Get the path to the egress policy file.
  */
 export function getEgressPolicyPath(stateDir?: string): string {
-  const dir = stateDir ?? path.join(os.homedir(), ".closedclaw");
+  const dir = stateDir ?? getStateDir();
   return path.join(dir, "egress-policy.json");
 }
 

@@ -1,6 +1,7 @@
 import os from "node:os";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as logging from "../logging.js";
+import { minutesToMs } from "../config/constants/index.js";
 
 const mocks = vi.hoisted(() => ({
   createService: vi.fn(),
@@ -298,12 +299,12 @@ describe("gateway bonjour advertiser", () => {
     expect(logWarn).toHaveBeenCalledWith(expect.stringContaining("advertise failed"));
 
     // watchdog should attempt re-advertise at the 60s interval tick
-    await vi.advanceTimersByTimeAsync(60_000);
+    await vi.advanceTimersByTimeAsync(minutesToMs(1));
     expect(advertise).toHaveBeenCalledTimes(2);
 
     await started.stop();
 
-    await vi.advanceTimersByTimeAsync(120_000);
+    await vi.advanceTimersByTimeAsync(minutesToMs(2));
     expect(advertise).toHaveBeenCalledTimes(2);
   });
 
