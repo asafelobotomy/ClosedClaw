@@ -2,7 +2,7 @@
 
 Docs: https://docs.OpenClaw.ai
 
-## Unreleased
+## 2026.2.3
 
 ### Phase 2 — Agent Profiles, Multi-Model Orchestration, Workflow Engine
 

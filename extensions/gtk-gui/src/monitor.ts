@@ -25,6 +25,8 @@ import {
   getNativeToolSystemPrompt,
   getPatternSystemPrompt,
 } from "./lite-tools.js";
+import { routeWithClawTalk, type ClawTalkRoutingResult } from "./clawtalk-bridge.js";
+import { hasOrchestrationTags, processOrchestrationTags } from "./orchestration-tags.js";
 
 /**
  * Conversation message for lite mode
@@ -55,6 +57,8 @@ async function callOllamaWithTools(params: {
   agentName: string;
   enableTools: boolean;
   maxIterations?: number;
+  customSystemPrompt?: string;
+  toolFilter?: string[];
   log?: { debug?: (msg: string) => void; error?: (msg: string) => void; info?: (msg: string) => void };
 }): Promise<string> {
   const { baseUrl, model, sessionKey, userMessage, agentName, enableTools, log } = params;
@@ -66,7 +70,7 @@ async function callOllamaWithTools(params: {
     history = [
       {
         role: "system" as const,
-        content: getNativeToolSystemPrompt(agentName),
+        content: params.customSystemPrompt ?? getNativeToolSystemPrompt(agentName),
       },
     ];
     liteModeSessions.set(sessionKey, history);
@@ -104,7 +108,14 @@ async function callOllamaWithTools(params: {
     };
 
     if (enableTools) {
-      requestBody.tools = getOllamaTools();
+      let tools = getOllamaTools();
+      if (params.toolFilter && params.toolFilter.length > 0) {
+        tools = tools.filter((t: Record<string, unknown>) => {
+          const fn = t.function as Record<string, unknown> | undefined;
+          return fn?.name && params.toolFilter!.includes(fn.name as string);
+        });
+      }
+      requestBody.tools = tools;
       if (iteration === 1) {
         log?.info?.(`Tools enabled: ${(requestBody.tools as unknown[]).length} tools available`);
       }
@@ -304,6 +315,29 @@ function getOllamaBaseUrl(cfg: CoreConfig): string | undefined {
   return ollama?.baseUrl as string | undefined;
 }
 
+/**
+ * Get ClawTalk escalation config from GTK plugin config
+ */
+function getClawTalkConfig(cfg: CoreConfig): {
+  escalationThreshold: number;
+  escalationModel: string | undefined;
+} {
+  const pluginConfig = (cfg as Record<string, unknown>).plugins as Record<string, unknown> | undefined;
+  const entries = pluginConfig?.entries as Record<string, unknown> | undefined;
+  const gtkConfig = entries?.["gtk-gui"] as Record<string, unknown> | undefined;
+  const config = gtkConfig?.config as Record<string, unknown> | undefined;
+  return {
+    escalationThreshold:
+      typeof config?.clawtalkEscalationThreshold === "number"
+        ? config.clawtalkEscalationThreshold
+        : 0.5,
+    escalationModel:
+      typeof config?.clawtalkEscalationModel === "string"
+        ? config.clawtalkEscalationModel
+        : undefined,
+  };
+}
+
 export type GtkMonitorContext = {
   cfg: ClosedClawConfig;
   accountId: string;
@@ -412,53 +446,92 @@ export async function processGtkMessage(
     const supportsNativeTools = modelSupportsTools(model);
     const maxIterations = getLiteModeMaxIterations(coreConfig);
 
-    log?.debug?.(
-      `Using lite mode: model=${model}, toolsEnabled=${toolsEnabled}, nativeTools=${supportsNativeTools}, maxIterations=${maxIterations}`,
+    // Route through ClawTalk pipeline for intent-based subagent routing
+    const clawTalkConfig = getClawTalkConfig(coreConfig);
+    const routing = routeWithClawTalk({
+      userMessage,
+      baseSessionKey: sessionKey,
+      config: {
+        agentName,
+        escalationThreshold: clawTalkConfig.escalationThreshold,
+        escalationModel: clawTalkConfig.escalationModel,
+      },
+    });
+
+    log?.info?.(
+      `[clawtalk] Intent: ${routing.intent} (${(routing.confidence * 100).toFixed(0)}%) → ${routing.agentName} [${routing.agentId}]${routing.escalated ? " ⬆ ESCALATED" : ""}`,
     );
+    log?.debug?.(
+      `[clawtalk] Wire: ${routing.wire}`,
+    );
+    log?.debug?.(
+      `Using lite mode: model=${routing.model ?? model}, toolsEnabled=${toolsEnabled}, nativeTools=${supportsNativeTools}, maxIterations=${maxIterations}`,
+    );
+
+    // Use the subagent-scoped session key and system prompt
+    const effectiveModel = routing.model ?? model;
+    const effectiveSessionKey = routing.sessionKey;
 
     try {
       let text: string;
 
       if (toolsEnabled && supportsNativeTools) {
-        // Use native tool calling for capable models (with ReAct loop)
-        log?.debug?.(`Lite mode: using native tool calling for ${model}`);
+        // Use native tool calling with ClawTalk subagent routing
+        log?.debug?.(`Lite mode: ${routing.agentName} using native tool calling for ${effectiveModel}`);
         text = await callOllamaWithTools({
           baseUrl,
-          model,
-          sessionKey,
+          model: effectiveModel,
+          sessionKey: effectiveSessionKey,
           userMessage,
           agentName,
-          enableTools: true,
+          enableTools: routing.tools.length > 0,
           maxIterations,
+          customSystemPrompt: routing.systemPrompt,
+          toolFilter: routing.tools.length > 0 ? routing.tools : undefined,
           log,
         });
       } else if (toolsEnabled) {
         // Use pattern-based fallback for non-tool models
-        log?.debug?.(`Lite mode: using pattern-based tools for ${model}`);
+        log?.debug?.(`Lite mode: using pattern-based tools for ${effectiveModel}`);
         text = await callOllamaWithPatterns({
           baseUrl,
-          model,
-          sessionKey,
+          model: effectiveModel,
+          sessionKey: effectiveSessionKey,
           userMessage,
           agentName,
           log,
         });
       } else {
-        // Tools disabled, just chat
-        log?.debug?.(`Lite mode: tools disabled, plain chat for ${model}`);
+        // Tools disabled, just chat with subagent's system prompt
+        log?.debug?.(`Lite mode: tools disabled, ${routing.agentName} plain chat for ${effectiveModel}`);
         text = await callOllamaWithTools({
           baseUrl,
-          model,
-          sessionKey,
+          model: effectiveModel,
+          sessionKey: effectiveSessionKey,
           userMessage,
           agentName,
           enableTools: false,
-          maxIterations: 1, // No tool loop needed when tools are disabled
+          maxIterations: 1,
+          customSystemPrompt: routing.systemPrompt,
           log,
         });
       }
 
       log?.info?.(`Lite mode response: ${text.slice(0, 80)}...`);
+
+      // Post-process: extract and act on orchestration tags
+      if (hasOrchestrationTags(text)) {
+        log?.debug?.(`[orch] Detected orchestration tags in response, processing...`);
+        const tagResult = await processOrchestrationTags(text, log);
+        if (tagResult.sideEffects.length > 0) {
+          log?.info?.(`[orch] Side-effects: ${tagResult.sideEffects.join("; ")}`);
+        }
+        if (tagResult.handoff) {
+          log?.info?.(`[orch] Handoff requested → ${tagResult.handoff.target}`);
+        }
+        text = tagResult.cleanText;
+      }
+
       return { text };
     } catch (err) {
       const errorMsg = `Lite mode error: ${err instanceof Error ? err.message : String(err)}`;
