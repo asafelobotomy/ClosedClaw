@@ -176,7 +176,7 @@ pnpm start
 sudo systemctl status docker
 
 # Check sandbox image
-sudo docker images | grep ClosedClaw-sandbox
+sudo docker images | grep closedclaw-sandbox
 
 # Build sandbox image if missing
 cd /opt/ClosedClaw/ClosedClaw

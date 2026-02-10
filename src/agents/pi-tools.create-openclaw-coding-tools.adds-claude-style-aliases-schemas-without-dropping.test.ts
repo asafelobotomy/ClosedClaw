@@ -463,7 +463,7 @@ describe("createClosedClawCodingTools", () => {
     }
   });
   it("applies sandbox path guards to file_path alias", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "ClosedClaw-sbx-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "closedclaw-sbx-"));
     const outsidePath = path.join(os.tmpdir(), "ClosedClaw-outside.txt");
     await fs.writeFile(outsidePath, "outside", "utf8");
     try {

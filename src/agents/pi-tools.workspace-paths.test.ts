@@ -147,7 +147,7 @@ describe("workspace path resolution", () => {
 
 describe("sandboxed workspace paths", () => {
   it("uses sandbox workspace for relative read/write/edit", async () => {
-    await withTempDir("ClosedClaw-sandbox-", async (sandboxDir) => {
+    await withTempDir("closedclaw-sandbox-", async (sandboxDir) => {
       await withTempDir("ClosedClaw-workspace-", async (workspaceDir) => {
         const sandbox = {
           enabled: true,
@@ -155,11 +155,11 @@ describe("sandboxed workspace paths", () => {
           workspaceDir: sandboxDir,
           agentWorkspaceDir: workspaceDir,
           workspaceAccess: "rw",
-          containerName: "ClosedClaw-sbx-test",
+          containerName: "closedclaw-sbx-test",
           containerWorkdir: "/workspace",
           docker: {
-            image: "ClosedClaw-sandbox:bookworm-slim",
-            containerPrefix: "ClosedClaw-sbx-",
+            image: "closedclaw-sandbox:bookworm-slim",
+            containerPrefix: "closedclaw-sbx-",
             workdir: "/workspace",
             readOnlyRoot: true,
             tmpfs: [],

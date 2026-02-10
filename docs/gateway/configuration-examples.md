@@ -277,7 +277,7 @@ Save to `~/.ClosedClaw/ClosedClaw.json` and you can DM the bot from that number.
         perSession: true,
         workspaceRoot: "~/.ClosedClaw/sandboxes",
         docker: {
-          image: "ClosedClaw-sandbox:bookworm-slim",
+          image: "closedclaw-sandbox:bookworm-slim",
           workdir: "/workspace",
           readOnlyRoot: true,
           tmpfs: ["/tmp", "/var/tmp", "/run"],

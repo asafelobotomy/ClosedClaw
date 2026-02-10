@@ -284,7 +284,7 @@ x-i18n:
         perSession: true,
         workspaceRoot: "~/.ClosedClaw/sandboxes",
         docker: {
-          image: "ClosedClaw-sandbox:bookworm-slim",
+          image: "closedclaw-sandbox:bookworm-slim",
           workdir: "/workspace",
           readOnlyRoot: true,
           tmpfs: ["/tmp", "/var/tmp", "/run"],

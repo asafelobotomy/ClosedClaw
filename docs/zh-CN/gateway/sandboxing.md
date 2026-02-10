@@ -110,7 +110,7 @@ ClosedClaw 会将符合条件的 Skills 镜像到沙箱工作区（`.../skills`�
 
 ## 镜像 + 设置
 
-默认镜像：`ClosedClaw-sandbox:bookworm-slim`
+默认镜像：`closedclaw-sandbox:bookworm-slim`
 
 构建一次即可：
 

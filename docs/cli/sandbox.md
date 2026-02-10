@@ -72,8 +72,8 @@ ClosedClaw sandbox recreate --all --force        # Skip confirmation
 
 ```bash
 # Pull new image
-docker pull ClosedClaw-sandbox:latest
-docker tag ClosedClaw-sandbox:latest ClosedClaw-sandbox:bookworm-slim
+docker pull closedclaw-sandbox:latest
+docker tag closedclaw-sandbox:latest closedclaw-sandbox:bookworm-slim
 
 # Update config to use new image
 # Edit config: agents.defaults.sandbox.docker.image (or agents.list[].sandbox.docker.image)
@@ -131,8 +131,8 @@ Sandbox settings live in `~/.ClosedClaw/ClosedClaw.json` under `agents.defaults.
         "mode": "all", // off, non-main, all
         "scope": "agent", // session, agent, shared
         "docker": {
-          "image": "ClosedClaw-sandbox:bookworm-slim",
-          "containerPrefix": "ClosedClaw-sbx-",
+          "image": "closedclaw-sandbox:bookworm-slim",
+          "containerPrefix": "closedclaw-sbx-",
           // ... more Docker options
         },
         "prune": {

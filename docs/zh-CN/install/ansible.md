@@ -183,7 +183,7 @@ pnpm start
 sudo systemctl status docker
 
 # 检查沙箱镜像
-sudo docker images | grep ClosedClaw-sandbox
+sudo docker images | grep closedclaw-sandbox
 
 # 如果缺少沙箱镜像则构建
 cd /opt/ClosedClaw/ClosedClaw

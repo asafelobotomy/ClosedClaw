@@ -354,7 +354,7 @@ After configuring multi-agent sandbox and tools:
 2. **Verify sandbox containers:**
 
    ```exec
-   docker ps --filter "name=ClosedClaw-sbx-"
+   docker ps --filter "name=closedclaw-sbx-"
    ```
 
 3. **Test tool restrictions:**

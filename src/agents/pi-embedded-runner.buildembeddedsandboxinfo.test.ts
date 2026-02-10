@@ -107,14 +107,14 @@ describe("buildEmbeddedSandboxInfo", () => {
     const sandbox = {
       enabled: true,
       sessionKey: "session:test",
-      workspaceDir: "/tmp/ClosedClaw-sandbox",
+      workspaceDir: "/tmp/closedclaw-sandbox",
       agentWorkspaceDir: "/tmp/ClosedClaw-workspace",
       workspaceAccess: "none",
-      containerName: "ClosedClaw-sbx-test",
+      containerName: "closedclaw-sbx-test",
       containerWorkdir: "/workspace",
       docker: {
-        image: "ClosedClaw-sandbox:bookworm-slim",
-        containerPrefix: "ClosedClaw-sbx-",
+        image: "closedclaw-sandbox:bookworm-slim",
+        containerPrefix: "closedclaw-sbx-",
         workdir: "/workspace",
         readOnlyRoot: true,
         tmpfs: ["/tmp"],
@@ -131,13 +131,13 @@ describe("buildEmbeddedSandboxInfo", () => {
       browser: {
         bridgeUrl: "http://localhost:9222",
         noVncUrl: "http://localhost:6080",
-        containerName: "ClosedClaw-sbx-browser-test",
+        containerName: "closedclaw-sbx-browser-test",
       },
     } satisfies SandboxContext;
 
     expect(buildEmbeddedSandboxInfo(sandbox)).toEqual({
       enabled: true,
-      workspaceDir: "/tmp/ClosedClaw-sandbox",
+      workspaceDir: "/tmp/closedclaw-sandbox",
       workspaceAccess: "none",
       agentWorkspaceMount: undefined,
       browserBridgeUrl: "http://localhost:9222",
@@ -149,14 +149,14 @@ describe("buildEmbeddedSandboxInfo", () => {
     const sandbox = {
       enabled: true,
       sessionKey: "session:test",
-      workspaceDir: "/tmp/ClosedClaw-sandbox",
+      workspaceDir: "/tmp/closedclaw-sandbox",
       agentWorkspaceDir: "/tmp/ClosedClaw-workspace",
       workspaceAccess: "none",
-      containerName: "ClosedClaw-sbx-test",
+      containerName: "closedclaw-sbx-test",
       containerWorkdir: "/workspace",
       docker: {
-        image: "ClosedClaw-sandbox:bookworm-slim",
-        containerPrefix: "ClosedClaw-sbx-",
+        image: "closedclaw-sandbox:bookworm-slim",
+        containerPrefix: "closedclaw-sbx-",
         workdir: "/workspace",
         readOnlyRoot: true,
         tmpfs: ["/tmp"],
@@ -180,7 +180,7 @@ describe("buildEmbeddedSandboxInfo", () => {
       }),
     ).toEqual({
       enabled: true,
-      workspaceDir: "/tmp/ClosedClaw-sandbox",
+      workspaceDir: "/tmp/closedclaw-sandbox",
       workspaceAccess: "none",
       agentWorkspaceMount: undefined,
       hostBrowserAllowed: false,

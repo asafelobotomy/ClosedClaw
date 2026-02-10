@@ -79,8 +79,8 @@ ClosedClaw sandbox recreate --all --force        # 跳过确认提示
 
 ```bash
 # 拉取新镜像
-docker pull ClosedClaw-sandbox:latest
-docker tag ClosedClaw-sandbox:latest ClosedClaw-sandbox:bookworm-slim
+docker pull closedclaw-sandbox:latest
+docker tag closedclaw-sandbox:latest closedclaw-sandbox:bookworm-slim
 
 # 更新配置以使用新镜像
 # 编辑配置：agents.defaults.sandbox.docker.image（或 agents.list[].sandbox.docker.image）
@@ -137,8 +137,8 @@ ClosedClaw sandbox recreate --agent alfred
         "mode": "all", // off, non-main, all
         "scope": "agent", // session, agent, shared
         "docker": {
-          "image": "ClosedClaw-sandbox:bookworm-slim",
-          "containerPrefix": "ClosedClaw-sbx-",
+          "image": "closedclaw-sandbox:bookworm-slim",
+          "containerPrefix": "closedclaw-sbx-",
           // ... 更多 Docker 选项
         },
         "prune": {

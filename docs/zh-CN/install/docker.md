@@ -244,7 +244,7 @@ pnpm test:docker:qr
 
 ### 默认行为
 
-- 镜像：`ClosedClaw-sandbox:bookworm-slim`
+- 镜像：`closedclaw-sandbox:bookworm-slim`
 - 每个智能体一个容器
 - 智能体工作区访问：`workspaceAccess: "none"`（默认）使用 `~/.ClosedClaw/sandboxes`
   - `"ro"` 将沙箱工作区保留在 `/workspace`，并将智能体工作区以只读方式挂载到 `/agent`（禁用 `write`/`edit`/`apply_patch`）
@@ -273,7 +273,7 @@ pnpm test:docker:qr
         workspaceAccess: "none", // none | ro | rw
         workspaceRoot: "~/.ClosedClaw/sandboxes",
         docker: {
-          image: "ClosedClaw-sandbox:bookworm-slim",
+          image: "closedclaw-sandbox:bookworm-slim",
           workdir: "/workspace",
           readOnlyRoot: true,
           tmpfs: ["/tmp", "/var/tmp", "/run"],
@@ -291,7 +291,7 @@ pnpm test:docker:qr
             nproc: 256,
           },
           seccompProfile: "/path/to/seccomp.json",
-          apparmorProfile: "ClosedClaw-sandbox",
+          apparmorProfile: "closedclaw-sandbox",
           dns: ["1.1.1.1", "8.8.8.8"],
           extraHosts: ["internal.service:10.0.0.5"],
         },
@@ -337,7 +337,7 @@ pnpm test:docker:qr
 scripts/sandbox-setup.sh
 ```
 
-这会使用 `Dockerfile.sandbox` 构建 `ClosedClaw-sandbox:bookworm-slim`。
+这会使用 `Dockerfile.sandbox` 构建 `closedclaw-sandbox:bookworm-slim`。
 
 ### 沙箱通用镜像（可选）
 
@@ -347,13 +347,13 @@ scripts/sandbox-setup.sh
 scripts/sandbox-common-setup.sh
 ```
 
-这会构建 `ClosedClaw-sandbox-common:bookworm-slim`。使用方法：
+这会构建 `closedclaw-sandbox-common:bookworm-slim`。使用方法：
 
 ```json5
 {
   agents: {
     defaults: {
-      sandbox: { docker: { image: "ClosedClaw-sandbox-common:bookworm-slim" } },
+      sandbox: { docker: { image: "closedclaw-sandbox-common:bookworm-slim" } },
     },
   },
 }
@@ -367,7 +367,7 @@ scripts/sandbox-common-setup.sh
 scripts/sandbox-browser-setup.sh
 ```
 
-这会使用 `Dockerfile.sandbox-browser` 构建 `ClosedClaw-sandbox-browser:bookworm-slim`。容器运行启用了 CDP 的 Chromium，并提供可选的 noVNC 观察器（通过 Xvfb 实现有头模式）。
+这会使用 `Dockerfile.sandbox-browser` 构建 `closedclaw-sandbox-browser:bookworm-slim`。容器运行启用了 CDP 的 Chromium，并提供可选的 noVNC 观察器（通过 Xvfb 实现有头模式）。
 
 注意事项：
 
@@ -414,14 +414,14 @@ scripts/sandbox-browser-setup.sh
 构建你自己的镜像并在配置中指向它：
 
 ```bash
-docker build -t my-ClosedClaw-sbx -f Dockerfile.sandbox .
+docker build -t my-closedclaw-sbx -f Dockerfile.sandbox .
 ```
 
 ```json5
 {
   agents: {
     defaults: {
-      sandbox: { docker: { image: "my-ClosedClaw-sbx" } },
+      sandbox: { docker: { image: "my-closedclaw-sbx" } },
     },
   },
 }

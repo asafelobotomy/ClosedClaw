@@ -341,7 +341,7 @@ precedence, and troubleshooting.
 
 ### Default behavior
 
-- Image: `ClosedClaw-sandbox:bookworm-slim`
+- Image: `closedclaw-sandbox:bookworm-slim`
 - One container per agent
 - Agent workspace access: `workspaceAccess: "none"` (default) uses `~/.ClosedClaw/sandboxes`
   - `"ro"` keeps the sandbox workspace at `/workspace` and mounts the agent workspace read-only at `/agent` (disables `write`/`edit`/`apply_patch`)
@@ -372,7 +372,7 @@ If you plan to install packages in `setupCommand`, note:
         workspaceAccess: "none", // none | ro | rw
         workspaceRoot: "~/.ClosedClaw/sandboxes",
         docker: {
-          image: "ClosedClaw-sandbox:bookworm-slim",
+          image: "closedclaw-sandbox:bookworm-slim",
           workdir: "/workspace",
           readOnlyRoot: true,
           tmpfs: ["/tmp", "/var/tmp", "/run"],
@@ -390,7 +390,7 @@ If you plan to install packages in `setupCommand`, note:
             nproc: 256,
           },
           seccompProfile: "/path/to/seccomp.json",
-          apparmorProfile: "ClosedClaw-sandbox",
+          apparmorProfile: "closedclaw-sandbox",
           dns: ["1.1.1.1", "8.8.8.8"],
           extraHosts: ["internal.service:10.0.0.5"],
         },
@@ -436,7 +436,7 @@ Multi-agent: override `agents.defaults.sandbox.{docker,browser,prune}.*` per age
 scripts/sandbox-setup.sh
 ```
 
-This builds `ClosedClaw-sandbox:bookworm-slim` using `Dockerfile.sandbox`.
+This builds `closedclaw-sandbox:bookworm-slim` using `Dockerfile.sandbox`.
 
 ### Sandbox common image (optional)
 
@@ -446,13 +446,13 @@ If you want a sandbox image with common build tooling (Node, Go, Rust, etc.), bu
 scripts/sandbox-common-setup.sh
 ```
 
-This builds `ClosedClaw-sandbox-common:bookworm-slim`. To use it:
+This builds `closedclaw-sandbox-common:bookworm-slim`. To use it:
 
 ```json5
 {
   agents: {
     defaults: {
-      sandbox: { docker: { image: "ClosedClaw-sandbox-common:bookworm-slim" } },
+      sandbox: { docker: { image: "closedclaw-sandbox-common:bookworm-slim" } },
     },
   },
 }
@@ -466,7 +466,7 @@ To run the browser tool inside the sandbox, build the browser image:
 scripts/sandbox-browser-setup.sh
 ```
 
-This builds `ClosedClaw-sandbox-browser:bookworm-slim` using
+This builds `closedclaw-sandbox-browser:bookworm-slim` using
 `Dockerfile.sandbox-browser`. The container runs Chromium with CDP enabled and
 an optional noVNC observer (headful via Xvfb).
 
@@ -516,14 +516,14 @@ Prune rules (`agents.defaults.sandbox.prune`) apply to browser containers too.
 Build your own image and point config to it:
 
 ```bash
-docker build -t my-ClosedClaw-sbx -f Dockerfile.sandbox .
+docker build -t my-closedclaw-sbx -f Dockerfile.sandbox .
 ```
 
 ```json5
 {
   agents: {
     defaults: {
-      sandbox: { docker: { image: "my-ClosedClaw-sbx" } },
+      sandbox: { docker: { image: "my-closedclaw-sbx" } },
     },
   },
 }

@@ -112,7 +112,7 @@ Security notes:
 
 ## Images + setup
 
-Default image: `ClosedClaw-sandbox:bookworm-slim`
+Default image: `closedclaw-sandbox:bookworm-slim`
 
 Build it once:
 

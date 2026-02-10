@@ -5,8 +5,8 @@ import { STATE_DIR } from "../../config/config.js";
 
 export const DEFAULT_SANDBOX_WORKSPACE_ROOT = path.join(os.homedir(), ".ClosedClaw", "sandboxes");
 
-export const DEFAULT_SANDBOX_IMAGE = "ClosedClaw-sandbox:bookworm-slim";
-export const DEFAULT_SANDBOX_CONTAINER_PREFIX = "ClosedClaw-sbx-";
+export const DEFAULT_SANDBOX_IMAGE = "closedclaw-sandbox:bookworm-slim";
+export const DEFAULT_SANDBOX_CONTAINER_PREFIX = "closedclaw-sbx-";
 export const DEFAULT_SANDBOX_WORKDIR = "/workspace";
 export const DEFAULT_SANDBOX_IDLE_HOURS = 24;
 export const DEFAULT_SANDBOX_MAX_AGE_DAYS = 7;
@@ -36,10 +36,10 @@ export const DEFAULT_TOOL_DENY = [
   ...CHANNEL_IDS,
 ] as const;
 
-export const DEFAULT_SANDBOX_BROWSER_IMAGE = "ClosedClaw-sandbox-browser:bookworm-slim";
-export const DEFAULT_SANDBOX_COMMON_IMAGE = "ClosedClaw-sandbox-common:bookworm-slim";
+export const DEFAULT_SANDBOX_BROWSER_IMAGE = "closedclaw-sandbox-browser:bookworm-slim";
+export const DEFAULT_SANDBOX_COMMON_IMAGE = "closedclaw-sandbox-common:bookworm-slim";
 
-export const DEFAULT_SANDBOX_BROWSER_PREFIX = "ClosedClaw-sbx-browser-";
+export const DEFAULT_SANDBOX_BROWSER_PREFIX = "closedclaw-sbx-browser-";
 export const DEFAULT_SANDBOX_BROWSER_CDP_PORT = 9222;
 export const DEFAULT_SANDBOX_BROWSER_VNC_PORT = 5900;
 export const DEFAULT_SANDBOX_BROWSER_NOVNC_PORT = 6080;
