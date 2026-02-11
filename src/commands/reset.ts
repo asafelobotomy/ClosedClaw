@@ -16,8 +16,8 @@ import {
   listAgentSessionDirs,
   removePath,
 } from "./cleanup-utils.js";
-
-export type ResetScope = "config" | "config+creds+sessions" | "full";
+import type { ResetScope } from "./onboard-types.js";
+export type { ResetScope } from "./onboard-types.js";
 
 export type ResetOptions = {
   scope?: ResetScope;

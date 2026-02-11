@@ -14,7 +14,6 @@ function resolveCommand(command: string): string {
 }
 
 // Simple promise-wrapped execFile with optional verbosity logging.
-import { TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
 
 export async function runExec(
   command: string,

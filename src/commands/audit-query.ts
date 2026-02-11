@@ -5,7 +5,7 @@
  * export, and integrity verification capabilities.
  */
 
-import type { Runtime } from "../runtime.js";
+import type { RuntimeEnv as Runtime } from "../runtime.js";
 import { resolveStateDir } from "../config/paths.js";
 import {
   getAuditLogPath,

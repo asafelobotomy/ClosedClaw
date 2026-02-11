@@ -26,7 +26,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
-import { getStateDir, getCredentialsDir } from "@/config/constants";
+import { getStateDir, getCredentialsDir } from "../config/constants/index.js";
 
 const execFileAsync = promisify(execFile);
 

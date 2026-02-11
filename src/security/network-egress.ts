@@ -22,7 +22,7 @@
 import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
-import { getStateDir } from "@/config/constants";
+import { getStateDir } from "../config/constants/index.js";
 
 // ---------------------------------------------------------------------------
 // Types

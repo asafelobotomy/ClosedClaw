@@ -96,23 +96,23 @@ export const DELAY_RETRY_MAX_MS = 60_000 as const; // 60 seconds
 // ============================================================================
 
 // CLI & External Service TTLs
-export const TTL_EXTERNAL_CLI_SYNC_MS = 15 * 60 * 1000 as const; // 15 minutes
-export const TTL_EXTERNAL_CLI_NEAR_EXPIRY_MS = 10 * 60 * 1000 as const; // 10 minutes
+export const TTL_EXTERNAL_CLI_SYNC_MS = 15 * 60 * 1000; // 15 minutes
+export const TTL_EXTERNAL_CLI_NEAR_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 
 // Auth & Session TTLs
 export const TTL_AUTH_STORE_STALE_MS = 30_000 as const; // 30 seconds
-export const TTL_ACTIVE_LOGIN_MS = 3 * 60_000 as const; // 3 minutes
+export const TTL_ACTIVE_LOGIN_MS = 3 * 60_000; // 3 minutes
 
 // Message & Group TTLs
-export const TTL_RECENT_WEB_MESSAGE_MS = 20 * 60_000 as const; // 20 minutes
-export const TTL_GROUP_META_MS = 5 * 60 * 1000 as const; // 5 minutes
-export const TTL_DEDUPE_MS = 5 * 60_000 as const; // 5 minutes
+export const TTL_RECENT_WEB_MESSAGE_MS = 20 * 60_000; // 20 minutes
+export const TTL_GROUP_META_MS = 5 * 60 * 1000; // 5 minutes
+export const TTL_DEDUPE_MS = 5 * 60_000; // 5 minutes
 
 // Auto-Reply TTLs
-export const TTL_MESSAGE_TIMEOUT_MS = 30 * 60 * 1000 as const; // 30 minutes
+export const TTL_MESSAGE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 
 // Session Staleness
-export const TTL_SESSION_STALE_MS = 15 * 60_000 as const; // 15 minutes
+export const TTL_SESSION_STALE_MS = 15 * 60_000; // 15 minutes
 
 // ============================================================================
 // Utility Functions

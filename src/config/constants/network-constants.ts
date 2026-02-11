@@ -37,7 +37,7 @@ export const DEFAULT_FIRECRAWL_PORT = 3002 as const;
 export const DEFAULT_IPFS_API_PORT = 5001 as const;
 
 // Test-specific ports
-export const TEST_PORT_GATEWAY = DEFAULT_GATEWAY_PORT as const;
+export const TEST_PORT_GATEWAY = DEFAULT_GATEWAY_PORT;
 export const TEST_PORT_CUSTOM_GATEWAY = 38789 as const;
 
 // ============================================================================

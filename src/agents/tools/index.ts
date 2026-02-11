@@ -77,7 +77,7 @@ export * from './nodes-utils.js';
 // Media & UI Tools
 // ============================================================================
 
-export * from './image-tool.js';
+export { createImageTool, resolveImageModelConfigForTool, __testing as __imageToolTesting } from './image-tool.js';
 export * from './image-tool.helpers.js';
 
 export * from './tts-tool.js';

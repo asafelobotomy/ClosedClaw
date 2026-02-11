@@ -19,18 +19,18 @@
 // Media Size Limits
 // ============================================================================
 
-export const MAX_IMAGE_BYTES = 6 * 1024 * 1024 as const; // 6MB
-export const MAX_AUDIO_BYTES = 16 * 1024 * 1024 as const; // 16MB
-export const MAX_VIDEO_BYTES = 16 * 1024 * 1024 as const; // 16MB
-export const MAX_DOCUMENT_BYTES = 100 * 1024 * 1024 as const; // 100MB
+export const MAX_IMAGE_BYTES = 6 * 1024 * 1024; // 6MB
+export const MAX_AUDIO_BYTES = 16 * 1024 * 1024; // 16MB
+export const MAX_VIDEO_BYTES = 16 * 1024 * 1024; // 16MB
+export const MAX_DOCUMENT_BYTES = 100 * 1024 * 1024; // 100MB
 
 // ============================================================================
 // Size Units
 // ============================================================================
 
 export const BYTES_PER_KB = 1024 as const;
-export const BYTES_PER_MB = 1024 * 1024 as const;
-export const BYTES_PER_GB = 1024 * 1024 * 1024 as const;
+export const BYTES_PER_MB = 1024 * 1024;
+export const BYTES_PER_GB = 1024 * 1024 * 1024;
 
 // ============================================================================
 // Media Type Detection

@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { getStateDir } from "@/config/constants";
+import { getStateDir } from "../config/constants/index.js";
 
 export type DeviceIdentity = {
   deviceId: string;
