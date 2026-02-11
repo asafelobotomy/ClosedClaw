@@ -132,15 +132,15 @@ describe("loadClosedClawPlugins", () => {
         plugins: {
           allow: ["telegram"],
           entries: {
-            telegram: { enabled: true },
+            googlechat: { enabled: true },
           },
         },
       },
     });
 
-    const telegram = registry.plugins.find((entry) => entry.id === "telegram");
-    expect(telegram?.status).toBe("loaded");
-    expect(registry.channels.some((entry) => entry.plugin.id === "telegram")).toBe(true);
+    const googlechat = registry.plugins.find((entry) => entry.id === "googlechat");
+    expect(googlechat?.status).toBe("loaded");
+    expect(registry.channels.some((entry) => entry.plugin.id === "googlechat")).toBe(true);
   });
 
   it("enables bundled memory plugin when selected by slot", () => {

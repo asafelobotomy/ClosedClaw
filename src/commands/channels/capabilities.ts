@@ -351,16 +351,12 @@ async function resolveChannelReports(params: {
     let slackScopes: ChannelCapabilitiesReport["slackScopes"];
     // Slack channel archived — fetchSlackScopes no longer available.
 
-    let discordTarget: DiscordTargetSummary | undefined;
-    let discordPermissions: DiscordPermissionsReport | undefined;
-    if (plugin.id === "discord" && params.target) {
-      const perms = await buildDiscordPermissions({
-        account: resolvedAccount as { token?: string; accountId?: string },
-        target: params.target,
-      });
-      discordTarget = perms.target;
-      discordPermissions = perms.report;
-    }
+    /**
+     * Discord-specific permission checks archived (Discord platform removed in v2026.2).
+     * Discord permission reporting is no longer available.
+     */
+    let discordTarget: undefined;
+    let discordPermissions: undefined;
 
     reports.push({
       channel: plugin.id,
@@ -432,7 +428,7 @@ export async function channelsCapabilitiesCommand(
         cfg,
         timeoutMs,
         accountOverride,
-        target: rawTarget && plugin.id === "discord" ? rawTarget : undefined,
+        target: undefined,
       })),
     );
   }
