@@ -1,47 +1,13 @@
 import type { ClosedClawConfig } from "../config/config.js";
+
+/**
+ * Legacy WhatsApp config migration removed in v2026.2 (platform removal).
+ * WhatsApp channel has been removed from ClosedClaw.
+ */
 export function normalizeLegacyConfigValues(cfg: ClosedClawConfig): {
   config: ClosedClawConfig;
   changes: string[];
 } {
-  const changes: string[] = [];
-  let next: ClosedClawConfig = cfg;
-
-  const legacyAckReaction = cfg.messages?.ackReaction?.trim();
-  const hasWhatsAppConfig = cfg.channels?.whatsapp !== undefined;
-  if (legacyAckReaction && hasWhatsAppConfig) {
-    const hasWhatsAppAck = cfg.channels?.whatsapp?.ackReaction !== undefined;
-    if (!hasWhatsAppAck) {
-      const legacyScope = cfg.messages?.ackReactionScope ?? "group-mentions";
-      let direct = true;
-      let group: "always" | "mentions" | "never" = "mentions";
-      if (legacyScope === "all") {
-        direct = true;
-        group = "always";
-      } else if (legacyScope === "direct") {
-        direct = true;
-        group = "never";
-      } else if (legacyScope === "group-all") {
-        direct = false;
-        group = "always";
-      } else if (legacyScope === "group-mentions") {
-        direct = false;
-        group = "mentions";
-      }
-      next = {
-        ...next,
-        channels: {
-          ...next.channels,
-          whatsapp: {
-            ...next.channels?.whatsapp,
-            ackReaction: { emoji: legacyAckReaction, direct, group },
-          },
-        },
-      };
-      changes.push(
-        `Copied messages.ackReaction → channels.whatsapp.ackReaction (scope: ${legacyScope}).`,
-      );
-    }
-  }
-
-  return { config: next, changes };
+  // No legacy migrations needed - all removed platforms clean.
+  return { config: cfg, changes: [] };
 }

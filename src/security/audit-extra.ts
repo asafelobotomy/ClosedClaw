@@ -615,56 +615,26 @@ export async function collectPluginsTrustFindings(params: {
         hasString((account as Record<string, unknown>)[key]),
       );
 
-    const discordConfigured =
-      hasString(params.cfg.channels?.discord?.token) ||
-      Boolean(
-        params.cfg.channels?.discord?.accounts &&
-        Object.values(params.cfg.channels.discord.accounts).some((a) =>
-          hasAccountStringKey(a, "token"),
-        ),
-      ) ||
-      hasString(process.env.DISCORD_BOT_TOKEN);
+    // Check remaining platforms for native skills exposure
+    const msteamsConfigured =
+      hasString(params.cfg.channels?.msteams?.botId) ||
+      hasString(process.env.MSTEAMS_BOT_ID);
 
-    const telegramConfigured =
-      hasString(params.cfg.channels?.telegram?.botToken) ||
-      hasString(params.cfg.channels?.telegram?.tokenFile) ||
-      Boolean(
-        params.cfg.channels?.telegram?.accounts &&
-        Object.values(params.cfg.channels.telegram.accounts).some(
-          (a) => hasAccountStringKey(a, "botToken") || hasAccountStringKey(a, "tokenFile"),
-        ),
-      ) ||
-      hasString(process.env.TELEGRAM_BOT_TOKEN);
-
-    const slackConfigured =
-      hasString(params.cfg.channels?.slack?.botToken) ||
-      hasString(params.cfg.channels?.slack?.appToken) ||
-      Boolean(
-        params.cfg.channels?.slack?.accounts &&
-        Object.values(params.cfg.channels.slack.accounts).some(
-          (a) => hasAccountStringKey(a, "botToken") || hasAccountStringKey(a, "appToken"),
-        ),
-      ) ||
-      hasString(process.env.SLACK_BOT_TOKEN) ||
-      hasString(process.env.SLACK_APP_TOKEN);
+    const googlechatConfigured =
+      hasString(params.cfg.channels?.googlechat?.token) ||
+      hasString(process.env.GOOGLECHAT_TOKEN);
 
     const skillCommandsLikelyExposed =
-      (discordConfigured &&
+      (msteamsConfigured &&
         resolveNativeSkillsEnabled({
-          providerId: "discord",
-          providerSetting: params.cfg.channels?.discord?.commands?.nativeSkills,
+          providerId: "msteams",
+          providerSetting: params.cfg.channels?.msteams?.commands?.nativeSkills,
           globalSetting: params.cfg.commands?.nativeSkills,
         })) ||
-      (telegramConfigured &&
+      (googlechatConfigured &&
         resolveNativeSkillsEnabled({
-          providerId: "telegram",
-          providerSetting: params.cfg.channels?.telegram?.commands?.nativeSkills,
-          globalSetting: params.cfg.commands?.nativeSkills,
-        })) ||
-      (slackConfigured &&
-        resolveNativeSkillsEnabled({
-          providerId: "slack",
-          providerSetting: params.cfg.channels?.slack?.commands?.nativeSkills,
+          providerId: "googlechat",
+          providerSetting: params.cfg.channels?.googlechat?.commands?.nativeSkills,
           globalSetting: params.cfg.commands?.nativeSkills,
         }));
 
