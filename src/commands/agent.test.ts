@@ -14,8 +14,6 @@ vi.mock("../agents/model-catalog.js", () => ({
 
 import type { ClosedClawConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
-import { telegramPlugin } from "../../extensions/telegram/src/channel.js";
-import { setTelegramRuntime } from "../../extensions/telegram/src/runtime.js";
 import { loadModelCatalog } from "../agents/model-catalog.js";
 import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
 import * as configModule from "../config/config.js";
@@ -43,7 +41,6 @@ function mockConfig(
   home: string,
   storePath: string,
   agentOverrides?: Partial<NonNullable<NonNullable<ClosedClawConfig["agents"]>["defaults"]>>,
-  telegramOverrides?: Partial<NonNullable<ClosedClawConfig["telegram"]>>,
   agentsList?: Array<{ id: string; default?: boolean }>,
 ) {
   configSpy.mockReturnValue({
@@ -57,7 +54,6 @@ function mockConfig(
       list: agentsList,
     },
     session: { store: storePath, mainKey: "main" },
-    telegram: telegramOverrides ? { ...telegramOverrides } : undefined,
   });
 }
 
@@ -238,7 +234,7 @@ describe("agentCommand", () => {
   it("derives session key from --agent when no routing target is provided", async () => {
     await withTempHome(async (home) => {
       const store = path.join(home, "sessions.json");
-      mockConfig(home, store, undefined, undefined, [{ id: "ops" }]);
+      mockConfig(home, store, undefined, [{ id: "ops" }]);
 
       await agentCommand({ message: "hi", agentId: "ops" }, runtime);
 
@@ -316,47 +312,6 @@ describe("agentCommand", () => {
     });
   });
 
-  it("passes through telegram accountId when delivering", async () => {
-    await withTempHome(async (home) => {
-      const store = path.join(home, "sessions.json");
-      mockConfig(home, store, undefined, { botToken: "t-1" });
-      setTelegramRuntime(createPluginRuntime());
-      // Spy on the plugin's outbound sendText to verify delivery args.
-      const sendTextSpy = vi.fn(telegramPlugin.outbound!.sendText);
-      const pluginWithSpy = {
-        ...telegramPlugin,
-        outbound: { ...telegramPlugin.outbound!, sendText: sendTextSpy },
-      };
-      setActivePluginRegistry(
-        createTestRegistry([{ pluginId: "telegram", plugin: pluginWithSpy, source: "test" }]),
-      );
-
-      const prevTelegramToken = process.env.TELEGRAM_BOT_TOKEN;
-      process.env.TELEGRAM_BOT_TOKEN = "";
-      try {
-        await agentCommand(
-          {
-            message: "hi",
-            to: "123",
-            deliver: true,
-            channel: "telegram",
-          },
-          runtime,
-        );
-
-        expect(sendTextSpy).toHaveBeenCalledWith(
-          expect.objectContaining({ to: "123", text: "ok", accountId: undefined }),
-        );
-      } finally {
-        if (prevTelegramToken === undefined) {
-          delete process.env.TELEGRAM_BOT_TOKEN;
-        } else {
-          process.env.TELEGRAM_BOT_TOKEN = prevTelegramToken;
-        }
-      }
-    });
-  });
-
   it("uses reply channel as the message channel context", async () => {
     await withTempHome(async (home) => {
       const store = path.join(home, "sessions.json");
@@ -405,7 +360,7 @@ describe("agentCommand", () => {
   it("logs output when delivery is disabled", async () => {
     await withTempHome(async (home) => {
       const store = path.join(home, "sessions.json");
-      mockConfig(home, store, undefined, undefined, [{ id: "ops" }]);
+      mockConfig(home, store, undefined, [{ id: "ops" }]);
 
       await agentCommand({ message: "hi", agentId: "ops" }, runtime);
 
