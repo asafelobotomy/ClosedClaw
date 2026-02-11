@@ -1,0 +1,49 @@
+// Dev Container for ClosedClaw – keeps all deps/tools inside Docker.
+// See https://containers.dev/implementors/json_reference/
+{
+  "name": "ClosedClaw Dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+
+  // Run as the non-root "node" user (uid 1000, matches the base image)
+  "remoteUser": "node",
+
+  // Mount the workspace into the container
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/workspace",
+
+  // Use a named volume for node_modules so installs don't write to the host
+  "mounts": [
+    "source=closedclaw-node-modules,target=/workspace/node_modules,type=volume"
+  ],
+
+  // Ports the gateway and bridge listen on
+  "forwardPorts": [18789, 18790],
+
+  // Run after the container is created (first time only)
+  "postCreateCommand": "pnpm install && pnpm ui:build",
+
+  // Run every time the container starts
+  "postStartCommand": "echo '✔ ClosedClaw dev container ready – run: pnpm build && pnpm test'",
+
+  // VS Code settings inside the container
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "vitest.explorer"
+      ]
+    }
+  },
+
+  // Environment variables available inside the container
+  "containerEnv": {
+    "NODE_OPTIONS": "--max-old-space-size=4096"
+  }
+}

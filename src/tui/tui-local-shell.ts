@@ -101,6 +101,9 @@ export function createLocalShellRunner(deps: LocalShellDeps) {
     deps.tui.requestRender();
 
     await new Promise<void>((resolve) => {
+      // LOW-02: `shell: true` is intentional — user-initiated commands may contain
+      // shell syntax (pipes, redirects, etc.). Access is gated by
+      // `ensureLocalExecAllowed()` above, which enforces exec policy.
       const child = spawnCommand(cmd, {
         shell: true,
         cwd: getCwd(),

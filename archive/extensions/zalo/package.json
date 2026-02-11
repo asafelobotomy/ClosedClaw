@@ -4,11 +4,13 @@
   "description": "ClosedClaw Zalo channel plugin",
   "type": "module",
   "dependencies": {
-    "ClosedClaw": "workspace:*",
     "undici": "7.20.0"
   },
   "devDependencies": {
     "ClosedClaw": "workspace:*"
+  },
+  "peerDependencies": {
+    "ClosedClaw": ">=2026.1.0"
   },
   "ClosedClaw": {
     "extensions": [

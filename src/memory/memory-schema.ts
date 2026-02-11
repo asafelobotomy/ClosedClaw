@@ -88,6 +88,13 @@ function ensureColumn(
   column: string,
   definition: string,
 ): void {
+  // LOW-03: table/column names are internal constants (not user input), but validate
+  // the pattern defensively to prevent accidental SQL injection if this is ever
+  // extended with dynamic values.
+  const identifierPattern = /^[a-zA-Z_]\w*$/;
+  if (!identifierPattern.test(table) || !identifierPattern.test(column)) {
+    throw new Error(`Invalid SQL identifier: table=${table}, column=${column}`);
+  }
   const rows = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
   if (rows.some((row) => row.name === column)) {
     return;

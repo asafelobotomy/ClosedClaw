@@ -41,7 +41,7 @@ export type BroadcastConfig = {
 };
 
 export type AudioConfig = {
-  /** @deprecated Use tools.media.audio.models instead. */
+  /** @deprecated @removeBy 2026.4.0 Use tools.media.audio.models instead. */
   transcription?: {
     // Optional CLI to turn inbound audio into text; templated args, must output transcript to stdout.
     command: string[];
@@ -50,7 +50,7 @@ export type AudioConfig = {
 };
 
 export type MessagesConfig = {
-  /** @deprecated Use `whatsapp.messagePrefix` (WhatsApp-only inbound prefix). */
+  /** @deprecated @removeBy 2026.4.0 Use `whatsapp.messagePrefix` (WhatsApp-only inbound prefix). */
   messagePrefix?: string;
   /**
    * Prefix auto-added to all outbound replies.

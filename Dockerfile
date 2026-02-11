@@ -1,7 +1,7 @@
 FROM node:22-bookworm
 
-# Install Bun (required for build scripts)
-RUN curl -fsSL https://bun.sh/install | bash
+# Install Bun (required for build scripts) — pinned to specific version (LOW-04).
+RUN curl -fsSL https://bun.sh/install | bash -s -- --version 1.2.4
 ENV PATH="/root/.bun/bin:${PATH}"
 
 RUN corepack enable
@@ -41,6 +41,10 @@ USER node
 
 # Start gateway server with default config.
 # Binds to loopback (127.0.0.1) by default for security.
+#
+# NOTE: --allow-unconfigured is convenient for initial setup but should be
+# removed in production deployments. Configure authentication via
+# ClosedClaw_GATEWAY_TOKEN or ClosedClaw_GATEWAY_PASSWORD env vars.
 #
 # For container platforms requiring external health checks:
 #   1. Set ClosedClaw_GATEWAY_TOKEN or ClosedClaw_GATEWAY_PASSWORD env var

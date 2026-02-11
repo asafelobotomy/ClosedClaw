@@ -5,8 +5,33 @@ import type {
   ChannelPlugin,
 } from "../../src/channels/plugins/types.js";
 import type { PluginRegistry } from "../../src/plugins/registry.js";
-import { imessageOutbound } from "../../src/channels/plugins/outbound/imessage.js";
-import { normalizeIMessageHandle } from "../../src/imessage/targets.js";
+
+/**
+ * Minimal iMessage handle normalizer for test stubs.
+ * The real implementation was archived with the iMessage channel.
+ */
+function normalizeIMessageHandle(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return "";
+  const lowered = trimmed.toLowerCase();
+  for (const prefix of ["imessage:", "sms:", "auto:"]) {
+    if (lowered.startsWith(prefix)) return normalizeIMessageHandle(trimmed.slice(prefix.length));
+  }
+  if (trimmed.includes("@")) return lowered;
+  // Strip non-digits for phone numbers
+  const digits = trimmed.replace(/[^\d+]/g, "");
+  return digits || lowered;
+}
+
+/**
+ * Stub iMessage outbound adapter for tests.
+ * The real implementation was archived with the iMessage channel.
+ */
+const imessageStubOutbound: ChannelOutboundAdapter = {
+  deliveryMode: "direct",
+  sendText: async ({ to, text }) => ({ channel: "imessage", messageId: "test", to, text }),
+  sendMedia: async ({ to, text }) => ({ channel: "imessage", messageId: "test", to, text }),
+};
 
 export const createTestRegistry = (channels: PluginRegistry["channels"] = []): PluginRegistry => ({
   plugins: [],
@@ -58,7 +83,7 @@ export const createIMessageTestPlugin = (params?: {
         ];
       }),
   },
-  outbound: params?.outbound ?? imessageOutbound,
+  outbound: params?.outbound ?? imessageStubOutbound,
   messaging: {
     targetResolver: {
       looksLikeId: (raw) => {

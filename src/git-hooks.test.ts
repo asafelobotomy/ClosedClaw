@@ -7,8 +7,8 @@ import {
   filterOutPartialTargets,
   findPartiallyStagedFiles,
   splitNullDelimited,
-} from "../scripts/format-staged.js";
-import { setupGitHooks } from "../scripts/setup-git-hooks.js";
+} from "../tools/ci/format-staged.js";
+import { setupGitHooks } from "../tools/ci/setup-git-hooks.js";
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "ClosedClaw-hooks-"));

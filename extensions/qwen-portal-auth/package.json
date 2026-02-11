@@ -1,0 +1,17 @@
+{
+  "name": "@ClosedClaw/qwen-portal-auth",
+  "version": "2026.2.1",
+  "description": "ClosedClaw Qwen Portal OAuth provider plugin",
+  "type": "module",
+  "devDependencies": {
+    "ClosedClaw": "workspace:*"
+  },
+  "peerDependencies": {
+    "ClosedClaw": ">=2026.1.0"
+  },
+  "ClosedClaw": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

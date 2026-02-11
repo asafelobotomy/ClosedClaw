@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import fs from "node:fs";
 import path from "node:path";
@@ -179,10 +180,11 @@ interface ControlUiInjectionOpts {
   assistantAvatar?: string;
 }
 
-function injectControlUiConfig(html: string, opts: ControlUiInjectionOpts): string {
-  const { basePath, assistantName, assistantAvatar } = opts;
+function injectControlUiConfig(html: string, opts: ControlUiInjectionOpts & { nonce?: string }): string {
+  const { basePath, assistantName, assistantAvatar, nonce } = opts;
+  const nonceAttr = nonce ? ` nonce="${nonce}"` : "";
   const script =
-    `<script>` +
+    `<script${nonceAttr}>` +
     `window.__ClosedClaw_CONTROL_UI_BASE_PATH__=${JSON.stringify(basePath)};` +
     `window.__ClosedClaw_ASSISTANT_NAME__=${JSON.stringify(
       assistantName ?? DEFAULT_ASSISTANT_IDENTITY.name,
@@ -223,6 +225,14 @@ function serveIndexHtml(res: ServerResponse, indexPath: string, opts: ServeIndex
       agentId: resolvedAgentId,
       basePath,
     }) ?? identity.avatar;
+
+  // Generate a per-request nonce for the inline config script (HIGH-04 CSP hardening).
+  const nonce = randomBytes(16).toString("base64");
+  res.setHeader(
+    "Content-Security-Policy",
+    `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; frame-ancestors 'none'`,
+  );
+
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Cache-Control", "no-cache");
   const raw = fs.readFileSync(indexPath, "utf8");
@@ -231,6 +241,7 @@ function serveIndexHtml(res: ServerResponse, indexPath: string, opts: ServeIndex
       basePath,
       assistantName: identity.name,
       assistantAvatar: avatarValue,
+      nonce,
     }),
   );
 }

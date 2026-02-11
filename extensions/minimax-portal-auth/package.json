@@ -6,6 +6,9 @@
   "devDependencies": {
     "ClosedClaw": "workspace:*"
   },
+  "peerDependencies": {
+    "ClosedClaw": ">=2026.1.0"
+  },
   "ClosedClaw": {
     "extensions": [
       "./index.ts"

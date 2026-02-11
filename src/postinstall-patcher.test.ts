@@ -6,7 +6,7 @@ import {
   applyPatchSet,
   detectPackageManager,
   shouldApplyPnpmPatchedDependenciesFallback,
-} from "../scripts/postinstall.js";
+} from "../tools/dev/postinstall.js";
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "ClosedClaw-patch-"));

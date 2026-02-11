@@ -1,5 +1,13 @@
 import type { LegacyConfigRule } from "./legacy.shared.js";
 
+/**
+ * Legacy config migration rules. Each rule warns users about deprecated
+ * config paths that have been auto-migrated to new locations.
+ *
+ * @removeBy 2026.6.0 — Evaluate removing rules older than 3 release cycles.
+ * Rules for paths that no user has triggered (check telemetry/logs) can be
+ * safely dropped.
+ */
 export const LEGACY_CONFIG_RULES: LegacyConfigRule[] = [
   {
     path: ["whatsapp"],

@@ -184,7 +184,6 @@
     "express": "^5.2.1",
     "file-type": "^21.3.0",
     "grammy": "^1.39.3",
-    "hono": "4.11.7",
     "jiti": "^2.6.1",
     "json5": "^2.2.3",
     "jszip": "^3.10.1",
@@ -235,7 +234,15 @@
   },
   "peerDependencies": {
     "@napi-rs/canvas": "^0.1.89",
-    "node-llama-cpp": "3.15.1"
+    "node-llama-cpp": "^3.15.0"
+  },
+  "peerDependenciesMeta": {
+    "@napi-rs/canvas": {
+      "optional": true
+    },
+    "node-llama-cpp": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22.12.0"
@@ -243,9 +250,13 @@
   "packageManager": "pnpm@10.23.0",
   "pnpm": {
     "minimumReleaseAge": 2880,
+    "overrideComments": {
+      "tough-cookie": "CVE-2023-26136 fix. Pulled transitively via archived @matrix-org/matrix-sdk-crypto-nodejs → request@2.88.2. Re-evaluate when Matrix SDK dependency is fully removed. @removeBy 2026.6.0",
+      "form-data": "Pinned to 2.5.5 (same transitive chain as tough-cookie). @removeBy 2026.6.0"
+    },
     "overrides": {
       "fast-xml-parser": "5.3.4",
-      "form-data": "2.5.4",
+      "form-data": "2.5.5",
       "@hono/node-server>hono": "4.11.7",
       "hono": "4.11.7",
       "qs": "6.14.1",
@@ -255,10 +266,8 @@
     },
     "onlyBuiltDependencies": [
       "@lydell/node-pty",
-      "@matrix-org/matrix-sdk-crypto-nodejs",
       "@napi-rs/canvas",
       "@whiskeysockets/baileys",
-      "authenticate-pam",
       "esbuild",
       "node-llama-cpp",
       "protobufjs",

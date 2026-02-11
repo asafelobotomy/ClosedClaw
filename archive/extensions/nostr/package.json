@@ -5,11 +5,13 @@
   "type": "module",
   "dependencies": {
     "nostr-tools": "^2.22.1",
-    "ClosedClaw": "workspace:*",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "ClosedClaw": "workspace:*"
+  },
+  "peerDependencies": {
+    "ClosedClaw": ">=2026.1.0"
   },
   "ClosedClaw": {
     "extensions": [

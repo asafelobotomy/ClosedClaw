@@ -4,11 +4,13 @@
   "description": "ClosedClaw Zalo Personal Account plugin via zca-cli",
   "type": "module",
   "dependencies": {
-    "@sinclair/typebox": "0.34.48",
-    "ClosedClaw": "workspace:*"
+    "@sinclair/typebox": "0.34.48"
   },
   "devDependencies": {
     "ClosedClaw": "workspace:*"
+  },
+  "peerDependencies": {
+    "ClosedClaw": ">=2026.1.0"
   },
   "ClosedClaw": {
     "extensions": [

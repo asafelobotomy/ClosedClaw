@@ -72,6 +72,7 @@ export async function noteMacLaunchctlGatewayEnvOverrides(
   }
 
   const getenv = deps?.getenv ?? launchctlGetenv;
+  // @deprecated @removeBy 2026.4.0 — MOLTBOT_*/CLAWDBOT_* env vars superseded by ClosedClaw_*
   const deprecatedLaunchctlEntries = [
     ["MOLTBOT_GATEWAY_TOKEN", await getenv("MOLTBOT_GATEWAY_TOKEN")],
     ["MOLTBOT_GATEWAY_PASSWORD", await getenv("MOLTBOT_GATEWAY_PASSWORD")],
@@ -121,6 +122,7 @@ export async function noteMacLaunchctlGatewayEnvOverrides(
   (deps?.noteFn ?? note)(lines.join("\n"), "Gateway (macOS)");
 }
 
+// @deprecated @removeBy 2026.4.0 — MOLTBOT_*/CLAWDBOT_* env vars superseded by ClosedClaw_*
 export function noteDeprecatedLegacyEnvVars(
   env: NodeJS.ProcessEnv = process.env,
   deps?: { noteFn?: typeof note },

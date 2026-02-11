@@ -2,12 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChannelOutboundAdapter, ChannelPlugin } from "../../channels/plugins/types.js";
 import type { ClosedClawConfig } from "../../config/config.js";
 import type { PluginRegistry } from "../../plugins/registry.js";
-import { discordOutbound } from "../../channels/plugins/outbound/discord.js";
-import { imessageOutbound } from "../../channels/plugins/outbound/imessage.js";
-import { signalOutbound } from "../../channels/plugins/outbound/signal.js";
-import { slackOutbound } from "../../channels/plugins/outbound/slack.js";
-import { telegramOutbound } from "../../channels/plugins/outbound/telegram.js";
-import { whatsappOutbound } from "../../channels/plugins/outbound/whatsapp.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import {
   createIMessageTestPlugin,
@@ -15,6 +9,27 @@ import {
   createTestRegistry,
 } from "../../../test/helpers/channel-plugins.js";
 import { SILENT_REPLY_TOKEN } from "../tokens.js";
+
+/**
+ * Lightweight outbound stubs for tests. The real per-channel adapters were
+ * archived when channels moved to the plugin registry pattern. Tests mock the
+ * underlying send functions anyway, so these stubs just wire through to deps.
+ */
+const createChannelStubOutbound = (
+  channel: string,
+  opts?: { deliveryMode?: ChannelOutboundAdapter["deliveryMode"] },
+): ChannelOutboundAdapter => ({
+  deliveryMode: opts?.deliveryMode ?? "direct",
+  sendText: async ({ deps, to, text }) => ({ channel, messageId: "test", to, text, deps }),
+  sendMedia: async ({ deps, to, text, mediaUrl }) => ({
+    channel,
+    messageId: "test",
+    to,
+    text,
+    mediaUrl,
+    deps,
+  }),
+});
 
 const mocks = vi.hoisted(() => ({
   sendMessageDiscord: vi.fn(async () => ({ messageId: "m1", channelId: "c1" })),
@@ -404,21 +419,21 @@ const defaultRegistry = createTestRegistry([
     pluginId: "discord",
     plugin: createOutboundTestPlugin({
       id: "discord",
-      outbound: discordOutbound,
+      outbound: createChannelStubOutbound("discord"),
       label: "Discord",
     }),
     source: "test",
   },
   {
     pluginId: "slack",
-    plugin: createOutboundTestPlugin({ id: "slack", outbound: slackOutbound, label: "Slack" }),
+    plugin: createOutboundTestPlugin({ id: "slack", outbound: createChannelStubOutbound("slack"), label: "Slack" }),
     source: "test",
   },
   {
     pluginId: "telegram",
     plugin: createOutboundTestPlugin({
       id: "telegram",
-      outbound: telegramOutbound,
+      outbound: createChannelStubOutbound("telegram"),
       label: "Telegram",
     }),
     source: "test",
@@ -427,19 +442,19 @@ const defaultRegistry = createTestRegistry([
     pluginId: "whatsapp",
     plugin: createOutboundTestPlugin({
       id: "whatsapp",
-      outbound: whatsappOutbound,
+      outbound: createChannelStubOutbound("whatsapp", { deliveryMode: "gateway" }),
       label: "WhatsApp",
     }),
     source: "test",
   },
   {
     pluginId: "signal",
-    plugin: createOutboundTestPlugin({ id: "signal", outbound: signalOutbound, label: "Signal" }),
+    plugin: createOutboundTestPlugin({ id: "signal", outbound: createChannelStubOutbound("signal"), label: "Signal" }),
     source: "test",
   },
   {
     pluginId: "imessage",
-    plugin: createIMessageTestPlugin({ outbound: imessageOutbound }),
+    plugin: createIMessageTestPlugin(),
     source: "test",
   },
   {

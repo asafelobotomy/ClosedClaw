@@ -1,8 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ClosedClawConfig } from "../../config/config.js";
-import { signalOutbound } from "../../channels/plugins/outbound/signal.js";
-import { telegramOutbound } from "../../channels/plugins/outbound/telegram.js";
-import { whatsappOutbound } from "../../channels/plugins/outbound/whatsapp.js";
+import type { ChannelOutboundAdapter } from "../../channels/plugins/types.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import { markdownToSignalTextChunks } from "../../signal/format.js";
 import {
@@ -10,6 +8,26 @@ import {
   createOutboundTestPlugin,
   createTestRegistry,
 } from "../../../test/helpers/channel-plugins.js";
+
+/**
+ * Lightweight outbound stubs for tests. The real per-channel adapters were
+ * archived when channels moved to the plugin registry pattern.
+ */
+const createChannelStubOutbound = (
+  channel: string,
+  opts?: { deliveryMode?: ChannelOutboundAdapter["deliveryMode"] },
+): ChannelOutboundAdapter => ({
+  deliveryMode: opts?.deliveryMode ?? "direct",
+  sendText: async ({ deps, to, text }) => ({ channel, messageId: "test", to, text, deps }),
+  sendMedia: async ({ deps, to, text, mediaUrl }) => ({
+    channel,
+    messageId: "test",
+    to,
+    text,
+    mediaUrl,
+    deps,
+  }),
+});
 
 const mocks = vi.hoisted(() => ({
   appendAssistantMessageToSessionTranscript: vi.fn(async () => ({ ok: true, sessionFile: "x" })),
@@ -361,17 +379,17 @@ const emptyRegistry = createTestRegistry([]);
 const defaultRegistry = createTestRegistry([
   {
     pluginId: "telegram",
-    plugin: createOutboundTestPlugin({ id: "telegram", outbound: telegramOutbound }),
+    plugin: createOutboundTestPlugin({ id: "telegram", outbound: createChannelStubOutbound("telegram") }),
     source: "test",
   },
   {
     pluginId: "signal",
-    plugin: createOutboundTestPlugin({ id: "signal", outbound: signalOutbound }),
+    plugin: createOutboundTestPlugin({ id: "signal", outbound: createChannelStubOutbound("signal") }),
     source: "test",
   },
   {
     pluginId: "whatsapp",
-    plugin: createOutboundTestPlugin({ id: "whatsapp", outbound: whatsappOutbound }),
+    plugin: createOutboundTestPlugin({ id: "whatsapp", outbound: createChannelStubOutbound("whatsapp", { deliveryMode: "gateway" }) }),
     source: "test",
   },
   {

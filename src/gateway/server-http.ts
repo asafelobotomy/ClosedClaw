@@ -29,6 +29,7 @@ import {
 } from "./hooks.js";
 import { handleOpenAiHttpRequest } from "./openai-http.js";
 import { handleOpenResponsesHttpRequest } from "./openresponses-http.js";
+import { RateLimiter } from "./rate-limiter.js";
 import { handleToolsInvokeHttpRequest } from "./tools-invoke-http.js";
 
 type SubsystemLogger = ReturnType<typeof createSubsystemLogger>;
@@ -86,10 +87,13 @@ export function createHooksRequestHandler(
       return true;
     }
     if (fromQuery) {
+      // MED-03: Query-param tokens are deprecated. Add Sunset header to signal removal.
+      res.setHeader("Sunset", "Mon, 01 Jun 2026 00:00:00 GMT");
       logHooks.warn(
         "Hook token provided via query parameter is deprecated for security reasons. " +
           "Tokens in URLs appear in logs, browser history, and referrer headers. " +
-          "Use Authorization: Bearer <token> or X-ClosedClaw-Token header instead.",
+          "Use Authorization: Bearer <token> or X-ClosedClaw-Token header instead. " +
+          "Query-param token support will be removed after 2026-06-01.",
       );
     }
 
@@ -225,6 +229,10 @@ export function createGatewayHttpServer(opts: {
     handlePluginRequest,
     resolvedAuth,
   } = opts;
+
+  // Per-IP rate limiter: 200 requests/minute. Override via gateway config in the future.
+  const rateLimiter = new RateLimiter({ maxRequests: 200, windowMs: 60_000 });
+
   const httpServer: HttpServer = opts.tlsOptions
     ? createHttpsServer(opts.tlsOptions, (req, res) => {
         void handleRequest(req, res);
@@ -239,8 +247,21 @@ export function createGatewayHttpServer(opts: {
       return;
     }
 
+    // --- Rate limiting (HIGH-05) ---
+    const clientIp = req.socket.remoteAddress ?? "unknown";
+    const rateResult = rateLimiter.check(clientIp);
+    if (!rateResult.allowed) {
+      res.statusCode = 429;
+      res.setHeader("Retry-After", String(Math.ceil(rateResult.retryAfterMs / 1000)));
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.end("Too Many Requests");
+      return;
+    }
+
     // Apply baseline security headers to all HTTP responses.
-    res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; frame-ancestors 'none'");
+    // Baseline CSP — no inline scripts allowed. HTML pages that inject inline
+    // scripts (control-ui) override this header with a per-request nonce.
+    res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; frame-ancestors 'none'");
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "DENY");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");

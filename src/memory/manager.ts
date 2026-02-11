@@ -1,3 +1,16 @@
+/**
+ * Memory Manager — orchestrates SQLite-backed memory storage, vector
+ * embeddings, search, sync, and lifecycle management.
+ *
+ * TODO(MED-04): This file is ~2,400 LOC and should be split further.
+ * Candidates for extraction:
+ *   - Embedding/vector operations → manager-embeddings.ts
+ *   - Sync/watch logic → manager-sync.ts
+ *   - Lifecycle (init/close/migrate) → manager-lifecycle.ts
+ * Already extracted: manager-search.ts, manager-cache-key.ts
+ *
+ * @see https://github.com/nicobailon/ClosedClawRepositoryAudit — MED-04
+ */
 import type { DatabaseSync } from "node:sqlite";
 import chokidar, { type FSWatcher } from "chokidar";
 import { randomUUID } from "node:crypto";

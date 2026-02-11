@@ -133,11 +133,15 @@ export async function resolveGatewayBindHost(
   const mode = bind ?? "loopback";
 
   if (mode === "loopback") {
-    // 127.0.0.1 rarely fails, but handle gracefully
+    // 127.0.0.1 should always be available; error out if not (MED-02).
     if (await canBindToHost("127.0.0.1")) {
       return "127.0.0.1";
     }
-    return "0.0.0.0"; // extreme fallback
+    throw new Error(
+      "Cannot bind to 127.0.0.1 in loopback mode. " +
+        "Check if another process is using the port or if the loopback interface is down. " +
+        'Use bind mode "lan" or "auto" if you need a broader bind address.',
+    );
   }
 
   if (mode === "tailnet") {
@@ -148,6 +152,10 @@ export async function resolveGatewayBindHost(
     if (await canBindToHost("127.0.0.1")) {
       return "127.0.0.1";
     }
+    // MED-02: warn when falling back to 0.0.0.0 outside of explicit lan mode.
+    console.warn(
+      '[gateway] WARNING: tailnet mode falling back to 0.0.0.0 — the gateway will be exposed on all network interfaces.',
+    );
     return "0.0.0.0";
   }
 
@@ -158,6 +166,10 @@ export async function resolveGatewayBindHost(
   if (mode === "custom") {
     const host = customHost?.trim();
     if (!host) {
+      // MED-02: warn when falling back to 0.0.0.0 outside of explicit lan mode.
+      console.warn(
+        '[gateway] WARNING: custom bind mode with empty host — falling back to 0.0.0.0 (all interfaces).',
+      );
       return "0.0.0.0";
     } // invalid config → fall back to all
 
@@ -165,6 +177,9 @@ export async function resolveGatewayBindHost(
       return host;
     }
     // Custom IP failed → fall back to LAN
+    console.warn(
+      `[gateway] WARNING: custom bind address ${host} unavailable — falling back to 0.0.0.0 (all interfaces).`,
+    );
     return "0.0.0.0";
   }
 
@@ -172,9 +187,16 @@ export async function resolveGatewayBindHost(
     if (await canBindToHost("127.0.0.1")) {
       return "127.0.0.1";
     }
+    // MED-02: warn when falling back to 0.0.0.0 outside of explicit lan mode.
+    console.warn(
+      '[gateway] WARNING: auto mode falling back to 0.0.0.0 — the gateway will be exposed on all network interfaces.',
+    );
     return "0.0.0.0";
   }
 
+  console.warn(
+    `[gateway] WARNING: unknown bind mode "${mode}" — falling back to 0.0.0.0 (all interfaces).`,
+  );
   return "0.0.0.0";
 }
 

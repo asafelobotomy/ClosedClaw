@@ -592,6 +592,9 @@ function printResult(result: UpdateRunResult, opts: PrintResultOptions) {
 }
 
 export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
+  // LOW-01: Suppress deprecation warnings during update — npm emits noisy ones.
+  // This persists for the rest of the process lifetime, which is acceptable since
+  // the update command is typically the last operation before a restart.
   process.noDeprecation = true;
   process.env.NODE_NO_WARNINGS = "1";
   const timeoutMs = opts.timeout ? Number.parseInt(opts.timeout, 10) * 1000 : undefined;

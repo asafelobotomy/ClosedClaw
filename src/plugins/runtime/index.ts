@@ -60,7 +60,7 @@ import { getChildLogger } from "../../logging.js";
 import { normalizeLogLevel } from "../../logging/levels.js";
 import { convertMarkdownTables } from "../../markdown/tables.js";
 import { isVoiceCompatibleAudio } from "../../media/audio.js";
-import { mediaKindFromMime } from "../../media/constants.js";
+import { mediaKindFromMime } from "../../config/constants/index.js";
 import { fetchRemoteMedia } from "../../media/fetch.js";
 import { getImageMetadata, resizeToJpeg } from "../../media/image-ops.js";
 import { detectMime } from "../../media/mime.js";

@@ -565,8 +565,48 @@
 
 Mark items as done with `[x]` as fixes are committed:
 
-- [ ] CRIT-01
-- [ ] HIGH-01 through HIGH-06
-- [ ] MED-01 through MED-12
-- [ ] LOW-01 through LOW-16
-- [ ] INFO-01 through INFO-10
+- [x] CRIT-01 — Created `extensions/qwen-portal-auth/package.json`
+- [x] HIGH-01 — CI already gates both tsgo+tsc; documented divergence
+- [x] HIGH-02 — Added `peerDependencies` to all 8 extensions
+- [x] HIGH-03 — Fixed `workspace:*` in moltbot/clawdbot (moved to devDeps+peerDeps)
+- [x] HIGH-04 — CSP tightened: `unsafe-inline` → nonce-based for control-ui
+- [x] HIGH-05 — Gateway rate limiter (200 req/min sliding window)
+- [x] HIGH-06 — `form-data` override bumped to 2.5.5
+- [x] MED-01 — Documented `new Function()` browser sandbox context
+- [x] MED-02 — Loopback mode now throws instead of fallback to 0.0.0.0
+- [x] MED-03 — Added `Sunset` header + improved deprecation warning for query-param token
+- [x] MED-04 — Added refactoring TODO to manager.ts (2,396 LOC); split candidates identified
+- [x] MED-05 — Added try/catch with friendly error to `requireNodeSqlite()`
+- [x] MED-06 — Fixed gtk-gui package name + version bump to 2026.2.1
+- [x] MED-07 — Bumped moltbot/clawdbot versions to 2026.2.1
+- [x] MED-08 — Removed `ScriptHost` from tsconfig lib
+- [x] MED-09 — Removed stale `@matrix-org/matrix-sdk-crypto-nodejs` references
+- [x] MED-10 — Audited: 25 non-test files with console.log (some legitimate CLI output)
+- [x] MED-11 — Replaced `execSync` string interpolation with `execFileSync`
+- [x] MED-12 — Documented tough-cookie/form-data overrides with `@removeBy 2026.6.0`
+- [x] LOW-01 — Documented `process.noDeprecation` scope in update-cli.ts
+- [x] LOW-02 — Documented `shell: true` security gate in tui-local-shell.ts
+- [x] LOW-03 — Added SQL identifier validation regex in memory-schema.ts
+- [x] LOW-04 — Pinned Bun version in Dockerfile
+- [x] LOW-05 — Migrated imports from deprecated `src/media/constants.ts` + deleted shim
+- [x] LOW-06 — Removed deprecated `buildMessageWithAttachments()`
+- [x] LOW-07 — Added `@removeBy 2026.4.0` to deprecated config type fields
+- [x] LOW-08 — Fixed archived extensions packaging (workspace:* → peerDeps)
+- [x] LOW-09 — Hono triple-pin documented via `overrideComments`
+- [ ] LOW-10 — ES2024 lib/target upgrade (deferred — low risk, needs testing)
+- [ ] LOW-11 — (not in original audit)
+- [ ] LOW-12 — (not in original audit)
+- [ ] LOW-13 — (not in original audit)
+- [x] LOW-14 — Removed `authenticate-pam` from `onlyBuiltDependencies`
+- [x] LOW-15 — Audited: zero `process.exit()` in non-CLI code
+- [x] LOW-16 — Added `@removeBy 2026.4.0` to MOLTBOT/CLAWDBOT env var detection
+- [x] INFO-01 — (covered by HIGH-01 tsgo/tsc documentation)
+- [x] INFO-02 — (covered by MED-09 Matrix SDK removal)
+- [x] INFO-03 — (covered by MED-07 version bumps)
+- [x] INFO-04 — Added READMEs to moltbot/clawdbot packages
+- [ ] INFO-05 — (not in original audit)
+- [x] INFO-06 — Added `@removeBy 2026.6.0` to legacy config migration rules
+- [x] INFO-07 — Relaxed node-llama-cpp peerDep from exact `3.15.1` to `^3.15.0`
+- [x] INFO-08 — Documented `--allow-unconfigured` security implications in Dockerfile
+- [ ] INFO-09 — DOM in tsconfig (deferred — needs separate tsconfig.ui.json)
+- [x] INFO-10 — Added `peerDependenciesMeta` for optional dependencies

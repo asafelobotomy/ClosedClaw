@@ -231,6 +231,18 @@ export async function evaluateViaPlaywright(opts: {
   restoreRoleRefsForTarget({ cdpUrl: opts.cdpUrl, targetId: opts.targetId, page });
   if (opts.ref) {
     const locator = refLocator(page, opts.ref);
+    // SECURITY NOTE (MED-01): The `new Function()` / `eval()` usage below is
+    // intentional and acceptable for the following reasons:
+    //
+    // 1. This code runs inside Playwright's `page.evaluate()` / `locator.evaluate()`,
+    //    which executes in an *isolated browser tab* via CDP — NOT in the Node.js
+    //    process. The browser sandbox provides process-level isolation.
+    // 2. `fnText` originates from agent tool calls (not untrusted external input).
+    //    The agent decides what JS to evaluate — this is the tool's core purpose.
+    // 3. `new Function()` is used instead of a direct function literal because
+    //    esbuild injects an `__name` helper into function declarations, which
+    //    doesn't exist in the browser context and causes runtime errors.
+    //
     // Use Function constructor at runtime to avoid esbuild adding __name helper
     // which doesn't exist in the browser context
     // eslint-disable-next-line @typescript-eslint/no-implied-eval -- required for browser-context eval

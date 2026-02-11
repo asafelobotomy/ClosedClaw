@@ -53,7 +53,7 @@ export type MediaUnderstandingModelConfig = {
   language?: string;
   /** Optional provider-specific query params (merged into requests). */
   providerOptions?: Record<string, Record<string, string | number | boolean>>;
-  /** @deprecated Use providerOptions.deepgram instead. */
+  /** @deprecated @removeBy 2026.4.0 Use providerOptions.deepgram instead. */
   deepgram?: {
     detectLanguage?: boolean;
     punctuate?: boolean;
@@ -86,7 +86,7 @@ export type MediaUnderstandingConfig = {
   language?: string;
   /** Optional provider-specific query params (merged into requests). */
   providerOptions?: Record<string, Record<string, string | number | boolean>>;
-  /** @deprecated Use providerOptions.deepgram instead. */
+  /** @deprecated @removeBy 2026.4.0 Use providerOptions.deepgram instead. */
   deepgram?: {
     detectLanguage?: boolean;
     punctuate?: boolean;
@@ -392,7 +392,7 @@ export type ToolsConfig = {
   /** Message tool configuration. */
   message?: {
     /**
-     * @deprecated Use tools.message.crossContext settings.
+     * @deprecated @removeBy 2026.4.0 Use tools.message.crossContext settings.
      * Allows cross-context sends across providers.
      */
     allowCrossContextSend?: boolean;
