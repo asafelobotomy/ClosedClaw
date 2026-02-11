@@ -1,27 +1,29 @@
 ---
-summary: "RPC adapters for external CLIs (signal-cli, imsg) and gateway patterns"
+summary: "RPC adapters for external CLIs (archived platforms documented for reference)"
 read_when:
-  - Adding or changing external CLI integrations
-  - Debugging RPC adapters (signal-cli, imsg)
-title: "RPC Adapters"
+  - Understanding RPC integration patterns (Signal and iMessage platforms were removed in v2026.2.12)
+  - Historical reference for external CLI integration
+title: "RPC Adapters (Archive)"
 ---
 
 # RPC adapters
 
-ClosedClaw integrates external CLIs via JSON-RPC. Two patterns are used today.
+ClosedClaw previously integrated external CLIs via JSON-RPC. These patterns are documented for historical reference.
 
-## Pattern A: HTTP daemon (signal-cli)
+> **Note**: Signal and iMessage platforms were removed in v2026.2.12. The following RPC patterns are archived.
+
+## Pattern A: HTTP daemon (signal-cli) — Archive
 
 - `signal-cli` runs as a daemon with JSON-RPC over HTTP.
 - Event stream is SSE (`/api/v1/events`).
 - Health probe: `/api/v1/check`.
 - ClosedClaw owns lifecycle when `channels.signal.autoStart=true`.
 
-See [Signal](/channels/signal) for setup and endpoints.
+See archive documentation for setup and endpoints.
 
-## Pattern B: stdio child process (imsg)
+## Pattern B: stdio child process (imsg) — Archive
 
-- ClosedClaw spawns `imsg rpc` as a child process.
+- ClosedClaw spawned `imsg rpc` as a child process.
 - JSON-RPC is line-delimited over stdin/stdout (one JSON object per line).
 - No TCP port, no daemon required.
 

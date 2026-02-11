@@ -2,6 +2,47 @@
 
 Docs: https://docs.OpenClaw.ai
 
+## 2026.2.12
+
+### Platform Removal: GTK-GUI Focus
+
+Removed 6 messaging platform implementations (Discord, WhatsApp, Telegram, Signal, Slack, iMessage) to streamline codebase and focus development on GTK-GUI and core remaining platforms (GoogleChat, MSTeams, BlueBubbles, Nostr).
+
+#### Extensions & Config Cleanup
+
+- Deleted 6 complete channel extension implementations
+- Removed 7 config type definition files (`types.discord.ts`, `types.whatsapp.ts`, etc.)
+- Removed WhatsApp-specific config schema file
+- Removed 8 config migration rules for removed platforms
+- Cleaned plugin SDK exports (removed WhatsApp runtime)
+
+#### Code & Utilities
+
+- Removed 140+ lines of WhatsApp-specific utility functions (`toWhatsappJid`, `isSelfChatMode`, `jidToE164`, etc.)
+- Generalized `normalizeE164()` for platform-agnostic phone number handling
+- Removed platform-specific exports from `src/index.ts`
+
+#### UI Components
+
+- Deleted 6 channel card component files from web UI
+- Updated channel selection UI to remove removed platforms
+
+#### Test Suite
+
+- Deleted 5+ Category A test files (platform-exclusive tests: 2,789+ lines removed)
+- Cleaned imports in 20+ test files
+- Replaced Telegram/Discord/WhatsApp references with remaining platforms (iMessage, GoogleChat, MSTeams, Nostr)
+- Updated test fixtures and configs for remaining platforms
+
+#### Impact
+
+- **~10,000+ lines of code removed**
+- **25+ files deleted**, 15+ files modified
+- **Full TypeScript compatibility maintained** (verified zero import errors)
+- **All platform migrations completed** - no lingering references to removed platforms
+
+**Breaking Changes**: None (removed platforms were already disabled by default in most installations)
+
 ## 2026.2.11
 
 ### Test Suite Repairs

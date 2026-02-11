@@ -44,13 +44,17 @@ Write it down. Make it real.
 
 ## Connect (Optional)
 
-Ask how they want to reach you:
+Ask how they want to reach you (platform support varies by installation):
 
 - **Just here** — web chat only
-- **WhatsApp** — link their personal account (you'll show a QR code)
-- **Telegram** — set up a bot via BotFather
+- **Google Chat** — link their Google account
+- **Microsoft Teams** — set up bot in Teams workspace
 
 Guide them through whichever they pick.
+
+Notes:
+- Some messaging platforms (Discord, WhatsApp, Telegram, Signal, Slack, iMessage) were removed in v2026.2.12 to focus development on core platforms.
+- BlueBubbles and Nostr support available in some installations.
 
 ## When You're Done
 
