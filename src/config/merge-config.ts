@@ -1,5 +1,4 @@
 import type { ClosedClawConfig } from "./config.js";
-import type { WhatsAppConfig } from "./types.js";
 
 export type MergeSectionOptions<T> = {
   unsetOnUndefined?: Array<keyof T>;
@@ -23,16 +22,6 @@ export function mergeConfigSection<T extends Record<string, unknown>>(
   return next as T;
 }
 
-export function mergeWhatsAppConfig(
-  cfg: ClosedClawConfig,
-  patch: Partial<WhatsAppConfig>,
-  options?: MergeSectionOptions<WhatsAppConfig>,
-): ClosedClawConfig {
-  return {
-    ...cfg,
-    channels: {
-      ...cfg.channels,
-      whatsapp: mergeConfigSection(cfg.channels?.whatsapp, patch, options),
-    },
-  };
-}
+/**
+ * mergeWhatsAppConfig() removed in v2026.2 (WhatsApp channel removed)
+ */

@@ -608,35 +608,25 @@ export async function collectPluginsTrustFindings(params: {
   const allowConfigured = Array.isArray(allow) && allow.length > 0;
   if (!allowConfigured) {
     const hasString = (value: unknown) => typeof value === "string" && value.trim().length > 0;
-    const hasAccountStringKey = (account: unknown, key: string) =>
-      Boolean(
-        account &&
-        typeof account === "object" &&
-        hasString((account as Record<string, unknown>)[key]),
-      );
 
-    // Check remaining platforms for native skills exposure
-    const msteamsConfigured =
-      hasString(params.cfg.channels?.msteams?.botId) ||
-      hasString(process.env.MSTEAMS_BOT_ID);
+    // Check if any remaining platforms have native skills exposure
+    // (simplified check - just look for basic configuration presence)
+    const channelsConfig = params.cfg.channels as Record<string, unknown> | undefined;
+    const enabledChannels = channelsConfig
+      ? Object.entries(channelsConfig)
+          .filter(([, cfg]) => cfg && typeof cfg === "object")
+          .map(([name]) => name)
+      : [];
 
-    const googlechatConfigured =
-      hasString(params.cfg.channels?.googlechat?.token) ||
-      hasString(process.env.GOOGLECHAT_TOKEN);
-
-    const skillCommandsLikelyExposed =
-      (msteamsConfigured &&
-        resolveNativeSkillsEnabled({
-          providerId: "msteams",
-          providerSetting: params.cfg.channels?.msteams?.commands?.nativeSkills,
-          globalSetting: params.cfg.commands?.nativeSkills,
-        })) ||
-      (googlechatConfigured &&
-        resolveNativeSkillsEnabled({
-          providerId: "googlechat",
-          providerSetting: params.cfg.channels?.googlechat?.commands?.nativeSkills,
-          globalSetting: params.cfg.commands?.nativeSkills,
-        }));
+    const skillCommandsLikelyExposed = enabledChannels.some((channel) => {
+      const channelConfig = channelsConfig?.[channel] as Record<string, unknown> | undefined;
+      if (!channelConfig) {
+        return false;
+      }
+      const commands = channelConfig.commands as Record<string, unknown> | undefined;
+      const nativeSkills = commands?.nativeSkills ?? params.cfg.commands?.nativeSkills;
+      return nativeSkills === true || nativeSkills === "allow";
+    });
 
     findings.push({
       checkId: "plugins.extensions_no_allowlist",

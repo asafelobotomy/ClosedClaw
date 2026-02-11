@@ -1,9 +1,12 @@
 import type { ClosedClawConfig } from "./config.js";
-import type { TelegramCapabilitiesConfig } from "./types.telegram.js";
 import { normalizeChannelId } from "../channels/plugins/index.js";
 import { normalizeAccountId } from "../routing/session-key.js";
 
-type CapabilitiesConfig = TelegramCapabilitiesConfig;
+/**
+ * Generic capabilities type for any channel (previously Telegram-specific).
+ * Can be a simple check string array or an object with capabilities per mode.
+ */
+type CapabilitiesConfig = string[] | Record<string, unknown> | undefined;
 
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((entry) => typeof entry === "string");
