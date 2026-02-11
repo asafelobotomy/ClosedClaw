@@ -96,15 +96,9 @@ export type {
   MSTeamsTeamConfig,
 } from "../config/types.js";
 export {
-  DiscordConfigSchema,
   GoogleChatConfigSchema,
-  IMessageConfigSchema,
   MSTeamsConfigSchema,
-  SignalConfigSchema,
-  SlackConfigSchema,
-  TelegramConfigSchema,
 } from "../config/zod-schema.providers-core.js";
-export { WhatsAppConfigSchema } from "../config/zod-schema.providers-whatsapp.js";
 export {
   BlockStreamingCoalesceSchema,
   DmConfigSchema,
