@@ -61,11 +61,8 @@ describe("security fix", () => {
     expect(res.configWritten).toBe(true);
     expect(res.changes).toEqual(
       expect.arrayContaining([
-        "channels.telegram.groupPolicy=open -> allowlist",
-        "channels.whatsapp.groupPolicy=open -> allowlist",
-        "channels.discord.groupPolicy=open -> allowlist",
-        "channels.signal.groupPolicy=open -> allowlist",
-        "channels.imessage.groupPolicy=open -> allowlist",
+        "channels.googlechat.groupPolicy=open -> allowlist",
+        "channels.msteams.groupPolicy=open -> allowlist",
         'logging.redactSensitive=off -> "tools"',
       ]),
     );

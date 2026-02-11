@@ -247,7 +247,7 @@ export const SECTION_META: Record<string, { label: string; description: string }
   auth: { label: "Authentication", description: "API keys and authentication profiles" },
   channels: {
     label: "Channels",
-    description: "Messaging channels (Telegram, Discord, Slack, etc.)",
+    description: "Messaging channels (GoogleChat, MSTeams, BlueBubbles, etc.)",
   },
   messages: { label: "Messages", description: "Message handling and routing settings" },
   commands: { label: "Commands", description: "Custom slash commands" },

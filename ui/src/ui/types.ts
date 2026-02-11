@@ -56,87 +56,15 @@ export type ChannelAccountSnapshot = {
   application?: unknown;
 };
 
-export type WhatsAppSelf = {
-  e164?: string | null;
-  jid?: string | null;
-};
-
-export type WhatsAppDisconnect = {
-  at: number;
-  status?: number | null;
-  error?: string | null;
-  loggedOut?: boolean | null;
-};
-
-export type WhatsAppStatus = {
-  configured: boolean;
-  linked: boolean;
-  authAgeMs?: number | null;
-  self?: WhatsAppSelf | null;
-  running: boolean;
-  connected: boolean;
-  lastConnectedAt?: number | null;
-  lastDisconnect?: WhatsAppDisconnect | null;
-  reconnectAttempts: number;
-  lastMessageAt?: number | null;
-  lastEventAt?: number | null;
-  lastError?: string | null;
-};
-
-export type TelegramBot = {
-  id?: number | null;
-  username?: string | null;
-};
-
-export type TelegramWebhook = {
-  url?: string | null;
-  hasCustomCert?: boolean | null;
-};
-
-export type TelegramProbe = {
-  ok: boolean;
-  status?: number | null;
-  error?: string | null;
-  elapsedMs?: number | null;
-  bot?: TelegramBot | null;
-  webhook?: TelegramWebhook | null;
-};
-
-export type TelegramStatus = {
-  configured: boolean;
-  tokenSource?: string | null;
-  running: boolean;
-  mode?: string | null;
-  lastStartAt?: number | null;
-  lastStopAt?: number | null;
-  lastError?: string | null;
-  probe?: TelegramProbe | null;
-  lastProbeAt?: number | null;
-};
-
-export type DiscordBot = {
-  id?: string | null;
-  username?: string | null;
-};
-
-export type DiscordProbe = {
-  ok: boolean;
-  status?: number | null;
-  error?: string | null;
-  elapsedMs?: number | null;
-  bot?: DiscordBot | null;
-};
-
-export type DiscordStatus = {
-  configured: boolean;
-  tokenSource?: string | null;
-  running: boolean;
-  lastStartAt?: number | null;
-  lastStopAt?: number | null;
-  lastError?: string | null;
-  probe?: DiscordProbe | null;
-  lastProbeAt?: number | null;
-};
+/**
+ * Removed platform status types (v2026.2 platform removal):
+ * - WhatsAppSelf, WhatsAppDisconnect, WhatsAppStatus
+ * - TelegramBot, TelegramWebhook, TelegramProbe, TelegramStatus
+ * - DiscordBot, DiscordProbe, DiscordStatus
+ * - SlackBot, SlackTeam, SlackProbe, SlackStatus
+ * - SignalProbe, SignalStatus
+ * - IMessageProbe, IMessageStatus
+ */
 
 export type GoogleChatProbe = {
   ok: boolean;
@@ -157,73 +85,6 @@ export type GoogleChatStatus = {
   lastStopAt?: number | null;
   lastError?: string | null;
   probe?: GoogleChatProbe | null;
-  lastProbeAt?: number | null;
-};
-
-export type SlackBot = {
-  id?: string | null;
-  name?: string | null;
-};
-
-export type SlackTeam = {
-  id?: string | null;
-  name?: string | null;
-};
-
-export type SlackProbe = {
-  ok: boolean;
-  status?: number | null;
-  error?: string | null;
-  elapsedMs?: number | null;
-  bot?: SlackBot | null;
-  team?: SlackTeam | null;
-};
-
-export type SlackStatus = {
-  configured: boolean;
-  botTokenSource?: string | null;
-  appTokenSource?: string | null;
-  running: boolean;
-  lastStartAt?: number | null;
-  lastStopAt?: number | null;
-  lastError?: string | null;
-  probe?: SlackProbe | null;
-  lastProbeAt?: number | null;
-};
-
-export type SignalProbe = {
-  ok: boolean;
-  status?: number | null;
-  error?: string | null;
-  elapsedMs?: number | null;
-  version?: string | null;
-};
-
-export type SignalStatus = {
-  configured: boolean;
-  baseUrl: string;
-  running: boolean;
-  lastStartAt?: number | null;
-  lastStopAt?: number | null;
-  lastError?: string | null;
-  probe?: SignalProbe | null;
-  lastProbeAt?: number | null;
-};
-
-export type IMessageProbe = {
-  ok: boolean;
-  error?: string | null;
-};
-
-export type IMessageStatus = {
-  configured: boolean;
-  running: boolean;
-  lastStartAt?: number | null;
-  lastStopAt?: number | null;
-  lastError?: string | null;
-  cliPath?: string | null;
-  dbPath?: string | null;
-  probe?: IMessageProbe | null;
   lastProbeAt?: number | null;
 };
 
@@ -403,15 +264,7 @@ export type CronPayload =
       thinking?: string;
       timeoutSeconds?: number;
       deliver?: boolean;
-      provider?:
-        | "last"
-        | "whatsapp"
-        | "telegram"
-        | "discord"
-        | "slack"
-        | "signal"
-        | "imessage"
-        | "msteams";
+      provider?: "last" | "googlechat" | "msteams" | "bluebubbles" | "nostr";
       to?: string;
       bestEffortDeliver?: boolean;
     };

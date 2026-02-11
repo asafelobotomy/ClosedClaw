@@ -132,7 +132,7 @@ describe("config form renderer", () => {
     const schema = {
       type: "object",
       properties: {
-        slack: {
+        googlechat: {
           type: "object",
           additionalProperties: {
             type: "string",
@@ -146,7 +146,7 @@ describe("config form renderer", () => {
         schema: analysis.schema,
         uiHints: {},
         unsupportedPaths: analysis.unsupportedPaths,
-        value: { slack: { channelA: "ok" } },
+        value: { googlechat: { channelA: "ok" } },
         onPatch,
       }),
       container,
@@ -155,7 +155,7 @@ describe("config form renderer", () => {
     const removeButton = container.querySelector(".cfg-map__item-remove");
     expect(removeButton).not.toBeUndefined();
     removeButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    expect(onPatch).toHaveBeenCalledWith(["slack"], {});
+    expect(onPatch).toHaveBeenCalledWith(["googlechat"], {});
   });
 
   it("supports wildcard uiHints for map entries", () => {
@@ -228,7 +228,7 @@ describe("config form renderer", () => {
         channels: {
           type: "object",
           properties: {
-            whatsapp: {
+            msteams: {
               type: "object",
               properties: {
                 enabled: { type: "boolean" },
