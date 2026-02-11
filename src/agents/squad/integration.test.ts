@@ -252,8 +252,7 @@ describe("buildComplexTask", () => {
 
     expect(task.description).toBe("Build a caching layer");
     expect(task.input).toBe("Build a caching layer");
-    expect(task.priority).toBeGreaterThanOrEqual(1);
-    expect(task.priority).toBeLessThanOrEqual(3);
+    expect(["low", "normal", "high"]).toContain(task.priority);
   });
 
   it("generates subtasks for multi-profile tasks", () => {

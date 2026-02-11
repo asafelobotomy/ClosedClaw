@@ -31,16 +31,31 @@ import { generateSigningKeyPair } from "./skill-signing.js";
 
 // ─── Setup ───────────────────────────────────────────────────────────────────
 
+// Mock node:os at module level so the named import `homedir` in trusted-keyring.ts is intercepted.
+const { mockHomedir } = vi.hoisted(() => ({
+  mockHomedir: vi.fn(),
+}));
+
+vi.mock("node:os", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:os")>();
+  return {
+    ...actual,
+    default: { ...actual, homedir: mockHomedir },
+    homedir: mockHomedir,
+  };
+});
+
 let tmpDir: string;
 
 beforeEach(async () => {
   tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "closedclaw-keyring-test-"));
-  vi.spyOn(os, "homedir").mockReturnValue(tmpDir);
+  mockHomedir.mockReturnValue(tmpDir);
 });
 
 afterEach(async () => {
-  vi.restoreAllMocks();
+  mockHomedir.mockReturnValue(tmpDir); // keep returning tmpDir during cleanup
   await fs.rm(tmpDir, { recursive: true, force: true });
+  vi.restoreAllMocks();
 });
 
 // ─── Path ────────────────────────────────────────────────────────────────────
@@ -220,11 +235,13 @@ describe("getTrustedKey", () => {
 
 describe("listTrustedKeys", () => {
   it("returns empty array for empty keyring", async () => {
+    await saveKeyring({ version: 1, keys: {} });
     const keys = await listTrustedKeys();
     expect(keys).toEqual([]);
   });
 
   it("returns all keys as tuples", async () => {
+    await saveKeyring({ version: 1, keys: {} });
     const pair1 = generateSigningKeyPair();
     const pair2 = generateSigningKeyPair();
 

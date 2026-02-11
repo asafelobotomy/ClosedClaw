@@ -60,7 +60,7 @@ describe("sessions", () => {
         id: "123",
         key: "discord:group:123",
       }),
-    ).toBe("discord:friends-of-ClosedClaw#general");
+    ).toBe("discord:friends-of-closedclaw#general");
   });
 
   it("collapses direct chats to main by default", () => {

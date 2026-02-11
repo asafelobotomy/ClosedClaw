@@ -229,43 +229,43 @@ describe("EpisodicStore", () => {
     });
 
     it("searches by task description", () => {
-      const _result = store.search("security");
+      const result = store.search("security");
       expect(result.totalMatches).toBe(2);
       expect(result.episodes.map((e) => e.id)).toContain("s1");
       expect(result.episodes.map((e) => e.id)).toContain("s4");
     });
 
     it("searches by tags", () => {
-      const _result = store.search("gateway");
+      const result = store.search("gateway");
       expect(result.totalMatches).toBe(1);
       expect(result.episodes[0]!.id).toBe("s2");
     });
 
     it("searches by squad ID", () => {
-      const _result = store.search("squad-alpha");
+      const result = store.search("squad-alpha");
       expect(result.totalMatches).toBe(1);
       expect(result.episodes[0]!.id).toBe("s5");
     });
 
     it("searches by agent name", () => {
-      const _result = store.search("coder");
+      const result = store.search("coder");
       expect(result.totalMatches).toBe(1);
       expect(result.episodes[0]!.id).toBe("s5");
     });
 
     it("is case-insensitive", () => {
-      const _result = store.search("SECURITY");
+      const result = store.search("SECURITY");
       expect(result.totalMatches).toBe(2);
     });
 
     it("returns empty for no matches", () => {
-      const _result = store.search("nonexistent-query-xyz");
+      const result = store.search("nonexistent-query-xyz");
       expect(result.totalMatches).toBe(0);
       expect(result.episodes).toEqual([]);
     });
 
     it("respects limit", () => {
-      const _result = store.search("security", 1);
+      const result = store.search("security", 1);
       expect(result.episodes.length).toBe(1);
       expect(result.totalMatches).toBe(2); // Total matches still reported
     });
@@ -375,7 +375,7 @@ describe("EpisodicStore", () => {
         makeEpisodeAt(5, { id: "recent-success", outcome: "success" }),
       ]);
 
-      const _result = await store.cleanup();
+      const result = await store.cleanup();
       expect(result.removed).toBe(1);
       expect(result.retained).toBe(1);
       expect(store.getById("recent-success")).toBeDefined();
@@ -396,7 +396,7 @@ describe("EpisodicStore", () => {
       // Both are `failRetention + 5` days old.
       // Failure retention < success retention, so failure gets cleaned but success stays.
       if (failRetention + 5 <= successRetention) {
-        const _result = await store.cleanup();
+        const result = await store.cleanup();
         expect(store.getById("old-fail")).toBeUndefined();
         expect(store.getById("old-success")).toBeDefined();
       }
@@ -409,7 +409,7 @@ describe("EpisodicStore", () => {
         makeEpisodeAt(retentionDays + 10, { id: "old-partial", outcome: "partial" }),
       );
 
-      const _result = await store.cleanup();
+      const result = await store.cleanup();
       expect(result.removed).toBe(1);
     });
 
@@ -420,7 +420,7 @@ describe("EpisodicStore", () => {
         makeEpisodeAt(retentionDays + 10, { id: "old-cancelled", outcome: "cancelled" }),
       );
 
-      const _result = await store.cleanup();
+      const result = await store.cleanup();
       expect(result.removed).toBe(1);
     });
 
@@ -433,14 +433,14 @@ describe("EpisodicStore", () => {
       });
       await store.store(ep);
 
-      const _result = await store.cleanup(now);
+      const result = await store.cleanup(now);
       // SUCCESS_DAYS is 90, so 100 days old should be removed
       expect(result.removed).toBe(1);
     });
 
     it("no-ops when nothing to clean", async () => {
       await store.store(makeEpisode({ id: "fresh" }));
-      const _result = await store.cleanup();
+      const result = await store.cleanup();
       expect(result.removed).toBe(0);
       expect(result.retained).toBe(1);
     });

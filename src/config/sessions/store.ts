@@ -162,10 +162,12 @@ export function loadSessionStore(
 
     // Best-effort migration: GTK-only mode — rewrite non-GTK channel references
     // to "gtk-gui" so sessions route through the GTK channel by default.
-    if (typeof rec.channel === "string" && rec.channel !== "gtk-gui" && rec.channel !== "webchat") {
+    // Preserve common messaging channels that may be active.
+    const knownChannels = new Set(["gtk-gui", "webchat", "telegram", "whatsapp", "slack", "discord", "signal", "imessage"]);
+    if (typeof rec.channel === "string" && !knownChannels.has(rec.channel)) {
       rec.channel = "gtk-gui";
     }
-    if (typeof rec.lastChannel === "string" && rec.lastChannel !== "gtk-gui" && rec.lastChannel !== "webchat") {
+    if (typeof rec.lastChannel === "string" && !knownChannels.has(rec.lastChannel)) {
       rec.lastChannel = "gtk-gui";
     }
   }

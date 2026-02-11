@@ -19,6 +19,15 @@ import {
 } from "../security/audit-logger.js";
 import type { Runtime } from "../runtime.js";
 
+// Mock resolveStateDir to use temp directory
+vi.mock("../config/paths.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../config/paths.js")>();
+  return {
+    ...actual,
+    resolveStateDir: vi.fn(),
+  };
+});
+
 describe("audit query commands", () => {
   let tmpDir: string;
   let auditLogger: AuditLogger;
@@ -30,6 +39,10 @@ describe("audit query commands", () => {
     const logPath = path. join(tmpDir, "audit.log");
     auditLogger = new AuditLogger(logPath);
     await auditLogger.init();
+
+    // Mock resolveStateDir to return our temp directory
+    const { resolveStateDir } = await import("../config/paths.js");
+    vi.mocked(resolveStateDir).mockReturnValue(tmpDir);
 
     logOutput = [];
     runtime = {
@@ -49,23 +62,21 @@ describe("audit query commands", () => {
 
   describe("auditQueryCommand", () => {
     it("reports when no audit log exists", async () => {
-      const nonExistentPath = path.join(tmpDir, "nonexistent", "audit.log");
+      const nonExistentDir = path.join(tmpDir, "nonexistent");
+      const { resolveStateDir } = await import("../config/paths.js");
+      vi.mocked(resolveStateDir).mockReturnValue(nonExistentDir);
+
       const testRuntime = {
         ...runtime,
         log: (msg: string) => logOutput.push(msg),
       } as Runtime;
 
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => nonExistentPath,
-        };
-      });
-
       await auditQueryCommand(testRuntime, {});
 
       expect(logOutput.some((l) => l.includes("not found"))).toBe(true);
+      
+      // Restore for other tests
+      vi.mocked(resolveStateDir).mockReturnValue(tmpDir);
     });
 
     it("queries all entries", async () => {
@@ -81,14 +92,6 @@ describe("audit query commands", () => {
         severity: "info",
         summary: "Config update: ~/.closedclaw/config.json5",
         details: { action: "update", path: "~/.closedclaw/config.json5" },
-      });
-
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
       });
 
       await auditQueryCommand(runtime, {});
@@ -114,14 +117,6 @@ describe("audit query commands", () => {
         details: {},
       });
 
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
-      });
-
       await auditQueryCommand(runtime, { types: ["tool_exec"] });
 
       const output = logOutput.join("\n");
@@ -143,14 +138,6 @@ describe("audit query commands", () => {
         severity: "info",
         summary: "Tool exec",
         details: {},
-      });
-
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
       });
 
       await auditQueryCommand(runtime, { severities: ["critical"] });
@@ -178,14 +165,6 @@ describe("audit query commands", () => {
         details: {},
       });
 
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
-      });
-
       await auditQueryCommand(runtime, { since: "1s" });
 
       const output = logOutput.join("\n");
@@ -210,14 +189,6 @@ describe("audit query commands", () => {
         actor: "system",
       });
 
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
-      });
-
       await auditQueryCommand(runtime, { actor: "user:alice" });
 
       const output = logOutput.join("\n");
@@ -231,14 +202,6 @@ describe("audit query commands", () => {
         severity: "info",
         summary: "Test event",
         details: { foo: "bar" },
-      });
-
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
       });
 
       await auditQueryCommand(runtime, { json: true });
@@ -259,14 +222,6 @@ describe("audit query commands", () => {
           details: {},
         });
       }
-
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
-      });
 
       await auditQueryCommand(runtime, { limit: 5 });
 
@@ -347,14 +302,6 @@ describe("audit query commands", () => {
         details: {},
       });
 
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
-      });
-
       await auditStatsCommand(runtime, { verify: true });
 
       const output = logOutput.join("\n");
@@ -367,14 +314,6 @@ describe("audit query commands", () => {
         severity: "info",
         summary: "Test",
         details: {},
-      });
-
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
       });
 
       await auditStatsCommand(runtime, { json: true });
@@ -397,14 +336,6 @@ describe("audit query commands", () => {
 
       const exportPath = path.join(tmpDir, "export.csv");
 
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
-      });
-
       await auditExportCommand(runtime, { output: exportPath, format: "csv" });
 
       const content = await fs.readFile(exportPath, "utf-8");
@@ -422,14 +353,6 @@ describe("audit query commands", () => {
       });
 
       const exportPath = path.join(tmpDir, "export.json");
-
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
-      });
 
       await auditExportCommand(runtime, { output: exportPath, format: "json" });
 
@@ -457,14 +380,6 @@ describe("audit query commands", () => {
 
       const exportPath = path.join(tmpDir, "export.json");
 
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
-      });
-
       await auditExportCommand(runtime, {
         output: exportPath,
         format: "json",
@@ -487,14 +402,6 @@ describe("audit query commands", () => {
         details: {},
       });
 
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
-      });
-
       await auditVerifyCommand(runtime, {});
 
       const output = logOutput.join("\n");
@@ -508,14 +415,6 @@ describe("audit query commands", () => {
         severity: "info",
         summary: "Test",
         details: {},
-      });
-
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
       });
 
       await auditVerifyCommand(runtime, { json: true });
@@ -539,14 +438,6 @@ describe("audit query commands", () => {
       const logContent = await fs.readFile(auditLogger.getLogPath(), "utf-8");
       const tampered = logContent.replace("Test", "Tampered");
       await fs.writeFile(auditLogger.getLogPath(), tampered, "utf-8");
-
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
-      });
 
       await expect(auditVerifyCommand(runtime, {})).rejects.toThrow();
     });

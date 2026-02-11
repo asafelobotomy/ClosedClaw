@@ -2,7 +2,7 @@
  * Environment variable substitution for config values.
  *
  * Supports `${VAR_NAME}` syntax in string values, substituted at config load time.
- * - Only uppercase env vars are matched: `[A-Z_][A-Z0-9_]*`
+ * - Env var names match: `[A-Za-z_][A-Za-z0-9_]*`
  * - Escape with `$${}` to output literal `${}`
  * - Missing env vars throw `MissingEnvVarError` with context
  *
@@ -20,9 +20,9 @@
  * ```
  */
 
-// Pattern for valid uppercase env var names: starts with letter or underscore,
-// followed by letters, numbers, or underscores (all uppercase)
-const ENV_VAR_NAME_PATTERN = /^[A-Z_][A-Z0-9_]*$/;
+// Pattern for valid env var names: starts with letter or underscore,
+// followed by letters, numbers, or underscores (mixed case allowed)
+const ENV_VAR_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
 export class MissingEnvVarError extends Error {
   constructor(

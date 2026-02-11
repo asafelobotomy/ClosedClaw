@@ -125,8 +125,41 @@ function readCodexKeychainCredentials(options?: {
   platform?: NodeJS.Platform;
   execSync?: ExecSyncFn;
 }): CodexCliCredential | null {
-  // macOS keychain not available on Linux; always return null.
-  return null;
+  const platform = options?.platform ?? process.platform;
+  if (platform !== "darwin") {
+    return null;
+  }
+  const execSyncImpl = options?.execSync ?? execSync;
+  const codexHome = process.env.CODEX_HOME;
+  const accountHash = "cli|";
+  try {
+    const result = execSyncImpl(
+      `security find-generic-password -s "Codex Auth" -a "${accountHash}" -w`,
+      { encoding: "utf8", timeout: 5000, stdio: ["pipe", "pipe", "pipe"] },
+    );
+    const data = JSON.parse(result.trim());
+    const tokens = data?.tokens;
+    if (!tokens || typeof tokens !== "object") {
+      return null;
+    }
+    const accessToken = tokens.access_token;
+    const refreshToken = tokens.refresh_token;
+    if (typeof accessToken !== "string" || !accessToken) {
+      return null;
+    }
+    if (typeof refreshToken !== "string" || !refreshToken) {
+      return null;
+    }
+    return {
+      type: "oauth",
+      provider: "openai-codex" as OAuthProvider,
+      access: accessToken,
+      refresh: refreshToken,
+      expires: Date.now() + 60 * 60 * 1000,
+    };
+  } catch {
+    return null;
+  }
 }
 
 function readQwenCliCredentials(options?: { homeDir?: string }): QwenCliCredential | null {
@@ -242,8 +275,16 @@ export function readClaudeCliCredentials(options?: {
   homeDir?: string;
   execSync?: ExecSyncFn;
 }): ClaudeCliCredential | null {
-  // macOS keychain not available on Linux; skip keychain read.
+  // Try keychain first on macOS (darwin platform)
+  const platform = options?.platform ?? process.platform;
+  if (platform === "darwin") {
+    const keychain = readClaudeCliKeychainCredentials(options?.execSync);
+    if (keychain) {
+      return keychain;
+    }
+  }
 
+  // Fall back to filesystem credentials
   const credPath = resolveClaudeCliCredentialsPath(options?.homeDir);
   const raw = loadJsonFile(credPath);
   if (!raw || typeof raw !== "object") {
@@ -410,7 +451,12 @@ export function writeClaudeCliCredentials(
     options?.writeFile ??
     ((credentials, fileOptions) => writeClaudeCliFileCredentials(credentials, fileOptions));
 
-  // macOS keychain not available on Linux; always use file.
+  if (platform === "darwin") {
+    const keychainOk = writeKeychain(newCredentials);
+    if (keychainOk) {
+      return true;
+    }
+  }
   return writeFile(newCredentials, { homeDir: options?.homeDir });
 }
 

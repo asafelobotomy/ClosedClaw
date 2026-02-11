@@ -7,6 +7,10 @@ export const NODE_SERVICE_MARKER = "ClosedClaw";
 export const NODE_SERVICE_KIND = "node";
 export const LEGACY_GATEWAY_SYSTEMD_SERVICE_NAMES: string[] = [];
 
+// Platform-specific constants
+export const GATEWAY_LAUNCH_AGENT_LABEL = "ai.ClosedClaw.gateway";
+export const GATEWAY_WINDOWS_TASK_NAME = "ClosedClaw Gateway";
+
 export function normalizeGatewayProfile(profile?: string): string | null {
   const trimmed = profile?.trim();
   if (!trimmed || trimmed.toLowerCase() === "default") {
@@ -26,6 +30,22 @@ export function resolveGatewaySystemdServiceName(profile?: string): string {
     return GATEWAY_SYSTEMD_SERVICE_NAME;
   }
   return `ClosedClaw-gateway${suffix}`;
+}
+
+export function resolveGatewayLaunchAgentLabel(profile?: string): string {
+  const normalized = normalizeGatewayProfile(profile);
+  if (!normalized) {
+    return GATEWAY_LAUNCH_AGENT_LABEL;
+  }
+  return `ai.ClosedClaw.${normalized}`;
+}
+
+export function resolveGatewayWindowsTaskName(profile?: string): string {
+  const normalized = normalizeGatewayProfile(profile);
+  if (!normalized) {
+    return GATEWAY_WINDOWS_TASK_NAME;
+  }
+  return `ClosedClaw Gateway (${normalized})`;
 }
 
 export function formatGatewayServiceDescription(params?: {

@@ -1,6 +1,0 @@
-Archived 10 dead test files
-Tests whose source modules are archived: discord-actions, slack-actions, telegram-actions, whatsapp-actions, telegram outbound, slack.actions, directory-config, line-directives, voice-call.plugin, auto-reply.retry.
-
-Remaining 77 failures
-All pre-existing — logic/behavior mismatches, missing functions (resolveGatewayWindowsTaskName), variable typos (_result), stale mock targets, OAuth provider initialization errors. None are module-not-found errors from archived channels.
-

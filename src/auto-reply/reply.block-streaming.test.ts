@@ -16,7 +16,6 @@ const piEmbeddedMock = vi.hoisted(() => ({
   isEmbeddedPiRunStreaming: vi.fn().mockReturnValue(false),
 }));
 
-vi.mock("/src/agents/pi-embedded.js", () => piEmbeddedMock);
 vi.mock("../agents/pi-embedded.js", () => piEmbeddedMock);
 vi.mock("../agents/model-catalog.js", () => ({
   loadModelCatalog: vi.fn(),

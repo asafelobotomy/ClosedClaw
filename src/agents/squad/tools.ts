@@ -320,6 +320,7 @@ export function createSquadBroadcastTool(ctx: SquadToolContext): AnyAgentTool {
       const messageType = validTypes.includes(type) ? type : "notification";
 
       ctx.ipc.broadcast(ctx.agentId, {
+        from: ctx.agentId,
         type: messageType as AgentMessage["type"],
         payload: { message },
       });

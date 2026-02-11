@@ -21,6 +21,14 @@ import {
 } from "../security/audit-hooks.js";
 import { AuditLogger, getAuditLogPath, readAuditLog } from "../security/audit-logger.js";
 
+// Mock resolveStateDir at module level
+const mockResolveStateDir = vi.fn();
+const mockResolveConfigPath = vi.fn();
+vi.mock("../config/paths.js", () => ({
+  resolveStateDir: mockResolveStateDir,
+  resolveConfigPath: mockResolveConfigPath,
+}));
+
 describe("audit hooks", () => {
   let tmpDir: string;
   let auditLogPath: string;
@@ -29,19 +37,9 @@ describe("audit hooks", () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "audit-hooks-test-"));
     auditLogPath = path.join(tmpDir, "audit.log");
 
-    // Mock resolveStateDir to use temp directory
-    vi.mock("../config/paths.js", () => ({
-      resolveStateDir: () => tmpDir,
-    }));
-
-    // Mock getAuditLogPath to use temp directory
-    vi.mock("../security/audit-logger.js", async (importOriginal) => {
-      const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-      return {
-        ...actual,
-        getAuditLogPath: () => auditLogPath,
-      };
-    });
+    // Configure mocks to use temp directory
+    mockResolveStateDir.mockReturnValue(tmpDir);
+    mockResolveConfigPath.mockReturnValue(path.join(tmpDir, "config.json5"));
   });
 
   afterEach(async () => {

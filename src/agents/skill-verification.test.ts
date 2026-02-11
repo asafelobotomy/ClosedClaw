@@ -261,11 +261,12 @@ describe("skill-verification", () => {
     it("blocks signed skills with invalid signature", async () => {
       // Re-add key to keyring
       const publicKeyPem = formatPublicKeyPem(testKeyPair.publicKey);
-      await addTrustedKey({
-        keyId: testKeyPair.keyId,
+      await addTrustedKey(testKeyPair.keyId, {
+        name: "Test Signer",
         publicKeyPem,
-        signer: "Test Signer",
         trustLevel: "full",
+        added: new Date().toISOString(),
+        verifiedVia: "manual",
       });
 
       // Modify skill content (invalidates signature)

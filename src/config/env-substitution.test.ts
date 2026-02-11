@@ -155,14 +155,14 @@ describe("resolveConfigEnvVars", () => {
       expect(result).toEqual({ key: "$VAR" });
     });
 
-    it("leaves ${lowercase} unchanged (uppercase only)", () => {
+    it("substitutes ${lowercase} vars", () => {
       const result = resolveConfigEnvVars({ key: "${lowercase}" }, { lowercase: "value" });
-      expect(result).toEqual({ key: "${lowercase}" });
+      expect(result).toEqual({ key: "value" });
     });
 
-    it("leaves ${MixedCase} unchanged", () => {
+    it("substitutes ${MixedCase} vars", () => {
       const result = resolveConfigEnvVars({ key: "${MixedCase}" }, { MixedCase: "value" });
-      expect(result).toEqual({ key: "${MixedCase}" });
+      expect(result).toEqual({ key: "value" });
     });
 
     it("leaves ${123INVALID} unchanged (must start with letter or underscore)", () => {

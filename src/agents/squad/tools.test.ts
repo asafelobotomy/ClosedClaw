@@ -78,7 +78,8 @@ function mockContext(overrides?: Partial<SquadToolContext>): SquadToolContext {
         claimed: 1,
         completed: 5,
         failed: 0,
-        total: 8,
+        cancelled: 0,
+        totalEnqueued: 8,
       }),
     } as unknown as SquadToolContext["taskQueue"],
     isCoordinator: true,
@@ -94,7 +95,7 @@ describe("createDelegateToAgentTool", () => {
     const tool = createDelegateToAgentTool(ctx);
 
     const result = parseResult(
-      await tool.handler({
+      await tool.execute("test-call-id", {
         task_description: "Write auth module",
         task_type: "code",
         priority: "high",
@@ -117,7 +118,7 @@ describe("createDelegateToAgentTool", () => {
     const ctx = mockContext();
     const tool = createDelegateToAgentTool(ctx);
 
-    const result = parseResult(await tool.handler({ task_description: "Do something" })) as Record<
+    const result = parseResult(await tool.execute("test-call-id", { task_description: "Do something" })) as Record<
       string,
       unknown
     >;
@@ -132,7 +133,7 @@ describe("createDelegateToAgentTool", () => {
     const ctx = mockContext();
     const tool = createDelegateToAgentTool(ctx);
 
-    await tool.handler({ task_description: "Research topic", target_role: "researcher" });
+    await tool.execute("test-call-id", { task_description: "Research topic", target_role: "researcher" });
 
     const input = (ctx.taskQueue.enqueue as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(input.requiredCapabilities).toEqual(["researcher"]);
@@ -143,7 +144,7 @@ describe("createDelegateToAgentTool", () => {
     const ctx = mockContext();
     const tool = createDelegateToAgentTool(ctx);
 
-    await tool.handler({ task_description: "Review code", target_agent_id: "agent-7" });
+    await tool.execute("test-call-id", { task_description: "Review code", target_agent_id: "agent-7" });
 
     const input = (ctx.taskQueue.enqueue as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(input.metadata.targetAgentId).toBe("agent-7");
@@ -153,7 +154,7 @@ describe("createDelegateToAgentTool", () => {
     const ctx = mockContext();
     const tool = createDelegateToAgentTool(ctx);
 
-    await tool.handler({ task_description: "Process", input_data: '{"key":"val"}' });
+    await tool.execute("test-call-id", { task_description: "Process", input_data: '{"key":"val"}' });
 
     const input = (ctx.taskQueue.enqueue as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(input.input).toEqual({ key: "val" });
@@ -163,7 +164,7 @@ describe("createDelegateToAgentTool", () => {
     const ctx = mockContext();
     const tool = createDelegateToAgentTool(ctx);
 
-    await tool.handler({ task_description: "Process", input_data: "not-json" });
+    await tool.execute("test-call-id", { task_description: "Process", input_data: "not-json" });
 
     const input = (ctx.taskQueue.enqueue as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(input.input).toEqual({ raw: "not-json" });
@@ -180,7 +181,7 @@ describe("createSquadMemoryReadTool", () => {
     (ctx.sharedMemory.set as ReturnType<typeof vi.fn>)("key2", "val2");
 
     const tool = createSquadMemoryReadTool(ctx);
-    const result = parseResult(await tool.handler({ action: "list_keys" })) as {
+    const result = parseResult(await tool.execute("test-call-id", { action: "list_keys" })) as {
       keys: Array<{ key: string; found: boolean }>;
       count: number;
     };
@@ -194,7 +195,7 @@ describe("createSquadMemoryReadTool", () => {
     (ctx.sharedMemory.set as ReturnType<typeof vi.fn>)("mykey", "myval");
 
     const tool = createSquadMemoryReadTool(ctx);
-    const result = parseResult(await tool.handler({ action: "get", key: "mykey" })) as {
+    const result = parseResult(await tool.execute("test-call-id", { action: "get", key: "mykey" })) as {
       found: boolean;
       key: string;
       value: unknown;
@@ -209,7 +210,7 @@ describe("createSquadMemoryReadTool", () => {
     const ctx = mockContext();
 
     const tool = createSquadMemoryReadTool(ctx);
-    const result = parseResult(await tool.handler({ action: "get", key: "nope" })) as {
+    const result = parseResult(await tool.execute("test-call-id", { action: "get", key: "nope" })) as {
       found: boolean;
       value: unknown;
     };
@@ -221,7 +222,7 @@ describe("createSquadMemoryReadTool", () => {
   it("returns error when key missing for get action", async () => {
     const ctx = mockContext();
     const tool = createSquadMemoryReadTool(ctx);
-    const result = parseResult(await tool.handler({ action: "get" })) as { error: string };
+    const result = parseResult(await tool.execute("test-call-id", { action: "get" })) as { error: string };
 
     expect(result.error).toContain("Key required");
   });
@@ -234,7 +235,7 @@ describe("createSquadMemoryWriteTool", () => {
     const ctx = mockContext();
     const tool = createSquadMemoryWriteTool(ctx);
 
-    const result = parseResult(await tool.handler({ key: "results", value: '"hello"' })) as {
+    const result = parseResult(await tool.execute("test-call-id", { key: "results", value: '"hello"' })) as {
       success: boolean;
       key: string;
       writtenBy: string;
@@ -251,7 +252,7 @@ describe("createSquadMemoryWriteTool", () => {
     const tool = createSquadMemoryWriteTool(ctx);
 
     const result = parseResult(
-      await tool.handler({ key: "findings", value: '"critical data"', important: "true" }),
+      await tool.execute("test-call-id", { key: "findings", value: '"critical data"', important: "true" }),
     ) as { important: boolean };
 
     expect(result.important).toBe(true);
@@ -262,7 +263,7 @@ describe("createSquadMemoryWriteTool", () => {
     const ctx = mockContext();
     const tool = createSquadMemoryWriteTool(ctx);
 
-    await tool.handler({ key: "temp", value: '"data"', ttl_seconds: "60" });
+    await tool.execute("test-call-id", { key: "temp", value: '"data"', ttl_seconds: "60" });
 
     expect(ctx.sharedMemory.set).toHaveBeenCalledWith("temp", "data", 60_000);
   });
@@ -271,7 +272,7 @@ describe("createSquadMemoryWriteTool", () => {
     const ctx = mockContext();
     const tool = createSquadMemoryWriteTool(ctx);
 
-    await tool.handler({ key: "raw", value: "not valid json" });
+    await tool.execute("test-call-id", { key: "raw", value: "not valid json" });
 
     expect(ctx.sharedMemory.set).toHaveBeenCalledWith("raw", "not valid json", undefined);
   });
@@ -285,7 +286,7 @@ describe("createSquadBroadcastTool", () => {
     const tool = createSquadBroadcastTool(ctx);
 
     const result = parseResult(
-      await tool.handler({ message: "Found results", message_type: "result" }),
+      await tool.execute("test-call-id", { message: "Found results", message_type: "result" }),
     ) as { success: boolean; type: string };
 
     expect(result.success).toBe(true);
@@ -303,7 +304,7 @@ describe("createSquadBroadcastTool", () => {
     const ctx = mockContext();
     const tool = createSquadBroadcastTool(ctx);
 
-    const result = parseResult(await tool.handler({ message: "status update" })) as {
+    const result = parseResult(await tool.execute("test-call-id", { message: "status update" })) as {
       type: string;
     };
 
@@ -315,7 +316,7 @@ describe("createSquadBroadcastTool", () => {
     const tool = createSquadBroadcastTool(ctx);
 
     const result = parseResult(
-      await tool.handler({ message: "hello", message_type: "invalid_type" }),
+      await tool.execute("test-call-id", { message: "hello", message_type: "invalid_type" }),
     ) as { type: string };
 
     expect(result.type).toBe("notification");
@@ -329,7 +330,7 @@ describe("createSquadStatusTool", () => {
     const ctx = mockContext();
     const tool = createSquadStatusTool(ctx);
 
-    const result = parseResult(await tool.handler({})) as {
+    const result = parseResult(await tool.execute("test-call-id", {})) as {
       squadId: string;
       isRunning: boolean;
       strategy: string;
@@ -358,7 +359,7 @@ describe("createSquadStatusTool", () => {
     });
 
     const tool = createSquadStatusTool(ctx);
-    const result = parseResult(await tool.handler({})) as {
+    const result = parseResult(await tool.execute("test-call-id", {})) as {
       isRunning: boolean;
       strategy: string;
     };
@@ -375,7 +376,7 @@ describe("createWaitForTaskTool", () => {
     const ctx = mockContext();
     const tool = createWaitForTaskTool(ctx);
 
-    const result = parseResult(await tool.handler({ task_id: "task-42" })) as {
+    const result = parseResult(await tool.execute("test-call-id", { task_id: "task-42" })) as {
       taskId: string;
       status: string;
       result: unknown;
@@ -395,7 +396,7 @@ describe("createWaitForTaskTool", () => {
     });
 
     const tool = createWaitForTaskTool(ctx);
-    const result = parseResult(await tool.handler({ task_id: "task-999" })) as { error: string };
+    const result = parseResult(await tool.execute("test-call-id", { task_id: "task-999" })) as { error: string };
 
     expect(result.error).toContain("not found");
   });

@@ -370,20 +370,20 @@ describe("TaskQueue", () => {
   describe("getStats", () => {
     it("should report accurate counts", () => {
       queue.enqueue(makeTask({ id: "t1" }));
-      queue.enqueue(makeTask({ id: "t2" }));
-      queue.enqueue(makeTask({ id: "t3", retries: 0 }));
+      queue.enqueue(makeTask({ id: "t2", retries: 0 }));
+      queue.enqueue(makeTask({ id: "t3" }));
 
       queue.claim("a1");
       queue.complete("t1");
 
       queue.claim("a2");
-      queue.fail("t3", "bad");
+      queue.fail("t2", "bad");
 
       const stats = queue.getStats();
       expect(stats.totalEnqueued).toBe(3);
-      expect(stats.pending).toBe(1); // t2
+      expect(stats.pending).toBe(1); // t3
       expect(stats.completed).toBe(1); // t1
-      expect(stats.failed).toBe(1); // t3
+      expect(stats.failed).toBe(1); // t2
       expect(stats.claimed).toBe(0);
     });
   });

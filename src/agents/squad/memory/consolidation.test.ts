@@ -445,6 +445,9 @@ describe("startConsolidationScheduler", () => {
 
     // Advance timer to trigger one cycle
     await vi.advanceTimersByTimeAsync(150);
+    // Switch to real timers and allow async I/O in the callback to settle
+    vi.useRealTimers();
+    await new Promise((r) => setTimeout(r, 200));
 
     expect(scheduler.cycleCount).toBe(1);
     expect(scheduler.lastResult).not.toBeNull();
@@ -452,6 +455,5 @@ describe("startConsolidationScheduler", () => {
     expect(episodicStore.count()).toBe(1);
 
     scheduler.stop();
-    vi.useRealTimers();
   });
 });
