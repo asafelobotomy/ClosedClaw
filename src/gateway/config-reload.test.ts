@@ -27,13 +27,13 @@ describe("diffConfigPaths", () => {
 
 describe("buildGatewayReloadPlan", () => {
   const emptyRegistry = createTestRegistry([]);
-  const telegramPlugin: ChannelPlugin = {
-    id: "telegram",
+  const imessagePlugin: ChannelPlugin = {
+    id: "imessage",
     meta: {
-      id: "telegram",
-      label: "Telegram",
-      selectionLabel: "Telegram",
-      docsPath: "/channels/telegram",
+      id: "imessage",
+      label: "iMessage",
+      selectionLabel: "iMessage",
+      docsPath: "/channels/imessage",
       blurb: "test",
     },
     capabilities: { chatTypes: ["direct"] },
@@ -41,15 +41,15 @@ describe("buildGatewayReloadPlan", () => {
       listAccountIds: () => [],
       resolveAccount: () => ({}),
     },
-    reload: { configPrefixes: ["channels.telegram"] },
+    reload: { configPrefixes: ["channels.imessage"] },
   };
-  const whatsappPlugin: ChannelPlugin = {
-    id: "whatsapp",
+  const googlechatPlugin: ChannelPlugin = {
+    id: "googlechat",
     meta: {
-      id: "whatsapp",
-      label: "WhatsApp",
-      selectionLabel: "WhatsApp",
-      docsPath: "/channels/whatsapp",
+      id: "googlechat",
+      label: "Google Chat",
+      selectionLabel: "Google Chat",
+      docsPath: "/channels/googlechat",
       blurb: "test",
     },
     capabilities: { chatTypes: ["direct"] },
@@ -57,11 +57,11 @@ describe("buildGatewayReloadPlan", () => {
       listAccountIds: () => [],
       resolveAccount: () => ({}),
     },
-    reload: { configPrefixes: ["web"], noopPrefixes: ["channels.whatsapp"] },
+    reload: { configPrefixes: ["web"], noopPrefixes: ["channels.googlechat"] },
   };
   const registry = createTestRegistry([
-    { pluginId: "telegram", plugin: telegramPlugin, source: "test" },
-    { pluginId: "whatsapp", plugin: whatsappPlugin, source: "test" },
+    { pluginId: "imessage", plugin: imessagePlugin, source: "test" },
+    { pluginId: "googlechat", plugin: googlechatPlugin, source: "test" },
   ]);
 
   beforeEach(() => {
@@ -86,7 +86,7 @@ describe("buildGatewayReloadPlan", () => {
   });
 
   it("restarts providers when provider config prefixes change", () => {
-    const changedPaths = ["web.enabled", "channels.telegram.botToken"];
+    const changedPaths = ["web.enabled", "channels.imessage.enabled"];
     const plan = buildGatewayReloadPlan(changedPaths);
     expect(plan.restartGateway).toBe(false);
     const expected = new Set(
