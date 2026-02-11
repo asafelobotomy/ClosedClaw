@@ -9,6 +9,8 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 SOCKET_PATH="/tmp/closedclaw-gtk.sock"
 LOG_DIR="${HOME}/.ClosedClaw/logs"
 PID_FILE="${HOME}/.ClosedClaw/gateway.pid"
+GATEWAY_PORT="${ClosedClaw_GATEWAY_PORT:-18789}"
+GATEWAY_URL="http://localhost:${GATEWAY_PORT}"
 
 # Colors
 RED='\033[0;31m'
@@ -87,39 +89,29 @@ start_gateway() {
     
     cd "$PROJECT_ROOT"
     
-    # Start gateway in background
-    node openclaw.mjs gateway start > "$LOG_DIR/gateway.log" 2>&1 &
+    # Generate or use existing gateway token
+    if [[ -z "${ClosedClaw_GATEWAY_TOKEN:-}" ]]; then
+        export ClosedClaw_GATEWAY_TOKEN="gtk-launcher-$(date +%s)"
+    fi
+    
+    # Start gateway in background with HTTP port (non-blocking)
+    ClosedClaw_GATEWAY_TOKEN="$ClosedClaw_GATEWAY_TOKEN" \
+    node tools/dev/run-node.mjs gateway \
+        --port "$GATEWAY_PORT" \
+        > "$LOG_DIR/gateway.log" 2>&1 &
     GATEWAY_PID=$!
     echo "$GATEWAY_PID" > "$PID_FILE"
     
-    log_info "Gateway starting (PID: $GATEWAY_PID)..."
-    
-    # Wait for socket to be created
-    local max_wait=30
-    local waited=0
-    while [[ ! -S "$SOCKET_PATH" ]] && [[ $waited -lt $max_wait ]]; do
-        sleep 0.5
-        waited=$((waited + 1))
-        
-        # Check if gateway is still running
-        if ! kill -0 "$GATEWAY_PID" 2>/dev/null; then
-            log_error "Gateway crashed during startup. Check logs: $LOG_DIR/gateway.log"
-            tail -20 "$LOG_DIR/gateway.log" 2>/dev/null || true
-            exit 1
-        fi
-    done
-    
-    if [[ -S "$SOCKET_PATH" ]]; then
-        log_success "Gateway ready - socket at $SOCKET_PATH"
-    else
-        log_warn "Socket not created after ${max_wait}s - gateway may still be initializing"
-    fi
+    log_success "Gateway starting in background (PID: $GATEWAY_PID, port $GATEWAY_PORT)"
+    log_info "GTK GUI will auto-connect once the gateway is ready"
 }
 
 # Start GTK GUI
 start_gui() {
     log_info "Launching GTK Messenger..."
     cd "$SCRIPT_DIR"
+    # Force software rendering (Cairo) to avoid OpenGL/EGL issues in containers
+    export GSK_RENDERER=cairo
     python3 closedclaw_messenger.py
 }
 
@@ -147,7 +139,7 @@ case "${1:-}" in
         # Just start gateway (for debugging)
         check_deps
         start_gateway
-        log_info "Gateway running. Press Ctrl+C to stop."
+        log_info "Gateway running at $GATEWAY_URL. Press Ctrl+C to stop."
         while true; do sleep 1; done
         ;;
     --help|-h)
@@ -158,7 +150,10 @@ case "${1:-}" in
         echo "  --gateway-only  Start only the gateway (no GUI)"
         echo "  --help, -h      Show this help"
         echo ""
-        echo "Default: Start both gateway and GTK GUI"
+        echo "Environment:"
+        echo "  ClosedClaw_GATEWAY_PORT  Gateway HTTP port (default: 18789)"
+        echo ""
+        echo "Default: Start gateway on port ${GATEWAY_PORT} and launch GTK GUI"
         ;;
     *)
         main

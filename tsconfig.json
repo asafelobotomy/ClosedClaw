@@ -15,7 +15,6 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2023",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@test/*": ["./test/*"]

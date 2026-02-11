@@ -9,7 +9,7 @@ const env = { ...process.env };
 const cwd = process.cwd();
 const compilerOverride = env.ClosedClaw_TS_COMPILER ?? env.CLAWDBOT_TS_COMPILER;
 const compiler = compilerOverride === "tsc" ? "tsc" : "tsgo";
-const projectArgs = ["--project", "tsconfig.json"];
+const projectArgs = ["--project", "tsconfig.json", "--noEmit", "false"];
 
 const distRoot = path.join(cwd, "dist");
 const distEntry = path.join(distRoot, "/entry.js");
@@ -109,7 +109,7 @@ const logRunner = (message) => {
 };
 
 const runNode = () => {
-  const nodeProcess = spawn(process.execPath, ["ClosedClaw.mjs", ...args], {
+  const nodeProcess = spawn(process.execPath, ["closedclaw.mjs", ...args], {
     cwd,
     env,
     stdio: "inherit",

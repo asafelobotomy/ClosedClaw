@@ -324,6 +324,7 @@ class MessengerWindow(Adw.ApplicationWindow):
         self.ipc.message_callback = self._on_message_received
         self.ipc.status_callback = self._on_status_changed
         self.messages: list[Message] = []
+        self._retry_timer_id: Optional[int] = None
         
         self._setup_window()
         self._setup_ui()
@@ -454,7 +455,7 @@ class MessengerWindow(Adw.ApplicationWindow):
     def _apply_css(self):
         """Apply global CSS styles (all message types + UI elements)"""
         css_provider = Gtk.CssProvider()
-        css_provider.load_from_string("""
+        css_provider.load_from_data("""
             /* Message bubble base */
             .message-bubble {
                 border-radius: 12px;
@@ -530,7 +531,7 @@ class MessengerWindow(Adw.ApplicationWindow):
             textview text {
                 background: transparent;
             }
-        """)
+        """.encode('utf-8'))
         Gtk.StyleContext.add_provider_for_display(
             Gdk.Display.get_default(),
             css_provider,
@@ -538,12 +539,37 @@ class MessengerWindow(Adw.ApplicationWindow):
         )
     
     def _initial_connect(self) -> bool:
-        """Initial connection attempt"""
-        self.ipc.connect()
-        return False  # Don't repeat
+        """Initial connection attempt — starts auto-retry loop if not connected"""
+        if not self.ipc.connect():
+            self._add_system_message("Waiting for gateway to start...")
+            self._start_auto_retry()
+        return False  # Don't repeat this GLib timeout
+    
+    def _start_auto_retry(self):
+        """Schedule periodic reconnection attempts until connected"""
+        if self._retry_timer_id is not None:
+            return  # Already retrying
+        self._retry_timer_id = GLib.timeout_add(2000, self._auto_retry_tick)
+    
+    def _stop_auto_retry(self):
+        """Cancel the auto-retry timer"""
+        if self._retry_timer_id is not None:
+            GLib.source_remove(self._retry_timer_id)
+            self._retry_timer_id = None
+    
+    def _auto_retry_tick(self) -> bool:
+        """Attempt to reconnect; keep retrying until connected"""
+        if self.ipc.connected:
+            self._retry_timer_id = None
+            return False  # Stop retrying
+        if self.ipc.connect():
+            self._retry_timer_id = None
+            return False  # Connected, stop retrying
+        return True  # Keep retrying
     
     def _on_close(self, window) -> bool:
         """Handle window close"""
+        self._stop_auto_retry()
         self.ipc.disconnect()
         return False
     
@@ -556,6 +582,7 @@ class MessengerWindow(Adw.ApplicationWindow):
     def _on_status_changed(self, connected: bool, message: str):
         """Handle connection status change"""
         if connected:
+            self._stop_auto_retry()
             self.status_icon.set_from_icon_name("network-transmit-receive-symbolic")
             self.status_button.set_tooltip_text("Connected")
             self.subtitle.set_text("Connected")
@@ -565,6 +592,8 @@ class MessengerWindow(Adw.ApplicationWindow):
             self.status_button.set_tooltip_text(message)
             self.subtitle.set_text("Disconnected")
             self.send_button.set_sensitive(False)
+            # Auto-retry on unexpected disconnect
+            self._start_auto_retry()
             
             if "not found" in message.lower() or "refused" in message.lower():
                 self._add_error_message(message)
