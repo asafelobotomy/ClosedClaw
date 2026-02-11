@@ -7,7 +7,7 @@ import { secondsToMs, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/ind
 import { secondsToMs, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
 import type { PluginRegistry } from "../plugins/registry.js";
-import { whatsappPlugin } from "../../extensions/whatsapp/src/channel.js";
+// WhatsApp removed - using MSTeams for testing
 import { emitAgentEvent, registerAgentRunContext } from "../infra/agent-events.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
@@ -107,9 +107,9 @@ const createMSTeamsPlugin = (params?: { aliases?: string[] }): ChannelPlugin => 
 const emptyRegistry = createRegistry([]);
 const defaultRegistry = createRegistry([
   {
-    pluginId: "whatsapp",
+    pluginId: "msteams",
     source: "test",
-    plugin: whatsappPlugin,
+    plugin: createMSTeamsPlugin(),
   },
 ]);
 

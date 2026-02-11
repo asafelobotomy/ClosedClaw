@@ -63,7 +63,7 @@ const whatsappOutbound: ChannelOutboundAdapter = {
   },
 };
 
-const whatsappPlugin = createOutboundTestPlugin({
+const msteamsPlugin = createOutboundTestPlugin({
   id: "whatsapp",
   outbound: whatsappOutbound,
   label: "WhatsApp",
@@ -86,7 +86,7 @@ const whatsappRegistry = createRegistry([
   {
     pluginId: "whatsapp",
     source: "test",
-    plugin: whatsappPlugin,
+    plugin: msteamsPlugin,
   },
 ]);
 const emptyRegistry = createRegistry([]);

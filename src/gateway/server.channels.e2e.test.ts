@@ -88,7 +88,7 @@ const createStubChannelPlugin = (params: {
   },
 });
 
-const telegramPlugin: ChannelPlugin = {
+const googlechatPlugin: ChannelPlugin = {
   ...createStubChannelPlugin({
     id: "telegram",
     label: "Telegram",
@@ -121,7 +121,7 @@ const defaultRegistry = createRegistry([
   {
     pluginId: "telegram",
     source: "test",
-    plugin: telegramPlugin,
+    plugin: googlechatPlugin,
   },
   {
     pluginId: "signal",

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { telegramPlugin } from "../../extensions/telegram/src/channel.js";
+// Telegram removed - using remaining test setup
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
 import { extractMessagingToolSend } from "./pi-embedded-subscribe.tools.js";
