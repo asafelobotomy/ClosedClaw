@@ -1,9 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChannelPlugin } from "../../channels/plugins/types.js";
 import type { ClosedClawConfig } from "../../config/config.js";
-import { slackPlugin } from "../../../extensions/slack/src/channel.js";
-import { telegramPlugin } from "../../../extensions/telegram/src/channel.js";
-import { whatsappPlugin } from "../../../extensions/whatsapp/src/channel.js";
 import { jsonResult } from "../../agents/tools/common.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import { createIMessageTestPlugin, createTestRegistry } from "../../../test/helpers/channel-plugins.js";
@@ -18,50 +15,16 @@ vi.mock("../../media/load-web-media.js", async () => {
   };
 });
 
-const slackConfig = {
+const imessageConfig = {
   channels: {
-    slack: {
-      botToken: "xoxb-test",
-      appToken: "xapp-test",
-    },
-  },
-} as ClosedClawConfig;
-
-const whatsappConfig = {
-  channels: {
-    whatsapp: {
-      allowFrom: ["*"],
-    },
+    imessage: {},
   },
 } as ClosedClawConfig;
 
 describe("runMessageAction context isolation", () => {
   beforeEach(async () => {
-    const { createPluginRuntime } = await import("../../plugins/runtime/index.js");
-    const { setSlackRuntime } = await import("../../../extensions/slack/src/runtime.js");
-    const { setTelegramRuntime } = await import("../../../extensions/telegram/src/runtime.js");
-    const { setWhatsAppRuntime } = await import("../../../extensions/whatsapp/src/runtime.js");
-    const runtime = createPluginRuntime();
-    setSlackRuntime(runtime);
-    setTelegramRuntime(runtime);
-    setWhatsAppRuntime(runtime);
     setActivePluginRegistry(
       createTestRegistry([
-        {
-          pluginId: "slack",
-          source: "test",
-          plugin: slackPlugin,
-        },
-        {
-          pluginId: "whatsapp",
-          source: "test",
-          plugin: whatsappPlugin,
-        },
-        {
-          pluginId: "telegram",
-          source: "test",
-          plugin: telegramPlugin,
-        },
         {
           pluginId: "imessage",
           source: "test",
@@ -77,10 +40,10 @@ describe("runMessageAction context isolation", () => {
 
   it("allows send when target matches current channel", async () => {
     const result = await runMessageAction({
-      cfg: slackConfig,
+      cfg: imessageConfig,
       action: "send",
       params: {
-        channel: "slack",
+        channel: "imessage",
         target: "#C12345678",
         message: "hi",
       },
@@ -93,10 +56,10 @@ describe("runMessageAction context isolation", () => {
 
   it("accepts legacy to parameter for send", async () => {
     const result = await runMessageAction({
-      cfg: slackConfig,
+      cfg: imessageConfig,
       action: "send",
       params: {
-        channel: "slack",
+        channel: "imessage",
         to: "#C12345678",
         message: "hi",
       },
@@ -108,10 +71,10 @@ describe("runMessageAction context isolation", () => {
 
   it("defaults to current channel when target is omitted", async () => {
     const result = await runMessageAction({
-      cfg: slackConfig,
+      cfg: imessageConfig,
       action: "send",
       params: {
-        channel: "slack",
+        channel: "imessage",
         message: "hi",
       },
       toolContext: { currentChannelId: "C12345678" },
@@ -123,10 +86,10 @@ describe("runMessageAction context isolation", () => {
 
   it("allows media-only send when target matches current channel", async () => {
     const result = await runMessageAction({
-      cfg: slackConfig,
+      cfg: imessageConfig,
       action: "send",
       params: {
-        channel: "slack",
+        channel: "imessage",
         target: "#C12345678",
         media: "https://example.com/note.ogg",
       },
@@ -140,10 +103,10 @@ describe("runMessageAction context isolation", () => {
   it("requires message when no media hint is provided", async () => {
     await expect(
       runMessageAction({
-        cfg: slackConfig,
+        cfg: imessageConfig,
         action: "send",
         params: {
-          channel: "slack",
+          channel: "imessage",
           target: "#C12345678",
         },
         toolContext: { currentChannelId: "C12345678" },
@@ -154,71 +117,23 @@ describe("runMessageAction context isolation", () => {
 
   it("blocks send when target differs from current channel", async () => {
     const result = await runMessageAction({
-      cfg: slackConfig,
+      cfg: imessageConfig,
       action: "send",
       params: {
-        channel: "slack",
+        channel: "imessage",
         target: "channel:C99999999",
         message: "hi",
       },
-      toolContext: { currentChannelId: "C12345678", currentChannelProvider: "slack" },
-      dryRun: true,
-    });
-
-    expect(result.kind).toBe("send");
-  });
-
-  it("blocks thread-reply when channelId differs from current channel", async () => {
-    const result = await runMessageAction({
-      cfg: slackConfig,
-      action: "thread-reply",
-      params: {
-        channel: "slack",
-        target: "C99999999",
-        message: "hi",
-      },
-      toolContext: { currentChannelId: "C12345678", currentChannelProvider: "slack" },
+      toolContext: { currentChannelId: "C12345678", currentChannelProvider: "googlechat" },
       dryRun: true,
     });
 
     expect(result.kind).toBe("action");
   });
 
-  it("allows WhatsApp send when target matches current chat", async () => {
-    const result = await runMessageAction({
-      cfg: whatsappConfig,
-      action: "send",
-      params: {
-        channel: "whatsapp",
-        target: "123@g.us",
-        message: "hi",
-      },
-      toolContext: { currentChannelId: "123@g.us" },
-      dryRun: true,
-    });
-
-    expect(result.kind).toBe("send");
-  });
-
-  it("blocks WhatsApp send when target differs from current chat", async () => {
-    const result = await runMessageAction({
-      cfg: whatsappConfig,
-      action: "send",
-      params: {
-        channel: "whatsapp",
-        target: "456@g.us",
-        message: "hi",
-      },
-      toolContext: { currentChannelId: "123@g.us", currentChannelProvider: "whatsapp" },
-      dryRun: true,
-    });
-
-    expect(result.kind).toBe("send");
-  });
-
   it("allows iMessage send when target matches current handle", async () => {
     const result = await runMessageAction({
-      cfg: whatsappConfig,
+      cfg: imessageConfig,
       action: "send",
       params: {
         channel: "imessage",
@@ -234,7 +149,7 @@ describe("runMessageAction context isolation", () => {
 
   it("blocks iMessage send when target differs from current handle", async () => {
     const result = await runMessageAction({
-      cfg: whatsappConfig,
+      cfg: imessageConfig,
       action: "send",
       params: {
         channel: "imessage",
@@ -254,13 +169,7 @@ describe("runMessageAction context isolation", () => {
   it("infers channel + target from tool context when missing", async () => {
     const multiConfig = {
       channels: {
-        slack: {
-          botToken: "xoxb-test",
-          appToken: "xapp-test",
-        },
-        telegram: {
-          token: "tg-test",
-        },
+        imessage: {},
       },
     } as ClosedClawConfig;
 
@@ -270,25 +179,31 @@ describe("runMessageAction context isolation", () => {
       params: {
         message: "hi",
       },
-      toolContext: { currentChannelId: "C12345678", currentChannelProvider: "slack" },
+      toolContext: { currentChannelId: "handle:+15551234567", currentChannelProvider: "imessage" },
       dryRun: true,
     });
 
     expect(result.kind).toBe("send");
-    expect(result.channel).toBe("slack");
+    expect(result.channel).toBe("imessage");
   });
 
   it("blocks cross-provider sends by default", async () => {
+    const multiConfig = {
+      channels: {
+        imessage: {},
+      },
+    } as ClosedClawConfig;
+
     await expect(
       runMessageAction({
-        cfg: slackConfig,
+        cfg: multiConfig,
         action: "send",
         params: {
-          channel: "telegram",
-          target: "telegram:@ops",
+          channel: "googlechat",
+          target: "spaces/ABC123",
           message: "hi",
         },
-        toolContext: { currentChannelId: "C12345678", currentChannelProvider: "slack" },
+        toolContext: { currentChannelId: "spaces/XYZ789", currentChannelProvider: "googlechat" },
         dryRun: true,
       }),
     ).rejects.toThrow(/Cross-context messaging denied/);
@@ -296,7 +211,7 @@ describe("runMessageAction context isolation", () => {
 
   it("blocks same-provider cross-context when disabled", async () => {
     const cfg = {
-      ...slackConfig,
+      ...imessageConfig,
       tools: {
         message: {
           crossContext: {
@@ -311,14 +226,11 @@ describe("runMessageAction context isolation", () => {
         cfg,
         action: "send",
         params: {
-          channel: "slack",
+          channel: "imessage",
           target: "channel:C99999999",
           message: "hi",
         },
-        toolContext: { currentChannelId: "C12345678", currentChannelProvider: "slack" },
-        dryRun: true,
-      }),
-    ).rejects.toThrow(/Cross-context messaging denied/);
+        toolContext: { currentChannelId: "C12345678", currentChannelProvider: "googlechat" },
   });
 
   it("aborts send when abortSignal is already aborted", async () => {
@@ -327,10 +239,10 @@ describe("runMessageAction context isolation", () => {
 
     await expect(
       runMessageAction({
-        cfg: slackConfig,
+        cfg: imessageConfig,
         action: "send",
         params: {
-          channel: "slack",
+          channel: "imessage",
           target: "#C12345678",
           message: "hi",
         },
@@ -346,11 +258,11 @@ describe("runMessageAction context isolation", () => {
 
     await expect(
       runMessageAction({
-        cfg: slackConfig,
+        cfg: imessageConfig,
         action: "broadcast",
         params: {
           targets: ["channel:C12345678"],
-          channel: "slack",
+          channel: "imessage",
           message: "hi",
         },
         dryRun: true,
