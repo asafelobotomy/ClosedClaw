@@ -2,6 +2,66 @@
 
 Docs: https://docs.OpenClaw.ai
 
+## 2026.2.11
+
+### Test Suite Repairs
+
+Bulk fix of ~200 unit test failures caused by accumulated API refactors, bringing the suite from 199 failures to 0 code failures (4871/4879 passing; the remaining 8 are a pre-existing vitest worker crash in `session-write-lock.test.ts`).
+
+#### Outbound Delivery Refactor Alignment (33 tests)
+
+- Updated `deliver.test.ts`, `message-action-runner.test.ts`, `outbound-session.test.ts`, `message-action-runner.threading.test.ts`, `message.test.ts` to use `deliverOutboundPayloads` instead of per-channel send mocks
+- Added `messaging` sections (with `targetResolver` and `normalizeTarget`) to Discord, Slack, Telegram, WhatsApp, Signal, and iMessage channel plugins
+- Fixed `resolveFallbackSession` in `outbound-session.ts` for kind-prefix parsing, Telegram topic syntax, and `chat_guid:` prefix handling
+- Added auto-threading logic in `message-action-runner.ts` reading `toolContext.currentThreadTs`
+
+#### Cron & Isolated Agent (10 tests)
+
+- Migrated `isolated-agent.*.test.ts` from per-channel deps to `deliverOutboundPayloads` mock pattern
+- Made Swift conformance assertions conditional in `cron-protocol-conformance.test.ts` (macOS app archived)
+
+#### Auto-Reply & Command System (31 tests)
+
+- Updated `reply-routing.test.ts` defaults to `"all"` (channel docks not registered in tests)
+- Fixed `inbound.test.ts` for lowercased `normalizeMentionText` output and `resolveGroupRequireMention` true default
+- Updated `command-control.test.ts` sender ID expectations for raw first-candidate resolution
+- Fixed `commands-registry.test.ts` gating and dock alias normalization
+- Replaced per-channel send assertions in `route-reply.test.ts` with `deliverOutboundPayloads`
+- Updated `session-resets.test.ts` authorization expectations without registered docks
+- Fixed `commands-policy.test.ts` allowFrom visibility without dock
+- Updated `agent-runner-utils.test.ts` threading context fallback to `sessionCtx.To`
+
+#### Agent Runner & Memory Flush (6 tests)
+
+- Added `sandbox: { mode: "off" }` to memory-flush and reasoning-tags test configs (new default `mode: "all"` with `workspaceAccess: "none"` was blocking flush)
+
+#### Vitest Mock Patterns (100+ tests)
+
+- Fixed JSDoc-trapped import in `llm-slug-generator.ts` (unblocked `TIMEOUT_TEST_SUITE_MEDIUM_MS`)
+- Applied `vi.hoisted()` pattern in `audit-hooks.test.ts` for temporal dead zone
+- Applied `importOriginal` pattern in `tts.test.ts` to preserve `getOAuthProviders` export
+- Replaced `vi.doMock` with hoisted `vi.mock` in `upstream.git.test.ts` for module-level `promisify` capture
+
+#### CLI Command API Alignment (35 tests)
+
+- Rewrote `skill-sign.test.ts` for `RuntimeEnv` void-return pattern
+- Rewrote `chrome.test.ts` for `resolveBrowserExecutableForPlatform` (removed platform-specific finders)
+- Converted `chrome.default-browser.test.ts` to Linux/xdg-settings mocks
+- Fixed `profiles.test.ts` for lowercase profile name regex
+- Fixed `upstream.storage.test.ts` leading-underscore variable name typos
+
+#### Security & Config (25 tests)
+
+- Updated `keys-management.test.ts` for `TrustedKey` type and `addTrustedKey(keyId, key)` two-arg API
+- Fixed `audit-query.test.ts` and `audit-query.ts` for renamed fields and severity levels
+- Updated various config tests for schema/loading changes
+
+#### Infrastructure & Daemon (7 tests)
+
+- Fixed `daemon/service-env.test.ts` for cross-platform user-dir inclusion behavior
+- Fixed `daemon/paths.test.ts` for `path.resolve` platform behavior on Linux
+- Fixed `browser/server.*.test.ts` for lowercase profile name validation
+
 ## 2026.2.3
 
 ### Developer Experience — Constants Library (Phases 1-3)
