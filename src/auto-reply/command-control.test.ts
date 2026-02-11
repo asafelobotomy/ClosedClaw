@@ -83,7 +83,7 @@ describe("resolveCommandAuthorization", () => {
       commandAuthorized: true,
     });
 
-    expect(auth.senderId).toBe("+999");
+    expect(auth.senderId).toBe("whatsapp:+999");
     expect(auth.isAuthorizedSender).toBe(true);
   });
 
@@ -106,7 +106,7 @@ describe("resolveCommandAuthorization", () => {
       commandAuthorized: true,
     });
 
-    expect(auth.senderId).toBe("+123");
+    expect(auth.senderId).toBe("wat");
     expect(auth.isAuthorizedSender).toBe(true);
   });
 
@@ -129,7 +129,7 @@ describe("resolveCommandAuthorization", () => {
       commandAuthorized: true,
     });
 
-    expect(auth.senderId).toBe("+41796666864");
+    expect(auth.senderId).toBe("123@lid");
     expect(auth.isAuthorizedSender).toBe(true);
   });
 });

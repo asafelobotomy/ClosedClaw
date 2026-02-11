@@ -6,11 +6,13 @@ import {
 } from "./registry.js";
 
 describe("channel registry", () => {
-  it("normalizes aliases", () => {
-    expect(normalizeChatChannelId("imsg")).toBe("imessage");
-    expect(normalizeChatChannelId("gchat")).toBe("googlechat");
-    expect(normalizeChatChannelId("google-chat")).toBe("googlechat");
+  it("normalizes core aliases", () => {
+    // Only gtk-gui aliases remain in core registry; channel plugins (imessage, googlechat, etc.) are now extensions.
+    expect(normalizeChatChannelId("gtk")).toBe("gtk-gui");
+    expect(normalizeChatChannelId("gui")).toBe("gtk-gui");
+    expect(normalizeChatChannelId("desktop")).toBe("gtk-gui");
     expect(normalizeChatChannelId("web")).toBeNull();
+    expect(normalizeChatChannelId("imsg")).toBeNull();
   });
 
   it("keeps GTK GUI first in the default order", () => {
@@ -25,16 +27,14 @@ describe("channel registry", () => {
 
   it("formats selection lines with docs labels", () => {
     const channels = listChatChannels();
-    // Find Telegram to test doc link formatting (gtk-gui may not have an external docs URL)
-    const telegram = channels.find((c) => c.id === "telegram");
-    if (!telegram) {
-      throw new Error("Missing Telegram channel metadata.");
+    // Use gtk-gui since that's the only core channel now.
+    const gtkGui = channels.find((c) => c.id === "gtk-gui");
+    if (!gtkGui) {
+      throw new Error("Missing GTK GUI channel metadata.");
     }
-    const line = formatChannelSelectionLine(telegram, (path, label) =>
+    const line = formatChannelSelectionLine(gtkGui, (path, label) =>
       [label, path].filter(Boolean).join(":"),
     );
-    expect(line).not.toContain("Docs:");
-    expect(line).toContain("/channels/telegram");
-    expect(line).toContain("https://ClosedClaw.ai");
+    expect(line).toContain("/channels/gtk-gui");
   });
 });

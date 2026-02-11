@@ -86,7 +86,7 @@ describe("runMessageAction Slack threading", () => {
     });
 
     const call = mocks.executeSendAction.mock.calls[0]?.[0];
-    expect(call?.ctx?.mirror?.sessionKey).toBe("agent:main:slack:channel:c123:thread:111.222");
+    expect(call?.ctx?.mirror?.sessionKey).toBe("agent:main:slack:group:c123:thread:111.222");
   });
 
   it("matches auto-threading when channel ids differ in case", async () => {
@@ -112,6 +112,6 @@ describe("runMessageAction Slack threading", () => {
     });
 
     const call = mocks.executeSendAction.mock.calls[0]?.[0];
-    expect(call?.ctx?.mirror?.sessionKey).toBe("agent:main:slack:channel:c123:thread:333.444");
+    expect(call?.ctx?.mirror?.sessionKey).toBe("agent:main:slack:group:c123:thread:333.444");
   });
 });

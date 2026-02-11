@@ -387,21 +387,22 @@ export async function auditVerifyCommand(
     return;
   }
 
-  try {
-    await verifyAuditLogIntegrity(logPath);
+  const result = await verifyAuditLogIntegrity(logPath);
+
+  if (result.ok) {
     if (options.json) {
       runtime.log(JSON.stringify({ integrityOk: true }, null, 2));
     } else {
       runtime.log(theme.success("✓ Audit log integrity verified"));
       runtime.log(theme.muted("All hash chains are valid. No tampering detected."));
     }
-  } catch (err) {
-    const error = err as Error;
+  } else {
+    const errorMessage = result.failure?.message ?? "Unknown integrity error";
     if (options.json) {
-      runtime.log(JSON.stringify({ integrityOk: false, error: error.message }, null, 2));
+      runtime.log(JSON.stringify({ integrityOk: false, error: errorMessage }, null, 2));
     } else {
       runtime.log(theme.error(`✗ Audit log integrity failure`));
-      runtime.log(theme.error(error.message));
+      runtime.log(theme.error(errorMessage));
       runtime.log("");
       runtime.log(theme.warn("This may indicate:"));
       runtime.log("  • Manual modification of the audit log");

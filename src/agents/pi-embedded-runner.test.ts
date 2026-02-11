@@ -117,6 +117,7 @@ afterAll(async () => {
 
 const makeOpenAiConfig = (modelIds: string[]) =>
   ({
+    agents: { defaults: { sandbox: { mode: "off" } } },
     models: {
       providers: {
         openai: {
@@ -180,6 +181,7 @@ describe("runEmbeddedPiAgent", () => {
     const sessionFile = nextSessionFile();
 
     const cfg = {
+      agents: { defaults: { sandbox: { mode: "off" as const } } },
       models: {
         providers: {
           minimax: {

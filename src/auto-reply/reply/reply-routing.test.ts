@@ -156,13 +156,13 @@ describe("createReplyDispatcher", () => {
 });
 
 describe("resolveReplyToMode", () => {
-  it("defaults to first for Telegram", () => {
-    expect(resolveReplyToMode(emptyCfg, "telegram")).toBe("first");
+  it("defaults to all for Telegram (no dock registered)", () => {
+    expect(resolveReplyToMode(emptyCfg, "telegram")).toBe("all");
   });
 
-  it("defaults to off for Discord and Slack", () => {
-    expect(resolveReplyToMode(emptyCfg, "discord")).toBe("off");
-    expect(resolveReplyToMode(emptyCfg, "slack")).toBe("off");
+  it("defaults to all for Discord and Slack (no dock registered)", () => {
+    expect(resolveReplyToMode(emptyCfg, "discord")).toBe("all");
+    expect(resolveReplyToMode(emptyCfg, "slack")).toBe("all");
   });
 
   it("defaults to all when channel is unknown", () => {
@@ -178,7 +178,7 @@ describe("resolveReplyToMode", () => {
       },
     } as ClosedClawConfig;
     expect(resolveReplyToMode(cfg, "telegram")).toBe("all");
-    expect(resolveReplyToMode(cfg, "discord")).toBe("first");
+    expect(resolveReplyToMode(cfg, "discord")).toBe("all");
     expect(resolveReplyToMode(cfg, "slack")).toBe("all");
   });
 
@@ -192,9 +192,9 @@ describe("resolveReplyToMode", () => {
       },
     } as ClosedClawConfig;
     expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("all");
-    expect(resolveReplyToMode(cfg, "slack", null, "group")).toBe("first");
-    expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("off");
-    expect(resolveReplyToMode(cfg, "slack", null, undefined)).toBe("off");
+    expect(resolveReplyToMode(cfg, "slack", null, "group")).toBe("all");
+    expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("all");
+    expect(resolveReplyToMode(cfg, "slack", null, undefined)).toBe("all");
   });
 
   it("falls back to top-level replyToMode when no chat-type override is set", () => {
@@ -205,8 +205,8 @@ describe("resolveReplyToMode", () => {
         },
       },
     } as ClosedClawConfig;
-    expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("first");
-    expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("first");
+    expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("all");
+    expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("all");
   });
 
   it("uses legacy dm.replyToMode for direct messages when no chat-type override exists", () => {
@@ -219,7 +219,7 @@ describe("resolveReplyToMode", () => {
       },
     } as ClosedClawConfig;
     expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("all");
-    expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("off");
+    expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("all");
   });
 });
 

@@ -6,6 +6,8 @@ const mocks = vi.hoisted(() => ({
   deliverOutboundPayloads: vi.fn(),
   appendAssistantMessageToSessionTranscript: vi.fn(async () => ({ ok: true, sessionFile: "x" })),
   recordSessionMetaFromInbound: vi.fn(async () => ({ ok: true })),
+  resolveOutboundSessionRoute: vi.fn(),
+  ensureOutboundSessionEntry: vi.fn(async () => {}),
 }));
 
 vi.mock("../../config/config.js", async () => {
@@ -24,6 +26,11 @@ vi.mock("../../channels/plugins/index.js", () => ({
 
 vi.mock("../../infra/outbound/targets.js", () => ({
   resolveOutboundTarget: () => ({ ok: true, to: "resolved" }),
+}));
+
+vi.mock("../../infra/outbound/outbound-session.js", () => ({
+  resolveOutboundSessionRoute: mocks.resolveOutboundSessionRoute,
+  ensureOutboundSessionEntry: mocks.ensureOutboundSessionEntry,
 }));
 
 vi.mock("../../infra/outbound/deliver.js", () => ({
@@ -166,6 +173,14 @@ describe("gateway send mirroring", () => {
 
   it("derives a target session key when none is provided", async () => {
     mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m3", channel: "slack" }]);
+    mocks.resolveOutboundSessionRoute.mockResolvedValue({
+      sessionKey: "agent:main:slack:channel:resolved",
+      baseSessionKey: "agent:main:slack:channel:resolved",
+      peer: { kind: "channel", id: "resolved" },
+      chatType: "channel",
+      from: "slack:channel:resolved",
+      to: "channel:resolved",
+    });
 
     const respond = vi.fn();
     await sendHandlers.send({
@@ -182,7 +197,7 @@ describe("gateway send mirroring", () => {
       isWebchatConnect: () => false,
     });
 
-    expect(mocks.recordSessionMetaFromInbound).toHaveBeenCalled();
+    expect(mocks.ensureOutboundSessionEntry).toHaveBeenCalled();
     expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
       expect.objectContaining({
         mirror: expect.objectContaining({

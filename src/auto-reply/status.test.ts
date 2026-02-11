@@ -27,6 +27,7 @@ describe("buildStatusMessage", () => {
   it("summarizes agent readiness and context usage", () => {
     const text = buildStatusMessage({
       config: {
+        agents: { defaults: { sandbox: { mode: "off" } } },
         models: {
           providers: {
             anthropic: {

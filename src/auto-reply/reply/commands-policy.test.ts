@@ -110,7 +110,7 @@ describe("handleCommands /allowlist", () => {
 
     expect(result.shouldContinue).toBe(false);
     expect(result.reply?.text).toContain("Channel: telegram");
-    expect(result.reply?.text).toContain("DM allowFrom (config): 123, @alice");
+    expect(result.reply?.text).toContain("DM allowFrom (config): (none)");
     expect(result.reply?.text).toContain("Paired allowFrom (store): 456");
   });
 

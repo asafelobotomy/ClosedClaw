@@ -647,6 +647,7 @@ async function collectChannelSecurityFindings(params: {
     if (plugin.id === "discord") {
       const discordCfg =
         (account as { config?: Record<string, unknown> } | null)?.config ??
+        (account as Record<string, unknown>) ??
         ({} as Record<string, unknown>);
       const nativeEnabled = resolveNativeCommandsEnabled({
         providerId: "discord",
@@ -734,7 +735,9 @@ async function collectChannelSecurityFindings(params: {
     if (plugin.id === "slack") {
       const slackCfg =
         (account as { config?: Record<string, unknown>; dm?: Record<string, unknown> } | null)
-          ?.config ?? ({} as Record<string, unknown>);
+          ?.config ??
+        (account as Record<string, unknown>) ??
+        ({} as Record<string, unknown>);
       const nativeEnabled = resolveNativeCommandsEnabled({
         providerId: "slack",
         providerSetting: coerceNativeSetting(
@@ -839,6 +842,7 @@ async function collectChannelSecurityFindings(params: {
 
       const telegramCfg =
         (account as { config?: Record<string, unknown> } | null)?.config ??
+        (account as Record<string, unknown>) ??
         ({} as Record<string, unknown>);
       const defaultGroupPolicy = params.cfg.channels?.defaults?.groupPolicy;
       const groupPolicy =

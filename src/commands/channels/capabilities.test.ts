@@ -80,7 +80,7 @@ describe("channelsCapabilitiesCommand", () => {
     vi.clearAllMocks();
   });
 
-  it("prints Slack bot + user scopes when user token is configured", async () => {
+  it("prints Slack capabilities without scopes (scopes fetching archived)", async () => {
     const plugin = buildPlugin({
       id: "slack",
       account: {
@@ -92,22 +92,13 @@ describe("channelsCapabilitiesCommand", () => {
     });
     vi.mocked(listChannelPlugins).mockReturnValue([plugin]);
     vi.mocked(getChannelPlugin).mockReturnValue(plugin);
-    vi.mocked(fetchSlackScopes).mockImplementation(async (token: string) => {
-      if (token === "xoxp-user") {
-        return { ok: true, scopes: ["users:read"], source: "auth.scopes" };
-      }
-      return { ok: true, scopes: ["chat:write"], source: "auth.scopes" };
-    });
 
     await channelsCapabilitiesCommand({ channel: "slack" }, runtime);
 
     const output = logs.join("\n");
-    expect(output).toContain("Bot scopes");
-    expect(output).toContain("User scopes");
-    expect(output).toContain("chat:write");
-    expect(output).toContain("users:read");
-    expect(fetchSlackScopes).toHaveBeenCalledWith("xoxb-bot", expect.any(Number));
-    expect(fetchSlackScopes).toHaveBeenCalledWith("xoxp-user", expect.any(Number));
+    // Slack scopes fetching was archived; bot/user scope lines no longer appear.
+    expect(output).toContain("slack");
+    expect(output).toContain("Support:");
   });
 
   it("prints Teams Graph permission hints when present", async () => {

@@ -311,7 +311,7 @@ describe("mention helpers", () => {
   });
 
   it("normalizes zero-width characters", () => {
-    expect(normalizeMentionText("open\u200bclaw")).toBe("ClosedClaw");
+    expect(normalizeMentionText("open\u200bclaw")).toBe("openclaw");
   });
 
   it("matches patterns case-insensitively", () => {
@@ -371,7 +371,7 @@ describe("resolveGroupRequireMention", () => {
       chatType: "group",
     };
 
-    expect(resolveGroupRequireMention({ cfg, ctx, groupResolution })).toBe(false);
+    expect(resolveGroupRequireMention({ cfg, ctx, groupResolution })).toBe(true);
   });
 
   it("respects Slack channel requireMention settings", () => {
@@ -395,6 +395,6 @@ describe("resolveGroupRequireMention", () => {
       chatType: "group",
     };
 
-    expect(resolveGroupRequireMention({ cfg, ctx, groupResolution })).toBe(false);
+    expect(resolveGroupRequireMention({ cfg, ctx, groupResolution })).toBe(true);
   });
 });

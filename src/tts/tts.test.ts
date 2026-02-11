@@ -5,7 +5,8 @@ import { resolveModel } from "../agents/pi-embedded-runner/model.js";
 import { TIMEOUT_HTTP_DEFAULT_MS } from "../config/constants/index.js";
 import * as tts from "./tts.js";
 
-vi.mock("@mariozechner/pi-ai", () => ({
+vi.mock("@mariozechner/pi-ai", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@mariozechner/pi-ai")>()),
   completeSimple: vi.fn(),
 }));
 

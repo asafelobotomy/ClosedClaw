@@ -6,8 +6,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   decorateClosedClawProfile,
   ensureProfileCleanExit,
-  findChromeExecutableMac,
-  findChromeExecutableWindows,
   isChromeReachable,
   resolveBrowserExecutableForPlatform,
   stopClosedClawChrome,
@@ -140,73 +138,81 @@ describe("browser chrome helpers", () => {
   });
 
   it("picks the first existing Chrome candidate on macOS", () => {
-    const exists = vi
+    // macOS detection removed (Linux-only build); falls through to Linux candidates
+    const spy = vi
       .spyOn(fs, "existsSync")
-      .mockImplementation((p) =>
-        String(p).includes("Google Chrome.app/Contents/MacOS/Google Chrome"),
-      );
-    const exe = findChromeExecutableMac();
+      .mockImplementation((p) => String(p) === "/usr/bin/google-chrome");
+    const exe = resolveBrowserExecutableForPlatform(
+      {} as Parameters<typeof resolveBrowserExecutableForPlatform>[0],
+      "darwin",
+    );
     expect(exe?.kind).toBe("chrome");
-    expect(exe?.path).toMatch(/Google Chrome\.app/);
-    exists.mockRestore();
+    expect(exe?.path).toBe("/usr/bin/google-chrome");
+    spy.mockRestore();
   });
 
   it("returns null when no Chrome candidate exists", () => {
-    const exists = vi.spyOn(fs, "existsSync").mockReturnValue(false);
-    expect(findChromeExecutableMac()).toBeNull();
-    exists.mockRestore();
+    const spy = vi.spyOn(fs, "existsSync").mockReturnValue(false);
+    expect(
+      resolveBrowserExecutableForPlatform(
+        {} as Parameters<typeof resolveBrowserExecutableForPlatform>[0],
+        "darwin",
+      ),
+    ).toBeNull();
+    spy.mockRestore();
   });
 
   it("picks the first existing Chrome candidate on Windows", () => {
-    vi.stubEnv("LOCALAPPDATA", "C:\\Users\\Test\\AppData\\Local");
-    const exists = vi.spyOn(fs, "existsSync").mockImplementation((p) => {
-      const pathStr = String(p);
-      return (
-        pathStr.includes("Google\\Chrome\\Application\\chrome.exe") ||
-        pathStr.includes("BraveSoftware\\Brave-Browser\\Application\\brave.exe") ||
-        pathStr.includes("Microsoft\\Edge\\Application\\msedge.exe")
-      );
-    });
-    const exe = findChromeExecutableWindows();
-    expect(exe?.kind).toBe("chrome");
-    expect(exe?.path).toMatch(/chrome\.exe$/);
-    exists.mockRestore();
-  });
-
-  it("finds Chrome in Program Files on Windows", () => {
-    const marker = path.win32.join("Program Files", "Google", "Chrome");
-    const exists = vi.spyOn(fs, "existsSync").mockImplementation((p) => String(p).includes(marker));
-    const exe = findChromeExecutableWindows();
-    expect(exe?.kind).toBe("chrome");
-    expect(exe?.path).toMatch(/chrome\.exe$/);
-    exists.mockRestore();
-  });
-
-  it("returns null when no Chrome candidate exists on Windows", () => {
-    const exists = vi.spyOn(fs, "existsSync").mockReturnValue(false);
-    expect(findChromeExecutableWindows()).toBeNull();
-    exists.mockRestore();
-  });
-
-  it("resolves Windows executables without LOCALAPPDATA", () => {
-    vi.stubEnv("LOCALAPPDATA", "");
-    vi.stubEnv("ProgramFiles", "C:\\Program Files");
-    vi.stubEnv("ProgramFiles(x86)", "C:\\Program Files (x86)");
-    const marker = path.win32.join(
-      "Program Files",
-      "Google",
-      "Chrome",
-      "Application",
-      "chrome.exe",
-    );
-    const exists = vi.spyOn(fs, "existsSync").mockImplementation((p) => String(p).includes(marker));
+    // Windows detection removed (Linux-only build); falls through to Linux candidates
+    const spy = vi
+      .spyOn(fs, "existsSync")
+      .mockImplementation((p) => String(p) === "/usr/bin/google-chrome");
     const exe = resolveBrowserExecutableForPlatform(
       {} as Parameters<typeof resolveBrowserExecutableForPlatform>[0],
       "win32",
     );
     expect(exe?.kind).toBe("chrome");
-    expect(exe?.path).toMatch(/chrome\.exe$/);
-    exists.mockRestore();
+    expect(exe?.path).toBe("/usr/bin/google-chrome");
+    spy.mockRestore();
+  });
+
+  it("uses executablePath from config when set", () => {
+    const customPath = "/opt/google/chrome/chrome";
+    const spy = vi
+      .spyOn(fs, "existsSync")
+      .mockImplementation((p) => String(p) === customPath);
+    const exe = resolveBrowserExecutableForPlatform(
+      { executablePath: customPath } as Parameters<typeof resolveBrowserExecutableForPlatform>[0],
+      "win32",
+    );
+    expect(exe?.kind).toBe("custom");
+    expect(exe?.path).toBe(customPath);
+    spy.mockRestore();
+  });
+
+  it("returns null when no Chrome candidate exists on Windows", () => {
+    const spy = vi.spyOn(fs, "existsSync").mockReturnValue(false);
+    expect(
+      resolveBrowserExecutableForPlatform(
+        {} as Parameters<typeof resolveBrowserExecutableForPlatform>[0],
+        "win32",
+      ),
+    ).toBeNull();
+    spy.mockRestore();
+  });
+
+  it("resolves brave as fallback on non-Linux platform", () => {
+    // Windows detection removed; falls through to Linux candidates
+    const spy = vi
+      .spyOn(fs, "existsSync")
+      .mockImplementation((p) => String(p) === "/usr/bin/brave-browser");
+    const exe = resolveBrowserExecutableForPlatform(
+      {} as Parameters<typeof resolveBrowserExecutableForPlatform>[0],
+      "win32",
+    );
+    expect(exe?.kind).toBe("brave");
+    expect(exe?.path).toBe("/usr/bin/brave-browser");
+    spy.mockRestore();
   });
 
   it("reports reachability based on /json/version", async () => {

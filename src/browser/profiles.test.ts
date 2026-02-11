@@ -12,7 +12,7 @@ import {
 
 describe("profile name validation", () => {
   it("accepts valid lowercase names", () => {
-    expect(isValidProfileName("ClosedClaw")).toBe(true);
+    expect(isValidProfileName("closedclaw")).toBe(true);
     expect(isValidProfileName("work")).toBe(true);
     expect(isValidProfileName("my-profile")).toBe(true);
     expect(isValidProfileName("test123")).toBe(true);

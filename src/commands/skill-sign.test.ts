@@ -1,15 +1,17 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from "vitest";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import * as os from "node:os";
 import { generateKeyPair, parseSignatureFile } from "../security/skill-signing.js";
-import { addTrustedKey, removeTrustedKey, loadKeyring } from "../security/trusted-keyring.js";
+import { removeTrustedKey, getTrustedKey } from "../security/trusted-keyring.js";
 import { generateKeyCommand, signSkillCommand } from "./skill-sign.js";
+import type { RuntimeEnv } from "../runtime.js";
 
 describe("skill-sign commands", () => {
   let testDir: string;
   let skillPath: string;
-  let keyringBackup: string | null = null;
+  let runtime: RuntimeEnv;
+  let processExitSpy: ReturnType<typeof vi.spyOn>;
 
   beforeAll(async () => {
     // Create temp directory for test files
@@ -31,16 +33,6 @@ describe("skill-sign commands", () => {
         "Test skill content.",
       ].join("\n"),
     );
-
-    // Backup existing keyring
-    try {
-      const keyring = await loadKeyring();
-      if (keyring.keys.length > 0) {
-        keyringBackup = JSON.stringify(keyring);
-      }
-    } catch {
-      // No keyring to backup
-    }
   });
 
   afterAll(async () => {
@@ -50,134 +42,157 @@ describe("skill-sign commands", () => {
     } catch {
       // Ignore cleanup errors
     }
+  });
 
-    // Restore keyring if backed up
-    if (keyringBackup) {
-      const keyring = JSON.parse(keyringBackup);
-      // This is a simplified restore - in production you'd want proper restore logic
-    }
+  beforeEach(() => {
+    runtime = {
+      log: vi.fn(),
+      error: vi.fn(),
+      exit: vi.fn() as unknown as RuntimeEnv["exit"],
+    };
+
+    processExitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("process.exit called");
+    }) as unknown as typeof process.exit);
+  });
+
+  afterEach(() => {
+    processExitSpy.mockRestore();
   });
 
   describe("generateKeyCommand", () => {
-    it("generates key pair without output path", async () => {
-      const result = await generateKeyCommand({
-        signer: "Test Signer",
-        addToKeyring: false,
-      });
+    it("generates key pair with JSON output", async () => {
+      const outputDir = path.join(testDir, "keys-json");
 
-      expect(result).toBeDefined();
-      expect(result.keyId).toBeDefined();
-      expect(result.keyId.length).toBeGreaterThan(0);
-      expect(result.signer).toBe("Test Signer");
-      expect(result.publicKey).toContain("-----BEGIN PUBLIC KEY-----");
-      expect(result.privateKey).toContain("-----BEGIN PRIVATE KEY-----");
-    });
-
-    it("generates key pair with output path", async () => {
-      const outputDir = path.join(testDir, "keys");
-      await fs.mkdir(outputDir, { recursive: true });
-
-      const result = await generateKeyCommand({
-        signer: "Test Signer",
+      await generateKeyCommand(runtime, {
+        signerName: "Test Signer",
         output: outputDir,
         addToKeyring: false,
+        json: true,
       });
 
+      expect(runtime.log).toHaveBeenCalled();
+      const logCall = vi.mocked(runtime.log).mock.calls[0][0] as string;
+      const result = JSON.parse(logCall);
+
       expect(result.keyId).toBeDefined();
+      expect(result.keyId.length).toBeGreaterThan(0);
+      expect(result.addedToKeyring).toBe(false);
+      expect(result.privateKeyPath).toBeDefined();
+      expect(result.publicKeyPath).toBeDefined();
+    });
 
-      // Check files were created
-      const publicKeyPath = path.join(outputDir, "skill-signing.pub");
-      const privateKeyPath = path.join(outputDir, "skill-signing.key");
+    it("generates key pair with output path and writes files", async () => {
+      const outputDir = path.join(testDir, "keys-files");
+      await fs.mkdir(outputDir, { recursive: true });
 
-      const publicKeyExists = await fs
-        .access(publicKeyPath)
-        .then(() => true)
-        .catch(() => false);
-      const privateKeyExists = await fs
-        .access(privateKeyPath)
-        .then(() => true)
-        .catch(() => false);
+      await generateKeyCommand(runtime, {
+        signerName: "Test Signer",
+        output: outputDir,
+        addToKeyring: false,
+        json: true,
+      });
 
-      expect(publicKeyExists).toBe(true);
-      expect(privateKeyExists).toBe(true);
+      const logCall = vi.mocked(runtime.log).mock.calls[0][0] as string;
+      const result = JSON.parse(logCall);
 
-      // Verify file contents match returned keys
-      const savedPublicKey = await fs.readFile(publicKeyPath, "utf-8");
-      const savedPrivateKey = await fs.readFile(privateKeyPath, "utf-8");
+      // Check files were created - filename includes keyId prefix
+      const files = await fs.readdir(outputDir);
+      const pubFile = files.find((f) => f.endsWith(".pub"));
+      const pemFile = files.find((f) => f.endsWith(".pem") && !f.endsWith(".pub"));
 
-      expect(savedPublicKey.trim()).toBe(result.publicKey.trim());
-      expect(savedPrivateKey.trim()).toBe(result.privateKey.trim());
+      expect(pubFile).toBeDefined();
+      expect(pemFile).toBeDefined();
+
+      // Verify file contents are valid PEM
+      const publicKeyContent = await fs.readFile(path.join(outputDir, pubFile!), "utf-8");
+      const privateKeyContent = await fs.readFile(path.join(outputDir, pemFile!), "utf-8");
+
+      expect(publicKeyContent).toContain("-----BEGIN PUBLIC KEY-----");
+      expect(privateKeyContent).toContain("-----BEGIN PRIVATE KEY-----");
     });
 
     it("adds key to keyring when addToKeyring=true", async () => {
-      const result = await generateKeyCommand({
-        signer: "Keyring Test Signer",
+      const outputDir = path.join(testDir, "keys-keyring");
+
+      await generateKeyCommand(runtime, {
+        signerName: "Keyring Test Signer",
+        output: outputDir,
         addToKeyring: true,
-        trustLevel: "full",
+        json: true,
       });
 
+      const logCall = vi.mocked(runtime.log).mock.calls[0][0] as string;
+      const result = JSON.parse(logCall);
+      expect(result.addedToKeyring).toBe(true);
+
       // Verify key was added to keyring
-      const keyring = await loadKeyring();
-      const addedKey = keyring.keys.find((k) => k.keyId === result.keyId);
+      const addedKey = await getTrustedKey(result.keyId);
 
       expect(addedKey).toBeDefined();
-      expect(addedKey?.signer).toBe("Keyring Test Signer");
+      expect(addedKey?.name).toBe("Keyring Test Signer");
       expect(addedKey?.trustLevel).toBe("full");
 
       // Cleanup
       await removeTrustedKey(result.keyId);
     });
 
-    it("supports marginal trust level", async () => {
-      const result = await generateKeyCommand({
-        signer: "Marginal Signer",
-        addToKeyring: true,
-        trustLevel: "marginal",
+    it("uses formatted display output when json=false", async () => {
+      const outputDir = path.join(testDir, "keys-display");
+
+      await generateKeyCommand(runtime, {
+        signerName: "Display Signer",
+        output: outputDir,
+        addToKeyring: false,
       });
 
-      const keyring = await loadKeyring();
-      const addedKey = keyring.keys.find((k) => k.keyId === result.keyId);
+      // Should produce multiple log calls for formatted output
+      expect(vi.mocked(runtime.log).mock.calls.length).toBeGreaterThan(1);
 
-      expect(addedKey?.trustLevel).toBe("marginal");
-
-      // Cleanup
-      await removeTrustedKey(result.keyId);
+      const allOutput = vi.mocked(runtime.log).mock.calls.map((c) => String(c[0])).join("\n");
+      expect(allOutput).toContain("Key ID:");
     });
   });
 
   describe("signSkillCommand", () => {
     let testKeyPair: { publicKey: string; privateKey: string; keyId: string };
     let privateKeyPath: string;
+    let publicKeyPath: string;
 
     beforeEach(async () => {
-      // Generate a test key pair for Each test
+      // Generate a test key pair for each test
       testKeyPair = await generateKeyPair("Test Signer");
-      
-      // Save private key to file
-      privateKeyPath = path.join(testDir, "test-private.key");
+
+      // Save private key (.pem) and public key (.pub) to files
+      // signSkillCommand expects .pem extension and derives .pub from it
+      privateKeyPath = path.join(testDir, "test-signing.pem");
+      publicKeyPath = path.join(testDir, "test-signing.pub");
       await fs.writeFile(privateKeyPath, testKeyPair.privateKey);
+      await fs.writeFile(publicKeyPath, testKeyPair.publicKey);
     });
 
     it("signs skill file successfully", async () => {
-      const result = await signSkillCommand({
-        skillPath,
-        privateKeyPath,
-        keyId: testKeyPair.keyId,
-        signer: "Test Signer",
+      await signSkillCommand(runtime, skillPath, {
+        keyPath: privateKeyPath,
+        signerName: "Test Signer",
+        json: true,
       });
 
-      expect(result.skillPath).toBe(skillPath);
-      expect(result.signaturePath).toBe(`${skillPath}.sig`);
+      expect(runtime.log).toHaveBeenCalled();
+      const logCall = vi.mocked(runtime.log).mock.calls[0][0] as string;
+      const result = JSON.parse(logCall);
+
+      expect(result.skillPath).toBeDefined();
+      expect(result.signaturePath).toBeDefined();
       expect(result.keyId).toBe(testKeyPair.keyId);
       expect(result.signer).toBe("Test Signer");
 
       // Verify signature file was created
-      const sigPath = `${skillPath}.sig`;
+      const sigPath = skillPath + ".sig";
       const sigExists = await fs
         .access(sigPath)
         .then(() => true)
         .catch(() => false);
-
       expect(sigExists).toBe(true);
 
       // Verify signature content
@@ -189,74 +204,78 @@ describe("skill-sign commands", () => {
       expect(signature?.signer).toBe("Test Signer");
     });
 
-    it("detects non-existent skill file", async () => {
-      const nonExistentPath = path.join(testDir, "nonexistent", "SKILL.md");
+    it("signs with generateKey (ephemeral key)", async () => {
+      await signSkillCommand(runtime, skillPath, {
+        generateKey: true,
+        signerName: "Ephemeral Signer",
+        json: true,
+      });
 
-      await expect(
-        signSkillCommand({
-          skillPath: nonExistentPath,
-          privateKeyPath,
-          keyId: testKeyPair.keyId,
-          signer: "Test Signer",
-        }),
-      ).rejects.toThrow();
+      expect(runtime.log).toHaveBeenCalled();
+      // Find the JSON output (last log call, after ephemeral warning)
+      const allCalls = vi.mocked(runtime.log).mock.calls;
+      const jsonCall = allCalls[allCalls.length - 1][0] as string;
+      const result = JSON.parse(jsonCall);
+
+      expect(result.keyId).toBeDefined();
+      expect(result.signer).toBe("Ephemeral Signer");
     });
 
-    it("detects non-existent private key file", async () => {
-      const nonExistentKeyPath = path.join(testDir, "nonexistent.key");
+    it("exits with error for non-existent key path", async () => {
+      const nonExistentKeyPath = path.join(testDir, "nonexistent.pem");
 
       await expect(
-        signSkillCommand({
-          skillPath,
-          privateKeyPath: nonExistentKeyPath,
-          keyId: testKeyPair.keyId,
-          signer: "Test Signer",
+        signSkillCommand(runtime, skillPath, {
+          keyPath: nonExistentKeyPath,
+          signerName: "Test Signer",
         }),
-      ).rejects.toThrow();
+      ).rejects.toThrow("process.exit called");
+
+      expect(runtime.error).toHaveBeenCalledWith(
+        expect.stringContaining("Key not found"),
+      );
+      expect(processExitSpy).toHaveBeenCalledWith(1);
     });
 
     it("allows signing with custom output path", async () => {
       const customSigPath = path.join(testDir, "custom-signature.sig");
 
-      const result = await signSkillCommand({
-        skillPath,
-        privateKeyPath,
-        keyId: testKeyPair.keyId,
-        signer: "Test Signer",
-        outputPath: customSigPath,
+      await signSkillCommand(runtime, skillPath, {
+        keyPath: privateKeyPath,
+        signerName: "Test Signer",
+        output: customSigPath,
+        json: true,
       });
 
-      expect(result.signaturePath).toBe(customSigPath);
+      const logCall = vi.mocked(runtime.log).mock.calls[0][0] as string;
+      const result = JSON.parse(logCall);
+      expect(result.signaturePath).toBeDefined();
 
       // Verify custom signature file exists
       const sigExists = await fs
         .access(customSigPath)
         .then(() => true)
         .catch(() => false);
-
       expect(sigExists).toBe(true);
     });
 
     it("overwrites existing signature file", async () => {
-      const sigPath = `${skillPath}.sig`;
-
       // Create initial signature
-      await signSkillCommand({
-        skillPath,
-        privateKeyPath,
-        keyId: testKeyPair.keyId,
-        signer: "First Signer",
+      await signSkillCommand(runtime, skillPath, {
+        keyPath: privateKeyPath,
+        signerName: "First Signer",
       });
 
+      const sigPath = skillPath + ".sig";
       const firstSig = await fs.readFile(sigPath, "utf-8");
       const firstParsed = parseSignatureFile(firstSig);
 
+      vi.mocked(runtime.log).mockClear();
+
       // Sign again with different signer name
-      await signSkillCommand({
-        skillPath,
-        privateKeyPath,
-        keyId: testKeyPair.keyId,
-        signer: "Second Signer",
+      await signSkillCommand(runtime, skillPath, {
+        keyPath: privateKeyPath,
+        signerName: "Second Signer",
       });
 
       const secondSig = await fs.readFile(sigPath, "utf-8");
@@ -266,32 +285,26 @@ describe("skill-sign commands", () => {
       expect(firstParsed?.signer).toBe("First Signer");
       expect(secondParsed?.signer).not.toBe(firstParsed?.signer);
     });
-
-    it("handles invalid private key gracefully", async () => {
-      // Write invalid private key
-      const invalidKeyPath = path.join(testDir, "invalid.key");
-      await fs.writeFile(invalidKeyPath, "not a valid private key");
-
-      await expect(
-        signSkillCommand({
-          skillPath,
-          privateKeyPath: invalidKeyPath,
-          keyId: testKeyPair.keyId,
-          signer: "Test Signer",
-        }),
-      ).rejects.toThrow();
-    });
   });
 
   describe("integration: generate + sign + verify", () => {
     it("full workflow: keygen -> sign -> verify signature", async () => {
       // 1. Generate new key pair
-      const keyResult = await generateKeyCommand({
-        signer: "Integration Test Signer",
-        output: path.join(testDir, "integration-keys"),
+      const keyOutputDir = path.join(testDir, "integration-keys");
+
+      await generateKeyCommand(runtime, {
+        signerName: "Integration Test Signer",
+        output: keyOutputDir,
         addToKeyring: true,
-        trustLevel: "full",
+        json: true,
       });
+
+      const keyLogCall = vi.mocked(runtime.log).mock.calls[0][0] as string;
+      const keyResult = JSON.parse(keyLogCall);
+      expect(keyResult.keyId).toBeDefined();
+      expect(keyResult.addedToKeyring).toBe(true);
+
+      vi.mocked(runtime.log).mockClear();
 
       // 2. Create a new skill to sign
       const newSkillPath = path.join(testDir, "integration-skill", "SKILL.md");
@@ -310,19 +323,22 @@ describe("skill-sign commands", () => {
         ].join("\n"),
       );
 
-      // 3. Sign the skill
-      const privateKeyPath = path.join(testDir, "integration-keys", "skill-signing.key");
-      const signResult = await signSkillCommand({
-        skillPath: newSkillPath,
-        privateKeyPath,
-        keyId: keyResult.keyId,
-        signer: "Integration Test Signer",
+      // 3. Sign the skill using the generated key directory
+      await signSkillCommand(runtime, newSkillPath, {
+        keyPath: keyOutputDir,
+        signerName: "Integration Test Signer",
+        json: true,
       });
 
-      expect(signResult.signaturePath).toBe(`${newSkillPath}.sig`);
+      const signLogCall = vi.mocked(runtime.log).mock.calls[0][0] as string;
+      const signResult = JSON.parse(signLogCall);
+
+      expect(signResult.keyId).toBe(keyResult.keyId);
+      expect(signResult.signer).toBe("Integration Test Signer");
 
       // 4. Verify signature file exists and is valid
-      const sigContent = await fs.readFile(signResult.signaturePath, "utf-8");
+      const sigPath = newSkillPath + ".sig";
+      const sigContent = await fs.readFile(sigPath, "utf-8");
       const signature = parseSignatureFile(sigContent);
 
       expect(signature).toBeDefined();

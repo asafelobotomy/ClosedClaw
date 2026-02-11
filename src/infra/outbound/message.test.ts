@@ -63,7 +63,25 @@ describe("sendMessage channel normalization", () => {
         {
           pluginId: "imessage",
           source: "test",
-          plugin: createIMessageTestPlugin(),
+          plugin: createIMessageTestPlugin({
+            outbound: {
+              deliveryMode: "direct",
+              sendText: async ({ deps, to, text }: any) => {
+                if (deps?.sendIMessage) {
+                  const res = await deps.sendIMessage(to, text, { verbose: false });
+                  return { channel: "imessage", ...res };
+                }
+                return { channel: "imessage", messageId: "fallback" };
+              },
+              sendMedia: async ({ deps, to, text, mediaUrl }: any) => {
+                if (deps?.sendIMessage) {
+                  const res = await deps.sendIMessage(to, text, { verbose: false, mediaUrl });
+                  return { channel: "imessage", ...res };
+                }
+                return { channel: "imessage", messageId: "fallback" };
+              },
+            },
+          }),
         },
       ]),
     );

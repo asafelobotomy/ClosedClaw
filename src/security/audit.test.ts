@@ -124,9 +124,10 @@ describe("security audit", () => {
   it("treats Windows ACL-only perms as secure", async () => {
     const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ClosedClaw-security-audit-win-"));
     const stateDir = path.join(tmp, "state");
-    await fs.mkdir(stateDir, { recursive: true });
+    await fs.mkdir(stateDir, { recursive: true, mode: 0o700 });
     const configPath = path.join(stateDir, "ClosedClaw.json");
     await fs.writeFile(configPath, "{}\n", "utf-8");
+    await fs.chmod(configPath, 0o600);
 
     const user = "DESKTOP-TEST\\Tester";
     const execIcacls = async (_cmd: string, args: string[]) => ({
@@ -200,7 +201,7 @@ describe("security audit", () => {
 
   it("warns when small models are paired with web/browser tools", async () => {
     const cfg: ClosedClawConfig = {
-      agents: { defaults: { model: { primary: "ollama/mistral-8b" } } },
+      agents: { defaults: { model: { primary: "ollama/mistral-8b" }, sandbox: { mode: "off" } } },
       tools: {
         web: {
           search: { enabled: true },

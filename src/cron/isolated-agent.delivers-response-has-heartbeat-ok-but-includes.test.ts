@@ -14,9 +14,17 @@ vi.mock("../agents/pi-embedded.js", () => ({
 vi.mock("../agents/model-catalog.js", () => ({
   loadModelCatalog: vi.fn(),
 }));
+vi.mock("../infra/outbound/deliver.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../infra/outbound/deliver.js")>();
+  return {
+    ...actual,
+    deliverOutboundPayloads: vi.fn().mockResolvedValue([{ messageId: "mock-1" }]),
+  };
+});
 
 import { loadModelCatalog } from "../agents/model-catalog.js";
 import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
+import { deliverOutboundPayloads } from "../infra/outbound/deliver.js";
 import { runCronIsolatedAgentTurn } from "./isolated-agent.js";
 
 async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise<T> {
@@ -83,21 +91,13 @@ describe("runCronIsolatedAgentTurn", () => {
   beforeEach(() => {
     vi.mocked(runEmbeddedPiAgent).mockReset();
     vi.mocked(loadModelCatalog).mockResolvedValue([]);
+    vi.mocked(deliverOutboundPayloads).mockReset().mockResolvedValue([{ messageId: "mock-1" }]);
   });
 
   it("delivers when response has HEARTBEAT_OK but includes media", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn().mockResolvedValue({
-          messageId: "t1",
-          chatId: "123",
-        }),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       // Media should still be delivered even if text is just HEARTBEAT_OK.
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
         payloads: [{ text: "HEARTBEAT_OK", mediaUrl: "https://example.com/img.png" }],
@@ -123,10 +123,12 @@ describe("runCronIsolatedAgentTurn", () => {
       });
 
       expect(res.status).toBe("ok");
-      expect(deps.sendMessageTelegram).toHaveBeenCalledWith(
-        "123",
-        "HEARTBEAT_OK",
-        expect.objectContaining({ mediaUrl: "https://example.com/img.png" }),
+      expect(deliverOutboundPayloads).toHaveBeenCalledWith(
+        expect.objectContaining({
+          channel: "telegram",
+          to: "123",
+          payloads: [{ text: "HEARTBEAT_OK", mediaUrl: "https://example.com/img.png" }],
+        }),
       );
     });
   });
@@ -134,16 +136,7 @@ describe("runCronIsolatedAgentTurn", () => {
   it("delivers when heartbeat ack padding exceeds configured limit", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn().mockResolvedValue({
-          messageId: "t1",
-          chatId: "123",
-        }),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
         payloads: [{ text: "HEARTBEAT_OK 🦞" }],
         meta: {
@@ -177,7 +170,7 @@ describe("runCronIsolatedAgentTurn", () => {
       });
 
       expect(res.status).toBe("ok");
-      expect(deps.sendMessageTelegram).toHaveBeenCalled();
+      expect(deliverOutboundPayloads).toHaveBeenCalled();
     });
   });
 });

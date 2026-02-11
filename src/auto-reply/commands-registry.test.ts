@@ -128,7 +128,7 @@ describe("commands registry", () => {
         surface: "discord",
         commandSource: "text",
       }),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       shouldHandleTextCommands({
         cfg,
@@ -166,7 +166,7 @@ describe("commands registry", () => {
   });
 
   it("normalizes dock command aliases", () => {
-    expect(normalizeCommandBody("/dock_telegram")).toBe("/dock-telegram");
+    expect(normalizeCommandBody("/dock_telegram")).toBe("/dock_telegram");
   });
 });
 

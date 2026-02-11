@@ -7,11 +7,11 @@ import { whatsappPlugin } from "../../../extensions/whatsapp/src/channel.js";
 import { jsonResult } from "../../agents/tools/common.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import { createIMessageTestPlugin, createTestRegistry } from "../../../test/helpers/channel-plugins.js";
-import { loadWebMedia } from "../../web/media.js";
+import { loadWebMedia } from "../../media/load-web-media.js";
 import { runMessageAction } from "./message-action-runner.js";
 
-vi.mock("../../web/media.js", async () => {
-  const actual = await vi.importActual<typeof import("../../web/media.js")>("../../web/media.js");
+vi.mock("../../media/load-web-media.js", async () => {
+  const actual = await vi.importActual<typeof import("../../media/load-web-media.js")>("../../media/load-web-media.js");
   return {
     ...actual,
     loadWebMedia: vi.fn(actual.loadWebMedia),

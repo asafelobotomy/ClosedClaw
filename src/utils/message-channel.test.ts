@@ -17,32 +17,37 @@ const createRegistry = (channels: PluginRegistry["channels"]): PluginRegistry =>
   diagnostics: [],
 });
 
-const emptyRegistry = createRegistry([]);
-
-const msteamsPlugin = {
-  id: "msteams",
+const createPlugin = (id: string, opts?: { aliases?: string[] }): ChannelPlugin => ({
+  id,
   meta: {
-    id: "msteams",
-    label: "Microsoft Teams",
-    selectionLabel: "Microsoft Teams (Bot Framework)",
-    docsPath: "/channels/msteams",
-    blurb: "Bot Framework; enterprise support.",
-    aliases: ["teams"],
+    id,
+    label: id,
+    selectionLabel: id,
+    docsPath: `/channels/${id}`,
+    blurb: `${id} channel`,
+    ...(opts?.aliases ? { aliases: opts.aliases } : {}),
   },
   capabilities: { chatTypes: ["direct"] },
   config: {
     listAccountIds: () => [],
     resolveAccount: () => ({}),
   },
-} satisfies ChannelPlugin;
+});
+
+const msteamsPlugin = createPlugin("msteams", { aliases: ["teams"] });
+
+const defaultRegistry = createRegistry([
+  { pluginId: "discord", plugin: createPlugin("discord"), source: "test" },
+  { pluginId: "imessage", plugin: createPlugin("imessage", { aliases: ["imsg"] }), source: "test" },
+]);
 
 describe("message-channel", () => {
   beforeEach(() => {
-    setActivePluginRegistry(emptyRegistry);
+    setActivePluginRegistry(defaultRegistry);
   });
 
   afterEach(() => {
-    setActivePluginRegistry(emptyRegistry);
+    setActivePluginRegistry(createRegistry([]));
   });
 
   it("normalizes gateway message channels and rejects unknown values", () => {

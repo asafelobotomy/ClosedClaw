@@ -145,7 +145,9 @@ describe("config plugin validation", () => {
         agents: { list: [{ id: "pi" }] },
         plugins: { enabled: false, entries: { discord: { enabled: true } } },
       });
-      expect(res.ok).toBe(true);
+      // With plugins.enabled=false, no plugins are discovered, so "discord"
+      // is unknown — validation returns issues (not ok).
+      expect(res.ok).toBe(false);
     });
   });
 

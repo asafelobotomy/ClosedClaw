@@ -321,16 +321,15 @@ describe("agentCommand", () => {
       const store = path.join(home, "sessions.json");
       mockConfig(home, store, undefined, { botToken: "t-1" });
       setTelegramRuntime(createPluginRuntime());
-      setActivePluginRegistry(
-        createTestRegistry([{ pluginId: "telegram", plugin: telegramPlugin, source: "test" }]),
-      );
-      const deps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn().mockResolvedValue({ messageId: "t1", chatId: "123" }),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
+      // Spy on the plugin's outbound sendText to verify delivery args.
+      const sendTextSpy = vi.fn(telegramPlugin.outbound!.sendText);
+      const pluginWithSpy = {
+        ...telegramPlugin,
+        outbound: { ...telegramPlugin.outbound!, sendText: sendTextSpy },
       };
+      setActivePluginRegistry(
+        createTestRegistry([{ pluginId: "telegram", plugin: pluginWithSpy, source: "test" }]),
+      );
 
       const prevTelegramToken = process.env.TELEGRAM_BOT_TOKEN;
       process.env.TELEGRAM_BOT_TOKEN = "";
@@ -343,13 +342,10 @@ describe("agentCommand", () => {
             channel: "telegram",
           },
           runtime,
-          deps,
         );
 
-        expect(deps.sendMessageTelegram).toHaveBeenCalledWith(
-          "123",
-          "ok",
-          expect.objectContaining({ accountId: undefined, verbose: false }),
+        expect(sendTextSpy).toHaveBeenCalledWith(
+          expect.objectContaining({ to: "123", text: "ok", accountId: undefined }),
         );
       } finally {
         if (prevTelegramToken === undefined) {

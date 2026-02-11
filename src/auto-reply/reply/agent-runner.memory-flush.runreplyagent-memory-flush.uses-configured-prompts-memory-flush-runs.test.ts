@@ -91,7 +91,7 @@ function createBaseRun(params: {
       messageProvider: "whatsapp",
       sessionFile: "/tmp/session.jsonl",
       workspaceDir: "/tmp",
-      config: params.config ?? {},
+      config: params.config ?? { agents: { defaults: { sandbox: { mode: "off" } } } },
       skillsSnapshot: {},
       provider: "anthropic",
       model: "claude",
@@ -154,6 +154,7 @@ describe("runReplyAgent memory flush", () => {
       config: {
         agents: {
           defaults: {
+            sandbox: { mode: "off" },
             compaction: {
               memoryFlush: {
                 prompt: "Write notes.",

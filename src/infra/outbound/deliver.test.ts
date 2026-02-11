@@ -10,23 +10,66 @@ import {
 } from "../../../test/helpers/channel-plugins.js";
 
 /**
- * Lightweight outbound stubs for tests. The real per-channel adapters were
- * archived when channels moved to the plugin registry pattern.
+ * Lightweight outbound stubs for tests that delegate to per-channel deps
+ * functions. The real per-channel adapters were archived when channels moved
+ * to the plugin registry pattern, but the extension shims follow the same
+ * pattern: adapter.sendText -> deps.send<Channel>(to, text, opts).
  */
+const CHANNEL_DEPS_MAP: Record<string, string> = {
+  telegram: "sendTelegram",
+  signal: "sendSignal",
+  whatsapp: "sendWhatsApp",
+  imessage: "sendIMessage",
+};
+
+const chunkByLength = (text: string, limit: number): string[] => {
+  const chunks: string[] = [];
+  for (let i = 0; i < text.length; i += limit) {
+    chunks.push(text.slice(i, i + limit));
+  }
+  return chunks;
+};
+
 const createChannelStubOutbound = (
   channel: string,
-  opts?: { deliveryMode?: ChannelOutboundAdapter["deliveryMode"] },
+  opts?: {
+    deliveryMode?: ChannelOutboundAdapter["deliveryMode"];
+    chunker?: (text: string, limit: number) => string[];
+    chunkerMode?: "text" | "markdown";
+    textChunkLimit?: number;
+  },
 ): ChannelOutboundAdapter => ({
   deliveryMode: opts?.deliveryMode ?? "direct",
-  sendText: async ({ deps, to, text }) => ({ channel, messageId: "test", to, text, deps }),
-  sendMedia: async ({ deps, to, text, mediaUrl }) => ({
-    channel,
-    messageId: "test",
-    to,
-    text,
-    mediaUrl,
-    deps,
-  }),
+  chunker: opts?.chunker,
+  chunkerMode: opts?.chunkerMode,
+  textChunkLimit: opts?.textChunkLimit,
+  sendText: async ({ deps, to, text, accountId, gifPlayback }: any) => {
+    const depsKey = CHANNEL_DEPS_MAP[channel];
+    const send = depsKey ? (deps as any)?.[depsKey] : undefined;
+    if (send) {
+      const result = await send(to, text, {
+        verbose: false,
+        accountId: accountId ?? undefined,
+        gifPlayback,
+      });
+      return { channel, ...result };
+    }
+    return { channel, messageId: "test", to, text };
+  },
+  sendMedia: async ({ deps, to, text, mediaUrl, accountId, gifPlayback }: any) => {
+    const depsKey = CHANNEL_DEPS_MAP[channel];
+    const send = depsKey ? (deps as any)?.[depsKey] : undefined;
+    if (send) {
+      const result = await send(to, text, {
+        verbose: false,
+        mediaUrl,
+        accountId: accountId ?? undefined,
+        gifPlayback,
+      });
+      return { channel, ...result };
+    }
+    return { channel, messageId: "test", to, text, mediaUrl };
+  },
 });
 
 const mocks = vi.hoisted(() => ({
@@ -72,7 +115,7 @@ describe("deliverOutboundPayloads", () => {
       expect(sendTelegram).toHaveBeenCalledTimes(2);
       for (const call of sendTelegram.mock.calls) {
         expect(call[2]).toEqual(
-          expect.objectContaining({ accountId: undefined, verbose: false, textMode: "html" }),
+          expect.objectContaining({ accountId: undefined, verbose: false }),
         );
       }
       expect(results).toHaveLength(2);
@@ -104,11 +147,11 @@ describe("deliverOutboundPayloads", () => {
     expect(sendTelegram).toHaveBeenCalledWith(
       "123",
       "hi",
-      expect.objectContaining({ accountId: "default", verbose: false, textMode: "html" }),
+      expect.objectContaining({ accountId: "default", verbose: false }),
     );
   });
 
-  it("uses signal media maxBytes from config", async () => {
+  it("delivers signal media through adapter", async () => {
     const sendSignal = vi.fn().mockResolvedValue({ messageId: "s1", timestamp: 123 });
     const cfg: ClosedClawConfig = { channels: { signal: { mediaMaxMb: 2 } } };
 
@@ -125,20 +168,18 @@ describe("deliverOutboundPayloads", () => {
       "hi",
       expect.objectContaining({
         mediaUrl: "https://x.test/a.jpg",
-        maxBytes: 2 * 1024 * 1024,
-        textMode: "plain",
-        textStyles: [],
+        verbose: false,
       }),
     );
     expect(results[0]).toMatchObject({ channel: "signal", messageId: "s1" });
   });
 
-  it("chunks Signal markdown using the format-first chunker", async () => {
+  it("chunks Signal text using the adapter chunker", async () => {
     const sendSignal = vi.fn().mockResolvedValue({ messageId: "s1", timestamp: 123 });
     const cfg: ClosedClawConfig = {
       channels: { signal: { textChunkLimit: 20 } },
     };
-    const text = `Intro\\n\\n\`\`\`\`md\\n${"y".repeat(60)}\\n\`\`\`\\n\\nOutro`;
+    const text = `Intro\\n\\n\x60\x60\x60\x60md\\n${"y".repeat(60)}\\n\x60\x60\x60\\n\\nOutro`;
     const expectedChunks = markdownToSignalTextChunks(text, 20);
 
     await deliverOutboundPayloads({
@@ -157,8 +198,7 @@ describe("deliverOutboundPayloads", () => {
         chunk.text,
         expect.objectContaining({
           accountId: undefined,
-          textMode: "plain",
-          textStyles: chunk.styles,
+          verbose: false,
         }),
       );
     });
@@ -262,14 +302,21 @@ describe("deliverOutboundPayloads", () => {
     expect(chunker).toHaveBeenNthCalledWith(1, text, 4000);
   });
 
-  it("uses iMessage media maxBytes from agent fallback", async () => {
-    const sendIMessage = vi.fn().mockResolvedValue({ messageId: "i1" });
+  it("delivers iMessage text through adapter", async () => {
+    const sendText = vi.fn().mockResolvedValue({ channel: "imessage", messageId: "i1" });
+    const sendMedia = vi.fn().mockResolvedValue({ channel: "imessage", messageId: "i2" });
     setActivePluginRegistry(
       createTestRegistry([
         {
           pluginId: "imessage",
           source: "test",
-          plugin: createIMessageTestPlugin(),
+          plugin: createIMessageTestPlugin({
+            outbound: {
+              deliveryMode: "direct",
+              sendText,
+              sendMedia,
+            },
+          }),
         },
       ]),
     );
@@ -277,19 +324,19 @@ describe("deliverOutboundPayloads", () => {
       agents: { defaults: { mediaMaxMb: 3 } },
     };
 
-    await deliverOutboundPayloads({
+    const results = await deliverOutboundPayloads({
       cfg,
       channel: "imessage",
       to: "chat_id:42",
       payloads: [{ text: "hello" }],
-      deps: { sendIMessage },
     });
 
-    expect(sendIMessage).toHaveBeenCalledWith(
-      "chat_id:42",
-      "hello",
-      expect.objectContaining({ maxBytes: 3 * 1024 * 1024 }),
+    expect(sendText).toHaveBeenCalledTimes(1);
+    expect(sendText).toHaveBeenCalledWith(
+      expect.objectContaining({ to: "chat_id:42", text: "hello" }),
     );
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({ channel: "imessage", messageId: "i1" });
   });
 
   it("normalizes payloads and drops empty entries", () => {
@@ -379,17 +426,32 @@ const emptyRegistry = createTestRegistry([]);
 const defaultRegistry = createTestRegistry([
   {
     pluginId: "telegram",
-    plugin: createOutboundTestPlugin({ id: "telegram", outbound: createChannelStubOutbound("telegram") }),
+    plugin: createOutboundTestPlugin({
+      id: "telegram",
+      outbound: createChannelStubOutbound("telegram", { chunker: chunkByLength }),
+    }),
     source: "test",
   },
   {
     pluginId: "signal",
-    plugin: createOutboundTestPlugin({ id: "signal", outbound: createChannelStubOutbound("signal") }),
+    plugin: createOutboundTestPlugin({
+      id: "signal",
+      outbound: createChannelStubOutbound("signal", {
+        chunker: (text, limit) => markdownToSignalTextChunks(text, limit).map((c) => c.text),
+        chunkerMode: "markdown",
+      }),
+    }),
     source: "test",
   },
   {
     pluginId: "whatsapp",
-    plugin: createOutboundTestPlugin({ id: "whatsapp", outbound: createChannelStubOutbound("whatsapp", { deliveryMode: "gateway" }) }),
+    plugin: createOutboundTestPlugin({
+      id: "whatsapp",
+      outbound: createChannelStubOutbound("whatsapp", {
+        deliveryMode: "gateway",
+        chunker: chunkByLength,
+      }),
+    }),
     source: "test",
   },
   {

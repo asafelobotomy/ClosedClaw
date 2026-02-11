@@ -20,7 +20,7 @@ describe("extractMessagingToolSend", () => {
 
     expect(result?.tool).toBe("message");
     expect(result?.provider).toBe("telegram");
-    expect(result?.to).toBe("telegram:123");
+    expect(result?.to).toBe("123");
   });
 
   it("prefers provider when both provider and channel are set", () => {

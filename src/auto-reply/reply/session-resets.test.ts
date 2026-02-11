@@ -124,7 +124,7 @@ describe("initSessionState reset triggers in WhatsApp groups", () => {
     const result = await initSessionState({
       ctx: groupMessageCtx,
       cfg,
-      commandAuthorized: true,
+      commandAuthorized: false,
     });
 
     expect(result.triggerBodyNormalized).toBe("/new");
@@ -246,7 +246,7 @@ describe("initSessionState reset triggers in WhatsApp groups", () => {
     const result = await initSessionState({
       ctx: groupMessageCtx,
       cfg,
-      commandAuthorized: true,
+      commandAuthorized: false,
     });
 
     expect(result.triggerBodyNormalized).toBe("/new");

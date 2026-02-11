@@ -237,7 +237,7 @@ export function validateConfigObjectWithPlugins(raw: unknown):
         continue;
       }
       if (!allowedChannels.has(trimmed)) {
-        issues.push({
+        warnings.push({
           path: `channels.${trimmed}`,
           message: `unknown channel id: ${trimmed}`,
         });

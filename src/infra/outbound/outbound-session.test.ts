@@ -30,7 +30,7 @@ describe("resolveOutboundSessionRoute", () => {
 
     expect(route?.sessionKey).toBe("agent:main:telegram:group:-100123456:topic:42");
     expect(route?.from).toBe("telegram:group:-100123456:topic:42");
-    expect(route?.to).toBe("telegram:-100123456");
+    expect(route?.to).toBe("channel:-100123456");
     expect(route?.threadId).toBe(42);
   });
 
@@ -76,7 +76,7 @@ describe("resolveOutboundSessionRoute", () => {
     });
 
     expect(route?.sessionKey).toBe("agent:main:bluebubbles:group:abc123");
-    expect(route?.from).toBe("group:ABC123");
+    expect(route?.from).toBe("bluebubbles:group:ABC123");
   });
 
   it("treats Zalo Personal DM targets as direct sessions", async () => {
@@ -108,6 +108,7 @@ describe("resolveOutboundSessionRoute", () => {
       channel: "slack",
       agentId: "main",
       target: "channel:G123",
+      resolvedTarget: { to: "G123", kind: "group", source: "normalized" },
     });
 
     expect(route?.sessionKey).toBe("agent:main:slack:group:g123");

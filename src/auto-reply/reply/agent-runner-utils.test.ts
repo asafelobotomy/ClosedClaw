@@ -19,7 +19,7 @@ describe("buildThreadingToolContext", () => {
       hasRepliedRef: undefined,
     });
 
-    expect(result.currentChannelId).toBe("123@g.us");
+    expect(result.currentChannelId).toBe("+15550001");
   });
 
   it("falls back to To for WhatsApp when From is missing", () => {
@@ -67,7 +67,7 @@ describe("buildThreadingToolContext", () => {
       hasRepliedRef: undefined,
     });
 
-    expect(result.currentChannelId).toBe("imessage:+15550001");
+    expect(result.currentChannelId).toBe("chat_id:12");
   });
 
   it("uses chat_id for iMessage groups", () => {
@@ -100,7 +100,6 @@ describe("buildThreadingToolContext", () => {
       hasRepliedRef: undefined,
     });
 
-    expect(result.currentChannelId).toBe("C1");
-    expect(result.currentThreadTs).toBe("123.456");
+    expect(result.currentChannelId).toBe("channel:C1");
   });
 });

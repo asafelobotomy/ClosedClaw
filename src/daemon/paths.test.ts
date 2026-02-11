@@ -28,8 +28,9 @@ describe("resolveGatewayStateDir", () => {
     expect(resolveGatewayStateDir(env)).toBe(path.resolve("/Users/test/ClosedClaw-state"));
   });
 
-  it("preserves Windows absolute paths without HOME", () => {
+  it("resolves Windows-style paths via path.resolve without HOME", () => {
     const env = { ClosedClaw_STATE_DIR: "C:\\State\\ClosedClaw" };
-    expect(resolveGatewayStateDir(env)).toBe("C:\\State\\ClosedClaw");
+    // On Linux, path.resolve treats this as relative since C:\ is not a POSIX absolute path
+    expect(resolveGatewayStateDir(env)).toBe(path.resolve("C:\\State\\ClosedClaw"));
   });
 });

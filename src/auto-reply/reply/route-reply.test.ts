@@ -184,7 +184,7 @@ describe("routeReply", () => {
   });
 
   it("applies responsePrefix when routing", async () => {
-    mocks.sendMessageSlack.mockClear();
+    mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m1" }]);
     const cfg = {
       messages: { responsePrefix: "[ClosedClaw]" },
     } as unknown as ClosedClawConfig;
@@ -194,15 +194,17 @@ describe("routeReply", () => {
       to: "channel:C123",
       cfg,
     });
-    expect(mocks.sendMessageSlack).toHaveBeenCalledWith(
-      "channel:C123",
-      "[ClosedClaw] hi",
-      expect.any(Object),
+    expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channel: "slack",
+        to: "channel:C123",
+        payloads: [expect.objectContaining({ text: "[ClosedClaw] hi" })],
+      }),
     );
   });
 
   it("does not derive responsePrefix from agent identity when routing", async () => {
-    mocks.sendMessageSlack.mockClear();
+    mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m1" }]);
     const cfg = {
       agents: {
         list: [
@@ -221,11 +223,17 @@ describe("routeReply", () => {
       sessionKey: "agent:rich:main",
       cfg,
     });
-    expect(mocks.sendMessageSlack).toHaveBeenCalledWith("channel:C123", "hi", expect.any(Object));
+    expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channel: "slack",
+        to: "channel:C123",
+        payloads: [expect.objectContaining({ text: "hi" })],
+      }),
+    );
   });
 
   it("uses threadId for Slack when replyToId is missing", async () => {
-    mocks.sendMessageSlack.mockClear();
+    mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m1" }]);
     await routeReply({
       payload: { text: "hi" },
       channel: "slack",
@@ -233,15 +241,18 @@ describe("routeReply", () => {
       threadId: "456.789",
       cfg: {} as never,
     });
-    expect(mocks.sendMessageSlack).toHaveBeenCalledWith(
-      "channel:C123",
-      "hi",
-      expect.objectContaining({ threadTs: "456.789" }),
+    expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channel: "slack",
+        to: "channel:C123",
+        replyToId: "456.789",
+        threadId: null,
+      }),
     );
   });
 
   it("passes thread id to Telegram sends", async () => {
-    mocks.sendMessageTelegram.mockClear();
+    mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m1" }]);
     await routeReply({
       payload: { text: "hi" },
       channel: "telegram",
@@ -249,45 +260,51 @@ describe("routeReply", () => {
       threadId: 42,
       cfg: {} as never,
     });
-    expect(mocks.sendMessageTelegram).toHaveBeenCalledWith(
-      "telegram:123",
-      "hi",
-      expect.objectContaining({ messageThreadId: 42 }),
+    expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channel: "telegram",
+        to: "telegram:123",
+        threadId: 42,
+      }),
     );
   });
 
   it("passes replyToId to Telegram sends", async () => {
-    mocks.sendMessageTelegram.mockClear();
+    mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m1" }]);
     await routeReply({
       payload: { text: "hi", replyToId: "123" },
       channel: "telegram",
       to: "telegram:123",
       cfg: {} as never,
     });
-    expect(mocks.sendMessageTelegram).toHaveBeenCalledWith(
-      "telegram:123",
-      "hi",
-      expect.objectContaining({ replyToMessageId: 123 }),
+    expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channel: "telegram",
+        to: "telegram:123",
+        replyToId: "123",
+      }),
     );
   });
 
   it("uses replyToId as threadTs for Slack", async () => {
-    mocks.sendMessageSlack.mockClear();
+    mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m1" }]);
     await routeReply({
       payload: { text: "hi", replyToId: "1710000000.0001" },
       channel: "slack",
       to: "channel:C123",
       cfg: {} as never,
     });
-    expect(mocks.sendMessageSlack).toHaveBeenCalledWith(
-      "channel:C123",
-      "hi",
-      expect.objectContaining({ threadTs: "1710000000.0001" }),
+    expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channel: "slack",
+        to: "channel:C123",
+        replyToId: "1710000000.0001",
+      }),
     );
   });
 
   it("uses threadId as threadTs for Slack when replyToId is missing", async () => {
-    mocks.sendMessageSlack.mockClear();
+    mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m1" }]);
     await routeReply({
       payload: { text: "hi" },
       channel: "slack",
@@ -295,38 +312,39 @@ describe("routeReply", () => {
       threadId: "1710000000.9999",
       cfg: {} as never,
     });
-    expect(mocks.sendMessageSlack).toHaveBeenCalledWith(
-      "channel:C123",
-      "hi",
-      expect.objectContaining({ threadTs: "1710000000.9999" }),
+    expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channel: "slack",
+        to: "channel:C123",
+        replyToId: "1710000000.9999",
+      }),
     );
   });
 
   it("sends multiple mediaUrls (caption only on first)", async () => {
-    mocks.sendMessageSlack.mockClear();
+    mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m1" }]);
     await routeReply({
       payload: { text: "caption", mediaUrls: ["a", "b"] },
       channel: "slack",
       to: "channel:C123",
       cfg: {} as never,
     });
-    expect(mocks.sendMessageSlack).toHaveBeenCalledTimes(2);
-    expect(mocks.sendMessageSlack).toHaveBeenNthCalledWith(
-      1,
-      "channel:C123",
-      "caption",
-      expect.objectContaining({ mediaUrl: "a" }),
-    );
-    expect(mocks.sendMessageSlack).toHaveBeenNthCalledWith(
-      2,
-      "channel:C123",
-      "",
-      expect.objectContaining({ mediaUrl: "b" }),
+    expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channel: "slack",
+        to: "channel:C123",
+        payloads: [
+          expect.objectContaining({
+            text: "caption",
+            mediaUrls: ["a", "b"],
+          }),
+        ],
+      }),
     );
   });
 
   it("routes WhatsApp via outbound sender (accountId honored)", async () => {
-    mocks.sendMessageWhatsApp.mockClear();
+    mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m1" }]);
     await routeReply({
       payload: { text: "hi" },
       channel: "whatsapp",
@@ -334,10 +352,13 @@ describe("routeReply", () => {
       accountId: "acc-1",
       cfg: {} as never,
     });
-    expect(mocks.sendMessageWhatsApp).toHaveBeenCalledWith(
-      "+15551234567",
-      "hi",
-      expect.objectContaining({ accountId: "acc-1", verbose: false }),
+    expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channel: "whatsapp",
+        to: "+15551234567",
+        accountId: "acc-1",
+        payloads: [expect.objectContaining({ text: "hi" })],
+      }),
     );
   });
 

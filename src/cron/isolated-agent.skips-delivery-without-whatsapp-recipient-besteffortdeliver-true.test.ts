@@ -23,9 +23,17 @@ vi.mock("../agents/pi-embedded.js", () => ({
 vi.mock("../agents/model-catalog.js", () => ({
   loadModelCatalog: vi.fn(),
 }));
+vi.mock("../infra/outbound/deliver.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../infra/outbound/deliver.js")>();
+  return {
+    ...actual,
+    deliverOutboundPayloads: vi.fn().mockResolvedValue([{ messageId: "mock-1" }]),
+  };
+});
 
 import { loadModelCatalog } from "../agents/model-catalog.js";
 import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
+import { deliverOutboundPayloads } from "../infra/outbound/deliver.js";
 import { runCronIsolatedAgentTurn } from "./isolated-agent.js";
 
 async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise<T> {
@@ -92,6 +100,7 @@ describe("runCronIsolatedAgentTurn", () => {
   beforeEach(() => {
     vi.mocked(runEmbeddedPiAgent).mockReset();
     vi.mocked(loadModelCatalog).mockResolvedValue([]);
+    vi.mocked(deliverOutboundPayloads).mockReset().mockResolvedValue([{ messageId: "mock-1" }]);
     const runtime = createPluginRuntime();
     setDiscordRuntime(runtime);
     setTelegramRuntime(runtime);
@@ -108,13 +117,7 @@ describe("runCronIsolatedAgentTurn", () => {
   it("skips delivery without a WhatsApp recipient when bestEffortDeliver=true", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn(),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
         payloads: [{ text: "hello" }],
         meta: {
@@ -140,23 +143,14 @@ describe("runCronIsolatedAgentTurn", () => {
 
       expect(res.status).toBe("skipped");
       expect(String(res.summary ?? "")).toMatch(/delivery skipped/i);
-      expect(deps.sendMessageWhatsApp).not.toHaveBeenCalled();
+      expect(deliverOutboundPayloads).not.toHaveBeenCalled();
     });
   });
 
   it("delivers telegram via channel send", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn().mockResolvedValue({
-          messageId: "t1",
-          chatId: "123",
-        }),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
         payloads: [{ text: "hello from cron" }],
         meta: {
@@ -186,10 +180,12 @@ describe("runCronIsolatedAgentTurn", () => {
         });
 
         expect(res.status).toBe("ok");
-        expect(deps.sendMessageTelegram).toHaveBeenCalledWith(
-          "123",
-          "hello from cron",
-          expect.objectContaining({ verbose: false }),
+        expect(deliverOutboundPayloads).toHaveBeenCalledWith(
+          expect.objectContaining({
+            channel: "telegram",
+            to: "123",
+            payloads: [{ text: "hello from cron" }],
+          }),
         );
       } finally {
         if (prevTelegramToken === undefined) {
@@ -204,16 +200,7 @@ describe("runCronIsolatedAgentTurn", () => {
   it("auto-delivers when explicit target is set without deliver flag", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn().mockResolvedValue({
-          messageId: "t1",
-          chatId: "123",
-        }),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
         payloads: [{ text: "hello from cron" }],
         meta: {
@@ -242,10 +229,12 @@ describe("runCronIsolatedAgentTurn", () => {
         });
 
         expect(res.status).toBe("ok");
-        expect(deps.sendMessageTelegram).toHaveBeenCalledWith(
-          "123",
-          "hello from cron",
-          expect.objectContaining({ verbose: false }),
+        expect(deliverOutboundPayloads).toHaveBeenCalledWith(
+          expect.objectContaining({
+            channel: "telegram",
+            to: "123",
+            payloads: [{ text: "hello from cron" }],
+          }),
         );
       } finally {
         if (prevTelegramToken === undefined) {
@@ -260,16 +249,7 @@ describe("runCronIsolatedAgentTurn", () => {
   it("skips auto-delivery when messaging tool already sent to the target", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn().mockResolvedValue({
-          messageId: "t1",
-          chatId: "123",
-        }),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
         payloads: [{ text: "sent" }],
         meta: {
@@ -300,7 +280,7 @@ describe("runCronIsolatedAgentTurn", () => {
         });
 
         expect(res.status).toBe("ok");
-        expect(deps.sendMessageTelegram).not.toHaveBeenCalled();
+        expect(deliverOutboundPayloads).not.toHaveBeenCalled();
       } finally {
         if (prevTelegramToken === undefined) {
           delete process.env.TELEGRAM_BOT_TOKEN;
@@ -314,16 +294,7 @@ describe("runCronIsolatedAgentTurn", () => {
   it("delivers telegram topic targets via channel send", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn().mockResolvedValue({
-          messageId: "t1",
-          chatId: "-1001234567890",
-        }),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
         payloads: [{ text: "hello from cron" }],
         meta: {
@@ -348,10 +319,12 @@ describe("runCronIsolatedAgentTurn", () => {
       });
 
       expect(res.status).toBe("ok");
-      expect(deps.sendMessageTelegram).toHaveBeenCalledWith(
-        "telegram:group:-1001234567890:topic:321",
-        "hello from cron",
-        expect.objectContaining({ verbose: false }),
+      expect(deliverOutboundPayloads).toHaveBeenCalledWith(
+        expect.objectContaining({
+          channel: "telegram",
+          to: "telegram:group:-1001234567890:topic:321",
+          payloads: [{ text: "hello from cron" }],
+        }),
       );
     });
   });
@@ -359,16 +332,7 @@ describe("runCronIsolatedAgentTurn", () => {
   it("delivers telegram shorthand topic suffixes via channel send", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn().mockResolvedValue({
-          messageId: "t1",
-          chatId: "-1001234567890",
-        }),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
         payloads: [{ text: "hello from cron" }],
         meta: {
@@ -393,10 +357,12 @@ describe("runCronIsolatedAgentTurn", () => {
       });
 
       expect(res.status).toBe("ok");
-      expect(deps.sendMessageTelegram).toHaveBeenCalledWith(
-        "-1001234567890:321",
-        "hello from cron",
-        expect.objectContaining({ verbose: false }),
+      expect(deliverOutboundPayloads).toHaveBeenCalledWith(
+        expect.objectContaining({
+          channel: "telegram",
+          to: "-1001234567890:321",
+          payloads: [{ text: "hello from cron" }],
+        }),
       );
     });
   });
@@ -404,16 +370,7 @@ describe("runCronIsolatedAgentTurn", () => {
   it("delivers via discord when configured", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn(),
-        sendMessageDiscord: vi.fn().mockResolvedValue({
-          messageId: "d1",
-          channelId: "chan",
-        }),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
         payloads: [{ text: "hello from cron" }],
         meta: {
@@ -438,10 +395,12 @@ describe("runCronIsolatedAgentTurn", () => {
       });
 
       expect(res.status).toBe("ok");
-      expect(deps.sendMessageDiscord).toHaveBeenCalledWith(
-        "channel:1122",
-        "hello from cron",
-        expect.objectContaining({ verbose: false }),
+      expect(deliverOutboundPayloads).toHaveBeenCalledWith(
+        expect.objectContaining({
+          channel: "discord",
+          to: "channel:1122",
+          payloads: [{ text: "hello from cron" }],
+        }),
       );
     });
   });
@@ -449,16 +408,7 @@ describe("runCronIsolatedAgentTurn", () => {
   it("skips delivery when response is exactly HEARTBEAT_OK", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn().mockResolvedValue({
-          messageId: "t1",
-          chatId: "123",
-        }),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
         payloads: [{ text: "HEARTBEAT_OK" }],
         meta: {
@@ -485,23 +435,14 @@ describe("runCronIsolatedAgentTurn", () => {
       // Job still succeeds, but no delivery happens.
       expect(res.status).toBe("ok");
       expect(res.summary).toBe("HEARTBEAT_OK");
-      expect(deps.sendMessageTelegram).not.toHaveBeenCalled();
+      expect(deliverOutboundPayloads).not.toHaveBeenCalled();
     });
   });
 
   it("skips delivery when response has HEARTBEAT_OK with short padding", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn().mockResolvedValue({
-          messageId: "w1",
-          chatId: "+1234",
-        }),
-        sendMessageTelegram: vi.fn(),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       // Short junk around HEARTBEAT_OK (<=30 chars) should still skip delivery.
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
         payloads: [{ text: "HEARTBEAT_OK 🦞" }],
@@ -529,23 +470,14 @@ describe("runCronIsolatedAgentTurn", () => {
       });
 
       expect(res.status).toBe("ok");
-      expect(deps.sendMessageWhatsApp).not.toHaveBeenCalled();
+      expect(deliverOutboundPayloads).not.toHaveBeenCalled();
     });
   });
 
   it("delivers when response has HEARTBEAT_OK but also substantial content", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
-      const deps: CliDeps = {
-        sendMessageWhatsApp: vi.fn(),
-        sendMessageTelegram: vi.fn().mockResolvedValue({
-          messageId: "t1",
-          chatId: "123",
-        }),
-        sendMessageDiscord: vi.fn(),
-        sendMessageSignal: vi.fn(),
-        sendMessageIMessage: vi.fn(),
-      };
+      const deps = {} as CliDeps;
       // Long content after HEARTBEAT_OK should still be delivered.
       const longContent = `Important alert: ${"a".repeat(500)}`;
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
@@ -572,7 +504,12 @@ describe("runCronIsolatedAgentTurn", () => {
       });
 
       expect(res.status).toBe("ok");
-      expect(deps.sendMessageTelegram).toHaveBeenCalled();
+      expect(deliverOutboundPayloads).toHaveBeenCalledWith(
+        expect.objectContaining({
+          channel: "telegram",
+          to: "123",
+        }),
+      );
     });
   });
 });

@@ -7,7 +7,16 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { classifyCommit, GitService, type GitCommit } from "./upstream.git.js";
+import { classifyCommit, type GitCommit } from "./upstream.git.js";
+
+// Hoisted mock for node:child_process so promisify(execFile) picks it up
+const { execFileMock } = vi.hoisted(() => ({
+  execFileMock: vi.fn(),
+}));
+vi.mock("node:child_process", () => ({
+  execFile: execFileMock,
+  spawn: vi.fn(),
+}));
 
 // ─── classifyCommit ──────────────────────────────────────────────────────────
 
@@ -104,18 +113,13 @@ describe("classifyCommit", () => {
 // ─── GitService ──────────────────────────────────────────────────────────────
 
 describe("GitService", () => {
-  let execFileMock: ReturnType<typeof vi.fn>;
-  let git: GitService;
+  let git: InstanceType<typeof import("./upstream.git.js").GitService>;
 
   beforeEach(async () => {
-    // Mock child_process.execFile
-    execFileMock = vi.fn();
-    vi.doMock("node:child_process", () => ({
-      execFile: execFileMock,
-      spawn: vi.fn(),
-    }));
+    // Reset mock between tests
+    execFileMock.mockReset();
 
-    // Re-import to get mocked version
+    // Import with mocked child_process already in place
     const mod = await import("./upstream.git.js");
     git = new mod.GitService("/test/repo");
   });

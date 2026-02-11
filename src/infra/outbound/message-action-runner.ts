@@ -703,7 +703,22 @@ async function handleSendAction(ctx: ResolvedActionContext): Promise<MessageActi
 
   const replyToId = readStringParam(params, "replyTo");
   const threadId = readStringParam(params, "threadId");
-  const slackAutoThreadId: string | undefined = undefined;
+  const autoThreadId: string | undefined = (() => {
+    const ctx = input.toolContext;
+    if (!ctx?.currentThreadTs) return undefined;
+    if (ctx.replyToMode === "none") return undefined;
+    const currentId = (ctx.currentChannelId ?? "").trim().toLowerCase();
+    if (!currentId) return undefined;
+    const targetNorm = to
+      .trim()
+      .toLowerCase()
+      .replace(/^(channel:|group:|#)/i, "");
+    const currentNorm = currentId.replace(/^(channel:|group:|#)/i, "");
+    if (targetNorm === currentNorm) {
+      return ctx.currentThreadTs;
+    }
+    return undefined;
+  })();
   const outboundRoute =
     agentId && !dryRun
       ? await resolveOutboundSessionRoute({
@@ -714,7 +729,7 @@ async function handleSendAction(ctx: ResolvedActionContext): Promise<MessageActi
           target: to,
           resolvedTarget,
           replyToId,
-          threadId: threadId ?? slackAutoThreadId,
+          threadId: threadId ?? autoThreadId,
         })
       : null;
   if (outboundRoute && agentId && !dryRun) {

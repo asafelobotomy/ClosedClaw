@@ -2,6 +2,16 @@
  * Test shim — the iMessage channel extension was archived.
  */
 import type { ChannelPlugin } from "../../../src/channels/plugins/types.js";
+import {
+  applyAccountNameToChannelSection,
+  migrateBaseNameToDefaultAccount,
+} from "../../../src/channels/plugins/setup-helpers.js";
+import {
+  deleteAccountFromConfigSection,
+  setAccountEnabledInConfigSection,
+} from "../../../src/channels/plugins/config-helpers.js";
+
+const DEFAULT_ACCOUNT_ID = "default";
 
 export const imessagePlugin: ChannelPlugin = {
   id: "imessage",
@@ -28,6 +38,56 @@ export const imessagePlugin: ChannelPlugin = {
       return accounts?.[accountId] ?? entry;
     },
     isConfigured: async (_account: unknown, cfg: any) => Boolean(cfg?.channels?.imessage),
+    setAccountEnabled: ({ cfg, accountId, enabled }: any) =>
+      setAccountEnabledInConfigSection({ cfg, sectionKey: "imessage", accountId, enabled, allowTopLevel: true }),
+    deleteAccount: ({ cfg, accountId }: any) =>
+      deleteAccountFromConfigSection({ cfg, sectionKey: "imessage", accountId, clearBaseFields: ["cliPath", "dbPath", "name"] }),
+  },
+  setup: {
+    applyAccountConfig: ({ cfg, accountId, input }: any) => {
+      const namedConfig = applyAccountNameToChannelSection({ cfg, channelKey: "imessage", accountId, name: input.name });
+      const next =
+        accountId !== DEFAULT_ACCOUNT_ID
+          ? migrateBaseNameToDefaultAccount({ cfg: namedConfig, channelKey: "imessage" })
+          : namedConfig;
+      if (accountId === DEFAULT_ACCOUNT_ID) {
+        return {
+          ...next,
+          channels: {
+            ...next.channels,
+            imessage: {
+              ...next.channels?.imessage,
+              enabled: true,
+              ...(input.cliPath ? { cliPath: input.cliPath } : {}),
+              ...(input.dbPath ? { dbPath: input.dbPath } : {}),
+              ...(input.service ? { service: input.service } : {}),
+              ...(input.region ? { region: input.region } : {}),
+            },
+          },
+        };
+      }
+      return {
+        ...next,
+        channels: {
+          ...next.channels,
+          imessage: {
+            ...next.channels?.imessage,
+            enabled: true,
+            accounts: {
+              ...next.channels?.imessage?.accounts,
+              [accountId]: {
+                ...next.channels?.imessage?.accounts?.[accountId],
+                enabled: true,
+                ...(input.cliPath ? { cliPath: input.cliPath } : {}),
+                ...(input.dbPath ? { dbPath: input.dbPath } : {}),
+                ...(input.service ? { service: input.service } : {}),
+                ...(input.region ? { region: input.region } : {}),
+              },
+            },
+          },
+        },
+      };
+    },
   },
   outbound: {
     deliveryMode: "direct",

@@ -42,7 +42,7 @@ describe("path resolution", () => {
 
 describe("upstream tracking state", () => {
   let tmpDir: string;
-  let _trackingFile: string;
+  let trackingFile: string;
 
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "closedclaw-test-"));
@@ -87,7 +87,7 @@ describe("upstream tracking state", () => {
 
 describe("tracking save/load round-trip", () => {
   let tmpDir: string;
-  let _originalHomedir: string;
+  let originalHomedir: string;
 
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "closedclaw-test-"));

@@ -38,7 +38,11 @@ describe("noteSecurityWarnings gateway exposure", () => {
     }
   });
 
-  const lastMessage = () => String(note.mock.calls.at(-1)?.[0] ?? "");
+  const lastMessage = () => {
+    // The function emits two note() calls: "Security" then "Encryption".
+    // Look through all calls for the relevant one.
+    return note.mock.calls.map((c: unknown[]) => String(c[0] ?? "")).join("\n");
+  };
 
   it("warns when exposed without auth", async () => {
     const cfg = { gateway: { bind: "lan" } } as ClosedClawConfig;

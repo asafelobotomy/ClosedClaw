@@ -244,14 +244,6 @@ describe("audit query commands", () => {
         details: {},
       });
 
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
-      });
-
       await auditQueryCommand(runtime, { reverse: true, json: true });
 
       const output = logOutput.join("\n");
@@ -275,14 +267,6 @@ describe("audit query commands", () => {
         severity: "warn",
         summary: "Config 1",
         details: {},
-      });
-
-      vi.mock("../security/audit-logger.js", async (importOriginal) => {
-        const actual = await importOriginal<typeof import("../security/audit-logger.js")>();
-        return {
-          ...actual,
-          getAuditLogPath: () => auditLogger.getLogPath(),
-        };
       });
 
       await auditStatsCommand(runtime, {});
@@ -339,7 +323,7 @@ describe("audit query commands", () => {
       await auditExportCommand(runtime, { output: exportPath, format: "csv" });
 
       const content = await fs.readFile(exportPath, "utf-8");
-      expect(content).toMatch(/seq,ts,type,severity,summary/);
+      expect(content).toMatch(/seq,timestamp,type,severity,summary/);
       expect(content).toMatch(/tool_exec/);
       expect(content).toMatch(/Test event/);
     });
@@ -439,7 +423,15 @@ describe("audit query commands", () => {
       const tampered = logContent.replace("Test", "Tampered");
       await fs.writeFile(auditLogger.getLogPath(), tampered, "utf-8");
 
-      await expect(auditVerifyCommand(runtime, {})).rejects.toThrow();
+      // auditVerifyCommand calls process.exit(1) on tampered logs
+      const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
+        throw new Error("process.exit");
+      });
+      try {
+        await expect(auditVerifyCommand(runtime, {})).rejects.toThrow();
+      } finally {
+        exitSpy.mockRestore();
+      }
     });
   });
 });

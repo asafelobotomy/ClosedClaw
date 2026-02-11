@@ -22,8 +22,10 @@ import {
 import { AuditLogger, getAuditLogPath, readAuditLog } from "../security/audit-logger.js";
 
 // Mock resolveStateDir at module level
-const mockResolveStateDir = vi.fn();
-const mockResolveConfigPath = vi.fn();
+const { mockResolveStateDir, mockResolveConfigPath } = vi.hoisted(() => ({
+  mockResolveStateDir: vi.fn(),
+  mockResolveConfigPath: vi.fn(),
+}));
 vi.mock("../config/paths.js", () => ({
   resolveStateDir: mockResolveStateDir,
   resolveConfigPath: mockResolveConfigPath,

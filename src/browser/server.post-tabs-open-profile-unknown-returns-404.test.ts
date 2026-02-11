@@ -93,9 +93,9 @@ vi.mock("../config/config.js", async (importOriginal) => {
         color: "#FF4500",
         attachOnly: cfgAttachOnly,
         headless: true,
-        defaultProfile: "ClosedClaw",
+        defaultProfile: "closedclaw",
         profiles: {
-          ClosedClaw: { cdpPort: testPort + 1, color: "#FF4500" },
+          closedclaw: { cdpPort: testPort + 1, color: "#FF4500" },
         },
       },
     }),
@@ -369,11 +369,11 @@ describe("profile CRUD endpoints", () => {
     await startBrowserControlServerFromConfig();
     const base = `http://127.0.0.1:${testPort}`;
 
-    // "ClosedClaw" already exists as the default profile
+    // "closedclaw" already exists as the default profile
     const result = await realFetch(`${base}/profiles/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "ClosedClaw" }),
+      body: JSON.stringify({ name: "closedclaw" }),
     });
     expect(result.status).toBe(409);
     const body = (await result.json()) as { error: string };
@@ -434,13 +434,13 @@ describe("profile CRUD endpoints", () => {
     await startBrowserControlServerFromConfig();
     const base = `http://127.0.0.1:${testPort}`;
 
-    // ClosedClaw is the default profile
-    const result = await realFetch(`${base}/profiles/ClosedClaw`, {
+    // closedclaw is the default profile
+    const result = await realFetch(`${base}/profiles/closedclaw`, {
       method: "DELETE",
     });
     expect(result.status).toBe(400);
     const body = (await result.json()) as { error: string };
-    expect(body.error).toContain("cannot delete the default profile");
+    expect(body.error).toContain("default profile");
   });
 
   it("DELETE /profiles/:name returns 400 for invalid name format", async () => {

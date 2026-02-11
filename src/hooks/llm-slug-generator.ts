@@ -1,9 +1,9 @@
 /**
-import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
  * LLM-based slug generator for session memory filenames
  */
 
 import fs from "node:fs/promises";
+import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import os from "node:os";
 import path from "node:path";
 import type { ClosedClawConfig } from "../config/config.js";

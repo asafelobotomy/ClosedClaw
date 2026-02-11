@@ -5,15 +5,14 @@ import { describe, expect, it } from "vitest";
 import { getChannelPluginCatalogEntry, listChannelPluginCatalogEntries } from "./catalog.js";
 
 describe("channel plugin catalog", () => {
-  it("includes Microsoft Teams", () => {
+  it("msteams is no longer in the default catalog (archived)", () => {
     const entry = getChannelPluginCatalogEntry("msteams");
-    expect(entry?.install.npmSpec).toBe("@ClosedClaw/msteams");
-    expect(entry?.meta.aliases).toContain("teams");
+    expect(entry).toBeUndefined();
   });
 
-  it("lists plugin catalog entries", () => {
+  it("lists plugin catalog entries without archived channels", () => {
     const ids = listChannelPluginCatalogEntries().map((entry) => entry.id);
-    expect(ids).toContain("msteams");
+    expect(ids).not.toContain("msteams");
   });
 
   it("includes external catalog entries", () => {

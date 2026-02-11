@@ -31,7 +31,7 @@ describe("channel plugin registry", () => {
     setActivePluginRegistry(emptyRegistry);
   });
 
-  it("sorts channel plugins by configured order", () => {
+  it("sorts channel plugins alphabetically when no explicit order is set", () => {
     const registry = createTestRegistry(
       ["slack", "telegram", "signal"].map((id) => ({
         pluginId: id,
@@ -41,6 +41,7 @@ describe("channel plugin registry", () => {
     );
     setActivePluginRegistry(registry);
     const pluginIds = listChannelPlugins().map((plugin) => plugin.id);
-    expect(pluginIds).toEqual(["telegram", "slack", "signal"]);
+    // Channels not in CHAT_CHANNEL_ORDER (which is now only gtk-gui) sort alphabetically by label.
+    expect(pluginIds).toEqual(["signal", "slack", "telegram"]);
   });
 });

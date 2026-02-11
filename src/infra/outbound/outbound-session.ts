@@ -88,7 +88,13 @@ function buildBaseSessionKey(params: {
 }
 
 // All channel-specific session resolvers removed (third-party channels archived).
-// Every channel now uses the generic fallback resolver.
+// Every channel now uses the generic fallback resolver which handles common
+// target patterns: kind prefixes (channel:/group:/user:), Telegram-style
+// topic syntax (-digits:topic:N), and chat_guid/chat_id prefixes.
+
+const TOPIC_RE = /^(-?\d+):topic:(\d+)$/i;
+const CHAT_PREFIX_RE = /^chat_(guid|id|identifier):/i;
+const KIND_PREFIX_RE = /^(channel|group|user|dm):/i;
 
 function resolveFallbackSession(
   params: ResolveOutboundSessionRouteParams,
@@ -97,14 +103,60 @@ function resolveFallbackSession(
   if (!trimmed) {
     return null;
   }
-  const peerKind = inferPeerKind({
-    channel: params.channel,
-    resolvedTarget: params.resolvedTarget,
-  });
-  const peerId = stripKindPrefix(trimmed);
-  if (!peerId) {
+
+  let targetBody = trimmed;
+  let parsedKind: RoutePeerKind | undefined;
+  let parsedTopicId: number | undefined;
+
+  // Detect kind prefix: "channel:X", "group:X", "user:X", "dm:X"
+  const kindMatch = KIND_PREFIX_RE.exec(targetBody);
+  if (kindMatch) {
+    const prefix = kindMatch[1]!.toLowerCase();
+    parsedKind = prefix === "channel" ? "channel" : prefix === "group" ? "group" : "dm";
+    targetBody = targetBody.slice(kindMatch[0].length);
+  }
+
+  // Detect chat_guid/chat_id/chat_identifier prefix (e.g. BlueBubbles) → group
+  const chatPrefixMatch = CHAT_PREFIX_RE.exec(targetBody);
+  if (chatPrefixMatch) {
+    parsedKind = "group";
+    targetBody = targetBody.slice(chatPrefixMatch[0].length);
+  }
+
+  // Detect Telegram-style topic: "-digits:topic:N"
+  const topicMatch = TOPIC_RE.exec(targetBody);
+  if (topicMatch) {
+    targetBody = topicMatch[1]!;
+    parsedTopicId = Number(topicMatch[2]);
+    if (!parsedKind) {
+      parsedKind = "group";
+    }
+  }
+
+  if (!targetBody) {
     return null;
   }
+
+  // Determine peer kind: resolvedTarget takes priority over parsed prefix
+  const resolvedKind = params.resolvedTarget?.kind;
+  let peerKind: RoutePeerKind;
+  if (resolvedKind === "user") {
+    peerKind = "dm";
+  } else if (resolvedKind === "channel") {
+    peerKind = "channel";
+  } else if (resolvedKind === "group") {
+    const plugin = getChannelPlugin(params.channel);
+    const chatTypes = plugin?.capabilities?.chatTypes ?? [];
+    const supportsChannel = chatTypes.includes("channel");
+    const supportsGroup = chatTypes.includes("group");
+    peerKind = supportsChannel && !supportsGroup ? "channel" : "group";
+  } else if (parsedKind) {
+    peerKind = parsedKind;
+  } else {
+    peerKind = "dm";
+  }
+
+  const peerId = targetBody;
   const peer: RoutePeer = { kind: peerKind, id: peerId };
   const baseSessionKey = buildBaseSessionKey({
     cfg: params.cfg,
@@ -112,17 +164,43 @@ function resolveFallbackSession(
     channel: params.channel,
     peer,
   });
+
+  // Thread handling: topic from target, or explicit threadId/replyToId
+  let sessionKey: string;
+  const effectiveThreadId: string | number | undefined =
+    parsedTopicId ?? params.threadId ?? params.replyToId ?? undefined;
+
+  if (parsedTopicId != null) {
+    // Use :topic: suffix for Telegram-style topics
+    sessionKey = `${baseSessionKey}:topic:${parsedTopicId}`;
+  } else {
+    const resolved = resolveThreadSessionKeys({
+      baseSessionKey,
+      threadId: effectiveThreadId != null ? String(effectiveThreadId) : undefined,
+    });
+    sessionKey = resolved.sessionKey;
+  }
+
   const chatType = peerKind === "dm" ? "direct" : peerKind === "channel" ? "channel" : "group";
-  const from =
-    peerKind === "dm" ? `${params.channel}:${peerId}` : `${params.channel}:${peerKind}:${peerId}`;
+
+  let from: string;
+  if (peerKind === "dm") {
+    from = `${params.channel}:${peerId}`;
+  } else if (parsedTopicId != null) {
+    from = `${params.channel}:${peerKind}:${peerId}:topic:${parsedTopicId}`;
+  } else {
+    from = `${params.channel}:${peerKind}:${peerId}`;
+  }
+
   const toPrefix = peerKind === "dm" ? "user" : "channel";
   return {
-    sessionKey: baseSessionKey,
+    sessionKey,
     baseSessionKey,
     peer,
     chatType,
     from,
     to: `${toPrefix}:${peerId}`,
+    threadId: effectiveThreadId,
   };
 }
 
