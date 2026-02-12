@@ -17,7 +17,8 @@ import { resolveUserPath } from "../../../utils.js";
 import { normalizeMessageChannel } from "../../../utils/message-channel.js";
 import { isReasoningTagProvider } from "../../../utils/provider-utils.js";
 import { resolveClosedClawAgentDir } from "../../agent-paths.js";
-import { resolveSessionAgentIds } from "../../agent-scope.js";
+import { resolveAgentConfig, resolveSessionAgentIds } from "../../agent-scope.js";
+import { filterToolsByTier } from "../../tool-tiers.js";
 import { createAnthropicPayloadLogger } from "../../anthropic-payload-log.js";
 import { makeBootstrapWarn, resolveBootstrapContextForRun } from "../../bootstrap-files.js";
 import { createCacheTrace } from "../../cache-trace.js";
@@ -200,6 +201,37 @@ export async function runEmbeddedAttempt(
 
     const agentDir = params.agentDir ?? resolveClosedClawAgentDir();
 
+    // Run before_agent_start hooks early to get tool/model overrides before tool assembly.
+    const hookRunner = getGlobalHookRunner();
+    let hookToolAllowlist: string[] | undefined;
+    let _hookModelOverride: string | undefined;
+    let hookPrependContext: string | undefined;
+    if (hookRunner?.hasHooks("before_agent_start")) {
+      try {
+        const hookResult = await hookRunner.runBeforeAgentStart(
+          {
+            prompt: params.prompt,
+          },
+          {
+            agentId: params.sessionKey?.split(":")[0] ?? "main",
+            sessionKey: params.sessionKey,
+            workspaceDir: params.workspaceDir,
+            messageProvider: params.messageProvider ?? undefined,
+          },
+        );
+        hookToolAllowlist = hookResult?.toolAllowlist;
+        _hookModelOverride = hookResult?.modelOverride;
+        hookPrependContext = hookResult?.prependContext;
+        if (hookResult?.toolAllowlist) {
+          log.debug(
+            `hooks: toolAllowlist set (${hookResult.toolAllowlist.length} tools)`,
+          );
+        }
+      } catch (hookErr) {
+        log.warn(`before_agent_start hook failed: ${String(hookErr)}`);
+      }
+    }
+
     // Check if the model supports native image input
     const modelHasVision = params.model.input?.includes("image") ?? false;
     const toolsRaw = params.disableTools
@@ -236,7 +268,23 @@ export async function runEmbeddedAttempt(
           hasRepliedRef: params.hasRepliedRef,
           modelHasVision,
         });
-    const tools = sanitizeToolsForGoogle({ tools: toolsRaw, provider: params.provider });
+    let tools = sanitizeToolsForGoogle({ tools: toolsRaw, provider: params.provider });
+    // Apply hook-provided tool allowlist filter
+    if (hookToolAllowlist && hookToolAllowlist.length > 0) {
+      const allowSet = new Set(hookToolAllowlist);
+      tools = tools.filter((t) => allowSet.has(t.name));
+      log.debug(`hooks: filtered tools to ${tools.length} (allowlist: ${hookToolAllowlist.join(", ")})`);
+    }
+    // Apply tool tier filter from agent config (lite/medium/full)
+    const agentIdForTier = params.sessionKey?.split(":")[1];
+    const tierConfig = agentIdForTier && params.config
+      ? resolveAgentConfig(params.config, agentIdForTier)?.tools?.tier
+      : undefined;
+    if (tierConfig && tierConfig !== "full") {
+      const beforeCount = tools.length;
+      tools = filterToolsByTier(tools, tierConfig);
+      log.debug(`tier: filtered tools from ${beforeCount} to ${tools.length} (tier=${tierConfig})`);
+    }
     logToolSchemasForGoogle({ tools, provider: params.provider });
 
     const machineName = await getMachineDisplayName();
@@ -656,37 +704,19 @@ export async function runEmbeddedAttempt(
       }
 
       // Get hook runner once for both before_agent_start and agent_end hooks
-      const hookRunner = getGlobalHookRunner();
+      // (hook was already called early for tool/model overrides — reuse results here)
 
       let promptError: unknown = null;
       try {
         const promptStartedAt = Date.now();
 
-        // Run before_agent_start hooks to allow plugins to inject context
+        // Apply hook-provided context (computed from the early hook call above)
         let effectivePrompt = params.prompt;
-        if (hookRunner?.hasHooks("before_agent_start")) {
-          try {
-            const hookResult = await hookRunner.runBeforeAgentStart(
-              {
-                prompt: params.prompt,
-                messages: activeSession.messages,
-              },
-              {
-                agentId: params.sessionKey?.split(":")[0] ?? "main",
-                sessionKey: params.sessionKey,
-                workspaceDir: params.workspaceDir,
-                messageProvider: params.messageProvider ?? undefined,
-              },
-            );
-            if (hookResult?.prependContext) {
-              effectivePrompt = `${hookResult.prependContext}\n\n${params.prompt}`;
-              log.debug(
-                `hooks: prepended context to prompt (${hookResult.prependContext.length} chars)`,
-              );
-            }
-          } catch (hookErr) {
-            log.warn(`before_agent_start hook failed: ${String(hookErr)}`);
-          }
+        if (hookPrependContext) {
+          effectivePrompt = `${hookPrependContext}\n\n${params.prompt}`;
+          log.debug(
+            `hooks: prepended context to prompt (${hookPrependContext.length} chars)`,
+          );
         }
 
         log.debug(`embedded run prompt start: runId=${params.runId} sessionId=${params.sessionId}`);

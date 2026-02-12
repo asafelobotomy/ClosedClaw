@@ -1,23 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { assertWebChannel, normalizeE164, toWhatsappJid } from "./index.js";
+import { assertWebChannel, normalizeE164 } from "./index.js";
 
 describe("normalizeE164", () => {
-  it("strips whatsapp prefix and whitespace", () => {
-    expect(normalizeE164("whatsapp:+1 555 555 0123")).toBe("+15555550123");
+  it("strips prefix and whitespace", () => {
+    expect(normalizeE164("+1 555 555 0123")).toBe("+15555550123");
   });
 
   it("adds plus when missing", () => {
     expect(normalizeE164("1555123")).toBe("+1555123");
-  });
-});
-
-describe("toWhatsappJid", () => {
-  it("converts E164 to jid", () => {
-    expect(toWhatsappJid("+1 555 555 0123")).toBe("15555550123@s.whatsapp.net");
-  });
-
-  it("keeps group JIDs intact", () => {
-    expect(toWhatsappJid("123456789-987654321@g.us")).toBe("123456789-987654321@g.us");
   });
 });
 

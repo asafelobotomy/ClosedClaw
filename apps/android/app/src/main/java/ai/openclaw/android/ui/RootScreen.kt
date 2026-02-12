@@ -88,6 +88,7 @@ fun RootScreen(viewModel: MainViewModel) {
   val talkIsSpeaking by viewModel.talkIsSpeaking.collectAsState()
   val seamColorArgb by viewModel.seamColorArgb.collectAsState()
   val seamColor = remember(seamColorArgb) { ComposeColor(seamColorArgb) }
+  val securityLevel by viewModel.connectionSecurity.collectAsState()
   val audioPermissionLauncher =
     rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
       if (granted) viewModel.setTalkEnabled(true)
@@ -209,6 +210,7 @@ fun RootScreen(viewModel: MainViewModel) {
       gateway = gatewayState,
       voiceEnabled = voiceEnabled,
       activity = activity,
+      connectionSecurity = securityLevel,
       onClick = { sheet = Sheet.Settings },
       modifier = Modifier.windowInsetsPadding(safeOverlayInsets).padding(start = 12.dp, top = 12.dp),
     )

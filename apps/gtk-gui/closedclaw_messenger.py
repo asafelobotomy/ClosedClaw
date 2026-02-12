@@ -34,7 +34,8 @@ import html
 # CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════════════════
 
-DEFAULT_SOCKET_PATH = "/tmp/closedclaw-gtk.sock"
+DEFAULT_SOCKET_PATH = os.path.join(os.path.expanduser("~"), ".ClosedClaw", "gtk.sock")
+DEFAULT_TOKEN_PATH = os.path.join(os.path.expanduser("~"), ".ClosedClaw", "gtk-session-token")
 APP_ID = "ai.closedclaw.messenger"
 APP_NAME = "ClosedClaw Messenger"
 
@@ -77,8 +78,9 @@ class Message:
 class ClosedClawIPC:
     """Unix socket IPC client for communicating with ClosedClaw"""
     
-    def __init__(self, socket_path: str = DEFAULT_SOCKET_PATH):
+    def __init__(self, socket_path: str = DEFAULT_SOCKET_PATH, token_path: str = DEFAULT_TOKEN_PATH):
         self.socket_path = socket_path
+        self.token_path = token_path
         self.socket: Optional[socket.socket] = None
         self.connected = False
         self.receive_thread: Optional[threading.Thread] = None
@@ -87,11 +89,63 @@ class ClosedClawIPC:
         self.status_callback: Optional[Callable[[bool, str], None]] = None
         self.buffer = ""
         
+    def _read_session_token(self) -> Optional[str]:
+        """Read the session token from the state directory"""
+        try:
+            with open(self.token_path, 'r') as f:
+                return f.read().strip()
+        except FileNotFoundError:
+            return None
+        except Exception as e:
+            if self.status_callback:
+                GLib.idle_add(self.status_callback, False, f"Token read error: {e}")
+            return None
+
+    def _authenticate(self) -> bool:
+        """Send auth token as first message after connecting"""
+        token = self._read_session_token()
+        if not token:
+            if self.status_callback:
+                GLib.idle_add(self.status_callback, False,
+                    f"Session token not found: {self.token_path}\nIs ClosedClaw gateway running?")
+            return False
+        try:
+            auth_msg = json.dumps({"type": "auth", "token": token}) + "\n"
+            self.socket.sendall(auth_msg.encode('utf-8'))
+            # Wait for auth response (up to 5 seconds)
+            self.socket.settimeout(5.0)
+            response_data = b""
+            while b"\n" not in response_data:
+                chunk = self.socket.recv(4096)
+                if not chunk:
+                    return False
+                response_data += chunk
+            self.socket.settimeout(None)
+            line = response_data.split(b"\n")[0]
+            response = json.loads(line.decode('utf-8'))
+            if response.get("type") == "auth_ok":
+                return True
+            if self.status_callback:
+                GLib.idle_add(self.status_callback, False,
+                    f"Authentication failed: {response.get('error', 'unknown')}")
+            return False
+        except Exception as e:
+            if self.status_callback:
+                GLib.idle_add(self.status_callback, False, f"Auth error: {e}")
+            return False
+
     def connect(self) -> bool:
         """Attempt to connect to ClosedClaw socket"""
         try:
             self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             self.socket.connect(self.socket_path)
+            
+            # Authenticate with session token
+            if not self._authenticate():
+                self.socket.close()
+                self.socket = None
+                return False
+            
             self.connected = True
             self.running = True
             

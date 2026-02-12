@@ -194,6 +194,8 @@ export function createHookRunner(registry: PluginRegistry, options: HookRunnerOp
           acc?.prependContext && next.prependContext
             ? `${acc.prependContext}\n\n${next.prependContext}`
             : (next.prependContext ?? acc?.prependContext),
+        toolAllowlist: next.toolAllowlist ?? acc?.toolAllowlist,
+        modelOverride: next.modelOverride ?? acc?.modelOverride,
       }),
     );
   }

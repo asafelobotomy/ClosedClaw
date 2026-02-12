@@ -536,6 +536,37 @@ export const ClosedClawSchema = z
       })
       .strict()
       .optional(),
+    security: z
+      .object({
+        kernelShield: z
+          .object({
+            enabled: z.boolean().optional(),
+            enforcement: z
+              .union([z.literal("strict"), z.literal("permissive"), z.literal("audit-only")])
+              .optional(),
+            riskThresholds: z
+              .object({
+                low: z.number().min(0).max(1).optional(),
+                high: z.number().min(0).max(1).optional(),
+              })
+              .strict()
+              .optional(),
+            attestation: z
+              .object({
+                enabled: z.boolean().optional(),
+                softDriftThreshold: z.number().min(0).max(1).optional(),
+                hardDriftThreshold: z.number().min(0).max(1).optional(),
+              })
+              .strict()
+              .optional(),
+            auditLog: z.boolean().optional(),
+            notifyOnBlock: z.boolean().optional(),
+          })
+          .strict()
+          .optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict()
   .superRefine((cfg, ctx) => {

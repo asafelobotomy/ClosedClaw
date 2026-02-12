@@ -34,11 +34,11 @@ const createPlugin = (id: string, opts?: { aliases?: string[] }): ChannelPlugin 
   },
 });
 
-const msteamsPlugin = createPlugin("msteams", { aliases: ["teams"] });
+const matrixExtPlugin = createPlugin("matrix-ext", { aliases: ["matrix"] });
 
 const defaultRegistry = createRegistry([
-  { pluginId: "discord", plugin: createPlugin("discord"), source: "test" },
-  { pluginId: "imessage", plugin: createPlugin("imessage", { aliases: ["imsg"] }), source: "test" },
+  { pluginId: "webchat", plugin: createPlugin("webchat"), source: "test" },
+  { pluginId: "gtk-gui", plugin: createPlugin("gtk-gui", { aliases: ["gtk"] }), source: "test" },
 ]);
 
 describe("message-channel", () => {
@@ -51,16 +51,16 @@ describe("message-channel", () => {
   });
 
   it("normalizes gateway message channels and rejects unknown values", () => {
-    expect(resolveGatewayMessageChannel("discord")).toBe("discord");
-    expect(resolveGatewayMessageChannel(" imsg ")).toBe("imessage");
+    expect(resolveGatewayMessageChannel("webchat")).toBe("webchat");
+    expect(resolveGatewayMessageChannel(" gtk ")).toBe("gtk-gui");
     expect(resolveGatewayMessageChannel("web")).toBeUndefined();
     expect(resolveGatewayMessageChannel("nope")).toBeUndefined();
   });
 
   it("normalizes plugin aliases when registered", () => {
     setActivePluginRegistry(
-      createRegistry([{ pluginId: "msteams", plugin: msteamsPlugin, source: "test" }]),
+      createRegistry([{ pluginId: "matrix-ext", plugin: matrixExtPlugin, source: "test" }]),
     );
-    expect(resolveGatewayMessageChannel("teams")).toBe("msteams");
+    expect(resolveGatewayMessageChannel("matrix")).toBe("matrix-ext");
   });
 });

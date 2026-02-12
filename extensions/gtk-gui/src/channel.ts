@@ -14,9 +14,13 @@ import type {
 import { GtkIpcBridge, generateMessageId, type GtkMessage, type GtkIpcConfig } from "./ipc.js";
 import { processGtkMessage } from "./monitor.js";
 
-const DEFAULT_SOCKET_PATH = "/tmp/closedclaw-gtk.sock";
-const DEFAULT_INBOX_PATH = "/tmp/closedclaw-gtk/inbox.jsonl";
-const DEFAULT_OUTBOX_PATH = "/tmp/closedclaw-gtk/outbox.jsonl";
+import { homedir } from "node:os";
+import { join } from "node:path";
+
+const CLOSEDCLAW_STATE_DIR = join(homedir(), ".ClosedClaw");
+const DEFAULT_SOCKET_PATH = join(CLOSEDCLAW_STATE_DIR, "gtk.sock");
+const DEFAULT_INBOX_PATH = join(CLOSEDCLAW_STATE_DIR, "gtk", "inbox.jsonl");
+const DEFAULT_OUTBOX_PATH = join(CLOSEDCLAW_STATE_DIR, "gtk", "outbox.jsonl");
 const DEFAULT_USER_ID = "gtk-user";
 const CHANNEL_ID = "gtk-gui";
 
@@ -261,6 +265,7 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
               to: message.from,
               text: result.text,
               timestamp: Date.now(),
+              riskLevel: result.riskLevel,
             };
             await bridge.send(response);
             log?.debug?.(`Sent response: ${response.id}`);

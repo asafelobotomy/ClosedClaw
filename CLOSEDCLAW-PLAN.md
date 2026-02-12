@@ -16,9 +16,11 @@
 | GTK Messenger | Running | GTK4/Libadwaita, Unix socket IPC, dark mode |
 | Auth Profiles | Fixed | `auth-profiles.json` with `AuthProfileStore` format |
 | Platform Removal | Complete | Discord/WhatsApp/Telegram/Signal/Slack/iMessage stripped |
-| ClawTalk Library | Built | 4,470 LOC across 17 files, not yet wired into runtime |
+| ClawTalk Library | **Wired** | 4,470 LOC across 17 files, wired into runtime via `before_agent_start` hook |
+| Tool Tiers | **Wired** | Lite/Medium/Full tier filtering in agent runtime, config-driven |
 | .claws Parser | Built | 993 LOC, 10 block types, not yet authoring skill files |
 | Security Stack | Built | XChaCha20-Poly1305, Argon2id, Keychain, Kernel Shield |
+| GTK Socket Security | **Hardened** | Socket at `~/.ClosedClaw/gtk.sock`, token auth, chmod 0600, risk levels |
 | 17+ Agent Tools | Built | Browser, exec, cron, canvas, TTS, web, memory, sessions |
 | Plugin System | Built | 15 hook points, tool/channel/provider/service registration |
 | Android App | Built | 63 Kotlin files, Jetpack Compose, WebSocket + mDNS |
@@ -34,7 +36,9 @@
 
 ## Priority 1 — Critical Path (Unlocks Everything Else)
 
-### 1.1 Wire ClawTalk Orchestrator into Agent Runtime
+### 1.1 Wire ClawTalk Orchestrator into Agent Runtime ✅
+
+**Completed**: 2026-02-12 (Day 1)
 
 **Impact**: Without this, ClawTalk is dead code. With it, every message gets intent-classified, routed to specialized subagents, and processed through the token-optimized pipeline.
 
@@ -62,7 +66,9 @@
 
 ---
 
-### 1.2 Enable Full Tool Suite for Qwen3:8B
+### 1.2 Enable Full Tool Suite for Qwen3:8B ✅
+
+**Completed**: 2026-02-12 (Day 1)
 
 **Impact**: Right now Qwen3 can only chat. Enabling tools gives it browser control, file operations, shell execution, web search, memory, cron, and canvas — the full OpenClaw feature set.
 
@@ -255,7 +261,9 @@
 
 ---
 
-### 3.2 GTK GUI Security Hardening
+### 3.2 GTK GUI Security Hardening ✅
+
+**Completed**: 2026-02-12 (Day 1)
 
 **Impact**: The GTK Unix socket is currently unauthenticated. Any local process can connect.
 
@@ -390,9 +398,9 @@
 
 ```
 Week 1:
-  ├── 1.1  Wire ClawTalk into Agent Runtime          [2-3 days]
-  ├── 1.2  Enable Full Tools for Qwen3:8B            [1-2 days] (parallel)
-  └── 3.2  GTK Socket Security Hardening              [1 day]   (parallel)
+  ├── 1.1  Wire ClawTalk into Agent Runtime          ✅ Done 2026-02-12
+  ├── 1.2  Enable Full Tools for Qwen3:8B            ✅ Done 2026-02-12
+  └── 3.2  GTK Socket Security Hardening              ✅ Done 2026-02-12
 
 Week 2:
   ├── 1.3  Activate ClawDense                         [1 day]

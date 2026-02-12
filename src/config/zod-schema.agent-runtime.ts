@@ -251,6 +251,7 @@ export const AgentSandboxSchema = z
 
 export const AgentToolsSchema = z
   .object({
+    tier: z.enum(["full", "medium", "lite"]).optional(),
     profile: ToolProfileSchema,
     allow: z.array(z.string()).optional(),
     alsoAllow: z.array(z.string()).optional(),
@@ -419,6 +420,18 @@ export const AgentModelSchema = z.union([
     })
     .strict(),
 ]);
+export const ClawTalkAgentSchema = z
+  .object({
+    enabled: z.boolean().optional(),
+    compression: z.enum(["off", "transport", "hybrid", "native"]).optional(),
+    escalationThreshold: z.number().min(0).max(1).optional(),
+    escalationModel: z.string().optional(),
+    fallbackChain: z.array(z.string()).optional(),
+    fallbackCooldownMs: z.number().int().positive().optional(),
+  })
+  .strict()
+  .optional();
+
 export const AgentEntrySchema = z
   .object({
     id: z.string(),
@@ -452,6 +465,7 @@ export const AgentEntrySchema = z
       .optional(),
     sandbox: AgentSandboxSchema,
     tools: AgentToolsSchema,
+    clawtalk: ClawTalkAgentSchema,
   })
   .strict();
 

@@ -256,3 +256,134 @@ function isValidIPv4(host: string): boolean {
 export function isLoopbackHost(host: string): boolean {
   return isLoopbackAddress(host);
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// IP VALIDATION — Defense-in-depth for bind mode enforcement
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Check whether an IP address belongs to a private (RFC 1918 / RFC 4193) range.
+ * Covers: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, and IPv4-mapped variants.
+ */
+export function isPrivateAddress(ip: string | undefined): boolean {
+  if (!ip) {
+    return false;
+  }
+  const normalized = normalizeIPv4MappedAddress(ip.trim());
+
+  // Loopback is always considered private
+  if (isLoopbackAddress(normalized)) {
+    return true;
+  }
+
+  const parts = normalized.split(".");
+  if (parts.length !== 4) {
+    return false;
+  }
+  const octets = parts.map((p) => parseInt(p, 10));
+  if (octets.some((o) => Number.isNaN(o))) {
+    return false;
+  }
+
+  // 10.0.0.0/8
+  if (octets[0] === 10) {
+    return true;
+  }
+  // 172.16.0.0/12
+  if (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) {
+    return true;
+  }
+  // 192.168.0.0/16
+  if (octets[0] === 192 && octets[1] === 168) {
+    return true;
+  }
+  // 169.254.0.0/16 (link-local)
+  if (octets[0] === 169 && octets[1] === 254) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Check whether an IP is in the Tailscale CGNAT range (100.64.0.0/10).
+ */
+export function isTailscaleAddress(ip: string | undefined): boolean {
+  if (!ip) {
+    return false;
+  }
+  const normalized = normalizeIPv4MappedAddress(ip.trim());
+  const parts = normalized.split(".");
+  if (parts.length !== 4) {
+    return false;
+  }
+  const octets = parts.map((p) => parseInt(p, 10));
+  if (octets.some((o) => Number.isNaN(o))) {
+    return false;
+  }
+
+  // 100.64.0.0/10 = 100.64.x.x through 100.127.x.x
+  return octets[0] === 100 && octets[1] >= 64 && octets[1] <= 127;
+}
+
+/**
+ * Validate whether an incoming connection IP is allowed for the given bind mode.
+ *
+ * This is a defense-in-depth layer: the OS-level bind already restricts which
+ * interfaces accept connections, but this provides application-level enforcement
+ * in case of misconfiguration or proxy scenarios.
+ *
+ * @param clientIp - The connecting client's IP address
+ * @param bindMode - The configured gateway bind mode
+ * @returns Object with `allowed` flag and optional `reason` for rejection
+ */
+export function validateClientIp(
+  clientIp: string | undefined,
+  bindMode: import("../config/types.gateway.js").GatewayBindMode | undefined,
+): { allowed: boolean; reason?: string } {
+  if (!clientIp) {
+    return { allowed: false, reason: "No client IP available" };
+  }
+
+  const mode = bindMode ?? "loopback";
+
+  switch (mode) {
+    case "loopback": {
+      if (isLoopbackAddress(clientIp)) {
+        return { allowed: true };
+      }
+      return {
+        allowed: false,
+        reason: `Bind mode "loopback" rejects non-loopback IP: ${clientIp}`,
+      };
+    }
+
+    case "tailnet": {
+      if (isLoopbackAddress(clientIp) || isTailscaleAddress(clientIp)) {
+        return { allowed: true };
+      }
+      return {
+        allowed: false,
+        reason: `Bind mode "tailnet" rejects non-Tailscale IP: ${clientIp}`,
+      };
+    }
+
+    case "lan": {
+      if (isPrivateAddress(clientIp)) {
+        return { allowed: true };
+      }
+      return {
+        allowed: false,
+        reason: `Bind mode "lan" rejects non-private IP: ${clientIp}`,
+      };
+    }
+
+    case "auto":
+    case "custom":
+      // These modes don't impose additional IP restrictions beyond bind
+      return { allowed: true };
+
+    default:
+      return { allowed: true };
+  }
+}

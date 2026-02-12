@@ -28,7 +28,7 @@
  *   - name: send-report
  *     tool: send_message
  *     params:
- *       channel: slack
+ *       channel: webchat
  *       message: "{{steps.summarize.output}}"
  *     dependsOn: [summarize]
  * ```

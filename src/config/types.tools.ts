@@ -196,6 +196,8 @@ export type ExecToolConfig = {
 };
 
 export type AgentToolsConfig = {
+  /** Tool tier controlling which tools are available: "full" (all), "medium" (reliable subset), "lite" (minimal safe set). */
+  tier?: "full" | "medium" | "lite";
   /** Base tool profile applied before allow/deny lists. */
   profile?: ToolProfileId;
   allow?: string[];

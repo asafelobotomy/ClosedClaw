@@ -109,62 +109,6 @@ describe("message tool path passthrough", () => {
   });
 });
 
-describe("message tool description", () => {
-  const bluebubblesPlugin: ChannelPlugin = {
-    id: "bluebubbles",
-    meta: {
-      id: "bluebubbles",
-      label: "BlueBubbles",
-      selectionLabel: "BlueBubbles",
-      docsPath: "/channels/bluebubbles",
-      blurb: "BlueBubbles test plugin.",
-    },
-    capabilities: { chatTypes: ["direct", "group"], media: true },
-    config: {
-      listAccountIds: () => ["default"],
-      resolveAccount: () => ({}),
-    },
-    messaging: {
-      normalizeTarget: (raw) => {
-        const trimmed = raw.trim().replace(/^bluebubbles:/i, "");
-        const lower = trimmed.toLowerCase();
-        if (lower.startsWith("chat_guid:")) {
-          const guid = trimmed.slice("chat_guid:".length);
-          const parts = guid.split(";");
-          if (parts.length === 3 && parts[1] === "-") {
-            return parts[2]?.trim() || trimmed;
-          }
-          return `chat_guid:${guid}`;
-        }
-        return trimmed;
-      },
-    },
-    actions: {
-      listActions: () =>
-        ["react", "renameGroup", "addParticipant", "removeParticipant", "leaveGroup"] as const,
-    },
-  };
-
-  it("hides BlueBubbles group actions for DM targets", () => {
-    setActivePluginRegistry(
-      createTestRegistry([{ pluginId: "bluebubbles", source: "test", plugin: bluebubblesPlugin }]),
-    );
-
-    const tool = createMessageTool({
-      config: {} as never,
-      currentChannelProvider: "bluebubbles",
-      currentChannelId: "bluebubbles:chat_guid:iMessage;-;+15551234567",
-    });
-
-    expect(tool.description).not.toContain("renameGroup");
-    expect(tool.description).not.toContain("addParticipant");
-    expect(tool.description).not.toContain("removeParticipant");
-    expect(tool.description).not.toContain("leaveGroup");
-
-    setActivePluginRegistry(createTestRegistry([]));
-  });
-});
-
 describe("message tool sandbox path validation", () => {
   it("rejects filePath that escapes sandbox root", async () => {
     const sandboxDir = await fs.mkdtemp(path.join(os.tmpdir(), "msg-sandbox-"));

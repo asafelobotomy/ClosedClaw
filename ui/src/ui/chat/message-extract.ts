@@ -3,17 +3,9 @@ import { stripThinkingTags } from "../format";
 const ENVELOPE_PREFIX = /^\[([^\]]+)\]\s*/;
 const ENVELOPE_CHANNELS = [
   "WebChat",
-  "WhatsApp",
-  "Telegram",
-  "Signal",
-  "Slack",
-  "Discord",
-  "iMessage",
-  "Teams",
   "Matrix",
   "Zalo",
   "Zalo Personal",
-  "BlueBubbles",
 ];
 
 const textCache = new WeakMap<object, string | null>();

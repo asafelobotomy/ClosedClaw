@@ -49,7 +49,7 @@ function detectAutoKind(input: string): ChannelResolveKind {
     return "user";
   }
   if (
-    /^(user|discord|slack|matrix|msteams|teams|zalo|zalouser|googlechat|google-chat|gchat):/i.test(
+    /^(user|matrix|zalo|zalouser):/i.test(
       trimmed,
     )
   ) {

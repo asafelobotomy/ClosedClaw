@@ -3,21 +3,14 @@ import type {
   ChannelAccountSnapshot,
   ChannelUiMetaEntry,
   ChannelsStatusSnapshot,
-  GoogleChatStatus,
-  NostrProfile,
-  NostrStatus,
 } from "../types";
 import type { ChannelKey, ChannelsChannelData, ChannelsProps } from "./channels.types";
 import { formatAgo } from "../format";
 import { renderChannelConfigSection } from "./channels.config";
-import { renderGoogleChatCard } from "./channels.googlechat";
-import { renderNostrCard } from "./channels.nostr";
 import { channelEnabled, renderChannelAccountCount } from "./channels.shared";
 
 export function renderChannels(props: ChannelsProps) {
   const channels = props.snapshot?.channels as Record<string, unknown> | null;
-  const googlechat = (channels?.googlechat ?? null) as GoogleChatStatus | null;
-  const nostr = (channels?.nostr ?? null) as NostrStatus | null;
   const channelOrder = resolveChannelOrder(props.snapshot);
   const orderedChannels = channelOrder
     .map((key, index) => ({
@@ -36,8 +29,6 @@ export function renderChannels(props: ChannelsProps) {
     <section class="grid grid-cols-2">
       ${orderedChannels.map((channel) =>
         renderChannel(channel.key, props, {
-          googlechat,
-          nostr,
           channelAccounts: props.snapshot?.channelAccounts ?? null,
         }),
       )}
@@ -72,48 +63,11 @@ function resolveChannelOrder(snapshot: ChannelsStatusSnapshot | null): ChannelKe
   if (snapshot?.channelOrder?.length) {
     return snapshot.channelOrder;
   }
-  return ["googlechat", "nostr"];
+  return [];
 }
 
 function renderChannel(key: ChannelKey, props: ChannelsProps, data: ChannelsChannelData) {
-  const accountCountLabel = renderChannelAccountCount(key, data.channelAccounts);
-  switch (key) {
-    case "googlechat":
-      return renderGoogleChatCard({
-        props,
-        googlechat: data.googlechat,
-        accountCountLabel,
-      });
-    case "nostr": {
-      const nostrAccounts = data.channelAccounts?.nostr ?? [];
-      const primaryAccount = nostrAccounts[0];
-      const accountId = primaryAccount?.accountId ?? "default";
-      const profile =
-        (primaryAccount as { profile?: NostrProfile | null } | undefined)?.profile ?? null;
-      const showForm =
-        props.nostrProfileAccountId === accountId ? props.nostrProfileFormState : null;
-      const profileFormCallbacks = showForm
-        ? {
-            onFieldChange: props.onNostrProfileFieldChange,
-            onSave: props.onNostrProfileSave,
-            onImport: props.onNostrProfileImport,
-            onCancel: props.onNostrProfileCancel,
-            onToggleAdvanced: props.onNostrProfileToggleAdvanced,
-          }
-        : null;
-      return renderNostrCard({
-        props,
-        nostr: data.nostr,
-        nostrAccounts,
-        accountCountLabel,
-        profileFormState: showForm,
-        profileFormCallbacks,
-        onEditProfile: () => props.onNostrProfileEdit(accountId, profile),
-      });
-    }
-    default:
-      return renderGenericChannelCard(key, props, data.channelAccounts ?? {});
-  }
+  return renderGenericChannelCard(key, props, data.channelAccounts ?? {});
 }
 
 function renderGenericChannelCard(

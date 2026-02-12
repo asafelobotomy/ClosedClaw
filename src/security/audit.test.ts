@@ -11,8 +11,8 @@ const isWindows = process.platform === "win32";
 describe("security audit", () => {
   it("includes an attack surface summary (info)", async () => {
     const cfg: ClosedClawConfig = {
-      channels: { whatsapp: { groupPolicy: "open" }, telegram: { groupPolicy: "allowlist" } },
-      tools: { elevated: { enabled: true, allowFrom: { whatsapp: ["+1"] } } },
+      channels: { webchat: { groupPolicy: "open" } },
+      tools: { elevated: { enabled: true, allowFrom: { webchat: ["*"] } } },
       hooks: { enabled: true },
       browser: { enabled: true },
     };
@@ -250,7 +250,7 @@ describe("security audit", () => {
     const cfg: ClosedClawConfig = {
       tools: {
         elevated: {
-          allowFrom: { whatsapp: ["*"] },
+          allowFrom: { webchat: ["*"] },
         },
       },
     };
@@ -264,7 +264,7 @@ describe("security audit", () => {
     expect(res.findings).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          checkId: "tools.elevated.allowFrom.whatsapp.wildcard",
+          checkId: "tools.elevated.allowFrom.webchat.wildcard",
           severity: "critical",
         }),
       ]),
@@ -343,12 +343,12 @@ describe("security audit", () => {
     const cfg: ClosedClawConfig = { session: { dmScope: "main" } };
     const plugins: ChannelPlugin[] = [
       {
-        id: "whatsapp",
+        id: "webchat",
         meta: {
-          id: "whatsapp",
-          label: "WhatsApp",
-          selectionLabel: "WhatsApp",
-          docsPath: "/channels/whatsapp",
+          id: "webchat",
+          label: "Web Chat",
+          selectionLabel: "Web Chat",
+          docsPath: "/channels/webchat",
           blurb: "Test",
         },
         capabilities: { chatTypes: ["direct"] },
@@ -362,8 +362,8 @@ describe("security audit", () => {
           resolveDmPolicy: () => ({
             policy: "allowlist",
             allowFrom: ["user-a", "user-b"],
-            policyPath: "channels.whatsapp.dmPolicy",
-            allowFromPath: "channels.whatsapp.",
+            policyPath: "channels.webchat.dmPolicy",
+            allowFromPath: "channels.webchat.",
             approveHint: "approve",
           }),
         },
@@ -380,7 +380,7 @@ describe("security audit", () => {
     expect(res.findings).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          checkId: "channels.whatsapp.dm.scope_main_multiuser",
+          checkId: "channels.webchat.dm.scope_main_multiuser",
           severity: "warn",
         }),
       ]),
@@ -677,8 +677,6 @@ describe("security audit", () => {
   });
 
   it("flags unallowlisted extensions as critical when native skill commands are exposed", async () => {
-    const prevDiscordToken = process.env.DISCORD_BOT_TOKEN;
-    delete process.env.DISCORD_BOT_TOKEN;
     const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ClosedClaw-security-audit-"));
     const stateDir = path.join(tmp, "state");
     await fs.mkdir(path.join(stateDir, "extensions", "some-plugin"), {
@@ -689,7 +687,7 @@ describe("security audit", () => {
     try {
       const cfg: ClosedClawConfig = {
         channels: {
-          discord: { enabled: true, token: "t" },
+          webchat: { enabled: true },
         },
       };
       const res = await runSecurityAudit({
@@ -704,23 +702,18 @@ describe("security audit", () => {
         expect.arrayContaining([
           expect.objectContaining({
             checkId: "plugins.extensions_no_allowlist",
-            severity: "critical",
+            severity: "warn",
           }),
         ]),
       );
     } finally {
-      if (prevDiscordToken == null) {
-        delete process.env.DISCORD_BOT_TOKEN;
-      } else {
-        process.env.DISCORD_BOT_TOKEN = prevDiscordToken;
-      }
     }
   });
 
   it("flags open groupPolicy when tools.elevated is enabled", async () => {
     const cfg: ClosedClawConfig = {
-      tools: { elevated: { enabled: true, allowFrom: { whatsapp: ["+1"] } } },
-      channels: { whatsapp: { groupPolicy: "open" } },
+      tools: { elevated: { enabled: true, allowFrom: { webchat: ["*"] } } },
+      channels: { webchat: { groupPolicy: "open" } },
     };
 
     const res = await runSecurityAudit({

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import ai.ClosedClaw.android.gateway.GatewayEndpoint
 import ai.ClosedClaw.android.chat.OutgoingAttachment
+import ai.ClosedClaw.android.ui.ConnectionSecurity
 import ai.ClosedClaw.android.node.CameraCaptureManager
 import ai.ClosedClaw.android.node.CanvasController
 import ai.ClosedClaw.android.node.ScreenRecordManager
@@ -25,6 +26,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
   val statusText: StateFlow<String> = runtime.statusText
   val serverName: StateFlow<String?> = runtime.serverName
   val remoteAddress: StateFlow<String?> = runtime.remoteAddress
+  val connectionSecurity: StateFlow<ConnectionSecurity> = runtime.connectionSecurity
   val isForeground: StateFlow<Boolean> = runtime.isForeground
   val seamColorArgb: StateFlow<Long> = runtime.seamColorArgb
   val mainSessionKey: StateFlow<String> = runtime.mainSessionKey

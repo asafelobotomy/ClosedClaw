@@ -212,7 +212,7 @@ export function renderOverview(props: OverviewProps) {
             </div>`
             : html`
                 <div class="callout" style="margin-top: 14px">
-                  Use Channels to link GoogleChat, MSTeams, BlueBubbles, or Nostr.
+                  Use Channels to connect external messaging services.
                 </div>
               `
         }

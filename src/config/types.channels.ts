@@ -1,6 +1,4 @@
 import type { GroupPolicy } from "./types.base.js";
-import type { GoogleChatConfig } from "./types.googlechat.js";
-import type { MSTeamsConfig } from "./types.msteams.js";
 
 export type ChannelHeartbeatVisibilityConfig = {
   /** Show HEARTBEAT_OK acknowledgments in chat (default: false). */
@@ -25,7 +23,5 @@ export type ChannelsConfig = {
    */
   mode?: "gtk-only" | "auto";
   defaults?: ChannelDefaultsConfig;
-  googlechat?: GoogleChatConfig;
-  msteams?: MSTeamsConfig;
   [key: string]: unknown;
 };

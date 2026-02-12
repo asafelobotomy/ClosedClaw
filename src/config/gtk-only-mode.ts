@@ -58,19 +58,12 @@ export function isGtkOnlyMode(cfg: ClosedClawConfig): boolean {
 
   // Auto-detect: check if any non-GTK channel has enabled accounts
   const knownChannelIds = [
-    "telegram",
-    "whatsapp",
-    "discord",
-    "googlechat",
-    "slack",
-    "signal",
-    "imessage",
-    // Extension channels
-    "msteams",
+    // Built-in channels
+    "webchat",
+    // Extension channels that may still be installed
     "matrix",
     "mattermost",
     "line",
-    "nostr",
     "tlon",
     "twitch",
     "nextcloud-talk",

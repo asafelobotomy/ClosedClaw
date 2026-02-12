@@ -25,7 +25,7 @@ import {
   getNativeToolSystemPrompt,
   getPatternSystemPrompt,
 } from "./lite-tools.js";
-import { routeWithClawTalk, type ClawTalkRoutingResult } from "./clawtalk-bridge.js";
+import { routeWithClawTalk } from "./clawtalk-bridge.js";
 import { hasOrchestrationTags, processOrchestrationTags } from "./orchestration-tags.js";
 
 /**
@@ -363,7 +363,7 @@ type SessionEntry = {
 export async function processGtkMessage(
   message: GtkMessage,
   ctx: GtkMonitorContext,
-): Promise<{ text: string | null; error?: string }> {
+): Promise<{ text: string | null; error?: string; riskLevel?: "low" | "medium" | "high" }> {
   const { cfg, accountId, log, userId } = ctx;
 
   if (message.type !== "message") {
@@ -532,7 +532,7 @@ export async function processGtkMessage(
         text = tagResult.cleanText;
       }
 
-      return { text };
+      return { text, riskLevel: routing.riskLevel };
     } catch (err) {
       const errorMsg = `Lite mode error: ${err instanceof Error ? err.message : String(err)}`;
       log?.error?.(errorMsg);

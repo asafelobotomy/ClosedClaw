@@ -137,16 +137,16 @@ describe("tts", () => {
   });
 
   describe("resolveOutputFormat", () => {
-    it("uses Opus for Telegram", () => {
-      const output = resolveOutputFormat("telegram");
-      expect(output.openai).toBe("opus");
-      expect(output.elevenlabs).toBe("opus_48000_64");
-      expect(output.extension).toBe(".opus");
-      expect(output.voiceCompatible).toBe(true);
+    it("uses MP3 format (default for all channels)", () => {
+      const output = resolveOutputFormat("webchat");
+      expect(output.openai).toBe("mp3");
+      expect(output.elevenlabs).toBe("mp3_44100_128");
+      expect(output.extension).toBe(".mp3");
+      expect(output.voiceCompatible).toBe(false);
     });
 
-    it("uses MP3 for other channels", () => {
-      const output = resolveOutputFormat("discord");
+    it("uses MP3 format for any channel input", () => {
+      const output = resolveOutputFormat("gtk-gui");
       expect(output.openai).toBe("mp3");
       expect(output.elevenlabs).toBe("mp3_44100_128");
       expect(output.extension).toBe(".mp3");

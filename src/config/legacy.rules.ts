@@ -10,10 +10,6 @@ import type { LegacyConfigRule } from "./legacy.shared.js";
  */
 export const LEGACY_CONFIG_RULES: LegacyConfigRule[] = [
   {
-    path: ["msteams"],
-    message: "msteams config moved to channels.msteams (auto-migrated on load).",
-  },
-  {
     path: ["routing", "bindings"],
     message: "routing.bindings was moved; use top-level bindings instead (auto-migrated on load).",
   },

@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config xmlns:tools="http://schemas.android.com/tools">
-  <!-- This app is primarily used on a trusted tailnet; allow cleartext for IP-based endpoints too. -->
-  <base-config cleartextTrafficPermitted="true" tools:ignore="InsecureBaseConfiguration" />
-  <!-- Allow HTTP for tailnet/local dev endpoints (e.g. canvas/background web). -->
+  <!--
+    Default: deny cleartext traffic. TLS is preferred for all connections.
+    Only loopback, *.local, and *.ts.net are allowed cleartext for gateway
+    discovery and canvas/WebView dev endpoints.
+  -->
+  <base-config cleartextTrafficPermitted="false" />
+  <!-- Loopback/local gateway (127.0.0.1 is always cleartext-safe) -->
+  <domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="false">localhost</domain>
+  </domain-config>
+  <!-- mDNS/Bonjour local gateway hostnames -->
   <domain-config cleartextTrafficPermitted="true">
     <domain includeSubdomains="true">ClosedClaw.local</domain>
   </domain-config>
+  <!-- Tailscale MagicDNS hostnames -->
   <domain-config cleartextTrafficPermitted="true">
     <domain includeSubdomains="true">ts.net</domain>
   </domain-config>
+  <!--
+    Debug override: allow cleartext for all domains in debug builds only.
+    Ensures emulator/dev workflows continue to work without TLS.
+  -->
+  <debug-overrides>
+    <trust-anchors>
+      <certificates src="system" />
+      <certificates src="user" />
+    </trust-anchors>
+  </debug-overrides>
 </network-security-config>

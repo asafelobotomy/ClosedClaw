@@ -97,20 +97,20 @@ describe("loadClosedClawPlugins", () => {
     expect(enabled?.status).toBe("loaded");
   });
 
-  it("loads bundled telegram plugin when enabled", () => {
+  it("loads bundled channel plugin when enabled", () => {
     const bundledDir = makeTempDir();
     writePlugin({
-      id: "telegram",
-      body: `export default { id: "telegram", register(api) {
+      id: "test-channel",
+      body: `export default { id: "test-channel", register(api) {
   api.registerChannel({
     plugin: {
-      id: "telegram",
+      id: "test-channel",
       meta: {
-        id: "telegram",
-        label: "Telegram",
-        selectionLabel: "Telegram",
-        docsPath: "/channels/telegram",
-        blurb: "telegram channel"
+        id: "test-channel",
+        label: "Test Channel",
+        selectionLabel: "Test Channel",
+        docsPath: "/channels/test-channel",
+        blurb: "test channel"
       },
       capabilities: { chatTypes: ["direct"] },
       config: {
@@ -122,7 +122,7 @@ describe("loadClosedClawPlugins", () => {
   });
 } };`,
       dir: bundledDir,
-      filename: "telegram.ts",
+      filename: "test-channel.ts",
     });
     process.env.ClosedClaw_BUNDLED_PLUGINS_DIR = bundledDir;
 
@@ -130,17 +130,17 @@ describe("loadClosedClawPlugins", () => {
       cache: false,
       config: {
         plugins: {
-          allow: ["telegram"],
+          allow: ["test-channel"],
           entries: {
-            googlechat: { enabled: true },
+            "test-channel": { enabled: true },
           },
         },
       },
     });
 
-    const googlechat = registry.plugins.find((entry) => entry.id === "googlechat");
-    expect(googlechat?.status).toBe("loaded");
-    expect(registry.channels.some((entry) => entry.plugin.id === "googlechat")).toBe(true);
+    const testChannel = registry.plugins.find((entry) => entry.id === "test-channel");
+    expect(testChannel?.status).toBe("loaded");
+    expect(registry.channels.some((entry) => entry.plugin.id === "test-channel")).toBe(true);
   });
 
   it("enables bundled memory plugin when selected by slot", () => {

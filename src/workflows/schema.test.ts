@@ -49,14 +49,14 @@ describe("parseWorkflowDefinition", () => {
   it("parses event triggers", () => {
     const workflow = parseWorkflowDefinition({
       name: "event-wf",
-      trigger: { event: "message:received", filter: { channel: "slack" } },
+      trigger: { event: "message:received", filter: { channel: "webchat" } },
       steps: [{ name: "s1", tool: "test" }],
     });
 
     expect(workflow.trigger.kind).toBe("event");
     if (workflow.trigger.kind === "event") {
       expect(workflow.trigger.eventName).toBe("message:received");
-      expect(workflow.trigger.filter).toEqual({ channel: "slack" });
+      expect(workflow.trigger.filter).toEqual({ channel: "webchat" });
     }
   });
 

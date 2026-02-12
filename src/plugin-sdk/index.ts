@@ -1,9 +1,4 @@
 export { CHANNEL_MESSAGE_ACTION_NAMES } from "../channels/plugins/message-action-names.js";
-export {
-  BLUEBUBBLES_ACTIONS,
-  BLUEBUBBLES_ACTION_NAMES,
-  BLUEBUBBLES_GROUP_ACTIONS,
-} from "../channels/plugins/bluebubbles-actions.js";
 export type {
   ChannelAccountSnapshot,
   ChannelAccountState,
@@ -85,20 +80,7 @@ export type {
   GroupToolPolicyBySenderConfig,
   MarkdownConfig,
   MarkdownTableMode,
-  GoogleChatAccountConfig,
-  GoogleChatConfig,
-  GoogleChatDmConfig,
-  GoogleChatGroupConfig,
-  GoogleChatActionConfig,
-  MSTeamsChannelConfig,
-  MSTeamsConfig,
-  MSTeamsReplyStyle,
-  MSTeamsTeamConfig,
 } from "../config/types.js";
-export {
-  GoogleChatConfigSchema,
-  MSTeamsConfigSchema,
-} from "../config/zod-schema.providers-core.js";
 export {
   BlockStreamingCoalesceSchema,
   DmConfigSchema,
@@ -224,8 +206,3 @@ export { extractOriginalFilename } from "../media/store.js";
 
 // Third-party channel re-exports removed — channels archived.
 // GTK GUI uses the plugin outbound adapter pipeline.
-// Channel: Discord, iMessage, Slack, Telegram, Signal, WhatsApp, LINE, and
-// web media utilities were all removed.
-
-// Channel: BlueBubbles (status issues only — no broken imports)
-export { collectBlueBubblesStatusIssues } from "../channels/plugins/status-issues/bluebubbles.js";

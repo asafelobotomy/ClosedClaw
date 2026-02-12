@@ -21,6 +21,7 @@ import type {
 import type { ModelsConfig } from "./types.models.js";
 import type { NodeHostConfig } from "./types.node-host.js";
 import type { PluginsConfig } from "./types.plugins.js";
+import type { KernelShieldConfig } from "./types.security.js";
 import type { SkillsConfig } from "./types.skills.js";
 import type { ToolsConfig } from "./types.tools.js";
 
@@ -95,6 +96,10 @@ export type ClosedClawConfig = {
   canvasHost?: CanvasHostConfig;
   talk?: TalkConfig;
   gateway?: GatewayConfig;
+  security?: {
+    /** Kernel Shield — three-layer tool invocation defense */
+    kernelShield?: KernelShieldConfig;
+  };
 };
 
 export type ConfigValidationIssue = {

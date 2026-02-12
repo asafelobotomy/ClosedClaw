@@ -8,6 +8,18 @@ import type {
 } from "./types.sandbox.js";
 import type { AgentToolsConfig, MemorySearchConfig } from "./types.tools.js";
 
+/** ClawTalk per-agent configuration */
+export type ClawTalkAgentConfig = {
+  /** Enable ClawTalk intent routing for this agent (default: false). */
+  enabled?: boolean;
+  /** Compression mode for inter-agent messages. */
+  compression?: "off" | "transport" | "hybrid" | "native";
+  /** Confidence threshold below which escalation to cloud model is triggered. */
+  escalationThreshold?: number;
+  /** Cloud model to use when escalating. */
+  escalationModel?: string;
+};
+
 export type AgentModelConfig =
   | string
   | {
@@ -60,6 +72,8 @@ export type AgentConfig = {
     prune?: SandboxPruneSettings;
   };
   tools?: AgentToolsConfig;
+  /** ClawTalk intent routing configuration. */
+  clawtalk?: ClawTalkAgentConfig;
 };
 
 export type AgentsConfig = {

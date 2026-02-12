@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -31,6 +32,7 @@ fun StatusPill(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
   activity: StatusActivity? = null,
+  connectionSecurity: ConnectionSecurity = ConnectionSecurity.Unknown,
 ) {
   Surface(
     onClick = onClick,
@@ -56,6 +58,15 @@ fun StatusPill(
           text = gateway.title,
           style = MaterialTheme.typography.labelLarge,
         )
+
+        if (gateway == GatewayState.Connected && connectionSecurity != ConnectionSecurity.Unknown) {
+          Icon(
+            imageVector = Icons.Default.Shield,
+            contentDescription = connectionSecurity.label,
+            tint = connectionSecurity.color,
+            modifier = Modifier.size(14.dp),
+          )
+        }
       }
 
       VerticalDivider(
@@ -111,4 +122,35 @@ enum class GatewayState(val title: String, val color: Color) {
   Connecting("Connecting…", Color(0xFFF1C40F)),
   Error("Error", Color(0xFFE74C3C)),
   Disconnected("Offline", Color(0xFF9E9E9E)),
+}
+
+/**
+ * Indicates the security tier of the current gateway connection.
+ * - [Encrypted]: TLS active with pinned/verified certificate (green shield)
+ * - [Trusted]: Loopback or VPN-only connection without TLS (yellow shield)
+ * - [Insecure]: Cleartext on a non-loopback network (red shield)
+ * - [Unknown]: Not connected or security state not determined
+ */
+enum class ConnectionSecurity(val label: String, val color: Color) {
+  Encrypted("Encrypted (TLS)", Color(0xFF2ECC71)),
+  Trusted("Trusted network", Color(0xFFF1C40F)),
+  Insecure("Insecure connection", Color(0xFFE74C3C)),
+  Unknown("Unknown", Color(0xFF9E9E9E)),
+  ;
+
+  companion object {
+    /** Derive security level from endpoint properties and remote address. */
+    fun from(
+      tlsActive: Boolean,
+      remoteAddress: String?,
+    ): ConnectionSecurity {
+      if (tlsActive) return Encrypted
+      val addr = remoteAddress ?: return Unknown
+      val host = addr.substringBeforeLast(":")
+      val plain = host.removePrefix("[").removeSuffix("]")
+      if (plain.startsWith("127.") || plain == "::1" || plain == "localhost") return Trusted
+      if (plain.startsWith("100.")) return Trusted // Tailscale CGNAT
+      return Insecure
+    }
+  }
 }

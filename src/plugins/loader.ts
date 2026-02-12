@@ -26,6 +26,21 @@ import { createPluginRegistry, type PluginRecord, type PluginRegistry } from "./
 import { setActivePluginRegistry } from "./runtime.js";
 import { createPluginRuntime } from "./runtime/index.js";
 import { validateJsonSchemaValue } from "./schema-validator.js";
+import {
+  clawtalkBeforeAgentStartHandler,
+  updateClawTalkHookConfig,
+} from "../agents/clawtalk/clawtalk-hook.js";
+import {
+  scanSkillsDirectory,
+  validatePermissions,
+  loadClawsFile,
+} from "../agents/clawtalk/claws-parser.js";
+import { loadLexicon } from "../agents/clawtalk/clawdense.js";
+import {
+  kernelShieldBeforeToolCallHandler,
+  registerSkillForShield,
+  updateKernelShieldConfig,
+} from "../agents/clawtalk/kernel-shield-hook.js";
 
 export type PluginLoadResult = PluginRegistry;
 
@@ -446,6 +461,158 @@ export function loadClosedClawPlugins(options: PluginLoadOptions = {}): PluginRe
     registryCache.set(cacheKey, registry);
   }
   setActivePluginRegistry(registry, cacheKey);
+
+  // Register the built-in ClawTalk before_agent_start hook if enabled in any agent config.
+  registerClawTalkHookIfEnabled(registry, cfg);
+
+  // Register the Kernel Shield before_tool_call hook if enabled in security config.
+  registerKernelShieldHookIfEnabled(registry, cfg);
+
+  // Load .claws skill files and their lexicons (async, non-blocking for startup).
+  void loadClawTalkSkillFiles(cfg);
+
   initializeGlobalHookRunner(registry);
   return registry;
+}
+
+/**
+ * Register ClawTalk's built-in `before_agent_start` hook into the plugin registry
+ * when ClawTalk is enabled anywhere in the config (agent-level or defaults-level).
+ */
+function registerClawTalkHookIfEnabled(
+  registry: PluginRegistry,
+  cfg: Partial<ClosedClawConfig>,
+): void {
+  // Check if any agent has clawtalk.enabled, or if there's a defaults-level setting.
+  const agents = cfg.agents?.list ?? [];
+  const anyEnabled = agents.some((a) => (a as Record<string, unknown>).clawtalk && ((a as Record<string, unknown>).clawtalk as Record<string, unknown>).enabled === true);
+
+  if (!anyEnabled) {
+    return;
+  }
+
+  // Find the first enabled agent's clawtalk config to seed initial settings.
+  const firstClawtalk = agents
+    .map((a) => (a as Record<string, unknown>).clawtalk as Record<string, unknown> | undefined)
+    .find((ct) => ct?.enabled === true);
+
+  if (firstClawtalk) {
+    updateClawTalkHookConfig({
+      enabled: true,
+      escalationThreshold: typeof firstClawtalk.escalationThreshold === "number"
+        ? firstClawtalk.escalationThreshold
+        : undefined,
+      escalationModel: typeof firstClawtalk.escalationModel === "string"
+        ? firstClawtalk.escalationModel
+        : undefined,
+      compressionLevel: typeof firstClawtalk.compression === "string"
+        ? (firstClawtalk.compression as "off" | "transport" | "hybrid" | "native")
+        : undefined,
+    } as Partial<import("../agents/clawtalk/types.js").ClawTalkConfig>);
+  }
+
+  // Register into the typed hooks array so the hook runner picks it up.
+  registry.typedHooks.push({
+    pluginId: "closedclaw:clawtalk",
+    hookName: "before_agent_start",
+    handler: clawtalkBeforeAgentStartHandler,
+    priority: 1000, // High priority: ClawTalk routing should run first
+    source: "src/agents/clawtalk/clawtalk-hook.ts",
+  });
+}
+
+/**
+ * Register the Kernel Shield `before_tool_call` hook when security.kernelShield
+ * is enabled in the config. Uses priority 900 (below ClawTalk's 1000) so
+ * shield evaluation runs early in the hook chain.
+ */
+function registerKernelShieldHookIfEnabled(
+  registry: PluginRegistry,
+  cfg: Partial<ClosedClawConfig>,
+): void {
+  const shieldCfg = (cfg as Record<string, unknown>).security as
+    | { kernelShield?: Record<string, unknown> }
+    | undefined;
+  if (!shieldCfg?.kernelShield?.enabled) {
+    return;
+  }
+
+  updateKernelShieldConfig(
+    shieldCfg.kernelShield as Parameters<typeof updateKernelShieldConfig>[0],
+  );
+
+  registry.typedHooks.push({
+    pluginId: "closedclaw:kernel-shield",
+    hookName: "before_tool_call",
+    handler: kernelShieldBeforeToolCallHandler,
+    priority: 900,
+    source: "src/agents/clawtalk/kernel-shield-hook.ts",
+  });
+
+  const logger = defaultLogger();
+  logger.info?.(
+    `[kernel-shield] Hook registered (enforcement=${String(shieldCfg.kernelShield.enforcement ?? "permissive")})`,
+  );
+}
+
+/**
+ * Load .claws skill files from `~/.closedclaw/skills/`, validate permissions,
+ * and activate the first available lexicon (Block 8) for ClawDense compression.
+ *
+ * Runs asynchronously after registry setup — skill file loading does not block
+ * gateway startup. Warnings are logged but do not prevent operation.
+ */
+async function loadClawTalkSkillFiles(
+  _cfg: Partial<ClosedClawConfig>,
+): Promise<void> {
+  const logger = defaultLogger();
+  try {
+    const summaries = await scanSkillsDirectory();
+    if (summaries.length === 0) {
+      logger.debug?.("[clawtalk] No .claws skill files found in ~/.closedclaw/skills/");
+      return;
+    }
+
+    logger.info?.(`[clawtalk] Found ${summaries.length} skill file(s)`);
+
+    // Load each file, validate permissions, collect lexicons
+    let lexiconLoaded = false;
+    for (const summary of summaries) {
+      try {
+        const clawsFile = await loadClawsFile(summary.filePath);
+
+        // Validate permissions — log warnings for dangerous capabilities
+        const { warnings } = validatePermissions(clawsFile.manifest);
+        for (const warning of warnings) {
+          logger.warn?.(
+            `[clawtalk] Skill "${clawsFile.manifest.id}" permission warning: ${warning}`,
+          );
+        }
+
+        // Load the first available lexicon for ClawDense
+        if (!lexiconLoaded && clawsFile.lexicon) {
+          loadLexicon(clawsFile.lexicon);
+          lexiconLoaded = true;
+          logger.debug?.(
+            `[clawtalk] Loaded lexicon from skill "${clawsFile.manifest.id}" (mode=${clawsFile.lexicon.mode})`,
+          );
+        }
+
+        // Register skill with the Kernel Shield for enforcement
+        registerSkillForShield(clawsFile);
+
+        logger.debug?.(
+          `[clawtalk] Loaded skill: ${clawsFile.manifest.id} v${clawsFile.manifest.version}`,
+        );
+      } catch (err) {
+        logger.warn?.(
+          `[clawtalk] Failed to load skill file ${summary.filePath}: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
+  } catch (err) {
+    logger.warn?.(
+      `[clawtalk] Failed to scan skills directory: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
 }

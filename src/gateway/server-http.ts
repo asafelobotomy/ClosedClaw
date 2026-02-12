@@ -12,9 +12,11 @@ import type { createSubsystemLogger } from "../logging/subsystem.js";
 import { resolveAgentAvatar } from "../agents/identity-avatar.js";
 import { handleA2uiHttpRequest } from "../canvas-host/a2ui.js";
 import { loadConfig } from "../config/config.js";
+import type { GatewayBindMode } from "../config/types.gateway.js";
 // Slack HTTP handler removed — channel archived.
 import { handleControlUiAvatarRequest, handleControlUiHttpRequest } from "./control-ui.js";
 import { applyHookMappings } from "./hooks-mapping.js";
+import { validateClientIp } from "./net.js";
 import {
   extractHookToken,
   getHookChannelError,
@@ -255,6 +257,17 @@ export function createGatewayHttpServer(opts: {
       res.setHeader("Retry-After", String(Math.ceil(rateResult.retryAfterMs / 1000)));
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.end("Too Many Requests");
+      return;
+    }
+
+    // --- IP validation (defense-in-depth for bind mode policy) ---
+    const configForIp = loadConfig();
+    const bindMode = (configForIp.gateway?.bind ?? "loopback") as GatewayBindMode;
+    const ipCheck = validateClientIp(clientIp, bindMode);
+    if (!ipCheck.allowed) {
+      res.statusCode = 403;
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.end("Forbidden");
       return;
     }
 

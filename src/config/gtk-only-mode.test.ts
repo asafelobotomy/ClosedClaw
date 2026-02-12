@@ -29,7 +29,7 @@ describe("isGtkOnlyMode", () => {
   it("returns true when channels exist but none have enabled accounts", () => {
     const cfg = makeConfig({
       channels: {
-        googlechat: { accounts: { main: { enabled: false } } },
+        webchat: { accounts: { main: { enabled: false } } },
       },
     });
     expect(isGtkOnlyMode(cfg)).toBe(true);
@@ -38,7 +38,7 @@ describe("isGtkOnlyMode", () => {
   it("returns false when a non-GTK channel has an enabled account", () => {
     const cfg = makeConfig({
       channels: {
-        googlechat: { accounts: { main: { enabled: true } } },
+        webchat: { accounts: { main: { enabled: true } } },
       },
     });
     expect(isGtkOnlyMode(cfg)).toBe(false);
@@ -47,7 +47,7 @@ describe("isGtkOnlyMode", () => {
   it("returns false when a non-GTK channel has account with default enabled (not false)", () => {
     const cfg = makeConfig({
       channels: {
-        imessage: { accounts: { default: {} } },
+        webchat: { accounts: { default: {} } },
       },
     });
     expect(isGtkOnlyMode(cfg)).toBe(false);
@@ -57,7 +57,7 @@ describe("isGtkOnlyMode", () => {
     const cfg = makeConfig({
       channels: {
         mode: "auto",
-        nostr: { accounts: { main: { enabled: true } } },
+        webchat: { accounts: { main: { enabled: true } } },
       },
     });
     expect(isGtkOnlyMode(cfg)).toBe(false);
@@ -66,9 +66,9 @@ describe("isGtkOnlyMode", () => {
 
 describe("filterChannelsForGtkOnlyMode", () => {
   const gtkPlugin = makePlugin("gtk-gui");
-  const googlechatPlugin = makePlugin("googlechat");
-  const nostrPlugin = makePlugin("nostr");
-  const allPlugins = [gtkPlugin, googlechatPlugin, nostrPlugin];
+  const webchatPlugin = makePlugin("webchat");
+  const otherPlugin = makePlugin("other-channel");
+  const allPlugins = [gtkPlugin, webchatPlugin, otherPlugin];
 
   it("returns only GTK plugin when in GTK-only mode", () => {
     const cfg = makeConfig({ channels: { mode: "gtk-only" } });
@@ -79,7 +79,7 @@ describe("filterChannelsForGtkOnlyMode", () => {
   it("returns all plugins when not in GTK-only mode", () => {
     const cfg = makeConfig({
       channels: {
-        googlechat: { accounts: { main: { enabled: true } } },
+        webchat: { accounts: { main: { enabled: true } } },
       },
     });
     const result = filterChannelsForGtkOnlyMode(allPlugins, cfg);
@@ -89,7 +89,7 @@ describe("filterChannelsForGtkOnlyMode", () => {
   it("returns empty array when GTK plugin not registered", () => {
     const cfg = makeConfig({ channels: { mode: "gtk-only" } });
     const result = filterChannelsForGtkOnlyMode(
-      [googlechatPlugin, nostrPlugin],
+      [webchatPlugin, otherPlugin],
       cfg,
     );
     expect(result).toEqual([]);
@@ -110,7 +110,7 @@ describe("formatGtkOnlyModeStatus", () => {
   it("formats off when other channels configured", () => {
     const cfg = makeConfig({
       channels: {
-        googlechat: { accounts: { main: { enabled: true } } },
+        webchat: { accounts: { main: { enabled: true } } },
       },
     });
     expect(formatGtkOnlyModeStatus(cfg)).toContain("off");

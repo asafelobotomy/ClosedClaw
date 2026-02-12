@@ -43,6 +43,136 @@ Removed 6 messaging platform implementations (Discord, WhatsApp, Telegram, Signa
 
 **Breaking Changes**: None (removed platforms were already disabled by default in most installations)
 
+### ClawTalk Wiring & Tool Tiers (Day 1 Implementation)
+
+Wired the ClawTalk orchestrator into the agent runtime, added configurable tool tiers, and hardened the GTK GUI socket security — completing all three Week 1 tracks of the ClosedClaw Development Plan.
+
+#### Track A: ClawTalk → Agent Runtime
+
+- Extended `PluginHookBeforeAgentStartResult` with `toolAllowlist` and `modelOverride` fields
+- Created canonical hook handler `src/agents/clawtalk/clawtalk-hook.ts` (157 LOC) — routes messages through ClawTalk encoder/directory, returns subagent context + tool allowlist
+- Registered ClawTalk hook in plugin loader (`registerClawTalkHookIfEnabled()`) at priority 1000
+- Moved `before_agent_start` hook call in `attempt.ts` before tool assembly for proper allowlist/tier filtering
+- Rewrote `extensions/gtk-gui/src/clawtalk-bridge.ts` from 508 → 160 LOC thin adapter delegating to canonical module
+- Added `clipboard_manage` intent to encoder, types, and directory
+- Added risk level classification (`low`/`medium`/`high`) to GTK bridge routing results
+
+#### Track B: Tool Tier System
+
+- Added `tier?: "full" | "medium" | "lite"` to `AgentToolsConfig` type and Zod schema
+- Created `src/agents/tool-tiers.ts` with `LITE_TOOL_NAMES`, `MEDIUM_TOOL_NAMES` sets and `filterToolsByTier()` function
+- Wired tier filtering into `attempt.ts` after hook allowlist filtering
+- Added `ClawTalkAgentConfig` type (enabled, compression, escalationThreshold, escalationModel) to agent config
+
+#### Track C: GTK Socket Security
+
+- Moved socket from `/tmp/closedclaw-gtk.sock` to `~/.ClosedClaw/gtk.sock`
+- Added session token auth handshake (32-byte hex, constant-time comparison via `crypto.timingSafeEqual`)
+- Socket file permissions set to `0o600` after listen
+- Token file written with `0o600` permissions at `~/.ClosedClaw/gtk-session-token`
+- Updated Python GTK client (`closedclaw_messenger.py`) with token auth handshake on connect
+- Risk level surfaced in IPC protocol (`GtkMessage.riskLevel`)
+
+#### Files Changed
+
+- **Created**: `src/agents/clawtalk/clawtalk-hook.ts`, `src/agents/tool-tiers.ts`
+- **Modified** (16): `src/plugins/types.ts`, `src/plugins/hooks.ts`, `src/plugins/loader.ts`, `src/config/types.agents.ts`, `src/config/types.tools.ts`, `src/config/zod-schema.agent-runtime.ts`, `src/agents/pi-embedded-runner/run/attempt.ts`, `src/agents/clawtalk/encoder.ts`, `src/agents/clawtalk/types.ts`, `src/agents/clawtalk/directory.ts`, `src/agents/clawtalk/index.ts`, `extensions/gtk-gui/src/clawtalk-bridge.ts`, `extensions/gtk-gui/src/ipc.ts`, `extensions/gtk-gui/src/channel.ts`, `extensions/gtk-gui/src/monitor.ts`, `apps/gtk-gui/closedclaw_messenger.py`
+
+### ClawDense Compression, .claws Skill Files & Security Hardening (Day 2)
+
+Added token-efficient ClawDense compression for inter-agent messaging, introduced the `.claws` skill file format with all 10 specification blocks, expanded the ClawTalk directory with Browser and Automation agents, and hardened Gateway and Android network security.
+
+#### ClawDense Token Compression
+
+- Integrated ClawDense compression into orchestrator (Step 4): hybrid/native modes compress CT/1 messages, transport mode defers to handoff layer
+- Added response decompression (Step 6) with ClawDense format detection via leading symbol heuristic
+- Token tracking: verbose → dense token ratio logged at debug level
+- Lexicon loading wired into skill file loader (first available lexicon activated)
+
+#### Orchestrator Enhancements
+
+- Orchestrator Step 5 expanded with full compression-aware prompt building
+- New imports: `toDense`, `fromDense`, `applyLexiconCompression`, `applyLexiconExpansion`, `estimateDenseTokens`, `compressionRatio`
+- Orchestrator result now carries decompressed response through decode pipeline
+- Wire log captures dense representation for debugging
+
+#### .claws Skill File Format (7 files)
+
+Created 7 complete `.claws` skill files under `src/agents/clawtalk/skills/`, each implementing all 10 specification blocks (Identity, Manifest, Vibe, IDL, Engine, Telemetry, State, Verification, Lexicon, Neural Fingerprint):
+
+- **research.claws** — web search, URL fetch, summarization (ephemeral memory)
+- **system.claws** — file I/O, shell commands, clipboard (ephemeral, deny /etc /boot)
+- **code.claws** — code generation, review, debug, refactor (session-scoped)
+- **memory.claws** — save/recall/reflect notes with typed prefixes (persistent)
+- **conversation.claws** — general Q&A fallback, TTS output (session-scoped)
+- **browser.claws** — Playwright automation, screenshot, form fill (ephemeral)
+- **automation.claws** — scheduling, reminders, cron tasks (persistent)
+
+#### ClawTalk Directory Expansion
+
+- Added Browser Agent (`browser`) to directory with capabilities: `browser_automate`
+- Added Automation Agent (`automation`) to directory with capabilities: `schedule_task`
+- Added `clipboard_manage` to System Agent capabilities
+- Added `browser_automate` and `schedule_task` intent patterns to encoder
+- Updated `IntentCategory` type with 3 new intents
+- Changed `Directory.route()` to use `.toSorted()` (non-mutating) instead of `.sort()`
+
+#### Skill Loading Pipeline (loader.ts)
+
+- Added `loadClawTalkSkillFiles()` async function: scans `~/.closedclaw/skills/`, validates permissions, loads first lexicon for ClawDense, registers skills with Kernel Shield
+- Integrated into `loadClosedClawPlugins()` — runs non-blocking after registry setup
+- Warning-level logging for permission issues and load failures
+
+#### Gateway IP Validation
+
+- Added `isPrivateAddress()` — RFC 1918/4193 range detection (10.x, 172.16-31.x, 192.168.x, link-local)
+- Added `isTailscaleAddress()` — CGNAT range detection (100.64-127.x)
+- Added `validateClientIp()` — defense-in-depth bind mode enforcement (loopback/tailnet/lan/auto)
+- Wired IP validation into `createGatewayHttpServer()` HTTP handler (403 on policy violation)
+
+#### Android Network Security
+
+- Replaced permissive `cleartextTrafficPermitted="true"` base-config with `"false"` default
+- Added domain-specific cleartext exceptions: localhost, `*.ClosedClaw.local`, `*.ts.net`
+- Added debug-overrides trust-anchors for emulator/dev workflows
+- Added `ConnectionSecurity` enum (Encrypted/Trusted/Insecure/Unknown) with `from()` factory
+- Wired `ConnectionSecurity` state flow through `NodeRuntime` → `MainViewModel` → `StatusPill`
+- Shield icon in `StatusPill` shows active connection security tier (green/yellow/red)
+
+#### Files Changed
+
+- **Created** (9): `src/agents/clawtalk/skills/research.claws`, `system.claws`, `code.claws`, `memory.claws`, `conversation.claws`, `browser.claws`, `automation.claws`, `src/config/types.security.ts`, `src/agents/clawtalk/kernel-shield-hook.ts`
+- **Modified** (11): `src/agents/clawtalk/orchestrator.ts`, `src/agents/clawtalk/encoder.ts`, `src/agents/clawtalk/types.ts`, `src/agents/clawtalk/directory.ts`, `src/agents/clawtalk/index.ts`, `src/plugins/loader.ts`, `src/gateway/net.ts`, `src/gateway/server-http.ts`, `apps/android/.../network_security_config.xml`, `apps/android/.../StatusPill.kt`, `apps/android/.../NodeRuntime.kt`
+
+### Kernel Shield & Model Hot-Swap (Day 3)
+
+Added Kernel Shield three-layer tool invocation defense and model fallback chain hot-swap — completing Tracks D and E of the development plan.
+
+#### Track D: Kernel Shield Configuration & Enforcement
+
+- Created `src/config/types.security.ts` with `KernelShieldConfig`, `KernelShieldEnforcement` ("strict"/"permissive"/"audit-only"), `KernelShieldRiskThresholds`, `KernelShieldAttestationConfig` types
+- Added `security.kernelShield` to `ClosedClawConfig` type and Zod schema with full nested validation (enforcement enum, risk thresholds 0–1, attestation settings)
+- Created `src/agents/clawtalk/kernel-shield-hook.ts` (294 LOC) — `before_tool_call` handler with:
+  - Tool→capability mapping for 15+ tools via `TOOL_PROFILES` registry
+  - Three enforcement modes: strict (blocks non-allowed), permissive (blocks only "block" verdicts), audit-only (records only)
+  - Session trust score tracking (0–1, increases on success, decreases on failure)
+  - Skill registration from `.claws` files with tool→skill mapping via IDL fields
+- Registered hook in plugin loader (`registerKernelShieldHookIfEnabled()`) at priority 900
+
+#### Track E: Model Fallback Chain Hot-Swap
+
+- Added `fallbackChain?: string[]` and `fallbackCooldownMs?: number` to `ClawTalkConfig` interface and `ClawTalkAgentSchema` Zod schema
+- Orchestrator Step 5 rewritten to use `FallbackChain.execute()` with circuit breaker:
+  - Escalation model gets priority on first attempt, then falls through configured chain
+  - Fallback events logged to wireLog with `⚡ fallback:` prefix showing model progression
+  - Chain failure surfaces `lastError` from final attempt
+- Constructor initializes `FallbackChain` when `config.fallbackChain` is populated
+
+#### Files Changed
+
+- **Created** (2): `src/config/types.security.ts`, `src/agents/clawtalk/kernel-shield-hook.ts`
+- **Modified** (7): `src/config/types.ts`, `src/config/types.openclaw.ts`, `src/config/zod-schema.ts`, `src/config/zod-schema.agent-runtime.ts`, `src/agents/clawtalk/types.ts`, `src/agents/clawtalk/orchestrator.ts`, `src/plugins/loader.ts`
+
 ## 2026.2.11
 
 ### Test Suite Repairs

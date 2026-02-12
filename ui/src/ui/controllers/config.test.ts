@@ -101,7 +101,7 @@ describe("updateConfigFormValue", () => {
   it("seeds from snapshot when form is null", () => {
     const state = createState();
     state.configSnapshot = {
-      config: { channels: { googlechat: { token: "t" } }, gateway: { mode: "local" } },
+      config: { channels: { webchat: { enabled: true } }, gateway: { mode: "local" } },
       valid: true,
       issues: [],
       raw: "{}",
@@ -111,7 +111,7 @@ describe("updateConfigFormValue", () => {
 
     expect(state.configFormDirty).toBe(true);
     expect(state.configForm).toEqual({
-      channels: { googlechat: { token: "t" } },
+      channels: { webchat: { enabled: true } },
       gateway: { mode: "local", port: 18789 },
     });
   });
@@ -139,7 +139,7 @@ describe("applyConfig", () => {
     const state = createState();
     state.connected = true;
     state.client = { request } as unknown as ConfigState["client"];
-    state.applySessionKey = "agent:main:whatsapp:dm:+15555550123";
+    state.applySessionKey = "agent:main:webchat:dm:user123";
     state.configFormMode = "raw";
     state.configRaw = '{\n  agent: { workspace: "~/ClosedClaw" }\n}\n';
     state.configSnapshot = {
@@ -151,7 +151,7 @@ describe("applyConfig", () => {
     expect(request).toHaveBeenCalledWith("config.apply", {
       raw: '{\n  agent: { workspace: "~/ClosedClaw" }\n}\n',
       baseHash: "hash-123",
-      sessionKey: "agent:main:whatsapp:dm:+15555550123",
+      sessionKey: "agent:main:webchat:dm:user123",
     });
   });
 });
@@ -162,12 +162,12 @@ describe("runUpdate", () => {
     const state = createState();
     state.connected = true;
     state.client = { request } as unknown as ConfigState["client"];
-    state.applySessionKey = "agent:main:whatsapp:dm:+15555550123";
+    state.applySessionKey = "agent:main:webchat:dm:user123";
 
     await runUpdate(state);
 
     expect(request).toHaveBeenCalledWith("update.run", {
-      sessionKey: "agent:main:whatsapp:dm:+15555550123",
+      sessionKey: "agent:main:webchat:dm:user123",
     });
   });
 });

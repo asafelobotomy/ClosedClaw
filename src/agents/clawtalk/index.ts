@@ -75,6 +75,15 @@ export { shouldEscalate } from "./escalation.js";
 export { Orchestrator, type OrchestratorDeps } from "./orchestrator.js";
 export { MetricsTracker } from "./metrics.js";
 
+// ClawTalk Hook — before_agent_start integration
+export {
+  clawtalkBeforeAgentStartHandler,
+  routeMessage as clawtalkRouteMessage,
+  updateClawTalkHookConfig,
+  getClawTalkDirectory,
+  type ClawTalkRouting,
+} from "./clawtalk-hook.js";
+
 // Kernel Shield — three-layer defense
 export {
   checkStructural,

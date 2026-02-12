@@ -1,7 +1,6 @@
 import { Type } from "@sinclair/typebox";
 import type { ClosedClawConfig } from "../../config/config.js";
 import type { AnyAgentTool } from "./common.js";
-import { BLUEBUBBLES_GROUP_ACTIONS } from "../../channels/plugins/bluebubbles-actions.js";
 import {
   listChannelMessageActions,
   supportsChannelMessageButtons,
@@ -279,26 +278,8 @@ function filterActionsForContext(params: {
   channel?: string;
   currentChannelId?: string;
 }): ChannelMessageActionName[] {
-  const channel = normalizeMessageChannel(params.channel);
-  if (!channel || channel !== "bluebubbles") {
-    return params.actions;
-  }
-  const currentChannelId = params.currentChannelId?.trim();
-  if (!currentChannelId) {
-    return params.actions;
-  }
-  const normalizedTarget =
-    normalizeTargetForProvider(channel, currentChannelId) ?? currentChannelId;
-  const lowered = normalizedTarget.trim().toLowerCase();
-  const isGroupTarget =
-    lowered.startsWith("chat_guid:") ||
-    lowered.startsWith("chat_id:") ||
-    lowered.startsWith("chat_identifier:") ||
-    lowered.startsWith("group:");
-  if (isGroupTarget) {
-    return params.actions;
-  }
-  return params.actions.filter((action) => !BLUEBUBBLES_GROUP_ACTIONS.has(action));
+  // No platform-specific filtering; return all actions
+  return params.actions;
 }
 
 function buildMessageToolDescription(options?: {

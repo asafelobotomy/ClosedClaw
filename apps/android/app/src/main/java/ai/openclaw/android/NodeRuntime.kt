@@ -20,6 +20,7 @@ import ai.ClosedClaw.android.gateway.GatewayDiscovery
 import ai.ClosedClaw.android.gateway.GatewayEndpoint
 import ai.ClosedClaw.android.gateway.GatewaySession
 import ai.ClosedClaw.android.gateway.GatewayTlsParams
+import ai.ClosedClaw.android.ui.ConnectionSecurity
 import ai.ClosedClaw.android.node.CameraCaptureManager
 import ai.ClosedClaw.android.node.LocationCaptureManager
 import ai.ClosedClaw.android.BuildConfig
@@ -138,6 +139,9 @@ class NodeRuntime(context: Context) {
   private val _remoteAddress = MutableStateFlow<String?>(null)
   val remoteAddress: StateFlow<String?> = _remoteAddress.asStateFlow()
 
+  private val _connectionSecurity = MutableStateFlow(ConnectionSecurity.Unknown)
+  val connectionSecurity: StateFlow<ConnectionSecurity> = _connectionSecurity.asStateFlow()
+
   private val _seamColorArgb = MutableStateFlow(DEFAULT_SEAM_COLOR_ARGB)
   val seamColorArgb: StateFlow<Long> = _seamColorArgb.asStateFlow()
 
@@ -162,6 +166,10 @@ class NodeRuntime(context: Context) {
         _serverName.value = name
         _remoteAddress.value = remote
         _seamColorArgb.value = DEFAULT_SEAM_COLOR_ARGB
+        // Derive connection security from TLS state + remote address
+        val ep = connectedEndpoint
+        val tlsActive = ep != null && resolveTlsParams(ep) != null
+        _connectionSecurity.value = ConnectionSecurity.from(tlsActive, remote)
         applyMainSessionKey(mainSessionKey)
         updateStatus()
         scope.launch { refreshBrandingFromGateway() }
@@ -173,6 +181,7 @@ class NodeRuntime(context: Context) {
         _serverName.value = null
         _remoteAddress.value = null
         _seamColorArgb.value = DEFAULT_SEAM_COLOR_ARGB
+        _connectionSecurity.value = ConnectionSecurity.Unknown
         if (!isCanonicalMainSessionKey(_mainSessionKey.value)) {
           _mainSessionKey.value = "main"
         }
@@ -565,6 +574,7 @@ class NodeRuntime(context: Context) {
     val token = prefs.loadGatewayToken()
     val password = prefs.loadGatewayPassword()
     val tls = resolveTlsParams(endpoint)
+    _connectionSecurity.value = ConnectionSecurity.Unknown
     operatorSession.connect(endpoint, token, password, buildOperatorConnectOptions(), tls)
     nodeSession.connect(endpoint, token, password, buildNodeConnectOptions(), tls)
   }

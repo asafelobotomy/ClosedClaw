@@ -56,6 +56,9 @@ export type IntentCategory =
   | "code_refactor"
   | "remember"
   | "recall"
+  | "clipboard_manage"
+  | "browser_automate"
+  | "schedule_task"
   | "conversation"
   | "unknown";
 
@@ -156,6 +159,15 @@ export interface ClawTalkConfig {
   escalationModel?: string;
   /** Local model for normal processing */
   localModel?: string;
+  /**
+   * Ordered model fallback chain for hot-swap failover.
+   * When a model fails (rate limit, down, auth error), the next model
+   * in the chain is tried automatically. Uses circuit breaker + cooldown.
+   * If omitted, falls back to the simple `fallbackOnError` behavior.
+   */
+  fallbackChain?: string[];
+  /** Cooldown in ms before retrying a failed model (default: 60000) */
+  fallbackCooldownMs?: number;
 }
 
 /** Default configuration */

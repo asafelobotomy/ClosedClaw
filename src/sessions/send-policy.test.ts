@@ -29,7 +29,7 @@ describe("resolveSendPolicy", () => {
           rules: [
             {
               action: "deny",
-              match: { channel: "discord", chatType: "group" },
+              match: { channel: "webchat", chatType: "group" },
             },
           ],
         },
@@ -38,10 +38,10 @@ describe("resolveSendPolicy", () => {
     const entry: SessionEntry = {
       sessionId: "s",
       updatedAt: 0,
-      channel: "discord",
+      channel: "webchat",
       chatType: "group",
     };
-    expect(resolveSendPolicy({ cfg, entry, sessionKey: "discord:group:dev" })).toBe("deny");
+    expect(resolveSendPolicy({ cfg, entry, sessionKey: "webchat:group:dev" })).toBe("deny");
   });
 
   it("rule match by keyPrefix", () => {

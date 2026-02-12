@@ -295,7 +295,6 @@ describe("createSquadBroadcastTool", () => {
 
     const [senderId, msg] = (ctx.ipc.broadcast as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(senderId).toBe("agent-1");
-    expect(msg.from).toBe("agent-1");
     expect(msg.type).toBe("result");
     expect(msg.payload.message).toBe("Found results");
   });

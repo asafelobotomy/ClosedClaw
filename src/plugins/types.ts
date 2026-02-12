@@ -319,6 +319,10 @@ export type PluginHookBeforeAgentStartEvent = {
 export type PluginHookBeforeAgentStartResult = {
   systemPrompt?: string;
   prependContext?: string;
+  /** Optional tool allowlist — when set, only these tools are available to the agent. */
+  toolAllowlist?: string[];
+  /** Optional model override — when set, the agent uses this model instead of the configured default. */
+  modelOverride?: string;
 };
 
 // agent_end hook

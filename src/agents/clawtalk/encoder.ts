@@ -237,6 +237,50 @@ const INTENT_PATTERNS: IntentPattern[] = [
     verb: "REQ",
     action: "recall_notes",
   },
+
+  // Clipboard management
+  {
+    intent: "clipboard_manage",
+    patterns: [
+      /\b(?:copy|paste|clipboard)\b/i,
+      /\b(?:copy|put)\b.*\bclipboard\b/i,
+      /\bclipboard\b.*\b(?:contents?|read|get|show)\b/i,
+      /\bpaste\b.*\b(?:from|what)\b/i,
+    ],
+    confidence: 0.8,
+    verb: "REQ",
+    action: "clipboard",
+  },
+
+  // Browser automation
+  {
+    intent: "browser_automate",
+    patterns: [
+      /\b(?:automate|scrape|crawl|fill|click|navigate)\b.*\b(?:page|site|website|browser|form)\b/i,
+      /\b(?:take|capture)\b.*\bscreenshot\b/i,
+      /\bplaywright\b/i,
+      /\b(?:open|go to)\b.*\b(?:page|site|website)\b.*\b(?:and|then)\b/i,
+      /\bfill\b.*\bform\b/i,
+      /\bextract\b.*\b(?:data|text|content)\b.*\b(?:from|page|site|website)\b/i,
+    ],
+    confidence: 0.8,
+    verb: "TASK",
+    action: "browser_automate",
+  },
+
+  // Scheduling / automation
+  {
+    intent: "schedule_task",
+    patterns: [
+      /\b(?:schedule|remind|set\s+(?:a\s+)?reminder|cron|alarm|timer|wake)\b/i,
+      /\b(?:every|at|in)\b.*\b(?:minutes?|hours?|days?|am|pm|\d{1,2}:\d{2})\b/i,
+      /\b(?:run|execute|do)\b.*\b(?:later|tomorrow|tonight|daily|weekly|hourly)\b/i,
+      /\bautomatically\b.*\b(?:run|check|update|send)\b/i,
+    ],
+    confidence: 0.8,
+    verb: "REQ",
+    action: "schedule",
+  },
 ];
 
 /**
@@ -281,7 +325,9 @@ export function encode(naturalLanguage: string): EncodedMessage {
   const params: Record<string, string | number | boolean | string[]> = {};
   if (pattern.extractors) {
     for (const extractor of pattern.extractors) {
-      if (params[extractor.key] !== undefined) continue; // First match wins
+      if (params[extractor.key] !== undefined) {
+        continue; // First match wins
+      }
       const match = text.match(extractor.pattern);
       if (match) {
         const raw = match[extractor.group ?? 0];

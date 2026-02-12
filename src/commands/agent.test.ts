@@ -315,12 +315,12 @@ describe("agentCommand", () => {
   it("uses reply channel as the message channel context", async () => {
     await withTempHome(async (home) => {
       const store = path.join(home, "sessions.json");
-      mockConfig(home, store, undefined, undefined, [{ id: "ops" }]);
+      mockConfig(home, store, undefined, [{ id: "ops" }]);
 
-      await agentCommand({ message: "hi", agentId: "ops", replyChannel: "slack" }, runtime);
+      await agentCommand({ message: "hi", agentId: "ops", replyChannel: "webchat" }, runtime);
 
       const callArgs = vi.mocked(runEmbeddedPiAgent).mock.calls.at(-1)?.[0];
-      expect(callArgs?.messageChannel).toBe("slack");
+      expect(callArgs?.messageChannel).toBe("webchat");
     });
   });
 
@@ -333,14 +333,14 @@ describe("agentCommand", () => {
         {
           message: "hi",
           to: "+1555",
-          channel: "whatsapp",
-          runContext: { messageChannel: "slack", accountId: "acct-2" },
+          channel: "webchat",
+          runContext: { messageChannel: "gtk-gui", accountId: "acct-2" },
         },
         runtime,
       );
 
       const callArgs = vi.mocked(runEmbeddedPiAgent).mock.calls.at(-1)?.[0];
-      expect(callArgs?.messageChannel).toBe("slack");
+      expect(callArgs?.messageChannel).toBe("gtk-gui");
       expect(callArgs?.agentAccountId).toBe("acct-2");
     });
   });

@@ -34,7 +34,7 @@ const SUBAGENT_PROFILES: SubagentProfile[] = [
     id: "system",
     name: "System Agent",
     description: "File operations, directory management, and command execution",
-    capabilities: ["read_file", "write_file", "list_directory", "run_command"],
+    capabilities: ["read_file", "write_file", "list_directory", "run_command", "clipboard_manage"],
     systemPrompt: [
       "You are a system operations assistant. Your job is to:",
       "- Read and write files safely",
@@ -80,6 +80,45 @@ const SUBAGENT_PROFILES: SubagentProfile[] = [
       "- Be precise with storage and recall. Confirm what was saved.",
     ].join("\n"),
     tools: ["save_note", "recall_notes", "reflect_memory", "current_time"],
+    priority: 10,
+  },
+  {
+    id: "browser",
+    name: "Browser Agent",
+    description: "Web page automation — navigation, screenshots, form filling, data extraction via Playwright",
+    capabilities: ["browser_automate"],
+    systemPrompt: [
+      "You are a browser automation specialist. Your job is to:",
+      "- Navigate to web pages and interact with them programmatically",
+      "- Take screenshots of pages or specific regions",
+      "- Fill forms and click buttons",
+      "- Extract structured data from web pages",
+      "- Handle authentication flows when credentials are provided",
+      "",
+      "Use the browser tool for multi-step page interactions.",
+      "Take screenshots to verify state before and after actions.",
+      "Be cautious with form submissions — confirm before submitting.",
+    ].join("\n"),
+    tools: ["browser", "screenshot", "screenshot_region", "screenshot_ocr", "web_search", "current_time"],
+    priority: 10,
+  },
+  {
+    id: "automation",
+    name: "Automation Agent",
+    description: "Scheduling, reminders, cron tasks, and recurring workflows",
+    capabilities: ["schedule_task"],
+    systemPrompt: [
+      "You are a task automation assistant. Your job is to:",
+      "- Schedule reminders and recurring tasks",
+      "- Set up cron-style periodic checks and notifications",
+      "- Manage timers and alarms",
+      "- Create automated workflows that run on schedule",
+      "",
+      "Always confirm scheduling details (time, recurrence, action) before committing.",
+      "Use set_reminder for one-time tasks and cron for recurring ones.",
+      "Report back clearly what was scheduled and when it will trigger.",
+    ].join("\n"),
+    tools: ["set_reminder", "current_time", "run_command", "save_note"],
     priority: 10,
   },
 ];
@@ -128,7 +167,7 @@ export class Directory {
   route(intent: IntentCategory): SubagentProfile[] {
     const matches = this.profiles
       .filter((p) => p.capabilities.includes(intent))
-      .sort((a, b) => b.priority - a.priority);
+      .toSorted((a, b) => b.priority - a.priority);
 
     if (matches.length === 0) {
       return [CONVERSATION_PROFILE];
