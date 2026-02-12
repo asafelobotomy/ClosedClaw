@@ -1,32 +1,7 @@
-# Contributing to ClosedClaw
-
-Welcome to the lobster tank! 🦞
-
-## Quick Links
-
-- **GitHub:** https://github.com/ClosedClaw/ClosedClaw
-- **Discord:** https://discord.gg/qkhbAGHRBT
-- **X/Twitter:** [@steipete](https://x.com/steipete) / [@ClosedClaw](https://x.com/ClosedClaw)
-
-## Maintainers
-
-- **Peter Steinberger** - Benevolent Dictator
-  - GitHub: [@steipete](https://github.com/steipete) · X: [@steipete](https://x.com/steipete)
-
-- **Shadow** - Discord + Slack subsystem
-  - GitHub: [@thewilloftheshadow](https://github.com/thewilloftheshadow) · X: [@4shad0wed](https://x.com/4shad0wed)
-
-- **Jos** - Telegram, API, Nix mode
-  - GitHub: [@joshp123](https://github.com/joshp123) · X: [@jjpcodes](https://x.com/jjpcodes)
-
-- **Christoph Nakazawa** - JS Infra
-  - GitHub: [@cpojer](https://github.com/cpojer) · X: [@cnakazawa](https://x.com/cnakazawa)
-
 ## How to Contribute
 
 1. **Bugs & small fixes** → Open a PR!
-2. **New features / architecture** → Start a [GitHub Discussion](https://github.com/ClosedClaw/ClosedClaw/discussions) or ask in Discord first
-3. **Questions** → Discord #setup-help
+2. **New features / architecture** → Start a [GitHub Discussion](https://github.com/ClosedClaw/ClosedClaw/discussions)
 
 ## Before You PR
 
@@ -47,14 +22,3 @@ Please include in your PR:
 - [ ] Confirm you understand what the code does
 
 AI PRs are first-class citizens here. We just want transparency so reviewers know what to look for.
-
-## Current Focus & Roadmap 🗺
-
-We are currently prioritizing:
-
-- **Stability**: Fixing edge cases in channel connections (WhatsApp/Telegram).
-- **UX**: Improving the onboarding wizard and error messages.
-- **Skills**: Expanding the library of bundled skills and improving the Skill Creation developer experience.
-- **Performance**: Optimizing token usage and compaction logic.
-
-Check the [GitHub Issues](https://github.com/ClosedClaw/ClosedClaw/issues) for "good first issue" labels!

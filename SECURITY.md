@@ -1,23 +1,3 @@
-# Security Policy
-
-If you believe you've found a security issue in ClosedClaw, please report it privately.
-
-## Reporting
-
-- Email: `steipete@gmail.com`
-- What to include: reproduction steps, impact assessment, and (if possible) a minimal PoC.
-
-## Bug Bounties
-
-ClosedClaw is a labor of love. There is no bug bounty program and no budget for paid reports. Please still disclose responsibly so we can fix issues quickly.
-The best way to help the project right now is by sending PRs.
-
-## Out of Scope
-
-- Public Internet Exposure
-- Using ClosedClaw in ways that the docs recommend not to
-- Prompt injection attacks
-
 ## Operational Guidance
 
 For threat model + hardening guidance (including `closedclaw security audit --deep` and `--fix`), see the security documentation.
