@@ -10,7 +10,6 @@ import { renderChannelConfigSection } from "./channels.config";
 import { channelEnabled, renderChannelAccountCount } from "./channels.shared";
 
 export function renderChannels(props: ChannelsProps) {
-  const channels = props.snapshot?.channels as Record<string, unknown> | null;
   const channelOrder = resolveChannelOrder(props.snapshot);
   const orderedChannels = channelOrder
     .map((key, index) => ({

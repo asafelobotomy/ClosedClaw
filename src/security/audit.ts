@@ -5,7 +5,6 @@ import { resolveBrowserConfig, resolveProfile } from "../browser/config.js";
 import { resolveChannelDefaultAccountId } from "../channels/plugins/helpers.js";
 import { listChannelPlugins } from "../channels/plugins/index.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import { resolveNativeCommandsEnabled, resolveNativeSkillsEnabled } from "../config/commands.js";
 import { resolveConfigPath, resolveStateDir } from "../config/paths.js";
 import { resolveGatewayAuth } from "../gateway/auth.js";
 import { buildGatewayConnectionDetails } from "../gateway/call.js";
@@ -539,19 +538,6 @@ async function collectChannelSecurityFindings(params: {
   plugins: ReturnType<typeof listChannelPlugins>;
 }): Promise<SecurityAuditFinding[]> {
   const findings: SecurityAuditFinding[] = [];
-
-  const coerceNativeSetting = (value: unknown): boolean | "auto" | undefined => {
-    if (value === true) {
-      return true;
-    }
-    if (value === false) {
-      return false;
-    }
-    if (value === "auto") {
-      return "auto";
-    }
-    return undefined;
-  };
 
   const warnDmPolicy = async (input: {
     label: string;

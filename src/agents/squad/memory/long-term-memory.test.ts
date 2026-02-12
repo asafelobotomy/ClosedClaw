@@ -115,9 +115,9 @@ describe("EpisodicStore", () => {
       await store.store(recent);
 
       const all = store.getRecent(10);
-      expect(all[0]!.id).toBe("new");
-      expect(all[1]!.id).toBe("mid");
-      expect(all[2]!.id).toBe("old");
+      expect(all[0].id).toBe("new");
+      expect(all[1].id).toBe("mid");
+      expect(all[2].id).toBe("old");
     });
 
     it("persists to disk", async () => {
@@ -197,8 +197,8 @@ describe("EpisodicStore", () => {
       await store.storeBatch(episodes);
 
       const recent = store.getRecent(10);
-      expect(recent[0]!.id).toBe("new");
-      expect(recent[2]!.id).toBe("old");
+      expect(recent[0].id).toBe("new");
+      expect(recent[2].id).toBe("old");
     });
   });
 
@@ -238,19 +238,19 @@ describe("EpisodicStore", () => {
     it("searches by tags", () => {
       const result = store.search("gateway");
       expect(result.totalMatches).toBe(1);
-      expect(result.episodes[0]!.id).toBe("s2");
+      expect(result.episodes[0].id).toBe("s2");
     });
 
     it("searches by squad ID", () => {
       const result = store.search("squad-alpha");
       expect(result.totalMatches).toBe(1);
-      expect(result.episodes[0]!.id).toBe("s5");
+      expect(result.episodes[0].id).toBe("s5");
     });
 
     it("searches by agent name", () => {
       const result = store.search("coder");
       expect(result.totalMatches).toBe(1);
-      expect(result.episodes[0]!.id).toBe("s5");
+      expect(result.episodes[0].id).toBe("s5");
     });
 
     it("is case-insensitive", () => {
@@ -286,8 +286,8 @@ describe("EpisodicStore", () => {
 
       const recent = store.getRecent(3);
       expect(recent.length).toBe(3);
-      expect(recent[0]!.id).toBe("r-0"); // Most recent
-      expect(recent[2]!.id).toBe("r-2");
+      expect(recent[0].id).toBe("r-0"); // Most recent
+      expect(recent[2].id).toBe("r-2");
     });
 
     it("returns all if limit exceeds count", async () => {
@@ -322,7 +322,7 @@ describe("EpisodicStore", () => {
     it("filters by failure", () => {
       const results = store.getByOutcome("failure");
       expect(results.length).toBe(1);
-      expect(results[0]!.id).toBe("o2");
+      expect(results[0].id).toBe("o2");
     });
 
     it("respects limit", () => {
@@ -396,7 +396,7 @@ describe("EpisodicStore", () => {
       // Both are `failRetention + 5` days old.
       // Failure retention < success retention, so failure gets cleaned but success stays.
       if (failRetention + 5 <= successRetention) {
-        const result = await store.cleanup();
+        await store.cleanup();
         expect(store.getById("old-fail")).toBeUndefined();
         expect(store.getById("old-success")).toBeDefined();
       }
@@ -553,7 +553,7 @@ describe("LongTermMemory", () => {
     const ep = makeEpisode({ taskDescription: "facade test" });
     await ltm.episodic.store(ep);
     expect(ltm.episodic.count()).toBe(1);
-    expect(ltm.episodic.getRecent(1)[0]!.taskDescription).toBe("facade test");
+    expect(ltm.episodic.getRecent(1)[0].taskDescription).toBe("facade test");
   });
 });
 

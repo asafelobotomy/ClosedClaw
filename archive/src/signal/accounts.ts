@@ -43,13 +43,11 @@ function resolveAccountConfig(
   if (!accounts || typeof accounts !== "object") {
     return undefined;
   }
-  return accounts[accountId] as SignalAccountConfig | undefined;
+  return accounts[accountId];
 }
 
 function mergeSignalAccountConfig(cfg: ClosedClawConfig, accountId: string): SignalAccountConfig {
-  const { accounts: _ignored, ...base } = (cfg.channels?.signal ?? {}) as SignalAccountConfig & {
-    accounts?: unknown;
-  };
+  const { accounts: _ignored, ...base } = (cfg.channels?.signal ?? {});
   const account = resolveAccountConfig(cfg, accountId) ?? {};
   return { ...base, ...account };
 }

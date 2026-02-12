@@ -22,7 +22,7 @@ describe("browser default executable detection", () => {
   });
 
   it("prefers default Chromium browser on Linux via xdg-settings", async () => {
-    vi.mocked(execFileSync).mockImplementation((cmd, args) => {
+    vi.mocked(execFileSync).mockImplementation((cmd, _args) => {
       if (cmd === "xdg-settings") {
         return "google-chrome.desktop";
       }

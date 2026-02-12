@@ -387,8 +387,8 @@ export class EpisodicStore {
       failureCount,
       avgDurationMs: this.episodes.length > 0 ? totalDuration / this.episodes.length : 0,
       totalTokensUsed: totalTokens,
-      oldestTimestamp: this.episodes.length > 0 ? this.episodes[this.episodes.length - 1]!.timestamp : null,
-      newestTimestamp: this.episodes.length > 0 ? this.episodes[0]!.timestamp : null,
+      oldestTimestamp: this.episodes.length > 0 ? this.episodes[this.episodes.length - 1].timestamp : null,
+      newestTimestamp: this.episodes.length > 0 ? this.episodes[0].timestamp : null,
     };
   }
 

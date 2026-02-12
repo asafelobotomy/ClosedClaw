@@ -17,8 +17,8 @@
  *   # NEURAL FINGERPRINT      → Block 9
  */
 
-import { readFile, readdir, writeFile, mkdir } from "node:fs/promises";
-import { join, basename, extname } from "node:path";
+import { readFile, readdir, writeFile } from "node:fs/promises";
+import { join, extname } from "node:path";
 import { homedir } from "node:os";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -295,7 +295,7 @@ export function splitBlocks(content: string): Record<string, string> {
 
   for (const section of sections) {
     const trimmed = section.trim();
-    if (!trimmed) continue;
+    if (!trimmed) {continue;}
 
     // Check for a block marker in the first few lines
     const lines = trimmed.split("\n");
@@ -354,7 +354,7 @@ function parseManifest(raw: string): ClawsManifest {
 
     // Skip list item dash for permissions
     if (trimmed.startsWith("- capability:") || trimmed.startsWith("- deny:")) {
-      if (currentPerm) permissions.push(currentPerm as ClawsPermission);
+      if (currentPerm) {permissions.push(currentPerm as ClawsPermission);}
       currentPerm = {};
     }
 
@@ -385,11 +385,17 @@ function parseManifest(raw: string): ClawsManifest {
     }
   }
 
-  if (currentPerm) permissions.push(currentPerm as ClawsPermission);
+  if (currentPerm) {permissions.push(currentPerm as ClawsPermission);}
+  const toStringSafe = (value: unknown, fallback: string): string => {
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      return String(value);
+    }
+    return fallback;
+  };
 
   return {
-    id: String(result.id ?? "unknown"),
-    version: String(result.version ?? "0.0.0"),
+    id: toStringSafe(result.id, "unknown"),
+    version: toStringSafe(result.version, "0.0.0"),
     schemaVersion: result.schema_version as string | undefined,
     runtime: result.runtime as string | undefined,
     memoryStrategy: result.memory_strategy as string | undefined,
@@ -406,17 +412,17 @@ function parseVibe(raw: string): ClawsVibe {
   const vibe: ClawsVibe = { raw };
 
   const purposeMatch = raw.match(/\*\*Purpose:\*\*\s*(.+)/i) ?? raw.match(/Purpose:\s*(.+)/i);
-  if (purposeMatch) vibe.purpose = purposeMatch[1].trim();
+  if (purposeMatch) {vibe.purpose = purposeMatch[1].trim();}
 
   const triggerMatch = raw.match(/\*\*Trigger:\*\*\s*(.+)/i) ?? raw.match(/Trigger:\s*(.+)/i);
-  if (triggerMatch) vibe.trigger = triggerMatch[1].trim();
+  if (triggerMatch) {vibe.trigger = triggerMatch[1].trim();}
 
   const toneMatch = raw.match(/\*\*Tone:\*\*\s*(.+)/i) ?? raw.match(/Tone:\s*(.+)/i);
-  if (toneMatch) vibe.tone = toneMatch[1].trim();
+  if (toneMatch) {vibe.tone = toneMatch[1].trim();}
 
   const constraintMatch =
     raw.match(/\*\*Constraint:\*\*\s*(.+)/i) ?? raw.match(/Constraint:\s*(.+)/i);
-  if (constraintMatch) vibe.constraint = constraintMatch[1].trim();
+  if (constraintMatch) {vibe.constraint = constraintMatch[1].trim();}
 
   return vibe;
 }
@@ -432,7 +438,7 @@ function parseTelemetry(raw: string): ClawsTelemetry | null {
     .join("\n")
     .trim();
 
-  if (!cleaned) return null;
+  if (!cleaned) {return null;}
 
   try {
     const data = JSON.parse(cleaned);
@@ -460,21 +466,29 @@ function parseLexicon(raw: string): ClawsLexicon | null {
     .join("\n")
     .trim();
 
-  if (!cleaned) return null;
+  if (!cleaned) {return null;}
 
   try {
     const data = JSON.parse(cleaned);
     const pm = data.priority_markers ?? data.priorityMarkers;
     const priorityMarkers: Record<string, ClawsPriorityMarker> | undefined = pm
       ? Object.fromEntries(
-          Object.entries(pm).map(([k, v]: [string, any]) => [
+          Object.entries(pm as Record<string, unknown>).map(([k, v]) => {
+            const marker = (v ?? {}) as Record<string, unknown>;
+            const blockingRaw = marker.blocking;
+            const priorityRaw = marker.priority;
+            const requireBiometricRaw = marker.require_biometric ?? marker.requireBiometric;
+            return [
             k,
             {
-              blocking: v.blocking ?? false,
-              priority: v.priority ?? "normal",
-              requireBiometric: v.require_biometric ?? v.requireBiometric,
+              blocking: typeof blockingRaw === "boolean" ? blockingRaw : false,
+              priority: typeof priorityRaw === "string" ? priorityRaw : "normal",
+              ...(typeof requireBiometricRaw === "boolean"
+                ? { requireBiometric: requireBiometricRaw }
+                : {}),
             },
-          ]),
+            ];
+          }),
         )
       : undefined;
 
@@ -501,7 +515,7 @@ function parseFingerprint(raw: string): ClawsNeuralFingerprint | null {
     .join("\n")
     .trim();
 
-  if (!cleaned) return null;
+  if (!cleaned) {return null;}
 
   try {
     const data = JSON.parse(cleaned);
@@ -555,7 +569,7 @@ function parseIdentity(raw: string): ClawsIdentity | null {
   }
 
   const sig = kv.signature;
-  if (!sig) return null;
+  if (!sig) {return null;}
 
   return {
     signature: sig,
@@ -573,7 +587,7 @@ function parseIdentity(raw: string): ClawsIdentity | null {
 function parseIdl(raw: string): ClawsIdl | null {
   // Extract interface name
   const ifaceMatch = raw.match(/interface\s+(\w+)/);
-  if (!ifaceMatch) return null;
+  if (!ifaceMatch) {return null;}
 
   const interfaceName = ifaceMatch[1];
   const fields: ClawsIdlField[] = [];
@@ -626,7 +640,7 @@ function parseIdl(raw: string): ClawsIdl | null {
     }
   }
 
-  if (fields.length === 0) return null;
+  if (fields.length === 0) {return null;}
 
   return { interfaceName, fields, raw };
 }
@@ -661,7 +675,7 @@ function parseEngine(raw: string): ClawsEngine | null {
   } else {
     // Fallback: treat entire block as source
     source = raw.trim();
-    if (!source) return null;
+    if (!source) {return null;}
   }
 
   // Extract imports
@@ -698,7 +712,7 @@ function parseStateCheckpoint(raw: string): ClawsStateCheckpoint | null {
     .join("\n")
     .trim();
 
-  if (!cleaned) return null;
+  if (!cleaned) {return null;}
 
   try {
     const data = JSON.parse(cleaned);
@@ -722,7 +736,7 @@ function parseStateCheckpoint(raw: string): ClawsStateCheckpoint | null {
  */
 function parseVerification(raw: string): ClawsVerificationProof | null {
   const theoremMatch = raw.match(/Theorem:\s*(\S+)/i);
-  if (!theoremMatch) return null;
+  if (!theoremMatch) {return null;}
 
   const theorem = theoremMatch[1];
 
@@ -805,7 +819,7 @@ export async function scanSkillsDirectory(
   const summaries: ClawsSkillSummary[] = [];
 
   for (const entry of entries) {
-    if (extname(entry) !== ".claws") continue;
+    if (extname(entry) !== ".claws") {continue;}
     const filePath = join(skillsDir, entry);
     try {
       const file = await loadClawsFile(filePath);
@@ -899,7 +913,7 @@ export async function updateTelemetry(
   if (update.error) {
     telem.errors.push({ ...update.error, timestamp: Math.floor(Date.now() / 1000) });
     // Keep last 50 errors
-    if (telem.errors.length > 50) telem.errors = telem.errors.slice(-50);
+    if (telem.errors.length > 50) {telem.errors = telem.errors.slice(-50);}
   }
 
   // Write updated telemetry back to file
@@ -923,9 +937,7 @@ export async function updateTelemetry(
   if (blocks.telemetry) {
     // Replace existing telemetry block: find the `---` + TELEMETRY header
     // and replace everything from there to EOF (or to next --- block)
-    const telemStart = content.search(/^---\s*$/m);
     // Find the specific --- that precedes TELEMETRY
-    let idx = 0;
     let telemDashPos = -1;
     const dashRegex = /^---\s*$/gm;
     let match: RegExpExecArray | null;
@@ -963,8 +975,8 @@ export function createClawsTemplate(opts: {
   const perms = (opts.permissions ?? [])
     .map((p) => {
       const parts = [`    - capability: "${p.capability}"`];
-      if (p.allow) parts.push(`      allow: [${p.allow.map((a) => `"${a}"`).join(", ")}]`);
-      if (p.piiScan) parts.push("      pii_scan: true");
+      if (p.allow) {parts.push(`      allow: [${p.allow.map((a) => `"${a}"`).join(", ")}]`);}
+      if (p.piiScan) {parts.push("      pii_scan: true");}
       return parts.join("\n");
     })
     .join("\n");

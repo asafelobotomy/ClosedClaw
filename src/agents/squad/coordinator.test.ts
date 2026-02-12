@@ -314,9 +314,7 @@ describe("SquadCoordinator", () => {
     });
 
     it("should pick majority output", async () => {
-      let callCount = 0;
       const mixedHandler: AgentTaskHandler = async () => {
-        callCount++;
         // First agent says "A", second says "A" → majority is "A"
         return { success: true, output: "A", tokensUsed: 5 };
       };

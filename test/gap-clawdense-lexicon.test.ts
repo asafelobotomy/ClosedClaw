@@ -66,8 +66,8 @@ test("loadLexicon sets active lexicon", () => {
   loadLexicon(TEST_LEXICON);
   const active = getActiveLexicon();
   assert.ok(active, "should have an active lexicon");
-  assert.equal(active!.mode, "hybrid_stenography");
-  assert.equal(active!.mappings.cfg, "configuration");
+  assert.equal(active.mode, "hybrid_stenography");
+  assert.equal(active.mappings.cfg, "configuration");
 });
 
 test("clearLexicon removes active lexicon", () => {

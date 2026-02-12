@@ -99,6 +99,6 @@ describe("discord processDiscordMessage inbound contract", () => {
     } as any);
 
     expect(capturedCtx).toBeTruthy();
-    expectInboundContextContract(capturedCtx!);
+    expectInboundContextContract(capturedCtx);
   });
 });

@@ -216,7 +216,7 @@ async function generateReport(): Promise<void> {
   
   console.log("\n📊 Migration Summary:");
   console.log("==================");
-  for (const [category, count] of Object.entries(categories).sort()) {
+  for (const [category, count] of Object.entries(categories).toSorted(([a], [b]) => a.localeCompare(b))) {
     console.log(`  ${category.padEnd(15)} ${count} files`);
   }
   console.log(`  ${"directories".padEnd(15)} ${DIRECTORY_MIGRATIONS.length} directories`);
@@ -286,9 +286,9 @@ async function migrate(options: { dryRun?: boolean; createSymlinks?: boolean } =
 }
 
 // CLI
-const args = process.argv.slice(2);
-const dryRun = args.includes("--dry-run");
-const noSymlinks = args.includes("--no-symlinks");
+const args = new Set(process.argv.slice(2));
+const dryRun = args.has("--dry-run");
+const noSymlinks = args.has("--no-symlinks");
 
 migrate({ dryRun, createSymlinks: !noSymlinks }).catch((error) => {
   console.error("\n❌ Migration failed:", error);

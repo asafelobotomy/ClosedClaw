@@ -51,7 +51,7 @@ export function createTestAgentConfig(
  */
 export function createTestChannelConfig(
   channelId: string,
-  config: any = {}
+  config: Record<string, unknown> = {}
 ): ClosedClawConfig {
   return createTestConfig({
     channels: {

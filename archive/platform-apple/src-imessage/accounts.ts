@@ -42,7 +42,7 @@ function resolveAccountConfig(
   if (!accounts || typeof accounts !== "object") {
     return undefined;
   }
-  return accounts[accountId] as IMessageAccountConfig | undefined;
+  return accounts[accountId];
 }
 
 function mergeIMessageAccountConfig(
@@ -50,7 +50,7 @@ function mergeIMessageAccountConfig(
   accountId: string,
 ): IMessageAccountConfig {
   const { accounts: _ignored, ...base } = (cfg.channels?.imessage ??
-    {}) as IMessageAccountConfig & { accounts?: unknown };
+    {});
   const account = resolveAccountConfig(cfg, accountId) ?? {};
   return { ...base, ...account };
 }

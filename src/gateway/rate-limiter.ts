@@ -60,7 +60,7 @@ export class RateLimiter {
     bucket.timestamps = bucket.timestamps.filter((t) => t > windowStart);
 
     if (bucket.timestamps.length >= this.maxRequests) {
-      const oldestInWindow = bucket.timestamps[0]!;
+      const oldestInWindow = bucket.timestamps[0];
       const retryAfterMs = oldestInWindow + this.windowMs - now;
       return { allowed: false, retryAfterMs: Math.max(retryAfterMs, 1000) };
     }

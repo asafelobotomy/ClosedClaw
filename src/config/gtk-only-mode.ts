@@ -56,22 +56,17 @@ export function isGtkOnlyMode(cfg: ClosedClawConfig): boolean {
     return true;
   }
 
-  // Auto-detect: check if any non-GTK channel has enabled accounts
-  const knownChannelIds = [
-    // Built-in channels
-    "webchat",
-    // Extension channels that may still be installed
-    "matrix",
-    "mattermost",
-    "line",
-    "tlon",
-    "twitch",
-    "nextcloud-talk",
-    "zalo",
-    "zalouser",
-  ];
+  const channels = cfg.channels as Record<string, unknown> | undefined;
+  if (!channels) {
+    return true;
+  }
 
-  for (const channelId of knownChannelIds) {
+  // Auto-detect: if any non-GTK configured channel has enabled accounts,
+  // gtk-only mode is off.
+  for (const channelId of Object.keys(channels)) {
+    if (channelId === "mode" || channelId === "defaults" || channelId === GTK_CHANNEL_ID) {
+      continue;
+    }
     if (hasEnabledAccounts(cfg, channelId)) {
       return false;
     }

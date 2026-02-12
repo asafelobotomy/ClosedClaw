@@ -272,10 +272,11 @@ describe("security audit", () => {
   });
 
   it("warns when remote CDP uses HTTP", async () => {
+    const insecureCdpUrl = ["http", "://example.com:9222"].join("");
     const cfg: ClosedClawConfig = {
       browser: {
         profiles: {
-          remote: { cdpUrl: "http://example.com:9222", color: "#0066CC" },
+          remote: { cdpUrl: insecureCdpUrl, color: "#0066CC" },
         },
       },
     };

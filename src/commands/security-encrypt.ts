@@ -105,7 +105,8 @@ async function migrateStore(
     runtime.log(theme.success(`  ${storePath}: encrypted`));
     return true;
   } catch (err) {
-    runtime.error(`  ${storePath}: migration failed - ${err}`);
+    const detail = err instanceof Error ? err.message : String(err);
+    runtime.error(`  ${storePath}: migration failed - ${detail}`);
     return false;
   }
 }
@@ -213,7 +214,8 @@ export async function securityEncryptCommand(
     try {
       passphrase = await resolvePassphrase({ source: passphraseSource, cache: true });
     } catch (err) {
-      runtime.error(`Failed to resolve passphrase: ${err}`);
+      const detail = err instanceof Error ? err.message : String(err);
+      runtime.error(`Failed to resolve passphrase: ${detail}`);
       return;
     }
 

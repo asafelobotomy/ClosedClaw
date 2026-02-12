@@ -4,7 +4,7 @@ import type { createSubsystemLogger } from "../logging/subsystem.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { resolveChannelDefaultAccountId } from "../channels/plugins/helpers.js";
 import { type ChannelId, getChannelPlugin, listChannelPlugins } from "../channels/plugins/index.js";
-import { filterChannelsForGtkOnlyMode, formatGtkOnlyModeStatus } from "../config/gtk-only-mode.js";
+import { filterChannelsForGtkOnlyMode } from "../config/gtk-only-mode.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { resetDirectoryCache } from "../infra/outbound/target-resolver.js";
 import { DEFAULT_ACCOUNT_ID } from "../routing/session-key.js";

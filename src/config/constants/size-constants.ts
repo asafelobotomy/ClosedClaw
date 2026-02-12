@@ -110,7 +110,7 @@ export function maxBytesForKind(kind: MediaKind): number {
  * ```
  */
 export function formatBytes(bytes: number, decimals: number = 2): string {
-  if (bytes === 0) return "0 Bytes";
+  if (bytes === 0) {return "0 Bytes";}
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
@@ -138,7 +138,7 @@ export function parseBytes(input: string): number {
     throw new Error(`Invalid size format: ${input}`);
   }
 
-  const value = parseFloat(match[1]!);
+  const value = parseFloat(match[1]);
   const unit = (match[2] || "B").toUpperCase();
 
   switch (unit) {

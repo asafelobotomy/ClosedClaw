@@ -129,13 +129,13 @@ const trustStore: Map<string, ToolTrustRecord> = new Map();
  */
 export function getTrustScore(toolName: string): number {
   const record = trustStore.get(toolName);
-  if (!record) return 0.0; // Unknown tool — untrusted
+  if (!record) {return 0.0;} // Unknown tool — untrusted
 
   // Three consecutive failures → hard reset
-  if (record.consecutiveFailures >= 3) return 0.0;
+  if (record.consecutiveFailures >= 3) {return 0.0;}
 
   const total = record.successes + record.failures;
-  if (total === 0) return 0.0;
+  if (total === 0) {return 0.0;}
 
   // Tier-based ceiling from total execution count
   let tierFloor: number;

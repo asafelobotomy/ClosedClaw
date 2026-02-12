@@ -4,7 +4,6 @@ import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
-import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import { WebSocket } from "ws";
 import type { ChannelOutboundAdapter } from "../channels/plugins/types.js";
 import type { PluginRegistry } from "../plugins/registry.js";

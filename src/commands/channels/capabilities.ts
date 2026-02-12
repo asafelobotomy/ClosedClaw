@@ -52,18 +52,6 @@ type ChannelCapabilitiesReport = {
   channelPermissions?: DiscordPermissionsReport;
 };
 
-const REQUIRED_DISCORD_PERMISSIONS = ["ViewChannel", "SendMessages"] as const;
-
-const TEAMS_GRAPH_PERMISSION_HINTS: Record<string, string> = {
-  "ChannelMessage.Read.All": "channel history",
-  "Chat.Read.All": "chat history",
-  "Channel.ReadBasic.All": "channel list",
-  "Team.ReadBasic.All": "team list",
-  "TeamsActivity.Read.All": "teams activity",
-  "Sites.Read.All": "files (SharePoint)",
-  "Files.Read.All": "files (OneDrive)",
-};
-
 function normalizeTimeout(raw: unknown, fallback = 10_000) {
   const value = typeof raw === "string" ? Number(raw) : Number(raw);
   if (!Number.isFinite(value) || value <= 0) {
@@ -116,29 +104,6 @@ function formatSupport(capabilities?: ChannelCapabilities) {
   return bits.length ? bits.join(" ") : "none";
 }
 
-function summarizeDiscordTarget(raw?: string): DiscordTargetSummary | undefined {
-  if (!raw) {
-    return undefined;
-  }
-  // Discord channel archived — parseDiscordTarget no longer available.
-  return { raw };
-}
-
-function formatDiscordIntents(intents?: {
-  messageContent?: string;
-  guildMembers?: string;
-  presence?: string;
-}) {
-  if (!intents) {
-    return "unknown";
-  }
-  return [
-    `messageContent=${intents.messageContent ?? "unknown"}`,
-    `guildMembers=${intents.guildMembers ?? "unknown"}`,
-    `presence=${intents.presence ?? "unknown"}`,
-  ].join(" ");
-}
-
 function formatProbeLines(channelId: string, probe: unknown): string[] {
   const lines: string[] = [];
   if (!probe || typeof probe !== "object") {
@@ -159,52 +124,6 @@ function formatProbeLines(channelId: string, probe: unknown): string[] {
     lines.push(`Probe: ${theme.error(`failed${error}`)}`);
   }
   return lines;
-}
-
-async function buildDiscordPermissions(params: {
-  account: { token?: string; accountId?: string };
-  target?: string;
-}): Promise<{ target?: DiscordTargetSummary; report?: DiscordPermissionsReport }> {
-  const target = summarizeDiscordTarget(params.target?.trim());
-  if (!target) {
-    return {};
-  }
-  if (target.kind !== "channel" || !target.channelId) {
-    return {
-      target,
-      report: {
-        error: "Target looks like a DM user; pass channel:<id> to audit channel permissions.",
-      },
-    };
-  }
-  const token = params.account.token?.trim();
-  if (!token) {
-    return {
-      target,
-      report: {
-        channelId: target.channelId,
-        error: "Discord bot token missing for permission audit.",
-      },
-    };
-  }
-  try {
-    // Discord channel archived — fetchChannelPermissionsDiscord no longer available.
-    return {
-      target,
-      report: {
-        channelId: target.channelId,
-        error: "Discord channel has been archived.",
-      },
-    };
-  } catch (err) {
-    return {
-      target,
-      report: {
-        channelId: target.channelId,
-        error: err instanceof Error ? err.message : String(err),
-      },
-    };
-  }
 }
 
 async function resolveChannelReports(params: {
@@ -250,16 +169,6 @@ async function resolveChannelReports(params: {
       }
     }
 
-    let slackScopes: ChannelCapabilitiesReport["slackScopes"];
-    // Slack channel archived — fetchSlackScopes no longer available.
-
-    /**
-     * Discord-specific permission checks archived (Discord platform removed in v2026.2).
-     * Discord permission reporting is no longer available.
-     */
-    let discordTarget: undefined;
-    let discordPermissions: undefined;
-
     reports.push({
       channel: plugin.id,
       accountId,
@@ -271,10 +180,10 @@ async function resolveChannelReports(params: {
       enabled,
       support: plugin.capabilities,
       probe,
-      target: discordTarget,
-      channelPermissions: discordPermissions,
+      target: undefined,
+      channelPermissions: undefined,
       actions,
-      slackScopes,
+      slackScopes: undefined,
     });
   }
   return reports;

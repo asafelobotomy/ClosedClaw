@@ -22,7 +22,7 @@ export function expandMacro(
   dict: ClawTalkDictionary,
 ): ClawTalkMessage | null {
   const macro = dict.macros[name.toUpperCase()];
-  if (!macro) return null;
+  if (!macro) {return null;}
 
   let expanded = macro.expansion;
 
@@ -60,13 +60,13 @@ export function parseMacroInvocation(
 ): { name: string; args: Record<string, string> } | null {
   const trimmed = input.trim();
   const match = trimmed.match(/^([A-Z_]{2,})(?:\((.+)\))?$/);
-  if (!match) return null;
+  if (!match) {return null;}
 
   const name = match[1];
   const args: Record<string, string> = {};
 
   if (match[2]) {
-    const argRegex = /(\w+)\s*=\s*(?:"([^"]*)"|([\w./\-]+))/g;
+    const argRegex = /(\w+)\s*=\s*(?:"([^"]*)"|([\w./-]+))/g;
     let argMatch: RegExpExecArray | null;
     while ((argMatch = argRegex.exec(match[2])) !== null) {
       args[argMatch[1]] = argMatch[2] ?? argMatch[3];

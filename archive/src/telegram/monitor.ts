@@ -54,11 +54,6 @@ export function createTelegramRunnerOptions(cfg: ClosedClawConfig): RunOptions<u
   };
 }
 
-import {
-  DELAY_RECONNECT_INITIAL_MS,
-  DELAY_RECONNECT_MAX_MS,
-} from "../config/constants/index.js";
-
 const TELEGRAM_POLL_RESTART_POLICY = {
   initialMs: DELAY_RECONNECT_INITIAL_MS,
   maxMs: DELAY_RECONNECT_MAX_MS,

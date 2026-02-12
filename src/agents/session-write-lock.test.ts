@@ -73,27 +73,33 @@ describe("acquireSessionWriteLock", () => {
   });
 
   it("removes held locks on termination signals", async () => {
+    const originalKill = process.kill.bind(process) as typeof process.kill;
+    process.kill = ((_pid: number, _signal?: NodeJS.Signals) => true) as typeof process.kill;
     const signals = ["SIGINT", "SIGTERM", "SIGQUIT", "SIGABRT"] as const;
-    for (const signal of signals) {
-      const root = await fs.mkdtemp(path.join(os.tmpdir(), "ClosedClaw-lock-cleanup-"));
-      try {
-        const sessionFile = path.join(root, "sessions.json");
-        const lockPath = `${sessionFile}.lock`;
-        await acquireSessionWriteLock({ sessionFile, timeoutMs: 500 });
-        const keepAlive = () => {};
-        if (signal === "SIGINT") {
-          process.on(signal, keepAlive);
-        }
+    try {
+      for (const signal of signals) {
+        const root = await fs.mkdtemp(path.join(os.tmpdir(), "ClosedClaw-lock-cleanup-"));
+        try {
+          const sessionFile = path.join(root, "sessions.json");
+          const lockPath = `${sessionFile}.lock`;
+          await acquireSessionWriteLock({ sessionFile, timeoutMs: 500 });
+          const keepAlive = () => {};
+          if (signal === "SIGINT") {
+            process.on(signal, keepAlive);
+          }
 
-        __testing.handleTerminationSignal(signal);
+          __testing.handleTerminationSignal(signal);
 
-        await expect(fs.stat(lockPath)).rejects.toThrow();
-        if (signal === "SIGINT") {
-          process.off(signal, keepAlive);
+          await expect(fs.stat(lockPath)).rejects.toThrow();
+          if (signal === "SIGINT") {
+            process.off(signal, keepAlive);
+          }
+        } finally {
+          await fs.rm(root, { recursive: true, force: true });
         }
-      } finally {
-        await fs.rm(root, { recursive: true, force: true });
       }
+    } finally {
+      process.kill = originalKill;
     }
   });
 
@@ -150,12 +156,18 @@ describe("acquireSessionWriteLock", () => {
     }
   });
   it("keeps other signal listeners registered", () => {
+    const originalKill = process.kill.bind(process) as typeof process.kill;
+    process.kill = ((_pid: number, _signal?: NodeJS.Signals) => true) as typeof process.kill;
     const keepAlive = () => {};
-    process.on("SIGINT", keepAlive);
+    try {
+      process.on("SIGINT", keepAlive);
 
-    __testing.handleTerminationSignal("SIGINT");
+      __testing.handleTerminationSignal("SIGINT");
 
-    expect(process.listeners("SIGINT")).toContain(keepAlive);
-    process.off("SIGINT", keepAlive);
+      expect(process.listeners("SIGINT")).toContain(keepAlive);
+      process.off("SIGINT", keepAlive);
+    } finally {
+      process.kill = originalKill;
+    }
   });
 });

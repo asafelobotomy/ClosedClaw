@@ -10,7 +10,6 @@ import { strict as assert } from "node:assert";
 import {
   extractTags,
   hasOrchestrationTags,
-  type OrchestrationTag,
 } from "../extensions/gtk-gui/src/orchestration-tags.js";
 
 let passed = 0;

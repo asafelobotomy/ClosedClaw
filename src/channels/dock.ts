@@ -108,7 +108,7 @@ function listPluginDockEntries(): Array<{ id: ChannelId; dock: ChannelDock; orde
 export function listChannelDocks(): ChannelDock[] {
   const baseEntries = CHAT_CHANNEL_ORDER.map((id) => ({
     id,
-    dock: DOCKS[id] as ChannelDock | undefined,
+    dock: DOCKS[id],
     order: getChatChannelMeta(id).order,
   })).filter((entry): entry is typeof entry & { dock: ChannelDock } => entry.dock != null);
   const pluginEntries = listPluginDockEntries();

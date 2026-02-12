@@ -5,7 +5,6 @@ import * as os from "node:os";
 import {
   verifySkillSignatureForInstall,
   getVerificationConfig,
-  type VerificationConfig,
 } from "./skill-verification.js";
 import {
   formatPublicKeyPem,

@@ -1,5 +1,3 @@
-import { execSync } from "node:child_process";
-
 export type TimeFormatPreference = "auto" | "12" | "24";
 export type ResolvedTimeFormat = "12" | "24";
 

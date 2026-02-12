@@ -37,7 +37,6 @@ import {
   requestExecHostViaSocket,
   type ExecHostRequest,
   type ExecHostResponse,
-  type ExecHostRunResult,
 } from "../infra/exec-host.js";
 import { getMachineDisplayName } from "../infra/machine-name.js";
 import { ensureClosedClawCliOnPath } from "../infra/path-env.js";
@@ -149,8 +148,8 @@ const OUTPUT_EVENT_TAIL = 20_000;
 const DEFAULT_NODE_PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
 const BROWSER_PROXY_MAX_FILE_BYTES = 10 * 1024 * 1024;
 
-const execHostEnforced = process.env.ClosedClaw_NODE_EXEC_HOST?.trim().toLowerCase() === "app";
-const execHostFallbackAllowed =
+const _execHostEnforced = process.env.ClosedClaw_NODE_EXEC_HOST?.trim().toLowerCase() === "app";
+const _execHostFallbackAllowed =
   process.env.ClosedClaw_NODE_EXEC_FALLBACK?.trim().toLowerCase() !== "0";
 
 const blockedEnvKeys = new Set([
@@ -531,7 +530,7 @@ function buildExecEventPayload(payload: ExecEventPayload): ExecEventPayload {
   return { ...payload, output: text };
 }
 
-async function runViaMacAppExecHost(params: {
+async function _runViaMacAppExecHost(params: {
   approvals: ReturnType<typeof resolveExecApprovals>;
   request: ExecHostRequest;
 }): Promise<ExecHostResponse | null> {

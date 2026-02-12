@@ -42,11 +42,9 @@ describe("path resolution", () => {
 
 describe("upstream tracking state", () => {
   let tmpDir: string;
-  let trackingFile: string;
 
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "closedclaw-test-"));
-    trackingFile = path.join(tmpDir, "upstream-tracking.json5");
   });
 
   afterEach(async () => {
@@ -87,12 +85,10 @@ describe("upstream tracking state", () => {
 
 describe("tracking save/load round-trip", () => {
   let tmpDir: string;
-  let originalHomedir: string;
 
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "closedclaw-test-"));
     // We need to mock homedir for the save/load functions
-    originalHomedir = os.homedir();
     vi.spyOn(os, "homedir").mockReturnValue(tmpDir);
   });
 

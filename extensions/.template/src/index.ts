@@ -19,7 +19,7 @@ export function register(api: ClosedClawPluginApi) {
 
   // Example: Register a tool
   api.registerTool({
-    factory: (ctx) => ({
+    factory: (_ctx) => ({
       name: "example_tool",
       description: "An example tool provided by this extension",
       parameters: {

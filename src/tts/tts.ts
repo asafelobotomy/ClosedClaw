@@ -1530,7 +1530,6 @@ export async function maybeApplyTtsToPayload(params: {
       latencyMs: result.latencyMs,
     };
 
-    const channelId = resolveChannelId(params.channel);
     const shouldVoice = result.voiceCompatible === true;
     const finalPayload = {
       ...nextPayload,

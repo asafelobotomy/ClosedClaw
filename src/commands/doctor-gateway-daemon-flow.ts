@@ -2,7 +2,6 @@ import type { ClosedClawConfig } from "../config/config.js";
 import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SHORT_MS } from "../config/constants/index.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { DoctorOptions, DoctorPrompter } from "./doctor-prompter.js";
-import { formatCliCommand } from "../cli/command-format.js";
 import { resolveGatewayPort } from "../config/config.js";
 import { readLastGatewayErrorLine } from "../daemon/diagnostics.js";
 import { resolveGatewayService } from "../daemon/service.js";

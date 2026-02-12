@@ -9,7 +9,7 @@
  *   facts_fts(content, entities)  — FTS5 virtual table
  */
 
-import { mkdirSync, existsSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { createRequire } from "node:module";
@@ -52,8 +52,8 @@ let _unavailable = false;
  * Returns null if node:sqlite is not available on this runtime.
  */
 export function getDatabase(): InstanceType<typeof import("node:sqlite").DatabaseSync> | null {
-  if (_db) return _db;
-  if (_unavailable) return null;
+  if (_db) {return _db;}
+  if (_unavailable) {return null;}
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -280,10 +280,10 @@ export function getAllEntities(
   for (const row of rows) {
     try {
       const arr = JSON.parse(row.entities) as string[];
-      for (const e of arr) entitySet.add(e);
+      for (const e of arr) {entitySet.add(e);}
     } catch {}
   }
-  return [...entitySet].sort();
+  return [...entitySet].toSorted();
 }
 
 /**
@@ -300,7 +300,7 @@ export function getStats(
   const typeRows = db
     .prepare("SELECT type, COUNT(*) as cnt FROM facts GROUP BY type")
     .all() as Array<{ type: string; cnt: number }>;
-  for (const r of typeRows) byType[r.type] = r.cnt;
+  for (const r of typeRows) {byType[r.type] = r.cnt;}
 
   const range = db
     .prepare("SELECT MIN(day) as earliest, MAX(day) as latest FROM facts")
@@ -401,20 +401,28 @@ function sanitizeFtsQuery(query: string): string {
 }
 
 function rowToResult(row: Record<string, unknown>): SearchResult {
+  const toSafeString = (value: unknown, fallback = ""): string => {
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      return String(value);
+    }
+    return fallback;
+  };
+
   let entities: string[] = [];
   try {
-    entities = JSON.parse(String(row.entities ?? "[]"));
+    const entitiesRaw = toSafeString(row.entities, "[]");
+    entities = JSON.parse(entitiesRaw);
   } catch {}
 
   return {
     fact: {
       id: Number(row.id),
-      type: String(row.type) as FactType,
-      content: String(row.content),
+      type: toSafeString(row.type) as FactType,
+      content: toSafeString(row.content),
       entities,
       confidence: row.confidence != null ? Number(row.confidence) : null,
-      timestamp: String(row.timestamp),
-      day: String(row.day),
+      timestamp: toSafeString(row.timestamp),
+      day: toSafeString(row.day),
     },
     rank: row.rank != null ? Number(row.rank) : undefined,
   };

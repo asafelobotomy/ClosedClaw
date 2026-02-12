@@ -4,7 +4,6 @@ import * as path from "node:path";
 import * as os from "node:os";
 import { generateKeyPair, formatPublicKeyPem } from "../security/skill-signing.js";
 import {
-  loadKeyring,
   addTrustedKey,
   removeTrustedKey,
   getTrustedKey,
@@ -361,10 +360,10 @@ describe("keys-management commands", () => {
       await listKeysCommand(runtime, { json: true });
 
       const logCall = vi.mocked(runtime.log).mock.calls[0][0] as string;
-      const keysMap = JSON.parse(logCall);
+      const keysMap = JSON.parse(logCall) as Record<string, { name?: string }>;
       expect(Object.keys(keysMap)).toHaveLength(3);
 
-      const names = Object.values(keysMap).map((k: any) => k.name);
+      const names = Object.values(keysMap).map((k) => k.name);
       expect(names).toContain("Test Signer 1");
       expect(names).toContain("Test Signer 2");
       expect(names).toContain("Test Signer 3");
@@ -374,10 +373,10 @@ describe("keys-management commands", () => {
       await listKeysCommand(runtime, { trustLevel: "full", json: true });
 
       const logCall = vi.mocked(runtime.log).mock.calls[0][0] as string;
-      const keysMap = JSON.parse(logCall);
+      const keysMap = JSON.parse(logCall) as Record<string, { name?: string; trustLevel?: string }>;
       expect(Object.keys(keysMap)).toHaveLength(1);
 
-      const key: any = Object.values(keysMap)[0];
+      const key = Object.values(keysMap)[0];
       expect(key.name).toBe("Test Signer 1");
       expect(key.trustLevel).toBe("full");
     });
@@ -389,7 +388,7 @@ describe("keys-management commands", () => {
       const keysMap = JSON.parse(logCall);
       expect(Object.keys(keysMap)).toHaveLength(2);
 
-      for (const key of Object.values(keysMap) as any[]) {
+      for (const key of Object.values(keysMap)) {
         expect(key.trustLevel).toBe("marginal");
       }
     });
@@ -425,12 +424,10 @@ describe("keys-management commands", () => {
       await listKeysCommand(runtime, { json: true });
 
       const logCall = vi.mocked(runtime.log).mock.calls[0][0] as string;
-      const keysMap = JSON.parse(logCall);
+      const keysMap = JSON.parse(logCall) as Record<string, { name?: string; notes?: string }>;
 
       // Find the key that has notes (Test Signer 3)
-      const keyWithNotes: any = Object.values(keysMap).find(
-        (k: any) => k.name === "Test Signer 3",
-      );
+      const keyWithNotes = Object.values(keysMap).find((k) => k.name === "Test Signer 3");
       expect(keyWithNotes).toBeDefined();
       expect(keyWithNotes.notes).toBe("Test comment");
     });

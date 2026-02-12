@@ -556,15 +556,6 @@ export async function runNodeDaemonStatus(opts: NodeDaemonStatusOptions = {}) {
     return;
   }
 
-  const baseEnv = {
-    ...(process.env as Record<string, string | undefined>),
-    ...(command?.environment ?? undefined),
-  };
-  const hintEnv = {
-    ...baseEnv,
-    ClosedClaw_LOG_PREFIX: baseEnv.ClosedClaw_LOG_PREFIX ?? "node",
-  } as NodeJS.ProcessEnv;
-
   if (runtime?.missingUnit) {
     defaultRuntime.error(errorText("Service unit not found."));
     for (const hint of buildNodeRuntimeHints()) {

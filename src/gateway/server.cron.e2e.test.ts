@@ -3,7 +3,6 @@ import os from "node:os";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
 import { TIMEOUT_TEST_LONG_MS, TIMEOUT_TEST_SUITE_EXTENDED_MS, TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
-import { TIMEOUT_TEST_LONG_MS, TIMEOUT_TEST_SUITE_EXTENDED_MS, TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 import {
   connectOk,
   installGatewayTestHooks,

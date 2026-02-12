@@ -69,7 +69,7 @@ const TAG_REGEX =
 
 /** Parse attributes from a tag attribute string */
 function parseAttrs(attrStr: string | undefined): Record<string, string> {
-  if (!attrStr) return {};
+  if (!attrStr) {return {};}
   const attrs: Record<string, string> = {};
   const attrRegex = /(\w+)\s*=\s*"([^"]*)"/g;
   let match: RegExpExecArray | null;
@@ -188,7 +188,7 @@ export async function processOrchestrationTags(
           log?.info?.(`[orch] <call:${skill}> ${tag.content.slice(0, 80)}`);
           try {
             const callParams: Record<string, string> = { ...tag.attrs };
-            if (tag.content) callParams.content = tag.content;
+            if (tag.content) {callParams.content = tag.content;}
             delete callParams.skill; // Don't pass skill as param
             const result = await executeTool(skill, callParams);
             sideEffects.push(`call:${skill}: ${result.slice(0, 100)}`);
@@ -216,7 +216,7 @@ export async function processOrchestrationTags(
   // Build clean text by removing hidden tags
   let cleanText = text;
   // Process in reverse order to maintain correct positions
-  const sortedTags = [...tags].sort((a, b) => b.start - a.start);
+  const sortedTags = [...tags].toSorted((a, b) => b.start - a.start);
   for (const tag of sortedTags) {
     if (HIDDEN_TAGS.has(tag.tag) || SIDE_EFFECT_TAGS.has(tag.tag)) {
       cleanText = cleanText.slice(0, tag.start) + cleanText.slice(tag.end);
@@ -233,7 +233,7 @@ export async function processOrchestrationTags(
  * Quick check if text contains any orchestration tags (fast pre-check).
  */
 export function hasOrchestrationTags(text: string): boolean {
-  return /<(?:thought|plan|reflection|memory_write|safety_check|safety_block|handoff|stream|call:\w+)[\s>\/]/i.test(
+  return /<(?:thought|plan|reflection|memory_write|safety_check|safety_block|handoff|stream|call:\w+)[\s>/]/i.test(
     text,
   );
 }

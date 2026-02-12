@@ -87,7 +87,6 @@ export const SessionSchema = z
 
 export const MessagesSchema = z
   .object({
-    messagePrefix: z.string().optional(),
     responsePrefix: z.string().optional(),
     groupChat: GroupChatSchema,
     queue: QueueSchema,

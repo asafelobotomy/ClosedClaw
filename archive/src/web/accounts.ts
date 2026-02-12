@@ -90,7 +90,7 @@ function resolveAccountConfig(
   if (!accounts || typeof accounts !== "object") {
     return undefined;
   }
-  const entry = accounts[accountId] as WhatsAppAccountConfig | undefined;
+  const entry = accounts[accountId];
   return entry;
 }
 

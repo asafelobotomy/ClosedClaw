@@ -1,10 +1,5 @@
 import fs from "node:fs/promises";
-import {
-  formatIcaclsResetCommand,
-  formatWindowsAclSummary,
-  inspectWindowsAcl,
-  type ExecFn,
-} from "./windows-acl.js";
+import { formatIcaclsResetCommand, type ExecFn } from "./windows-acl.js";
 
 export type PermissionCheck = {
   ok: boolean;
@@ -61,7 +56,7 @@ export async function safeStat(targetPath: string): Promise<{
 
 export async function inspectPathPermissions(
   targetPath: string,
-  opts?: PermissionCheckOptions,
+  _opts?: PermissionCheckOptions,
 ): Promise<PermissionCheck> {
   const st = await safeStat(targetPath);
   if (!st.ok) {
@@ -81,8 +76,6 @@ export async function inspectPathPermissions(
   }
 
   const bits = modeBits(st.mode);
-  const platform = opts?.platform ?? process.platform;
-
   // Windows ACL inspection removed (Linux-only build).
 
   return {

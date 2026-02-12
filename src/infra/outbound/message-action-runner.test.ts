@@ -77,7 +77,7 @@ describe("runMessageAction context isolation", () => {
         channel: "imessage",
         message: "hi",
       },
-      toolContext: { currentChannelId: "C12345678" },
+      toolContext: { currentChannelId: "#C12345678" },
       dryRun: true,
     });
 
@@ -116,48 +116,48 @@ describe("runMessageAction context isolation", () => {
   });
 
   it("blocks send when target differs from current channel", async () => {
-    const result = await runMessageAction({
-      cfg: imessageConfig,
-      action: "send",
-      params: {
-        channel: "imessage",
-        target: "channel:C99999999",
-        message: "hi",
-      },
-      toolContext: { currentChannelId: "C12345678", currentChannelProvider: "googlechat" },
-      dryRun: true,
-    });
-
-    expect(result.kind).toBe("action");
+    await expect(
+      runMessageAction({
+        cfg: imessageConfig,
+        action: "send",
+        params: {
+          channel: "imessage",
+          target: "#C99999999",
+          message: "hi",
+        },
+        toolContext: { currentChannelId: "C12345678", currentChannelProvider: "googlechat" },
+        dryRun: true,
+      }),
+    ).rejects.toThrow(/Cross-context messaging denied/);
   });
 
-  it("allows iMessage send when target matches current handle", async () => {
+  it("allows iMessage send when target matches current channel", async () => {
     const result = await runMessageAction({
       cfg: imessageConfig,
       action: "send",
       params: {
         channel: "imessage",
-        target: "imessage:+15551234567",
+        target: "#C12345678",
         message: "hi",
       },
-      toolContext: { currentChannelId: "imessage:+15551234567" },
+      toolContext: { currentChannelId: "C12345678" },
       dryRun: true,
     });
 
     expect(result.kind).toBe("send");
   });
 
-  it("blocks iMessage send when target differs from current handle", async () => {
+  it("blocks iMessage send when target differs from current channel", async () => {
     const result = await runMessageAction({
       cfg: imessageConfig,
       action: "send",
       params: {
         channel: "imessage",
-        target: "imessage:+15551230000",
+        target: "#C99999999",
         message: "hi",
       },
       toolContext: {
-        currentChannelId: "imessage:+15551234567",
+        currentChannelId: "C12345678",
         currentChannelProvider: "imessage",
       },
       dryRun: true,
@@ -179,7 +179,7 @@ describe("runMessageAction context isolation", () => {
       params: {
         message: "hi",
       },
-      toolContext: { currentChannelId: "handle:+15551234567", currentChannelProvider: "imessage" },
+      toolContext: { currentChannelId: "#C12345678", currentChannelProvider: "imessage" },
       dryRun: true,
     });
 
@@ -199,11 +199,11 @@ describe("runMessageAction context isolation", () => {
         cfg: multiConfig,
         action: "send",
         params: {
-          channel: "googlechat",
-          target: "spaces/ABC123",
+          channel: "imessage",
+          target: "#C99999999",
           message: "hi",
         },
-        toolContext: { currentChannelId: "spaces/XYZ789", currentChannelProvider: "googlechat" },
+        toolContext: { currentChannelId: "room:main", currentChannelProvider: "webchat" },
         dryRun: true,
       }),
     ).rejects.toThrow(/Cross-context messaging denied/);
@@ -231,8 +231,10 @@ describe("runMessageAction context isolation", () => {
           message: "hi",
         },
         toolContext: { currentChannelId: "C12345678", currentChannelProvider: "googlechat" },
+        dryRun: true,
+      }),
+    ).rejects.toThrow(/Cross-context messaging denied/);
   });
-
   it("aborts send when abortSignal is already aborted", async () => {
     const controller = new AbortController();
     controller.abort();

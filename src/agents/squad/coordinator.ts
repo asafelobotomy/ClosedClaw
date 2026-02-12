@@ -589,7 +589,7 @@ export class SquadCoordinator {
           output: null,
           contributions: [],
           metrics: { durationMs: 0, tasksCompleted: 0, tasksFailed: 0, totalTokens: 0 },
-          error: `Unknown strategy: ${squad.config.strategy}`,
+          error: "Unknown strategy",
         };
     }
   }

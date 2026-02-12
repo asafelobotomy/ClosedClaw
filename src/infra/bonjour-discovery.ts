@@ -194,7 +194,7 @@ function parseTxtTokens(tokens: string[]): Record<string, string> {
   return txt;
 }
 
-function parseDnsSdBrowse(stdout: string): string[] {
+function _parseDnsSdBrowse(stdout: string): string[] {
   const instances = new Set<string>();
   for (const raw of stdout.split("\n")) {
     const line = raw.trim();
@@ -212,7 +212,7 @@ function parseDnsSdBrowse(stdout: string): string[] {
   return Array.from(instances.values());
 }
 
-function parseDnsSdResolve(stdout: string, instanceName: string): GatewayBonjourBeacon | null {
+function _parseDnsSdResolve(stdout: string, instanceName: string): GatewayBonjourBeacon | null {
   const decodedInstanceName = decodeDnsSdEscapes(instanceName);
   const beacon: GatewayBonjourBeacon = { instanceName: decodedInstanceName };
   let txt: Record<string, string> = {};
@@ -276,7 +276,7 @@ function parseDnsSdResolve(stdout: string, instanceName: string): GatewayBonjour
 
 // discoverViaDnsSd removed (macOS dns-sd, Linux-only build uses avahi).
 
-async function discoverWideAreaViaTailnetDns(
+async function _discoverWideAreaViaTailnetDns(
   domain: string,
   timeoutMs: number,
   run: typeof runCommandWithTimeout,

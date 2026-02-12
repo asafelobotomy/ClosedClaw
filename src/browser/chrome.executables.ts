@@ -9,7 +9,7 @@ export type BrowserExecutable = {
   path: string;
 };
 
-const CHROMIUM_BUNDLE_IDS = new Set([
+const _CHROMIUM_BUNDLE_IDS = new Set([
   "com.google.Chrome",
   "com.google.Chrome.beta",
   "com.google.Chrome.canary",
@@ -112,7 +112,7 @@ function execText(
   }
 }
 
-function inferKindFromIdentifier(identifier: string): BrowserExecutable["kind"] {
+function _inferKindFromIdentifier(identifier: string): BrowserExecutable["kind"] {
   const id = identifier.toLowerCase();
   if (id.includes("brave")) {
     return "brave";

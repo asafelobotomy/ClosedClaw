@@ -399,15 +399,6 @@ export const MediaUnderstandingAttachmentsSchema = z
   .strict()
   .optional();
 
-const DeepgramAudioSchema = z
-  .object({
-    detectLanguage: z.boolean().optional(),
-    punctuate: z.boolean().optional(),
-    smartFormat: z.boolean().optional(),
-  })
-  .strict()
-  .optional();
-
 const ProviderOptionValueSchema = z.union([z.string(), z.number(), z.boolean()]);
 const ProviderOptionsSchema = z
   .record(z.string(), z.record(z.string(), ProviderOptionValueSchema))
@@ -427,7 +418,6 @@ export const MediaUnderstandingModelSchema = z
     timeoutSeconds: z.number().int().positive().optional(),
     language: z.string().optional(),
     providerOptions: ProviderOptionsSchema,
-    deepgram: DeepgramAudioSchema,
     baseUrl: z.string().optional(),
     headers: z.record(z.string(), z.string()).optional(),
     profile: z.string().optional(),
@@ -446,7 +436,6 @@ export const ToolsMediaUnderstandingSchema = z
     timeoutSeconds: z.number().int().positive().optional(),
     language: z.string().optional(),
     providerOptions: ProviderOptionsSchema,
-    deepgram: DeepgramAudioSchema,
     baseUrl: z.string().optional(),
     headers: z.record(z.string(), z.string()).optional(),
     attachments: MediaUnderstandingAttachmentsSchema,

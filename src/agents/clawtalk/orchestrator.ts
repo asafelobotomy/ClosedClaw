@@ -318,7 +318,7 @@ function buildAgentPrompt(
   if (ctMessage.action && ctMessage.action !== "chat") {
     parts.push(`Detected action: ${ctMessage.action}`);
     const paramStr = Object.entries(ctMessage.params)
-      .map(([k, v]) => `  ${k}: ${v}`)
+      .map(([k, v]) => `  ${k}: ${Array.isArray(v) ? v.join(", ") : String(v)}`)
       .join("\n");
     if (paramStr) {
       parts.push(`Parameters:\n${paramStr}`);

@@ -205,7 +205,7 @@ export function verifySkillSignature(
         valid: false,
         signer: signature.signer,
         keyId: signature.keyId,
-        error: `Unsupported algorithm: ${signature.algorithm}`,
+        error: "Unsupported algorithm",
       };
     }
 

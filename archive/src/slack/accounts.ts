@@ -60,13 +60,11 @@ function resolveAccountConfig(
   if (!accounts || typeof accounts !== "object") {
     return undefined;
   }
-  return accounts[accountId] as SlackAccountConfig | undefined;
+  return accounts[accountId];
 }
 
 function mergeSlackAccountConfig(cfg: ClosedClawConfig, accountId: string): SlackAccountConfig {
-  const { accounts: _ignored, ...base } = (cfg.channels?.slack ?? {}) as SlackAccountConfig & {
-    accounts?: unknown;
-  };
+  const { accounts: _ignored, ...base } = (cfg.channels?.slack ?? {});
   const account = resolveAccountConfig(cfg, accountId) ?? {};
   return { ...base, ...account };
 }

@@ -66,13 +66,13 @@ function resolveAccountConfig(
   if (!accounts || typeof accounts !== "object") {
     return undefined;
   }
-  const direct = accounts[accountId] as TelegramAccountConfig | undefined;
+  const direct = accounts[accountId];
   if (direct) {
     return direct;
   }
   const normalized = normalizeAccountId(accountId);
   const matchKey = Object.keys(accounts).find((key) => normalizeAccountId(key) === normalized);
-  return matchKey ? (accounts[matchKey] as TelegramAccountConfig | undefined) : undefined;
+  return matchKey ? (accounts[matchKey]) : undefined;
 }
 
 function mergeTelegramAccountConfig(
@@ -80,7 +80,7 @@ function mergeTelegramAccountConfig(
   accountId: string,
 ): TelegramAccountConfig {
   const { accounts: _ignored, ...base } = (cfg.channels?.telegram ??
-    {}) as TelegramAccountConfig & { accounts?: unknown };
+    {});
   const account = resolveAccountConfig(cfg, accountId) ?? {};
   return { ...base, ...account };
 }

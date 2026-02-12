@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  type ChatAttachment,
   parseMessageWithAttachments,
 } from "./chat-attachments.js";
 

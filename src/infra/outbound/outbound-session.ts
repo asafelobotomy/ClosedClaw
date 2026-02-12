@@ -1,13 +1,13 @@
 import type { MsgContext } from "../../auto-reply/templating.js";
+import { getChannelPlugin } from "../../channels/plugins/index.js";
 import type { ChannelId } from "../../channels/plugins/types.js";
 import type { ClosedClawConfig } from "../../config/config.js";
 import type { ResolvedMessagingTarget } from "./target-resolver.js";
-import { getChannelPlugin } from "../../channels/plugins/index.js";
 import { recordSessionMetaFromInbound, resolveStorePath } from "../../config/sessions.js";
 import {
   buildAgentSessionKey,
-  type RoutePeer,
   type RoutePeerKind,
+  type RoutePeer,
 } from "../../routing/resolve-route.js";
 import { resolveThreadSessionKeys } from "../../routing/session-key.js";
 
@@ -40,34 +40,6 @@ function stripProviderPrefix(raw: string, channel: string): string {
     return trimmed.slice(prefix.length).trim();
   }
   return trimmed;
-}
-
-function stripKindPrefix(raw: string): string {
-  return raw.replace(/^(user|channel|group|conversation|room|dm):/i, "").trim();
-}
-
-function inferPeerKind(params: {
-  channel: ChannelId;
-  resolvedTarget?: ResolvedMessagingTarget;
-}): RoutePeerKind {
-  const resolvedKind = params.resolvedTarget?.kind;
-  if (resolvedKind === "user") {
-    return "dm";
-  }
-  if (resolvedKind === "channel") {
-    return "channel";
-  }
-  if (resolvedKind === "group") {
-    const plugin = getChannelPlugin(params.channel);
-    const chatTypes = plugin?.capabilities?.chatTypes ?? [];
-    const supportsChannel = chatTypes.includes("channel");
-    const supportsGroup = chatTypes.includes("group");
-    if (supportsChannel && !supportsGroup) {
-      return "channel";
-    }
-    return "group";
-  }
-  return "dm";
 }
 
 function buildBaseSessionKey(params: {
@@ -111,7 +83,7 @@ function resolveFallbackSession(
   // Detect kind prefix: "channel:X", "group:X", "user:X", "dm:X"
   const kindMatch = KIND_PREFIX_RE.exec(targetBody);
   if (kindMatch) {
-    const prefix = kindMatch[1]!.toLowerCase();
+    const prefix = kindMatch[1].toLowerCase();
     parsedKind = prefix === "channel" ? "channel" : prefix === "group" ? "group" : "dm";
     targetBody = targetBody.slice(kindMatch[0].length);
   }

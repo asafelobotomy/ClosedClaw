@@ -88,7 +88,7 @@ const DEFAULT_DICTIONARY: ClawTalkDictionary = {
 
 /** Load dictionary from disk or return defaults. */
 export async function loadDictionary(path?: string): Promise<ClawTalkDictionary> {
-  if (!path) return structuredClone(DEFAULT_DICTIONARY);
+  if (!path) {return structuredClone(DEFAULT_DICTIONARY);}
 
   try {
     const raw = await readFile(path, "utf-8");
@@ -142,7 +142,7 @@ export function propose(dict: ClawTalkDictionary, proposal: ClawTalkProposal): v
 /** Approve a proposal, moving it to the macros. */
 export function approveProposal(dict: ClawTalkDictionary, name: string): boolean {
   const idx = dict.proposed.findIndex((p) => p.name.toUpperCase() === name.toUpperCase());
-  if (idx === -1) return false;
+  if (idx === -1) {return false;}
 
   const proposal = dict.proposed[idx];
   dict.proposed.splice(idx, 1);
@@ -160,7 +160,7 @@ export function approveProposal(dict: ClawTalkDictionary, name: string): boolean
 /** Reject a proposal. */
 export function rejectProposal(dict: ClawTalkDictionary, name: string): boolean {
   const idx = dict.proposed.findIndex((p) => p.name.toUpperCase() === name.toUpperCase());
-  if (idx === -1) return false;
+  if (idx === -1) {return false;}
   dict.proposed.splice(idx, 1);
   return true;
 }
@@ -168,11 +168,11 @@ export function rejectProposal(dict: ClawTalkDictionary, name: string): boolean 
 /** Evict least-used non-system macros if dictionary exceeds max size. */
 export function evictLRU(dict: ClawTalkDictionary, maxSize: number): string[] {
   const entries = Object.entries(dict.macros);
-  if (entries.length <= maxSize) return [];
+  if (entries.length <= maxSize) {return [];}
 
   const sortable = entries
     .filter(([_, m]) => m.addedBy !== "system")
-    .sort((a, b) => a[1].usageCount - b[1].usageCount);
+    .toSorted((a, b) => a[1].usageCount - b[1].usageCount);
 
   const evicted: string[] = [];
   while (entries.length - evicted.length > maxSize && sortable.length > 0) {
@@ -181,7 +181,7 @@ export function evictLRU(dict: ClawTalkDictionary, maxSize: number): string[] {
     evicted.push(name);
   }
 
-  if (evicted.length > 0) dict.version++;
+  if (evicted.length > 0) {dict.version++;}
   return evicted;
 }
 

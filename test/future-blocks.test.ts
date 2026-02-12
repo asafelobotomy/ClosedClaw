@@ -5,11 +5,6 @@
 import { describe, it, expect } from "vitest";
 import {
   parseClawsFile,
-  splitBlocks,
-  type ClawsIdentity,
-  type ClawsIdl,
-  type ClawsEngine,
-  type ClawsStateCheckpoint,
   type ClawsVerificationProof,
 } from "../src/agents/clawtalk/claws-parser.js";
 import {

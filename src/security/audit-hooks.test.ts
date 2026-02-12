@@ -19,7 +19,7 @@ import {
   logGatewayEvent,
   closeAuditLogger,
 } from "../security/audit-hooks.js";
-import { AuditLogger, getAuditLogPath, readAuditLog } from "../security/audit-logger.js";
+import { readAuditLog } from "../security/audit-logger.js";
 
 // Mock resolveStateDir at module level
 const { mockResolveStateDir, mockResolveConfigPath } = vi.hoisted(() => ({

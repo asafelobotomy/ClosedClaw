@@ -12,11 +12,7 @@ import {
   auditExportCommand,
   auditVerifyCommand,
 } from "./audit-query.js";
-import {
-  AuditLogger,
-  getAuditLogPath,
-  type AuditEntry,
-} from "../security/audit-logger.js";
+import { AuditLogger } from "../security/audit-logger.js";
 import type { Runtime } from "../runtime.js";
 
 // Mock resolveStateDir to use temp directory

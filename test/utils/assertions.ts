@@ -13,13 +13,28 @@ export function assertValidSessionKey(sessionKey: string) {
   expect(sessionKey).toMatch(/^agent:[^:]+:[^:]+:(dm|group|thread):.+$/);
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return typeof value === "object" && value !== null ? (value as Record<string, unknown>) : {};
+}
+
+function asPrimitiveString(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return "";
+}
+
 /**
  * Assert that a config object is valid
  */
-export function assertValidConfig(config: any) {
+export function assertValidConfig(config: unknown) {
+  const cfg = asRecord(config);
   expect(config).toBeDefined();
-  expect(config.agents).toBeDefined();
-  expect(typeof config.agents).toBe('object');
+  expect(cfg.agents).toBeDefined();
+  expect(typeof cfg.agents).toBe('object');
 }
 
 /**
@@ -33,33 +48,36 @@ export function assertErrorContains(error: Error, expected: string) {
 /**
  * Assert that a tool result is successful
  */
-export function assertToolSuccess(result: any) {
+export function assertToolSuccess(result: unknown) {
+  const value = asRecord(result);
   expect(result).toBeDefined();
-  expect(result.error).toBeUndefined();
+  expect(value.error).toBeUndefined();
 }
 
 /**
  * Assert that a tool result is an error
  */
-export function assertToolError(result: any, expectedMessage?: string) {
+export function assertToolError(result: unknown, expectedMessage?: string) {
+  const value = asRecord(result);
   expect(result).toBeDefined();
-  expect(result.error).toBeDefined();
+  expect(value.error).toBeDefined();
   
   if (expectedMessage) {
-    expect(result.error).toContain(expectedMessage);
+    expect(asPrimitiveString(value.error)).toContain(expectedMessage);
   }
 }
 
 /**
  * Assert that an audit log entry is valid
  */
-export function assertValidAuditEntry(entry: any) {
+export function assertValidAuditEntry(entry: unknown) {
+  const value = asRecord(entry);
   expect(entry).toBeDefined();
-  expect(entry.seq).toBeTypeOf('number');
-  expect(entry.ts).toBeTypeOf('string');
-  expect(entry.type).toBeTypeOf('string');
-  expect(entry.severity).toMatch(/^(debug|info|warn|error|critical)$/);
-  expect(entry.hash).toBeTypeOf('string');
+  expect(value.seq).toBeTypeOf('number');
+  expect(value.ts).toBeTypeOf('string');
+  expect(value.type).toBeTypeOf('string');
+  expect(asPrimitiveString(value.severity)).toMatch(/^(debug|info|warn|error|critical)$/);
+  expect(value.hash).toBeTypeOf('string');
 }
 
 /**
@@ -88,11 +106,12 @@ export function assertValidEncryptedFormat(encrypted: string) {
 /**
  * Assert that a keychain entry is valid
  */
-export function assertValidKeychainEntry(entry: any) {
+export function assertValidKeychainEntry(entry: unknown) {
+  const value = asRecord(entry);
   expect(entry).toBeDefined();
-  expect(entry.namespace).toBeTypeOf('string');
-  expect(entry.identifier).toBeTypeOf('string');
-  expect(entry.secret).toBeTypeOf('string');
+  expect(value.namespace).toBeTypeOf('string');
+  expect(value.identifier).toBeTypeOf('string');
+  expect(value.secret).toBeTypeOf('string');
 }
 
 /**

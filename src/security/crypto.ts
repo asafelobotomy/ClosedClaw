@@ -49,10 +49,10 @@ export function encrypt(params: {
   keyId?: string;
 }): EncryptedPayload {
   if (params.config.algorithm !== "xchacha20-poly1305") {
-    throw new Error(`Unsupported encryption algorithm: ${params.config.algorithm}`);
+    throw new Error("Unsupported encryption algorithm");
   }
   if (params.config.kdf !== "argon2id") {
-    throw new Error(`Unsupported KDF: ${params.config.kdf}`);
+    throw new Error("Unsupported KDF");
   }
 
   // Generate random salt and nonce
@@ -94,13 +94,13 @@ export function encrypt(params: {
  */
 export function decrypt(params: { payload: EncryptedPayload; passphrase: string }): string {
   if (params.payload.version !== 1) {
-    throw new Error(`Unsupported encryption version: ${params.payload.version}`);
+    throw new Error("Unsupported encryption version");
   }
   if (params.payload.algorithm !== "xchacha20-poly1305") {
-    throw new Error(`Unsupported encryption algorithm: ${params.payload.algorithm}`);
+    throw new Error("Unsupported encryption algorithm");
   }
   if (params.payload.kdf !== "argon2id") {
-    throw new Error(`Unsupported KDF: ${params.payload.kdf}`);
+    throw new Error("Unsupported KDF");
   }
 
   // Parse KDF params
@@ -126,7 +126,8 @@ export function decrypt(params: { payload: EncryptedPayload; passphrase: string 
   try {
     plaintextBytes = cipher.decrypt(ciphertext);
   } catch (err) {
-    throw new Error(`Decryption failed: incorrect passphrase or corrupted data: ${err}`, {
+    const detail = err instanceof Error ? err.message : String(err);
+    throw new Error(`Decryption failed: incorrect passphrase or corrupted data: ${detail}`, {
       cause: err,
     });
   }

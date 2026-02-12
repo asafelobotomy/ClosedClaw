@@ -1,8 +1,6 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { resolveOAuthDir } from "./config/paths.js";
-import { logVerbose, shouldLogVerbose } from "./globals.js";
 
 export async function ensureDir(dir: string) {
   await fs.promises.mkdir(dir, { recursive: true });

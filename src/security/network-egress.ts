@@ -19,7 +19,6 @@
  * @see {@link ../infra/net/ssrf.ts SSRF Protection Layer}
  */
 
-import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
 import { getStateDir } from "../config/constants/index.js";
@@ -303,9 +302,10 @@ export function evaluateEgress(domain: string, policy: EgressPolicy): EgressChec
 
     default: {
       const _exhaustive: never = policy.mode;
+      void _exhaustive;
       return {
         allowed: false,
-        reason: `Unknown egress mode: ${_exhaustive}`,
+        reason: "Unknown egress mode",
         mode: policy.mode,
       };
     }

@@ -63,10 +63,11 @@ export function parse(input: string): ClawTalkMessage {
   if (!versionMatch) {
     throw new ClawTalkParseError(`Invalid protocol header: "${header}" (expected CT/<version>)`, input);
   }
-  const version = Number.parseInt(versionMatch[1], 10) as ClawTalkVersion;
-  if (version !== 1) {
-    throw new ClawTalkParseError(`Unsupported protocol version: ${version}`, input);
+  const parsedVersion = Number.parseInt(versionMatch[1], 10);
+  if (parsedVersion !== 1) {
+    throw new ClawTalkParseError(`Unsupported protocol version: ${parsedVersion}`, input);
   }
+  const version: ClawTalkVersion = 1;
 
   // Parse verb
   const verbStr = tokens[1].toUpperCase();
@@ -190,8 +191,8 @@ function parseValue(raw: string): string | number | boolean | string[] {
   }
 
   // Boolean
-  if (value === "true") return true;
-  if (value === "false") return false;
+  if (value === "true") {return true;}
+  if (value === "false") {return false;}
 
   // Number
   if (/^-?\d+(\.\d+)?$/.test(value)) {
@@ -199,10 +200,10 @@ function parseValue(raw: string): string | number | boolean | string[] {
   }
 
   // Duration suffix (30d, 24h, 1w) → keep as string
-  if (/^\d+[smhdwMy]$/.test(value)) return value;
+  if (/^\d+[smhdwMy]$/.test(value)) {return value;}
 
   // Token count suffix (4.2k, 12M) → keep as string
-  if (/^\d+(\.\d+)?[kKmM]$/.test(value)) return value;
+  if (/^\d+(\.\d+)?[kKmM]$/.test(value)) {return value;}
 
   // Comma-separated array
   if (value.includes(",") && !value.includes(" ")) {

@@ -44,13 +44,11 @@ function resolveAccountConfig(
   if (!accounts || typeof accounts !== "object") {
     return undefined;
   }
-  return accounts[accountId] as DiscordAccountConfig | undefined;
+  return accounts[accountId];
 }
 
 function mergeDiscordAccountConfig(cfg: ClosedClawConfig, accountId: string): DiscordAccountConfig {
-  const { accounts: _ignored, ...base } = (cfg.channels?.discord ?? {}) as DiscordAccountConfig & {
-    accounts?: unknown;
-  };
+  const { accounts: _ignored, ...base } = (cfg.channels?.discord ?? {});
   const account = resolveAccountConfig(cfg, accountId) ?? {};
   return { ...base, ...account };
 }

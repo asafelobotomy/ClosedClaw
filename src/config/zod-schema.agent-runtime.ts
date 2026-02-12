@@ -481,7 +481,6 @@ export const ToolsSchema = z
     links: ToolsLinksSchema,
     message: z
       .object({
-        allowCrossContextSend: z.boolean().optional(),
         crossContext: z
           .object({
             allowWithinProvider: z.boolean().optional(),

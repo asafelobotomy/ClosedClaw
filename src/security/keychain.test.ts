@@ -325,7 +325,7 @@ describe("migrateCredentials", () => {
 
     // Migrate to a different directory
     const targetDir = path.join(tmpDir, "target");
-    const result = await migrateCredentials({
+    await migrateCredentials({
       backend: "encrypted-file",
       stateDir: targetDir,
     });

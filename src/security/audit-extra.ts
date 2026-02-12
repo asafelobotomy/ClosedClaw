@@ -14,7 +14,6 @@ import {
 import { resolveToolProfilePolicy } from "../agents/tool-policy.js";
 import { resolveBrowserConfig } from "../browser/config.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import { resolveNativeSkillsEnabled } from "../config/commands.js";
 import { createConfigIO } from "../config/config.js";
 import { INCLUDE_KEY, MAX_INCLUDE_DEPTH } from "../config/includes.js";
 import { resolveOAuthDir } from "../config/paths.js";
@@ -607,8 +606,6 @@ export async function collectPluginsTrustFindings(params: {
   const allow = params.cfg.plugins?.allow;
   const allowConfigured = Array.isArray(allow) && allow.length > 0;
   if (!allowConfigured) {
-    const hasString = (value: unknown) => typeof value === "string" && value.trim().length > 0;
-
     // Check if any remaining platforms have native skills exposure
     // (simplified check - just look for basic configuration presence)
     const channelsConfig = params.cfg.channels as Record<string, unknown> | undefined;

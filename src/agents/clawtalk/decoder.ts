@@ -7,53 +7,77 @@
 
 import type { ClawTalkMessage } from "./types.js";
 
+function formatParam(value: ClawTalkMessage["params"][string] | undefined): string {
+  if (value === undefined) {
+    return "";
+  }
+  if (Array.isArray(value)) {
+    return value.join(", ");
+  }
+  return String(value);
+}
+
+function formatUnknown(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value === "number" || typeof value === "boolean" || value === null) {
+    return String(value);
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return "[unserializable]";
+  }
+}
+
 /** Decode templates for common action types */
 const ACTION_TEMPLATES: Record<string, (msg: ClawTalkMessage) => string> = {
   web_search: (msg) => {
-    const q = msg.params.q ?? "unknown";
-    const limit = msg.params.limit ? ` (top ${msg.params.limit})` : "";
-    const since = msg.params.since ? ` from the last ${msg.params.since}` : "";
+    const q = formatParam(msg.params.q) || "unknown";
+    const limit = msg.params.limit !== undefined ? ` (top ${formatParam(msg.params.limit)})` : "";
+    const since = msg.params.since !== undefined ? ` from the last ${formatParam(msg.params.since)}` : "";
     return `Search the web for "${q}"${since}${limit}`;
   },
   summarize: (msg) => {
-    const target = msg.params.target ?? msg.params.url ?? "the content";
+    const target = formatParam(msg.params.target ?? msg.params.url) || "the content";
     return `Summarize ${target}`;
   },
   browse: (msg) => {
-    const url = msg.params.url ?? "the URL";
+    const url = formatParam(msg.params.url) || "the URL";
     return `Browse ${url}`;
   },
   read_file: (msg) => {
-    const target = msg.params.target ?? "the file";
+    const target = formatParam(msg.params.target) || "the file";
     return `Read file ${target}`;
   },
   write_file: (msg) => {
-    const target = msg.params.target ?? "the file";
+    const target = formatParam(msg.params.target) || "the file";
     return `Write to ${target}`;
   },
   list_directory: (msg) => {
-    const target = msg.params.target ?? ".";
+    const target = formatParam(msg.params.target) || ".";
     return `List contents of ${target}`;
   },
   exec: (msg) => {
-    const cmd = msg.params.cmd ?? "the command";
+    const cmd = formatParam(msg.params.cmd) || "the command";
     return `Run command: ${cmd}`;
   },
   code_generate: (msg) => {
-    const lang = msg.params.lang ? ` in ${msg.params.lang}` : "";
-    const q = msg.params.q ?? "the requested code";
+    const lang = msg.params.lang !== undefined ? ` in ${formatParam(msg.params.lang)}` : "";
+    const q = formatParam(msg.params.q) || "the requested code";
     return `Generate code${lang}: ${q}`;
   },
   review: (msg) => {
-    const target = msg.params.target ?? "the code";
+    const target = formatParam(msg.params.target) || "the code";
     return `Review ${target}`;
   },
   debug: (msg) => {
-    const target = msg.params.target ?? "the issue";
+    const target = formatParam(msg.params.target) || "the issue";
     return `Debug ${target}`;
   },
   refactor: (msg) => {
-    const target = msg.params.target ?? "the code";
+    const target = formatParam(msg.params.target) || "the code";
     return `Refactor ${target}`;
   },
   save_note: (msg) => {
@@ -62,13 +86,13 @@ const ACTION_TEMPLATES: Record<string, (msg: ClawTalkMessage) => string> = {
     return `Save note: ${str.slice(0, 100)}`;
   },
   recall_notes: (msg) => {
-    const q = msg.params.q ? ` matching "${msg.params.q}"` : "";
+    const q = msg.params.q !== undefined ? ` matching "${formatParam(msg.params.q)}"` : "";
     return `Recall notes${q}`;
   },
   chat: (msg) => String(msg.params.q ?? ""),
   audit: (msg) => {
-    const target = msg.params.target ?? "the target";
-    const scope = msg.params.scope ? ` (scope: ${msg.params.scope})` : "";
+    const target = formatParam(msg.params.target) || "the target";
+    const scope = msg.params.scope !== undefined ? ` (scope: ${formatParam(msg.params.scope)})` : "";
     return `Audit ${target}${scope}`;
   },
 };
@@ -77,38 +101,38 @@ const ACTION_TEMPLATES: Record<string, (msg: ClawTalkMessage) => string> = {
  * Decode a ClawTalk message back to human-readable text.
  */
 export function decode(msg: ClawTalkMessage): string {
-  if (msg.verb === "RES") return decodeResponse(msg);
-  if (msg.verb === "ERR") return decodeError(msg);
-  if (msg.verb === "STATUS") return decodeStatus(msg);
+  if (msg.verb === "RES") {return decodeResponse(msg);}
+  if (msg.verb === "ERR") {return decodeError(msg);}
+  if (msg.verb === "STATUS") {return decodeStatus(msg);}
 
   if (msg.verb === "ACK") {
-    return `Acknowledged${msg.params.ref ? ` (ref: ${msg.params.ref})` : ""}`;
+    return `Acknowledged${msg.params.ref !== undefined ? ` (ref: ${formatParam(msg.params.ref)})` : ""}`;
   }
 
   if (msg.verb === "NOOP") {
-    return msg.params.reason ? `No action needed: ${msg.params.reason}` : "No action needed";
+    return msg.params.reason !== undefined ? `No action needed: ${formatParam(msg.params.reason)}` : "No action needed";
   }
 
   // REQ/TASK — use action templates
   const action = msg.action ?? "";
   const template = ACTION_TEMPLATES[action];
-  if (template) return template(msg);
+  if (template) {return template(msg);}
 
   // Fallback: reconstruct from parts
   const parts: string[] = [msg.verb];
-  if (msg.action) parts.push(msg.action);
+  if (msg.action) {parts.push(msg.action);}
   for (const [k, v] of Object.entries(msg.params)) {
-    parts.push(`${k}=${v}`);
+    parts.push(`${k}=${formatParam(v)}`);
   }
   return parts.join(" ");
 }
 
 /** Decode a RES message */
 function decodeResponse(msg: ClawTalkMessage): string {
-  if (typeof msg.params.text === "string") return msg.params.text;
+  if (typeof msg.params.text === "string") {return msg.params.text;}
 
   if (msg.payload) {
-    if (typeof msg.payload === "string") return msg.payload;
+    if (typeof msg.payload === "string") {return msg.payload;}
     if (Array.isArray(msg.payload)) {
       return msg.payload.map((item, i) => `${i + 1}. ${formatPayloadItem(item)}`).join("\n");
     }
@@ -116,7 +140,7 @@ function decodeResponse(msg: ClawTalkMessage): string {
   }
 
   if (msg.params.ok) {
-    const items = msg.params.items ? ` (${msg.params.items} items)` : "";
+    const items = msg.params.items !== undefined ? ` (${formatParam(msg.params.items)} items)` : "";
     return `Completed successfully${items}`;
   }
 
@@ -125,9 +149,9 @@ function decodeResponse(msg: ClawTalkMessage): string {
 
 /** Decode an ERR message */
 function decodeError(msg: ClawTalkMessage): string {
-  const code = msg.params.code ?? "unknown";
-  const tool = msg.params.tool ? ` in ${msg.params.tool}` : "";
-  const elapsed = msg.params.elapsed ? ` after ${msg.params.elapsed}` : "";
+  const code = formatParam(msg.params.code) || "unknown";
+  const tool = msg.params.tool !== undefined ? ` in ${formatParam(msg.params.tool)}` : "";
+  const elapsed = msg.params.elapsed !== undefined ? ` after ${formatParam(msg.params.elapsed)}` : "";
   const retry = msg.params.retry ? " (will retry)" : "";
   return `Error: ${code}${tool}${elapsed}${retry}`;
 }
@@ -135,8 +159,8 @@ function decodeError(msg: ClawTalkMessage): string {
 /** Decode a STATUS message */
 function decodeStatus(msg: ClawTalkMessage): string {
   const progress = msg.params.progress;
-  const phase = msg.params.phase ? ` — ${msg.params.phase}` : "";
-  const findings = msg.params.findings ? `, ${msg.params.findings} finding(s)` : "";
+  const phase = msg.params.phase !== undefined ? ` — ${formatParam(msg.params.phase)}` : "";
+  const findings = msg.params.findings !== undefined ? `, ${formatParam(msg.params.findings)} finding(s)` : "";
 
   if (typeof progress === "number") {
     const pct = Math.round(Number(progress) * 100);
@@ -147,16 +171,19 @@ function decodeStatus(msg: ClawTalkMessage): string {
 
 /** Format a single payload item for display */
 function formatPayloadItem(item: unknown): string {
-  if (typeof item === "string") return item;
-  if (typeof item !== "object" || item === null) return String(item);
+  if (typeof item === "string") {return item;}
+  if (typeof item !== "object" || item === null) {return String(item);}
 
   const obj = item as Record<string, unknown>;
   const title = obj.title ?? obj.name ?? obj.label ?? obj.id;
   const desc = obj.description ?? obj.summary ?? obj.text;
 
-  if (title && desc) return `**${title}**: ${desc}`;
-  if (title) return String(title);
-  if (desc) return String(desc);
+  const titleText = title == null ? "" : formatUnknown(title);
+  const descText = desc == null ? "" : formatUnknown(desc);
+
+  if (titleText && descText) {return `**${titleText}**: ${descText}`;}
+  if (titleText) {return titleText;}
+  if (descText) {return descText;}
 
   return JSON.stringify(item);
 }

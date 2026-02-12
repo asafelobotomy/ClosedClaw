@@ -302,14 +302,14 @@ export async function auditStatsCommand(
 
   runtime.log("");
   runtime.log(theme.heading("By Event Type"));
-  const typeEntries = Object.entries(stats.byType).sort((a, b) => b[1] - a[1]);
+  const typeEntries = Object.entries(stats.byType).toSorted((a, b) => b[1] - a[1]);
   for (const [type, count] of typeEntries) {
     runtime.log(`  ${type.padEnd(20)} ${count}`);
   }
 
   runtime.log("");
   runtime.log(theme.heading("By Severity"));
-  const sevEntries = Object.entries(stats.bySeverity).sort((a, b) => {
+  const sevEntries = Object.entries(stats.bySeverity).toSorted((a, b) => {
     const sevOrder = { critical: 0, error: 1, warn: 2, info: 3 };
     return sevOrder[a[0] as keyof typeof sevOrder] - sevOrder[b[0] as keyof typeof sevOrder];
   });

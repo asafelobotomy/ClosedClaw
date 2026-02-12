@@ -9,8 +9,6 @@ export type TelegramFileInfo = {
   file_path?: string;
 };
 
-import { TIMEOUT_HTTP_DEFAULT_MS, TIMEOUT_HTTP_LONG_MS } from "../config/constants/index.js";
-
 export async function getTelegramFile(
   token: string,
   fileId: string,

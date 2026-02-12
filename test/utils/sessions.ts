@@ -52,7 +52,7 @@ export function createTestSessionWithMessages(
   }));
 
   return createTestSession(sessionKey, {
-    messages: messages as any,
+    messages: messages as unknown as AgentSession["messages"],
   });
 }
 

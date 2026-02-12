@@ -195,7 +195,7 @@ export async function resolveGatewayBindHost(
   }
 
   console.warn(
-    `[gateway] WARNING: unknown bind mode "${mode}" — falling back to 0.0.0.0 (all interfaces).`,
+    '[gateway] WARNING: unknown bind mode — falling back to 0.0.0.0 (all interfaces).',
   );
   return "0.0.0.0";
 }

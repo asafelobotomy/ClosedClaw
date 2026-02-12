@@ -681,10 +681,10 @@ async function handleSendAction(ctx: ResolvedActionContext): Promise<MessageActi
   const threadId = readStringParam(params, "threadId");
   const autoThreadId: string | undefined = (() => {
     const ctx = input.toolContext;
-    if (!ctx?.currentThreadTs) return undefined;
-    if (ctx.replyToMode === "off") return undefined;
+    if (!ctx?.currentThreadTs) {return undefined;}
+    if (ctx.replyToMode === "off") {return undefined;}
     const currentId = (ctx.currentChannelId ?? "").trim().toLowerCase();
-    if (!currentId) return undefined;
+    if (!currentId) {return undefined;}
     const targetNorm = to
       .trim()
       .toLowerCase()

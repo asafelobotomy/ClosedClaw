@@ -169,7 +169,7 @@ export function computeRiskVector(ctx: ToolInvocationContext): SemanticResult {
  * Compute cosine similarity between two vectors.
  */
 export function cosineSimilarity(a: number[], b: number[]): number {
-  if (a.length !== b.length || a.length === 0) return 0;
+  if (a.length !== b.length || a.length === 0) {return 0;}
 
   let dot = 0;
   let magA = 0;
@@ -288,8 +288,8 @@ export function evaluateShield(
     reason = `Risk vector ${semantic.riskVector} exceeds threshold — biometric required`;
   } else if (maxAction === "log") {
     const parts: string[] = [];
-    if (semantic.action === "log") parts.push(`risk=${semantic.riskVector}`);
-    if (attestation.action === "log") parts.push(`drift=${attestation.drift}`);
+    if (semantic.action === "log") {parts.push(`risk=${semantic.riskVector}`);}
+    if (attestation.action === "log") {parts.push(`drift=${attestation.drift}`);}
     reason = `Logged execution: ${parts.join(", ")}`;
   } else {
     reason = "All layers passed";

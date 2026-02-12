@@ -21,7 +21,8 @@ export class GitService {
       const { stdout } = await execFileAsync("git", args, { cwd: this.repoPath });
       return stdout.trim();
     } catch (error) {
-      throw new Error(`Git command failed: ${error}`, { cause: error });
+      const detail = error instanceof Error ? error.message : String(error);
+      throw new Error(`Git command failed: ${detail}`, { cause: error });
     }
   }
 

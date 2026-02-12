@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ClosedClawConfig } from "../../config/config.js";
 import type { ChannelOutboundAdapter } from "../../channels/plugins/types.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
-import { markdownToSignalTextChunks } from "../../signal/format.js";
 import {
   createIMessageTestPlugin,
   createOutboundTestPlugin,
@@ -30,6 +29,9 @@ const chunkByLength = (text: string, limit: number): string[] => {
   return chunks;
 };
 
+const markdownToTextChunks = (text: string, limit: number): Array<{ text: string }> =>
+  chunkByLength(text, limit).map((chunk) => ({ text: chunk }));
+
 const createChannelStubOutbound = (
   channel: string,
   opts?: {
@@ -43,11 +45,17 @@ const createChannelStubOutbound = (
   chunker: opts?.chunker,
   chunkerMode: opts?.chunkerMode,
   textChunkLimit: opts?.textChunkLimit,
-  sendText: async ({ deps, to, text, accountId, gifPlayback }: any) => {
+  sendText: async ({ deps, to, text, accountId, gifPlayback }: {
+    deps?: Record<string, unknown>;
+    to: string;
+    text: string;
+    accountId?: string | null;
+    gifPlayback?: unknown;
+  }) => {
     const depsKey = CHANNEL_DEPS_MAP[channel];
-    const send = depsKey ? (deps as any)?.[depsKey] : undefined;
+    const send = depsKey ? deps?.[depsKey] : undefined;
     if (send) {
-      const result = await send(to, text, {
+      const result = await (send as (to: string, text: string, opts: Record<string, unknown>) => Promise<Record<string, unknown>>)(to, text, {
         verbose: false,
         accountId: accountId ?? undefined,
         gifPlayback,
@@ -56,11 +64,18 @@ const createChannelStubOutbound = (
     }
     return { channel, messageId: "test", to, text };
   },
-  sendMedia: async ({ deps, to, text, mediaUrl, accountId, gifPlayback }: any) => {
+  sendMedia: async ({ deps, to, text, mediaUrl, accountId, gifPlayback }: {
+    deps?: Record<string, unknown>;
+    to: string;
+    text: string;
+    mediaUrl?: string;
+    accountId?: string | null;
+    gifPlayback?: unknown;
+  }) => {
     const depsKey = CHANNEL_DEPS_MAP[channel];
-    const send = depsKey ? (deps as any)?.[depsKey] : undefined;
+    const send = depsKey ? deps?.[depsKey] : undefined;
     if (send) {
-      const result = await send(to, text, {
+      const result = await (send as (to: string, text: string, opts: Record<string, unknown>) => Promise<Record<string, unknown>>)(to, text, {
         verbose: false,
         mediaUrl,
         accountId: accountId ?? undefined,
@@ -180,7 +195,7 @@ describe("deliverOutboundPayloads", () => {
       channels: { signal: { textChunkLimit: 20 } },
     };
     const text = `Intro\\n\\n\x60\x60\x60\x60md\\n${"y".repeat(60)}\\n\x60\x60\x60\\n\\nOutro`;
-    const expectedChunks = markdownToSignalTextChunks(text, 20);
+    const expectedChunks = markdownToTextChunks(text, 20);
 
     await deliverOutboundPayloads({
       cfg,
@@ -437,7 +452,7 @@ const defaultRegistry = createTestRegistry([
     plugin: createOutboundTestPlugin({
       id: "signal",
       outbound: createChannelStubOutbound("signal", {
-        chunker: (text, limit) => markdownToSignalTextChunks(text, limit).map((c) => c.text),
+        chunker: (text, limit) => markdownToTextChunks(text, limit).map((c) => c.text),
         chunkerMode: "markdown",
       }),
     }),

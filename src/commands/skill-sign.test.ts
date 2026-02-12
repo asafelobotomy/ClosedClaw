@@ -94,7 +94,7 @@ describe("skill-sign commands", () => {
       });
 
       const logCall = vi.mocked(runtime.log).mock.calls[0][0] as string;
-      const result = JSON.parse(logCall);
+      JSON.parse(logCall);
 
       // Check files were created - filename includes keyId prefix
       const files = await fs.readdir(outputDir);

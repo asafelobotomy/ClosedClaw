@@ -108,7 +108,7 @@ async function safeChmod(params: {
   }
 }
 
-async function safeAclReset(params: {
+async function _safeAclReset(params: {
   path: string;
   require: "dir" | "file";
   env: NodeJS.ProcessEnv;
@@ -289,6 +289,7 @@ function applyConfigFixes(params: { cfg: ClosedClawConfig; env: NodeJS.ProcessEn
   }
 
   for (const channel of [
+    "webchat",
     "telegram",
     "whatsapp",
     "discord",
@@ -460,8 +461,6 @@ export async function fixSecurityFootguns(opts?: {
   exec?: ExecFn;
 }): Promise<SecurityFixResult> {
   const env = opts?.env ?? process.env;
-  const platform = opts?.platform ?? process.platform;
-  const exec = opts?.exec ?? runExec;
   const stateDir = opts?.stateDir ?? resolveStateDir(env);
   const configPath = opts?.configPath ?? resolveConfigPath(env, stateDir);
   const actions: SecurityFixAction[] = [];

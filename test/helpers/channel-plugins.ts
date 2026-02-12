@@ -50,3 +50,29 @@ export const createOutboundTestPlugin = (params: {
   },
   outbound: params.outbound,
 });
+
+export const createIMessageTestPlugin = (params?: {
+  outbound?: ChannelOutboundAdapter;
+  capabilities?: ChannelCapabilities;
+}): ChannelPlugin => ({
+  id: "imessage",
+  meta: {
+    id: "imessage",
+    label: "iMessage",
+    selectionLabel: "iMessage",
+    docsPath: "/channels/imessage",
+    blurb: "test stub.",
+  },
+  capabilities: params?.capabilities ?? { chatTypes: ["direct"] },
+  config: {
+    listAccountIds: () => [],
+    resolveAccount: () => ({}),
+  },
+  outbound:
+    params?.outbound ??
+    ({
+      deliveryMode: "direct",
+      sendText: async () => ({ channel: "imessage", messageId: "test-imessage-text" }),
+      sendMedia: async () => ({ channel: "imessage", messageId: "test-imessage-media" }),
+    } as ChannelOutboundAdapter),
+});

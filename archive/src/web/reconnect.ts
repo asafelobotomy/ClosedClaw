@@ -12,10 +12,6 @@ export type ReconnectPolicy = BackoffPolicy & {
 };
 
 export const DEFAULT_HEARTBEAT_SECONDS = 60;
-import {
-  DELAY_RECONNECT_INITIAL_MS,
-  DELAY_RECONNECT_MAX_MS,
-} from "../config/constants/index.js";
 
 export const DEFAULT_RECONNECT_POLICY: ReconnectPolicy = {
   initialMs: DELAY_RECONNECT_INITIAL_MS,

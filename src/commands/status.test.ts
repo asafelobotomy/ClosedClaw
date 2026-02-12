@@ -1,5 +1,4 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { TIMEOUT_TEST_SUITE_SHORT_MS, minutesToMs } from "../config/constants/index.js";
 
 let previousProfile: string | undefined;
 

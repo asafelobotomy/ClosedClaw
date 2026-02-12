@@ -11,9 +11,9 @@ import type { ClosedClawPluginApi } from 'closedclaw/plugin-sdk';
 
 describe('Extension Template', () => {
   let mockApi: ClosedClawPluginApi;
-  let registeredTools: any[];
-  let registeredHooks: any[];
-  let registeredCommands: any[];
+  let registeredTools: unknown[];
+  let registeredHooks: unknown[];
+  let registeredCommands: unknown[];
 
   beforeEach(() => {
     registeredTools = [];
@@ -44,7 +44,7 @@ describe('Extension Template', () => {
       registerService: () => {},
       registerGatewayHandler: () => {},
       registerHttpRoute: () => {},
-    } as any;
+    } as unknown as ClosedClawPluginApi;
   });
 
   it('should register successfully', () => {

@@ -210,7 +210,7 @@ async function main() {
       });
     }
   } finally {
-    await (lock as GatewayLockHandle | null)?.release();
+    await (lock)?.release();
     cleanupSignals();
   }
 }

@@ -28,7 +28,8 @@ export async function upstreamStatusCommand(
   try {
     await git.fetch(remoteName);
   } catch (error) {
-    console.error(chalk.red(`❌ Failed to fetch upstream: ${error}`));
+    const detail = error instanceof Error ? error.message : String(error);
+    console.error(chalk.red(`❌ Failed to fetch upstream: ${detail}`));
     process.exit(1);
   }
 

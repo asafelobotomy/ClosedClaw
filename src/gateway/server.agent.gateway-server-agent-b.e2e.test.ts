@@ -4,7 +4,6 @@ import path from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { WebSocket } from "ws";
 import { secondsToMs, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
-import { secondsToMs, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
 import type { PluginRegistry } from "../plugins/registry.js";
 // WhatsApp removed - using MSTeams for testing

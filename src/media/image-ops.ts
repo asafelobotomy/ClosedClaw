@@ -11,10 +11,6 @@ export type ImageMetadata = {
   height: number;
 };
 
-function isBun(): boolean {
-  return typeof (process.versions as { bun?: unknown }).bun === "string";
-}
-
 function prefersSips(): boolean {
   return process.env.ClosedClaw_IMAGE_BACKEND === "sips";
 }

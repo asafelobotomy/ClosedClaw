@@ -230,7 +230,6 @@ export class AttestationMonitor {
    * Deprecates the current fingerprint and returns a request object.
    */
   requestRefingerprint(reason: string): RefingerprintRequest {
-    const oldState = this._state;
     this._state = "deprecated";
 
     return {
@@ -293,7 +292,7 @@ export class AttestationMonitor {
  * Parse a neural digest string (comma-separated floats) into a number array.
  */
 export function parseDigest(digest: string): number[] {
-  if (!digest || !digest.includes(",")) return [];
+  if (!digest || !digest.includes(",")) {return [];}
   return digest
     .split(",")
     .map((s) => parseFloat(s.trim()))

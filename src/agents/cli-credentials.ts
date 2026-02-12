@@ -130,8 +130,7 @@ function readCodexKeychainCredentials(options?: {
     return null;
   }
   const execSyncImpl = options?.execSync ?? execSync;
-  const codexHome = process.env.CODEX_HOME;
-  const accountHash = "cli|";
+  const accountHash = computeCodexKeychainAccount(resolveCodexHomePath());
   try {
     const result = execSyncImpl(
       `security find-generic-password -s "Codex Auth" -a "${accountHash}" -w`,

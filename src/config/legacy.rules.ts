@@ -93,4 +93,58 @@ export const LEGACY_CONFIG_RULES: LegacyConfigRule[] = [
     path: ["gateway", "token"],
     message: "gateway.token is ignored; use gateway.auth.token instead (auto-migrated on load).",
   },
+  {
+    path: ["messages", "messagePrefix"],
+    message:
+      "messages.messagePrefix is deprecated; use channels.whatsapp.messagePrefix (auto-migrated behavior will be removed in 2026.4.0).",
+  },
+  {
+    path: ["audio", "transcription"],
+    message:
+      "audio.transcription is deprecated; use tools.media.audio.models instead (auto-migrated behavior will be removed in 2026.4.0).",
+  },
+  {
+    path: ["tools", "media"],
+    message:
+      "tools.media.*.deepgram is deprecated; move settings to tools.media.*.providerOptions.deepgram (legacy deepgram keys will be removed in 2026.4.0).",
+    match: (value) => {
+      if (!value || typeof value !== "object") {
+        return false;
+      }
+      const media = value as Record<string, unknown>;
+
+      const hasDeepgramInSection = (section: unknown): boolean => {
+        if (!section || typeof section !== "object" || Array.isArray(section)) {
+          return false;
+        }
+        const sectionRecord = section as Record<string, unknown>;
+        const hasTopLevelDeepgram =
+          typeof sectionRecord.deepgram === "object" &&
+          sectionRecord.deepgram !== null &&
+          !Array.isArray(sectionRecord.deepgram);
+        if (hasTopLevelDeepgram) {
+          return true;
+        }
+        const models = Array.isArray(sectionRecord.models) ? sectionRecord.models : [];
+        return models.some((entry) => {
+          if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+            return false;
+          }
+          const modelEntry = entry as Record<string, unknown>;
+          return (
+            typeof modelEntry.deepgram === "object" &&
+            modelEntry.deepgram !== null &&
+            !Array.isArray(modelEntry.deepgram)
+          );
+        });
+      };
+
+      return [media.audio, media.image, media.video].some((section) => hasDeepgramInSection(section));
+    },
+  },
+  {
+    path: ["tools", "message", "allowCrossContextSend"],
+    message:
+      "tools.message.allowCrossContextSend is deprecated; use tools.message.crossContext.allowAcrossProviders (legacy flag will be removed in 2026.4.0).",
+  },
 ];

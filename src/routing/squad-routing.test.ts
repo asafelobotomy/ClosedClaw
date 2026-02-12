@@ -8,6 +8,8 @@ import { describe, it, expect, vi } from "vitest";
 import type { SquadCoordinator, SquadResult, _SquadConfig } from "../agents/squad/coordinator.js";
 import {
   analyzeSquadTrigger,
+
+/* oxlint-disable typescript-eslint/unbound-method */
   findSquadBinding,
   buildSquadConfig,
   aggregateSquadReply,
@@ -320,9 +322,9 @@ describe("routeToSquad", () => {
     expect(result.handled).toBe(true);
     expect(result.squadId).toBe("squad-test");
     expect(result.reply).toBeTruthy();
-    expect(coordinator.createSquad).toHaveBeenCalledOnce();
-    expect(coordinator.executeTask).toHaveBeenCalledOnce();
-    expect(coordinator.terminateSquad).toHaveBeenCalledWith("squad-test");
+    expect(coordinator.createSquad as unknown as ReturnType<typeof vi.fn>).toHaveBeenCalledOnce();
+    expect(coordinator.executeTask as unknown as ReturnType<typeof vi.fn>).toHaveBeenCalledOnce();
+    expect(coordinator.terminateSquad as unknown as ReturnType<typeof vi.fn>).toHaveBeenCalledWith("squad-test");
   });
 
   it("routes to auto squad on high complexity", async () => {
@@ -352,7 +354,7 @@ describe("routeToSquad", () => {
 
     expect(result.handled).toBe(false);
     expect(result.squadId).toBeUndefined();
-    expect(coordinator.createSquad).not.toHaveBeenCalled();
+    expect(coordinator.createSquad as unknown as ReturnType<typeof vi.fn>).not.toHaveBeenCalled();
   });
 
   it("routes explicit squad requests", async () => {
@@ -391,6 +393,6 @@ describe("routeToSquad", () => {
 
     expect(result.handled).toBe(true);
     expect(result.reply).toContain("Squad task failed");
-    expect(coordinator.terminateSquad).toHaveBeenCalled();
+    expect(coordinator.terminateSquad as unknown as ReturnType<typeof vi.fn>).toHaveBeenCalled();
   });
 });

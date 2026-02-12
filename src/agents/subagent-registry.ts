@@ -1,5 +1,5 @@
 import { loadConfig } from "../config/config.js";
-import { INTERVAL_HEALTH_REFRESH_MS, TIMEOUT_HTTP_DEFAULT_MS, TIMEOUT_HTTP_SHORT_MS, minutesToMs } from "../config/constants/index.js";
+import { INTERVAL_HEALTH_REFRESH_MS, TIMEOUT_HTTP_DEFAULT_MS, TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
 import { callGateway } from "../gateway/call.js";
 import { onAgentEvent } from "../infra/agent-events.js";
 import { type DeliveryContext, normalizeDeliveryContext } from "../utils/delivery-context.js";

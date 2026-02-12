@@ -484,9 +484,9 @@ export class AgentSpawner {
     } catch (err) {
       // Clean up on init failure
       this.agents.delete(id);
+      const detail = err instanceof Error ? err.message : String(err);
       throw new Error(
-        `Failed to initialize agent ${id} (${config.role}): ` +
-          `${err instanceof Error ? err.message : String(err)}`,
+        `Failed to initialize agent ${id} (${config.role}): ${detail}`,
         { cause: err },
       );
     }

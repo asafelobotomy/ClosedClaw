@@ -15,7 +15,6 @@
 
 import type {
   ClawsPermission,
-  ClawsManifest,
   ClawsVerificationProof,
 } from "./claws-parser.js";
 import { createClawsTemplate } from "./claws-parser.js";
@@ -366,7 +365,7 @@ function estimateComplexity(
   const words = request.split(/\s+/).length;
   const dataSources = env.apis.length + env.databases.length;
 
-  if (words <= 10 && dataSources <= 1) return "simple";
-  if (words <= 25 && dataSources <= 3) return "moderate";
+  if (words <= 10 && dataSources <= 1) {return "simple";}
+  if (words <= 25 && dataSources <= 3) {return "moderate";}
   return "complex";
 }

@@ -80,7 +80,7 @@ describe("consolidateMemory", () => {
       expect(result.failed).toBe(0);
       expect(episodicStore.count()).toBe(1);
 
-      const episode = episodicStore.getRecent(1)[0]!;
+      const episode = episodicStore.getRecent(1)[0];
       expect(episode.taskDescription).toBe("Security audit");
       expect(episode.outcome).toBe("success");
       expect(episode.tokensUsed).toBe(500);
@@ -228,7 +228,7 @@ describe("consolidateMemory", () => {
 
       await consolidateMemory(ctxNoSquad, { idGenerator: testIdGenerator, minAgeMs: 0 });
 
-      const episode = episodicStore.getRecent(1)[0]!;
+      const episode = episodicStore.getRecent(1)[0];
       expect(episode.squadId).toBe("unknown");
       expect(episode.agentsInvolved).toEqual([]);
     });

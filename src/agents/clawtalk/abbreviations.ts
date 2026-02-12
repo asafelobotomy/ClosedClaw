@@ -13,7 +13,7 @@ import type { ClawTalkDictionary } from "./types.js";
 export function compress(input: string, dict: ClawTalkDictionary): string {
   let result = input;
   // Sort by length (longest full form first) to avoid partial replacements
-  const sorted = Object.entries(dict.abbreviations).sort(
+  const sorted = Object.entries(dict.abbreviations).toSorted(
     (a, b) => b[1].length - a[1].length,
   );
   for (const [short, long] of sorted) {
@@ -28,7 +28,7 @@ export function compress(input: string, dict: ClawTalkDictionary): string {
 export function expand(input: string, dict: ClawTalkDictionary): string {
   let result = input;
   // Sort by length (longest short form first) to avoid partial expansions
-  const sorted = Object.entries(dict.abbreviations).sort(
+  const sorted = Object.entries(dict.abbreviations).toSorted(
     (a, b) => b[0].length - a[0].length,
   );
   for (const [short, long] of sorted) {

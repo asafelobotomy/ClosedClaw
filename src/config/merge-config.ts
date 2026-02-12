@@ -1,5 +1,3 @@
-import type { ClosedClawConfig } from "./config.js";
-
 export type MergeSectionOptions<T> = {
   unsetOnUndefined?: Array<keyof T>;
 };

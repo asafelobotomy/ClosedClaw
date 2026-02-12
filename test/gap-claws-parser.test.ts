@@ -10,8 +10,6 @@ import { strict as assert } from "node:assert";
 import {
   parseClawsFile,
   splitBlocks,
-  type ClawsLexicon,
-  type ClawsNeuralFingerprint,
 } from "../src/agents/clawtalk/claws-parser.js";
 
 let passed = 0;
@@ -95,7 +93,7 @@ version: "1.0.0"
 test("parseLexicon — full lexicon with all fields", () => {
   const file = parseClawsFile(FULL_CLAWS_WITH_LEXICON);
   assert.ok(file.lexicon, "lexicon should not be null");
-  const lex = file.lexicon!;
+  const lex = file.lexicon;
   assert.equal(lex.mode, "hybrid_stenography");
   assert.equal(lex.pruningLevel, "aggressive");
   assert.equal(lex.mappings.cfg, "configuration");
@@ -109,10 +107,10 @@ test("parseLexicon — priority markers with snake_case → camelCase", () => {
   const file = parseClawsFile(FULL_CLAWS_WITH_LEXICON);
   const pm = file.lexicon?.priorityMarkers;
   assert.ok(pm, "priority markers should exist");
-  assert.ok(pm!.HALT, "HALT marker should exist");
-  assert.equal(pm!.HALT.blocking, true);
-  assert.equal(pm!.HALT.priority, "critical");
-  assert.equal(pm!.HALT.requireBiometric, true);
+  assert.ok(pm.HALT, "HALT marker should exist");
+  assert.equal(pm.HALT.blocking, true);
+  assert.equal(pm.HALT.priority, "critical");
+  assert.equal(pm.HALT.requireBiometric, true);
 });
 
 test("parseLexicon — missing lexicon block returns null", () => {
@@ -131,10 +129,10 @@ test("parseLexicon — minimal lexicon (only mode + mappings)", () => {
   const content = `---\n# MANIFEST\nid: test\n---\n# LEXICON\n{"mode":"basic","mappings":{"k":"value"}}`;
   const file = parseClawsFile(content);
   assert.ok(file.lexicon);
-  assert.equal(file.lexicon!.mode, "basic");
-  assert.equal(file.lexicon!.mappings.k, "value");
-  assert.equal(file.lexicon!.pathCompressions, undefined);
-  assert.equal(file.lexicon!.priorityMarkers, undefined);
+  assert.equal(file.lexicon.mode, "basic");
+  assert.equal(file.lexicon.mappings.k, "value");
+  assert.equal(file.lexicon.pathCompressions, undefined);
+  assert.equal(file.lexicon.priorityMarkers, undefined);
 });
 
 // ─── Neural Fingerprint Parsing ─────────────────────────────────────────
@@ -179,7 +177,7 @@ version: "1.0.0"
 test("parseFingerprint — full fingerprint with all fields", () => {
   const file = parseClawsFile(FULL_CLAWS_WITH_FINGERPRINT);
   assert.ok(file.fingerprint, "fingerprint should not be null");
-  const fp = file.fingerprint!;
+  const fp = file.fingerprint;
   assert.equal(fp.signatureVersion, "2.1");
   assert.equal(fp.neuralDigest, "LSH:a1b2c3d4e5f6:cosine_sim=0.95");
   assert.equal(fp.calibrationDate, "2026-01-15");
@@ -192,9 +190,9 @@ test("parseFingerprint — drift thresholds with snake_case → camelCase", () =
   const file = parseClawsFile(FULL_CLAWS_WITH_FINGERPRINT);
   const dt = file.fingerprint?.driftThresholds;
   assert.ok(dt, "drift thresholds should exist");
-  assert.equal(dt!.softDrift, 0.85);
-  assert.equal(dt!.hardDrift, 0.75);
-  assert.equal(dt!.criticalShutdown, 0.50);
+  assert.equal(dt.softDrift, 0.85);
+  assert.equal(dt.hardDrift, 0.75);
+  assert.equal(dt.criticalShutdown, 0.50);
 });
 
 test("parseFingerprint — monitored decision points", () => {
@@ -210,9 +208,9 @@ test("parseFingerprint — hardware signature", () => {
   const file = parseClawsFile(FULL_CLAWS_WITH_FINGERPRINT);
   const hw = file.fingerprint?.hardwareSignature;
   assert.ok(hw, "hardware signature should exist");
-  assert.equal(hw!.anchor, "tpm");
-  assert.equal(hw!.keyId, "key-abc-123");
-  assert.equal(hw!.signature, "sig:deadbeef...");
+  assert.equal(hw.anchor, "tpm");
+  assert.equal(hw.keyId, "key-abc-123");
+  assert.equal(hw.signature, "sig:deadbeef...");
 });
 
 test("parseFingerprint — missing fingerprint block returns null", () => {
@@ -263,20 +261,20 @@ version: "2.0.0"
 test("parseClawsFile — both lexicon + fingerprint + telemetry together", () => {
   const file = parseClawsFile(FULL_CLAWS_BOTH);
   assert.ok(file.telemetry, "telemetry should exist");
-  assert.equal(file.telemetry!.executionCount, 42);
+  assert.equal(file.telemetry.executionCount, 42);
   assert.ok(file.lexicon, "lexicon should exist");
-  assert.equal(file.lexicon!.mode, "hybrid_stenography");
+  assert.equal(file.lexicon.mode, "hybrid_stenography");
   assert.ok(file.fingerprint, "fingerprint should exist");
-  assert.equal(file.fingerprint!.signatureVersion, "1.0");
-  assert.equal(file.fingerprint!.neuralDigest, "LSH:test123");
-  assert.equal(file.fingerprint!.calibrationDate, "2026-02-01");
+  assert.equal(file.fingerprint.signatureVersion, "1.0");
+  assert.equal(file.fingerprint.neuralDigest, "LSH:test123");
+  assert.equal(file.fingerprint.calibrationDate, "2026-02-01");
 });
 
 test("parseClawsFile — lexicon with comment lines stripped", () => {
   const content = `---\n# MANIFEST\nid: test\n---\n# THE LEXICON\n// Lexicon block\n/* Commentary */\n{"mode":"test","mappings":{}}`;
   const file = parseClawsFile(content);
   assert.ok(file.lexicon);
-  assert.equal(file.lexicon!.mode, "test");
+  assert.equal(file.lexicon.mode, "test");
 });
 
 // ─── Results ────────────────────────────────────────────────────────────

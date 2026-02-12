@@ -5,7 +5,6 @@
  */
 
 import * as fs from "node:fs/promises";
-import * as path from "node:path";
 import type { ClosedClawConfig } from "../config/config.js";
 import {
   parseSignatureFile,
@@ -14,7 +13,6 @@ import {
 } from "../security/skill-signing.js";
 import {
   getTrustedKey,
-  isKeyTrusted,
   type TrustLevel,
 } from "../security/trusted-keyring.js";
 

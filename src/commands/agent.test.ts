@@ -18,9 +18,6 @@ import { loadModelCatalog } from "../agents/model-catalog.js";
 import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
 import * as configModule from "../config/config.js";
 import { emitAgentEvent, onAgentEvent } from "../infra/agent-events.js";
-import { setActivePluginRegistry } from "../plugins/runtime.js";
-import { createPluginRuntime } from "../plugins/runtime/index.js";
-import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
 import { agentCommand } from "./agent.js";
 
 const runtime: RuntimeEnv = {
@@ -278,7 +275,7 @@ describe("agentCommand", () => {
   it("prints JSON payload when requested", async () => {
     await withTempHome(async (home) => {
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
-        payloads: [{ text: "json-reply", mediaUrl: "http://x.test/a.jpg" }],
+        payloads: [{ text: "json-reply", mediaUrl: "https://x.test/a.jpg" }],
         meta: {
           durationMs: 42,
           agentMeta: { sessionId: "s", provider: "p", model: "m" },
@@ -295,7 +292,7 @@ describe("agentCommand", () => {
         meta: { durationMs: number };
       };
       expect(parsed.payloads[0].text).toBe("json-reply");
-      expect(parsed.payloads[0].mediaUrl).toBe("http://x.test/a.jpg");
+      expect(parsed.payloads[0].mediaUrl).toBe("https://x.test/a.jpg");
       expect(parsed.meta.durationMs).toBe(42);
     });
   });

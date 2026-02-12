@@ -447,14 +447,6 @@ function normalizeMatchTarget(value: string): string {
   return value.replace(/\\\\/g, "/").toLowerCase();
 }
 
-function tryRealpath(value: string): string | null {
-  try {
-    return fs.realpathSync(value);
-  } catch {
-    return null;
-  }
-}
-
 function globToRegExp(pattern: string): RegExp {
   let regex = "^";
   let i = 0;
@@ -489,7 +481,6 @@ function matchesPattern(pattern: string, target: string): boolean {
     return false;
   }
   const expanded = trimmed.startsWith("~") ? expandHome(trimmed) : trimmed;
-  const hasWildcard = /[*?]/.test(expanded);
   let normalizedPattern = expanded;
   let normalizedTarget = target;
   normalizedPattern = normalizeMatchTarget(normalizedPattern);

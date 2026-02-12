@@ -94,7 +94,8 @@ export async function resolvePassphrase(params?: {
           throw new Error("Passphrase file is empty");
         }
       } catch (err) {
-        throw new Error(`Failed to read passphrase file ${source.path}: ${err}`, { cause: err });
+        const detail = err instanceof Error ? err.message : String(err);
+        throw new Error(`Failed to read passphrase file ${source.path}: ${detail}`, { cause: err });
       }
       break;
     }

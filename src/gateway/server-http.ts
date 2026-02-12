@@ -12,7 +12,6 @@ import type { createSubsystemLogger } from "../logging/subsystem.js";
 import { resolveAgentAvatar } from "../agents/identity-avatar.js";
 import { handleA2uiHttpRequest } from "../canvas-host/a2ui.js";
 import { loadConfig } from "../config/config.js";
-import type { GatewayBindMode } from "../config/types.gateway.js";
 // Slack HTTP handler removed — channel archived.
 import { handleControlUiAvatarRequest, handleControlUiHttpRequest } from "./control-ui.js";
 import { applyHookMappings } from "./hooks-mapping.js";
@@ -75,7 +74,7 @@ export function createHooksRequestHandler(
     if (!hooksConfig) {
       return false;
     }
-    const url = new URL(req.url ?? "/", `http://${bindHost}:${port}`);
+    const url = new URL(req.url ?? "/", `https://${bindHost}:${port}`);
     const basePath = hooksConfig.basePath;
     if (url.pathname !== basePath && !url.pathname.startsWith(`${basePath}/`)) {
       return false;
@@ -262,7 +261,7 @@ export function createGatewayHttpServer(opts: {
 
     // --- IP validation (defense-in-depth for bind mode policy) ---
     const configForIp = loadConfig();
-    const bindMode = (configForIp.gateway?.bind ?? "loopback") as GatewayBindMode;
+    const bindMode = (configForIp.gateway?.bind ?? "loopback");
     const ipCheck = validateClientIp(clientIp, bindMode);
     if (!ipCheck.allowed) {
       res.statusCode = 403;

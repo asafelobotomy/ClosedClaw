@@ -76,11 +76,11 @@ export function getActiveLexicon(): ClawsLexicon | null {
  * Replaces known full terms with shorthand and compresses paths.
  */
 export function applyLexiconCompression(text: string): string {
-  if (!activeLexicon) return text;
+  if (!activeLexicon) {return text;}
   let result = text;
 
   // Apply path compressions first (longer matches first to avoid partial)
-  const sortedPaths = Object.entries(pathCompression).sort(([a], [b]) => b.length - a.length);
+  const sortedPaths = Object.entries(pathCompression).toSorted(([a], [b]) => b.length - a.length);
   for (const [full, short] of sortedPaths) {
     result = result.replaceAll(full, short);
   }
@@ -98,11 +98,11 @@ export function applyLexiconCompression(text: string): string {
  * Expand lexicon shorthand in a dense string back to full terms.
  */
 export function applyLexiconExpansion(text: string): string {
-  if (!activeLexicon) return text;
+  if (!activeLexicon) {return text;}
   let result = text;
 
   // Apply path expansions first (longer matches first)
-  const sortedPaths = Object.entries(pathExpansion).sort(([a], [b]) => b.length - a.length);
+  const sortedPaths = Object.entries(pathExpansion).toSorted(([a], [b]) => b.length - a.length);
   for (const [short, full] of sortedPaths) {
     result = result.replaceAll(short, full);
   }
@@ -209,7 +209,7 @@ export function toDense(msg: ClawTalkMessage): string {
 
   // Verb prefix (REQ is implicit)
   const sigil = VERB_SIGILS[msg.verb] ?? "";
-  if (sigil) parts.push(sigil);
+  if (sigil) {parts.push(sigil);}
 
   // Action → op-code
   const action = msg.action ?? "";
@@ -233,7 +233,7 @@ export function toDense(msg: ClawTalkMessage): string {
 
   // Remaining params as key=value
   for (const [key, value] of paramEntries) {
-    if (key === "q" || key === "query" || key === "content") continue;
+    if (key === "q" || key === "query" || key === "content") {continue;}
     if (typeof value === "boolean" && value) {
       args.push(key);
     } else {
@@ -319,7 +319,7 @@ export function fromDense(line: string): ClawTalkMessage {
     const m = mainPart.match(/\$sub\((\w+)\)(?:\s+\[(\w+)\])?$/);
     if (m) {
       const params: Record<string, string | number | boolean | string[]> = { target: m[1] };
-      if (m[2]) params.state = m[2];
+      if (m[2]) {params.state = m[2];}
       return { version: 1, verb: "TASK", action: "subagent_handoff", params, raw: line };
     }
   }
@@ -410,7 +410,7 @@ export function fromDenseBlock(block: string): ClawTalkMessage[] {
  */
 export function estimateDenseTokens(text: string): number {
   // Symbols count as individual tokens
-  const symbolCount = (text.match(/[!@?$#:()=\[\]{}><]/g) ?? []).length;
+  const symbolCount = (text.match(/[!@?$#:()=[\]{}><]/g) ?? []).length;
   const wordCount = text.split(/\s+/).filter(Boolean).length;
   const charCount = text.replace(/\s/g, "").length;
   return Math.ceil(symbolCount * 0.7 + wordCount * 0.8 + charCount / 5);
@@ -433,7 +433,7 @@ export function compressionRatio(verbose: string, dense: string): number {
 function formatDenseValue(value: unknown): string {
   if (typeof value === "string") {
     // Variables pass through unquoted
-    if (value.startsWith("$")) return value;
+    if (value.startsWith("$")) {return value;}
     return `"${value.replace(/"/g, '\\"')}"`;
   }
   if (typeof value === "number" || typeof value === "boolean") {
@@ -452,11 +452,11 @@ function parseDenseValue(raw: string): string | number | boolean {
     return trimmed.slice(1, -1).replace(/\\"/g, '"');
   }
   // Boolean
-  if (trimmed === "true") return true;
-  if (trimmed === "false") return false;
+  if (trimmed === "true") {return true;}
+  if (trimmed === "false") {return false;}
   // Number
   const num = Number(trimmed);
-  if (!Number.isNaN(num) && trimmed !== "") return num;
+  if (!Number.isNaN(num) && trimmed !== "") {return num;}
   // Variable or bare string
   return trimmed;
 }
@@ -476,7 +476,7 @@ function tokenizeDenseArgs(input: string): string[] {
 
     if (inQuote) {
       current += ch;
-      if (ch === inQuote && input[i - 1] !== "\\") inQuote = null;
+      if (ch === inQuote && input[i - 1] !== "\\") {inQuote = null;}
       continue;
     }
 
@@ -499,7 +499,7 @@ function tokenizeDenseArgs(input: string): string[] {
 
     if (ch === "," && depth === 0) {
       const t = current.trim();
-      if (t) tokens.push(t);
+      if (t) {tokens.push(t);}
       current = "";
       continue;
     }
@@ -508,7 +508,7 @@ function tokenizeDenseArgs(input: string): string[] {
   }
 
   const last = current.trim();
-  if (last) tokens.push(last);
+  if (last) {tokens.push(last);}
 
   return tokens;
 }

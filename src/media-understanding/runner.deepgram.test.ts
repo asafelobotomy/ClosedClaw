@@ -59,7 +59,6 @@ describe("runCapability deepgram provider options", () => {
                 punctuate: true,
               },
             },
-            deepgram: { smartFormat: true },
             models: [
               {
                 provider: "deepgram",

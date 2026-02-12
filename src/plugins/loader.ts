@@ -550,8 +550,15 @@ function registerKernelShieldHookIfEnabled(
   });
 
   const logger = defaultLogger();
+  const enforcement = shieldCfg.kernelShield.enforcement;
+  const enforcementLabel =
+    typeof enforcement === "string" ||
+    typeof enforcement === "number" ||
+    typeof enforcement === "boolean"
+      ? String(enforcement)
+      : "permissive";
   logger.info?.(
-    `[kernel-shield] Hook registered (enforcement=${String(shieldCfg.kernelShield.enforcement ?? "permissive")})`,
+    `[kernel-shield] Hook registered (enforcement=${enforcementLabel})`,
   );
 }
 

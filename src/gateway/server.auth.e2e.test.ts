@@ -1,6 +1,5 @@
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
-import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import { WebSocket } from "ws";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import { buildDeviceAuthPayload } from "./device-auth.js";

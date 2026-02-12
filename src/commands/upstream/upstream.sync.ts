@@ -102,7 +102,8 @@ export async function upstreamSyncCommand(opts: SyncOptions, _runtime: RuntimeEn
       await git.cherryPick(commit.sha, { noCommit: false });
       appliedCount++;
     } catch (error) {
-      console.error(chalk.red(`❌ Failed to apply ${commit.sha.slice(0, 7)}: ${error}`));
+      const detail = error instanceof Error ? error.message : String(error);
+      console.error(chalk.red(`❌ Failed to apply ${commit.sha.slice(0, 7)}: ${detail}`));
       failedCount++;
 
       // Ask user what to do

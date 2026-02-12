@@ -4,7 +4,9 @@
  * @see {@link ./tools.ts}
  */
 
-import { describe, it, expect, vi, _beforeEach } from "vitest";
+/* oxlint-disable typescript-eslint/unbound-method */
+
+import { describe, it, expect, vi } from "vitest";
 import {
   createDelegateToAgentTool,
   createSquadMemoryReadTool,
@@ -187,7 +189,7 @@ describe("createSquadMemoryReadTool", () => {
     };
 
     expect(result.count).toBe(2);
-    expect(result.keys.map((k) => k.key).toSorted()).toEqual(["key1", "key2"]);
+    expect(result.keys.map((k) => k.key).toSorted((a, b) => a.localeCompare(b))).toEqual(["key1", "key2"]);
   });
 
   it("reads a specific key", async () => {
@@ -387,12 +389,8 @@ describe("createWaitForTaskTool", () => {
   });
 
   it("returns error for unknown task", async () => {
-    const ctx = mockContext({
-      taskQueue: {
-        ...mockContext().taskQueue,
-        getTask: vi.fn().mockReturnValue(undefined),
-      } as unknown as SquadToolContext["taskQueue"],
-    });
+    const ctx = mockContext();
+    (ctx.taskQueue.getTask as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
 
     const tool = createWaitForTaskTool(ctx);
     const result = parseResult(await tool.execute("test-call-id", { task_id: "task-999" })) as { error: string };

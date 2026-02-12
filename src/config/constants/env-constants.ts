@@ -154,14 +154,14 @@ export type RunnerOS = "macOS" | "Windows" | "Linux" | "unknown";
 
 export function getRunnerOS(): RunnerOS {
   const runnerOS = process.env[ENV_RUNNER_OS];
-  if (runnerOS === "macOS") return "macOS";
-  if (runnerOS === "Windows") return "Windows";
-  if (runnerOS === "Linux") return "Linux";
+  if (runnerOS === "macOS") {return "macOS";}
+  if (runnerOS === "Windows") {return "Windows";}
+  if (runnerOS === "Linux") {return "Linux";}
   
   // Fallback to platform detection
-  if (process.platform === "darwin") return "macOS";
-  if (process.platform === "win32") return "Windows";
-  if (process.platform === "linux") return "Linux";
+  if (process.platform === "darwin") {return "macOS";}
+  if (process.platform === "win32") {return "Windows";}
+  if (process.platform === "linux") {return "Linux";}
   
   return "unknown";
 }

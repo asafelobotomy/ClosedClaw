@@ -78,6 +78,121 @@ export const LEGACY_CONFIG_MIGRATIONS_PART_3: LegacyConfigMigration[] = [
     },
   },
   {
+    id: "messages.messagePrefix->channels.whatsapp.messagePrefix",
+    describe: "Move messages.messagePrefix to channels.whatsapp.messagePrefix",
+    apply: (raw, changes) => {
+      const messages = getRecord(raw.messages);
+      if (!messages || !("messagePrefix" in messages)) {
+        return;
+      }
+
+      const legacyPrefix = messages.messagePrefix;
+      const channels = ensureRecord(raw, "channels");
+      const whatsapp = ensureRecord(channels, "whatsapp");
+
+      if (whatsapp.messagePrefix === undefined) {
+        whatsapp.messagePrefix = legacyPrefix;
+        changes.push("Moved messages.messagePrefix → channels.whatsapp.messagePrefix.");
+      } else {
+        changes.push(
+          "Removed messages.messagePrefix (channels.whatsapp.messagePrefix already set).",
+        );
+      }
+
+      delete messages.messagePrefix;
+      if (Object.keys(messages).length === 0) {
+        delete raw.messages;
+      }
+    },
+  },
+  {
+    id: "tools.media.deepgram->providerOptions",
+    describe: "Move tools.media.*.deepgram to tools.media.*.providerOptions.deepgram",
+    apply: (_raw, changes) => {
+      const raw = _raw;
+      const tools = getRecord(raw.tools);
+      const media = getRecord(tools?.media);
+      if (!media) {
+        return;
+      }
+
+      const migrateDeepgram = (target: Record<string, unknown>, prefix: string): boolean => {
+        const deepgram = getRecord(target.deepgram);
+        if (!deepgram) {
+          return false;
+        }
+
+        const providerOptions =
+          target.providerOptions && typeof target.providerOptions === "object"
+            ? (target.providerOptions as Record<string, unknown>)
+            : {};
+        const existingDeepgram =
+          providerOptions.deepgram && typeof providerOptions.deepgram === "object"
+            ? (providerOptions.deepgram as Record<string, unknown>)
+            : undefined;
+
+        if (existingDeepgram) {
+          mergeMissing(existingDeepgram, deepgram);
+          providerOptions.deepgram = existingDeepgram;
+          changes.push(`Merged ${prefix}deepgram → ${prefix}providerOptions.deepgram.`);
+        } else {
+          providerOptions.deepgram = structuredClone(deepgram);
+          changes.push(`Moved ${prefix}deepgram → ${prefix}providerOptions.deepgram.`);
+        }
+
+        target.providerOptions = providerOptions;
+        delete target.deepgram;
+        return true;
+      };
+
+      for (const capability of ["audio", "image", "video"]) {
+        const section = getRecord(media[capability]);
+        if (!section) {
+          continue;
+        }
+
+        migrateDeepgram(section, `tools.media.${capability}.`);
+
+        const models = Array.isArray(section.models) ? section.models : [];
+        models.forEach((entry, index) => {
+          const model = getRecord(entry);
+          if (!model) {
+            return;
+          }
+          migrateDeepgram(model, `tools.media.${capability}.models[${String(index)}].`);
+        });
+      }
+    },
+  },
+  {
+    id: "tools.message.allowCrossContextSend->crossContext.allowAcrossProviders",
+    describe:
+      "Move tools.message.allowCrossContextSend to tools.message.crossContext.allowAcrossProviders",
+    apply: (raw, changes) => {
+      const tools = getRecord(raw.tools);
+      const message = getRecord(tools?.message);
+      if (!message || !("allowCrossContextSend" in message)) {
+        return;
+      }
+
+      const legacy = message.allowCrossContextSend;
+      const crossContext = ensureRecord(message, "crossContext");
+
+      if (crossContext.allowAcrossProviders === undefined && typeof legacy === "boolean") {
+        crossContext.allowAcrossProviders = legacy;
+        changes.push(
+          "Moved tools.message.allowCrossContextSend → tools.message.crossContext.allowAcrossProviders.",
+        );
+      } else {
+        changes.push(
+          "Removed tools.message.allowCrossContextSend (tools.message.crossContext.allowAcrossProviders already set).",
+        );
+      }
+
+      delete message.allowCrossContextSend;
+    },
+  },
+  {
     id: "agent.defaults-v2",
     describe: "Move agent config to agents.defaults and tools",
     apply: (raw, changes) => {

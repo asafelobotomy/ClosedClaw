@@ -5,7 +5,6 @@ import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
-import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import { parseModelRef } from "../agents/model-selection.js";
 import { loadConfig } from "../config/config.js";
 import { isTruthyEnvValue } from "../infra/env.js";

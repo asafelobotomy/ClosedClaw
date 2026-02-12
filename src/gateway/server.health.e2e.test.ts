@@ -4,7 +4,6 @@ import path from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { WebSocket } from "ws";
 import { secondsToMs, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
-import { secondsToMs, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import { emitAgentEvent } from "../infra/agent-events.js";
 import {
   loadOrCreateDeviceIdentity,

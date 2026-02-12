@@ -27,7 +27,7 @@ import {
 import { MissingEnvVarError, resolveConfigEnvVars } from "./env-substitution.js";
 import { collectConfigEnvVars } from "./env-vars.js";
 import { ConfigIncludeError, resolveConfigIncludes } from "./includes.js";
-import { findLegacyConfigIssues } from "./legacy.js";
+import { applyLegacyMigrations, findLegacyConfigIssues } from "./legacy.js";
 import { normalizeConfigPaths } from "./normalize-paths.js";
 import { resolveConfigPath, resolveDefaultConfigCandidates, resolveStateDir } from "./paths.js";
 import { applyConfigOverrides } from "./runtime-overrides.js";
@@ -242,7 +242,8 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
       // Substitute ${VAR} env var references
       const substituted = resolveConfigEnvVars(resolved, deps.env);
 
-      const resolvedConfig = substituted;
+      const migrationResult = applyLegacyMigrations(substituted);
+      const resolvedConfig = migrationResult.next ?? substituted;
       warnOnConfigMiskeys(resolvedConfig, deps.logger);
       if (typeof resolvedConfig !== "object" || resolvedConfig === null) {
         return {};
@@ -423,7 +424,8 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
         };
       }
 
-      const resolvedConfigRaw = substituted;
+      const migrationResult = applyLegacyMigrations(substituted);
+      const resolvedConfigRaw = migrationResult.next ?? substituted;
       const legacyIssues = findLegacyConfigIssues(resolvedConfigRaw);
 
       const validated = validateConfigObjectWithPlugins(resolvedConfigRaw);
@@ -520,7 +522,8 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
         await encryptConfigBackup(`${configPath}.bak`, DEFAULT_ENCRYPTION_CONFIG);
       } catch (err) {
         // Best-effort encryption - log but don't fail the write
-        deps.logger.warn(`Failed to encrypt config backup: ${err}`);
+        const detail = err instanceof Error ? err.message : String(err);
+        deps.logger.warn(`Failed to encrypt config backup: ${detail}`);
       }
     }
 
