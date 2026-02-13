@@ -148,6 +148,7 @@ export async function dispatchReplyFromConfig(params: {
   const inboundAudio = isInboundAudioContext(ctx);
   const sessionTtsAuto = resolveSessionTtsAuto(ctx, cfg);
   const hookRunner = getGlobalHookRunner();
+  const hasMessageSendingHooks = hookRunner?.hasHooks("message_sending") === true;
   if (hookRunner?.hasHooks("message_received")) {
     const timestamp =
       typeof ctx.Timestamp === "number" && Number.isFinite(ctx.Timestamp)
@@ -221,17 +222,45 @@ export async function dispatchReplyFromConfig(params: {
     payload: ReplyPayload,
     abortSignal?: AbortSignal,
     mirror?: boolean,
-  ): Promise<void> => {
+  ): Promise<boolean> => {
     // TypeScript doesn't narrow these from the shouldRouteToOriginating check,
     // but they're guaranteed non-null when this function is called.
     if (!originatingChannel || !originatingTo) {
-      return;
+      return false;
     }
     if (abortSignal?.aborted) {
-      return;
+      return false;
     }
+    let resolvedPayload = payload;
+    if (hasMessageSendingHooks) {
+      const sendResult = await hookRunner?.runMessageSending(
+        {
+          to: originatingTo,
+          content: payload.text ?? "",
+          metadata: {
+            transport: "route_reply",
+            provider: originatingChannel,
+            sessionKey: ctx.SessionKey,
+            messageThreadId: ctx.MessageThreadId,
+            hasMedia: Boolean(payload.mediaUrl || payload.mediaUrls?.length),
+          },
+        },
+        {
+          channelId: String(originatingChannel).toLowerCase(),
+          accountId: ctx.AccountId,
+          conversationId: originatingTo,
+        },
+      );
+      if (sendResult?.cancel) {
+        return false;
+      }
+      if (typeof sendResult?.content === "string") {
+        resolvedPayload = { ...payload, text: sendResult.content };
+      }
+    }
+
     const result = await routeReply({
-      payload,
+      payload: resolvedPayload,
       channel: originatingChannel,
       to: originatingTo,
       sessionKey: ctx.SessionKey,
@@ -243,7 +272,9 @@ export async function dispatchReplyFromConfig(params: {
     });
     if (!result.ok) {
       logVerbose(`dispatch-from-config: route-reply failed: ${result.error ?? "unknown error"}`);
+      return false;
     }
+    return true;
   };
 
   markProcessing();
@@ -251,32 +282,46 @@ export async function dispatchReplyFromConfig(params: {
   try {
     const fastAbort = await tryFastAbortFromMessage({ ctx, cfg });
     if (fastAbort.handled) {
-      const payload = {
+      const payload: ReplyPayload = {
         text: formatAbortReplyText(fastAbort.stoppedSubagents),
-      } satisfies ReplyPayload;
+      };
       let queuedFinal = false;
       let routedFinalCount = 0;
       if (shouldRouteToOriginating && originatingChannel && originatingTo) {
-        const result = await routeReply({
-          payload,
-          channel: originatingChannel,
-          to: originatingTo,
-          sessionKey: ctx.SessionKey,
-          accountId: ctx.AccountId,
-          threadId: ctx.MessageThreadId,
-          cfg,
-        });
-        queuedFinal = result.ok;
-        if (result.ok) {
+        const routed = await sendPayloadAsync(payload, undefined, undefined);
+        queuedFinal = routed;
+        if (routed) {
           routedFinalCount += 1;
         }
-        if (!result.ok) {
-          logVerbose(
-            `dispatch-from-config: route-reply (abort) failed: ${result.error ?? "unknown error"}`,
-          );
-        }
       } else {
-        queuedFinal = dispatcher.sendFinalReply(payload);
+        let sendPayload = payload;
+        let shouldSend = true;
+        if (hasMessageSendingHooks) {
+          const sendResult = await hookRunner?.runMessageSending(
+            {
+              to: ctx.To ?? ctx.From ?? "",
+              content: payload.text ?? "",
+              metadata: {
+                transport: "dispatcher",
+                provider: currentSurface,
+                sessionKey: ctx.SessionKey,
+                messageThreadId: ctx.MessageThreadId,
+                hasMedia: Boolean(payload.mediaUrl || payload.mediaUrls?.length),
+              },
+            },
+            {
+              channelId: (currentSurface ?? "").toLowerCase(),
+              accountId: ctx.AccountId,
+              conversationId: ctx.To ?? ctx.From ?? undefined,
+            },
+          );
+          if (sendResult?.cancel) {
+            shouldSend = false;
+          } else if (typeof sendResult?.content === "string") {
+            sendPayload = { ...payload, text: sendResult.content };
+          }
+        }
+        queuedFinal = shouldSend ? dispatcher.sendFinalReply(sendPayload) : false;
       }
       await dispatcher.waitForIdle();
       const counts = dispatcher.getQueuedCounts();
@@ -311,7 +356,35 @@ export async function dispatchReplyFromConfig(params: {
                   if (shouldRouteToOriginating) {
                     await sendPayloadAsync(ttsPayload, undefined, false);
                   } else {
-                    dispatcher.sendToolResult(ttsPayload);
+                    let sendPayload = ttsPayload;
+                    if (hasMessageSendingHooks) {
+                      const sendResult = await hookRunner?.runMessageSending(
+                        {
+                          to: ctx.To ?? ctx.From ?? "",
+                          content: ttsPayload.text ?? "",
+                          metadata: {
+                            transport: "dispatcher",
+                            dispatchKind: "tool",
+                            provider: currentSurface,
+                            sessionKey: ctx.SessionKey,
+                            messageThreadId: ctx.MessageThreadId,
+                            hasMedia: Boolean(ttsPayload.mediaUrl || ttsPayload.mediaUrls?.length),
+                          },
+                        },
+                        {
+                          channelId: (currentSurface ?? "").toLowerCase(),
+                          accountId: ctx.AccountId,
+                          conversationId: ctx.To ?? ctx.From ?? undefined,
+                        },
+                      );
+                      if (sendResult?.cancel) {
+                        return;
+                      }
+                      if (typeof sendResult?.content === "string") {
+                        sendPayload = { ...ttsPayload, text: sendResult.content };
+                      }
+                    }
+                    dispatcher.sendToolResult(sendPayload);
                   }
                 };
                 return run();
@@ -338,7 +411,35 @@ export async function dispatchReplyFromConfig(params: {
             if (shouldRouteToOriginating) {
               await sendPayloadAsync(ttsPayload, context?.abortSignal, false);
             } else {
-              dispatcher.sendBlockReply(ttsPayload);
+              let sendPayload = ttsPayload;
+              if (hasMessageSendingHooks) {
+                const sendResult = await hookRunner?.runMessageSending(
+                  {
+                    to: ctx.To ?? ctx.From ?? "",
+                    content: ttsPayload.text ?? "",
+                    metadata: {
+                      transport: "dispatcher",
+                      dispatchKind: "block",
+                      provider: currentSurface,
+                      sessionKey: ctx.SessionKey,
+                      messageThreadId: ctx.MessageThreadId,
+                      hasMedia: Boolean(ttsPayload.mediaUrl || ttsPayload.mediaUrls?.length),
+                    },
+                  },
+                  {
+                    channelId: (currentSurface ?? "").toLowerCase(),
+                    accountId: ctx.AccountId,
+                    conversationId: ctx.To ?? ctx.From ?? undefined,
+                  },
+                );
+                if (sendResult?.cancel) {
+                  return;
+                }
+                if (typeof sendResult?.content === "string") {
+                  sendPayload = { ...ttsPayload, text: sendResult.content };
+                }
+              }
+              dispatcher.sendBlockReply(sendPayload);
             }
           };
           return run();
@@ -361,27 +462,41 @@ export async function dispatchReplyFromConfig(params: {
         ttsAuto: sessionTtsAuto,
       });
       if (shouldRouteToOriginating && originatingChannel && originatingTo) {
-        // Route final reply to originating channel.
-        const result = await routeReply({
-          payload: ttsReply,
-          channel: originatingChannel,
-          to: originatingTo,
-          sessionKey: ctx.SessionKey,
-          accountId: ctx.AccountId,
-          threadId: ctx.MessageThreadId,
-          cfg,
-        });
-        if (!result.ok) {
-          logVerbose(
-            `dispatch-from-config: route-reply (final) failed: ${result.error ?? "unknown error"}`,
-          );
-        }
-        queuedFinal = result.ok || queuedFinal;
-        if (result.ok) {
+        const routed = await sendPayloadAsync(ttsReply, undefined, undefined);
+        queuedFinal = routed || queuedFinal;
+        if (routed) {
           routedFinalCount += 1;
         }
       } else {
-        queuedFinal = dispatcher.sendFinalReply(ttsReply) || queuedFinal;
+        let sendPayload = ttsReply;
+        if (hasMessageSendingHooks) {
+          const sendResult = await hookRunner?.runMessageSending(
+            {
+              to: ctx.To ?? ctx.From ?? "",
+              content: ttsReply.text ?? "",
+              metadata: {
+                transport: "dispatcher",
+                dispatchKind: "final",
+                provider: currentSurface,
+                sessionKey: ctx.SessionKey,
+                messageThreadId: ctx.MessageThreadId,
+                hasMedia: Boolean(ttsReply.mediaUrl || ttsReply.mediaUrls?.length),
+              },
+            },
+            {
+              channelId: (currentSurface ?? "").toLowerCase(),
+              accountId: ctx.AccountId,
+              conversationId: ctx.To ?? ctx.From ?? undefined,
+            },
+          );
+          if (sendResult?.cancel) {
+            continue;
+          }
+          if (typeof sendResult?.content === "string") {
+            sendPayload = { ...ttsReply, text: sendResult.content };
+          }
+        }
+        queuedFinal = dispatcher.sendFinalReply(sendPayload) || queuedFinal;
       }
     }
 
@@ -412,27 +527,47 @@ export async function dispatchReplyFromConfig(params: {
             audioAsVoice: ttsSyntheticReply.audioAsVoice,
           };
           if (shouldRouteToOriginating && originatingChannel && originatingTo) {
-            const result = await routeReply({
-              payload: ttsOnlyPayload,
-              channel: originatingChannel,
-              to: originatingTo,
-              sessionKey: ctx.SessionKey,
-              accountId: ctx.AccountId,
-              threadId: ctx.MessageThreadId,
-              cfg,
-            });
-            queuedFinal = result.ok || queuedFinal;
-            if (result.ok) {
+            const routed = await sendPayloadAsync(ttsOnlyPayload, undefined, undefined);
+            queuedFinal = routed || queuedFinal;
+            if (routed) {
               routedFinalCount += 1;
             }
-            if (!result.ok) {
-              logVerbose(
-                `dispatch-from-config: route-reply (tts-only) failed: ${result.error ?? "unknown error"}`,
-              );
-            }
           } else {
-            const didQueue = dispatcher.sendFinalReply(ttsOnlyPayload);
-            queuedFinal = didQueue || queuedFinal;
+            let sendPayload = ttsOnlyPayload;
+            let shouldSend = true;
+            if (hasMessageSendingHooks) {
+              const sendResult = await hookRunner?.runMessageSending(
+                {
+                  to: ctx.To ?? ctx.From ?? "",
+                  content: ttsOnlyPayload.text ?? "",
+                  metadata: {
+                    transport: "dispatcher",
+                    dispatchKind: "final",
+                    provider: currentSurface,
+                    sessionKey: ctx.SessionKey,
+                    messageThreadId: ctx.MessageThreadId,
+                    hasMedia: Boolean(
+                      ttsOnlyPayload.mediaUrl || ttsOnlyPayload.mediaUrls?.length,
+                    ),
+                  },
+                },
+                {
+                  channelId: (currentSurface ?? "").toLowerCase(),
+                  accountId: ctx.AccountId,
+                  conversationId: ctx.To ?? ctx.From ?? undefined,
+                },
+              );
+              if (sendResult?.cancel) {
+                shouldSend = false;
+              }
+              if (shouldSend && typeof sendResult?.content === "string") {
+                sendPayload = { ...ttsOnlyPayload, text: sendResult.content };
+              }
+            }
+            if (shouldSend) {
+              const didQueue = dispatcher.sendFinalReply(sendPayload);
+              queuedFinal = didQueue || queuedFinal;
+            }
           }
         }
       } catch (err) {

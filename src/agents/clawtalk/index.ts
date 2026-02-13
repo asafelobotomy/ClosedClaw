@@ -8,38 +8,6 @@
 // Core protocol
 export { parse, serialize, isClawTalkMessage, ClawTalkParseError } from "./parser.js";
 export { encode, estimateTokens } from "./encoder.js";
-export { decode } from "./decoder.js";
-
-// ClawDense — token-optimized notation
-export {
-  toDense,
-  toDenseBlock,
-  fromDense,
-  fromDenseBlock,
-  estimateDenseTokens,
-  compressionRatio,
-  loadLexicon,
-  clearLexicon,
-  getActiveLexicon,
-  applyLexiconCompression,
-  applyLexiconExpansion,
-} from "./clawdense.js";
-
-// Dictionary & macros
-export {
-  loadDictionary,
-  saveDictionary,
-  addMacro,
-  removeMacro,
-  trackMacroUsage,
-  propose,
-  approveProposal,
-  rejectProposal,
-  evictLRU,
-  getDefaultDictionary,
-} from "./dictionary.js";
-export { expandMacro, isMacroInvocation, parseMacroInvocation } from "./macros.js";
-export { compress, expand } from "./abbreviations.js";
 
 // .claws file format parser
 export {
@@ -72,13 +40,13 @@ export type {
 // Routing & orchestration
 export { Directory, type RoutingDecision } from "./directory.js";
 export { shouldEscalate } from "./escalation.js";
-export { Orchestrator, type OrchestratorDeps } from "./orchestrator.js";
-export { MetricsTracker } from "./metrics.js";
 
 // ClawTalk Hook — before_agent_start integration
 export {
   clawtalkBeforeAgentStartHandler,
+  clawtalkMessageSendingHandler,
   routeMessage as clawtalkRouteMessage,
+  stripClawTalkArtifacts,
   updateClawTalkHookConfig,
   getClawTalkDirectory,
   type ClawTalkRouting,
@@ -139,14 +107,9 @@ export type {
   ClawTalkVerb,
   ClawTalkVersion,
   ClawTalkConfig,
-  ClawTalkDictionary,
-  ClawTalkMacro,
-  ClawTalkProposal,
-  ClawTalkMetrics,
   EncodedMessage,
   IntentCategory,
   SubagentProfile,
   EscalationDecision,
-  OrchestratorResult,
 } from "./types.js";
 export { DEFAULT_CONFIG } from "./types.js";

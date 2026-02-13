@@ -21,6 +21,7 @@ const hookMocks = vi.hoisted(() => ({
   runner: {
     hasHooks: vi.fn(() => false),
     runMessageReceived: vi.fn(async () => {}),
+    runMessageSending: vi.fn(async () => undefined),
   },
 }));
 
@@ -76,6 +77,8 @@ describe("dispatchReplyFromConfig", () => {
     hookMocks.runner.hasHooks.mockReset();
     hookMocks.runner.hasHooks.mockReturnValue(false);
     hookMocks.runner.runMessageReceived.mockReset();
+    hookMocks.runner.runMessageSending.mockReset();
+    hookMocks.runner.runMessageSending.mockResolvedValue(undefined);
   });
   it("does not route when Provider matches OriginatingChannel (even if Surface is missing)", async () => {
     mocks.tryFastAbortFromMessage.mockResolvedValue({
@@ -401,6 +404,80 @@ describe("dispatchReplyFromConfig", () => {
         outcome: "completed",
         sessionKey: "agent:main:main",
       }),
+    );
+  });
+
+  it("applies message_sending content overrides for final replies", async () => {
+    mocks.tryFastAbortFromMessage.mockResolvedValue({
+      handled: false,
+      aborted: false,
+    });
+    hookMocks.runner.hasHooks.mockImplementation((name: string) => name === "message_sending");
+    hookMocks.runner.runMessageSending.mockResolvedValue({ content: "rewritten" });
+
+    const cfg = {} as ClosedClawConfig;
+    const dispatcher = createDispatcher();
+    const ctx = buildTestCtx({ Provider: "telegram" });
+
+    const replyResolver = async () => ({ text: "original" }) satisfies ReplyPayload;
+    await dispatchReplyFromConfig({ ctx, cfg, dispatcher, replyResolver });
+
+    expect(hookMocks.runner.runMessageSending).toHaveBeenCalledWith(
+      expect.objectContaining({ content: "original" }),
+      expect.objectContaining({ channelId: expect.any(String) }),
+    );
+    expect(dispatcher.sendFinalReply).toHaveBeenCalledWith(
+      expect.objectContaining({ text: "rewritten" }),
+    );
+  });
+
+  it("cancels final delivery when message_sending returns cancel", async () => {
+    mocks.tryFastAbortFromMessage.mockResolvedValue({
+      handled: false,
+      aborted: false,
+    });
+    hookMocks.runner.hasHooks.mockImplementation((name: string) => name === "message_sending");
+    hookMocks.runner.runMessageSending.mockResolvedValue({ cancel: true });
+
+    const cfg = {} as ClosedClawConfig;
+    const dispatcher = createDispatcher();
+    const ctx = buildTestCtx({ Provider: "telegram" });
+
+    const replyResolver = async () => ({ text: "original" }) satisfies ReplyPayload;
+    await dispatchReplyFromConfig({ ctx, cfg, dispatcher, replyResolver });
+
+    expect(dispatcher.sendFinalReply).not.toHaveBeenCalled();
+  });
+
+  it("applies message_sending to tool results", async () => {
+    mocks.tryFastAbortFromMessage.mockResolvedValue({
+      handled: false,
+      aborted: false,
+    });
+    hookMocks.runner.hasHooks.mockImplementation((name: string) => name === "message_sending");
+    hookMocks.runner.runMessageSending.mockImplementation(async (event: { content: string }) => {
+      if (event.content.includes("exec:")) {
+        return { content: "tool rewritten" };
+      }
+      return undefined;
+    });
+
+    const cfg = {} as ClosedClawConfig;
+    const dispatcher = createDispatcher();
+    const ctx = buildTestCtx({ Provider: "telegram", ChatType: "direct" });
+
+    const replyResolver = async (
+      _ctx: MsgContext,
+      opts: GetReplyOptions | undefined,
+    ) => {
+      await opts?.onToolResult?.({ text: "🔧 exec: ls" });
+      return { text: "done" } satisfies ReplyPayload;
+    };
+
+    await dispatchReplyFromConfig({ ctx, cfg, dispatcher, replyResolver });
+
+    expect(dispatcher.sendToolResult).toHaveBeenCalledWith(
+      expect.objectContaining({ text: "tool rewritten" }),
     );
   });
 

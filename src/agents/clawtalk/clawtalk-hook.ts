@@ -17,11 +17,39 @@ import { Directory, type RoutingDecision } from "./directory.js";
 import { shouldEscalate } from "./escalation.js";
 import type { ClawTalkConfig, EncodedMessage } from "./types.js";
 import { DEFAULT_CONFIG } from "./types.js";
+import { logVerbose } from "../../globals.js";
 import type {
   PluginHookBeforeAgentStartEvent,
   PluginHookBeforeAgentStartResult,
   PluginHookAgentContext,
+  PluginHookMessageContext,
+  PluginHookMessageSendingEvent,
+  PluginHookMessageSendingResult,
 } from "../../plugins/types.js";
+
+const ARTIFACT_PATTERNS: RegExp[] = [
+  /^CT\/\d+\s+(REQ|RES|TASK|STATUS|NOOP|ERR|ACK|MULTI)\b.*$/gm,
+  /[!@?][\w]+:[\w:]+\([^)]*\)/g,
+  /\[ClawTalk routing:.*?\]/g,
+  /^(<=|>>|!!|~|\.|ok|\[\])\s/gm,
+  />>?\$sub\(\w+\)/g,
+];
+
+export function stripClawTalkArtifacts(text: string): string {
+  if (!text) {
+    return text;
+  }
+  let cleaned = text;
+  for (const pattern of ARTIFACT_PATTERNS) {
+    cleaned = cleaned.replace(pattern, "");
+  }
+  return cleaned
+    .replace(/\n{3,}/g, "\n\n")
+    .split("\n")
+    .map((line) => line.trimEnd())
+    .join("\n")
+    .trim();
+}
 
 /** Resolved routing result exposed for external consumers (GTK bridge, telemetry). */
 export interface ClawTalkRouting {
@@ -135,11 +163,7 @@ export function clawtalkBeforeAgentStartHandler(
 
   // Inject subagent system prompt as prepended context
   if (routing.systemPrompt) {
-    result.prependContext = [
-      `[ClawTalk routing: intent=${routing.intent} → ${routing.agentId} (confidence=${(routing.confidence * 100).toFixed(0)}%)]`,
-      "",
-      routing.systemPrompt,
-    ].join("\n");
+    result.prependContext = routing.systemPrompt;
   }
 
   // Set tool allowlist
@@ -152,5 +176,34 @@ export function clawtalkBeforeAgentStartHandler(
     result.modelOverride = routing.modelOverride;
   }
 
+  logVerbose(
+    `[clawtalk] intent=${routing.intent} -> ${routing.agentId} confidence=${(routing.confidence * 100).toFixed(0)}%`,
+  );
+
   return result;
+}
+
+/**
+ * Outbound sanitizer for `message_sending`.
+ * Strips protocol artifacts from outgoing user-visible content.
+ */
+export function clawtalkMessageSendingHandler(
+  event: PluginHookMessageSendingEvent,
+  _ctx: PluginHookMessageContext,
+): PluginHookMessageSendingResult | void {
+  if (!activeConfig.enabled) {
+    return;
+  }
+
+  const content = typeof event.content === "string" ? event.content : "";
+  if (!content) {
+    return;
+  }
+
+  const cleaned = stripClawTalkArtifacts(content);
+  if (cleaned === content) {
+    return;
+  }
+
+  return { content: cleaned };
 }

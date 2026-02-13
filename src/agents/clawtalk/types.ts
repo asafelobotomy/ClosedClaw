@@ -94,65 +94,11 @@ export interface EscalationDecision {
   confidence: number;
 }
 
-/** Dictionary macro definition */
-export interface ClawTalkMacro {
-  /** Full ClawTalk expansion */
-  expansion: string;
-  /** Human description */
-  description: string;
-  /** Parameter names for substitution */
-  params?: string[];
-  /** Who added this macro */
-  addedBy: string;
-  /** When it was added */
-  addedAt: string;
-  /** Times used */
-  usageCount: number;
-}
-
-/** Macro proposal awaiting approval */
-export interface ClawTalkProposal {
-  name: string;
-  expansion: string;
-  proposedBy: string;
-  proposedAt: string;
-  reason: string;
-  estimatedSavings?: string;
-}
-
-/** Full dictionary structure */
-export interface ClawTalkDictionary {
-  version: number;
-  updated: string;
-  macros: Record<string, ClawTalkMacro>;
-  abbreviations: Record<string, string>;
-  proposed: ClawTalkProposal[];
-}
-
-/** Metrics snapshot */
-export interface ClawTalkMetrics {
-  totalEncoded: number;
-  totalDecoded: number;
-  avgCompressionRatio: number;
-  comprehensionRate: number;
-  tokensSaved: number;
-  macroUsage: Record<string, number>;
-  intentCounts: Record<string, number>;
-  escalationCount: number;
-  periodStart: string;
-}
-
 /** Orchestrator configuration */
 export interface ClawTalkConfig {
   enabled: boolean;
   version: ClawTalkVersion;
-  dictionaryPath?: string;
-  compressionLevel: "transport" | "hybrid" | "native";
-  autoPropose: boolean;
-  autoApproveThreshold: number;
-  maxDictionarySize: number;
-  metrics: boolean;
-  fallbackOnError: boolean;
+  compressionLevel: "off" | "transport";
   /** Confidence threshold for escalation (0.0-1.0) */
   escalationThreshold: number;
   /** Cloud model for escalation */
@@ -162,8 +108,7 @@ export interface ClawTalkConfig {
   /**
    * Ordered model fallback chain for hot-swap failover.
    * When a model fails (rate limit, down, auth error), the next model
-   * in the chain is tried automatically. Uses circuit breaker + cooldown.
-   * If omitted, falls back to the simple `fallbackOnError` behavior.
+  * in the chain is tried automatically. Uses circuit breaker + cooldown.
    */
   fallbackChain?: string[];
   /** Cooldown in ms before retrying a failed model (default: 60000) */
@@ -175,26 +120,5 @@ export const DEFAULT_CONFIG: ClawTalkConfig = {
   enabled: true,
   version: 1,
   compressionLevel: "transport",
-  autoPropose: true,
-  autoApproveThreshold: 50,
-  maxDictionarySize: 500,
-  metrics: true,
-  fallbackOnError: true,
   escalationThreshold: 0.5,
 };
-
-/** Orchestrator result */
-export interface OrchestratorResult {
-  /** Response text for the user */
-  text: string | null;
-  /** Error message if failed */
-  error?: string;
-  /** Which subagent(s) handled the request */
-  handledBy: string[];
-  /** Whether escalation was used */
-  escalated: boolean;
-  /** ClawTalk wire messages exchanged */
-  wireLog: string[];
-  /** Execution time in ms */
-  durationMs: number;
-}

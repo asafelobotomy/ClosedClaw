@@ -423,7 +423,7 @@ export const AgentModelSchema = z.union([
 export const ClawTalkAgentSchema = z
   .object({
     enabled: z.boolean().optional(),
-    compression: z.enum(["off", "transport", "hybrid", "native"]).optional(),
+    compression: z.enum(["off", "transport"]).optional(),
     escalationThreshold: z.number().min(0).max(1).optional(),
     escalationModel: z.string().optional(),
     fallbackChain: z.array(z.string()).optional(),

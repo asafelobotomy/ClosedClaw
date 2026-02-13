@@ -28,6 +28,7 @@ import { createPluginRuntime } from "./runtime/index.js";
 import { validateJsonSchemaValue } from "./schema-validator.js";
 import {
   clawtalkBeforeAgentStartHandler,
+  clawtalkMessageSendingHandler,
   updateClawTalkHookConfig,
 } from "../agents/clawtalk/clawtalk-hook.js";
 import {
@@ -35,7 +36,6 @@ import {
   validatePermissions,
   loadClawsFile,
 } from "../agents/clawtalk/claws-parser.js";
-import { loadLexicon } from "../agents/clawtalk/clawdense.js";
 import {
   kernelShieldBeforeToolCallHandler,
   registerSkillForShield,
@@ -468,7 +468,7 @@ export function loadClosedClawPlugins(options: PluginLoadOptions = {}): PluginRe
   // Register the Kernel Shield before_tool_call hook if enabled in security config.
   registerKernelShieldHookIfEnabled(registry, cfg);
 
-  // Load .claws skill files and their lexicons (async, non-blocking for startup).
+  // Load .claws skill files (async, non-blocking for startup).
   void loadClawTalkSkillFiles(cfg);
 
   initializeGlobalHookRunner(registry);
@@ -506,7 +506,7 @@ function registerClawTalkHookIfEnabled(
         ? firstClawtalk.escalationModel
         : undefined,
       compressionLevel: typeof firstClawtalk.compression === "string"
-        ? (firstClawtalk.compression as "off" | "transport" | "hybrid" | "native")
+        ? (firstClawtalk.compression as "off" | "transport")
         : undefined,
     } as Partial<import("../agents/clawtalk/types.js").ClawTalkConfig>);
   }
@@ -517,6 +517,14 @@ function registerClawTalkHookIfEnabled(
     hookName: "before_agent_start",
     handler: clawtalkBeforeAgentStartHandler,
     priority: 1000, // High priority: ClawTalk routing should run first
+    source: "src/agents/clawtalk/clawtalk-hook.ts",
+  });
+
+  registry.typedHooks.push({
+    pluginId: "closedclaw:clawtalk",
+    hookName: "message_sending",
+    handler: clawtalkMessageSendingHandler,
+    priority: 1000,
     source: "src/agents/clawtalk/clawtalk-hook.ts",
   });
 }
@@ -563,8 +571,7 @@ function registerKernelShieldHookIfEnabled(
 }
 
 /**
- * Load .claws skill files from `~/.closedclaw/skills/`, validate permissions,
- * and activate the first available lexicon (Block 8) for ClawDense compression.
+ * Load .claws skill files from `~/.closedclaw/skills/` and validate permissions.
  *
  * Runs asynchronously after registry setup — skill file loading does not block
  * gateway startup. Warnings are logged but do not prevent operation.
@@ -582,8 +589,7 @@ async function loadClawTalkSkillFiles(
 
     logger.info?.(`[clawtalk] Found ${summaries.length} skill file(s)`);
 
-    // Load each file, validate permissions, collect lexicons
-    let lexiconLoaded = false;
+    // Load each file and validate permissions
     for (const summary of summaries) {
       try {
         const clawsFile = await loadClawsFile(summary.filePath);
@@ -593,15 +599,6 @@ async function loadClawTalkSkillFiles(
         for (const warning of warnings) {
           logger.warn?.(
             `[clawtalk] Skill "${clawsFile.manifest.id}" permission warning: ${warning}`,
-          );
-        }
-
-        // Load the first available lexicon for ClawDense
-        if (!lexiconLoaded && clawsFile.lexicon) {
-          loadLexicon(clawsFile.lexicon);
-          lexiconLoaded = true;
-          logger.debug?.(
-            `[clawtalk] Loaded lexicon from skill "${clawsFile.manifest.id}" (mode=${clawsFile.lexicon.mode})`,
           );
         }
 

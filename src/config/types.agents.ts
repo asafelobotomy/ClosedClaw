@@ -13,11 +13,15 @@ export type ClawTalkAgentConfig = {
   /** Enable ClawTalk intent routing for this agent (default: false). */
   enabled?: boolean;
   /** Compression mode for inter-agent messages. */
-  compression?: "off" | "transport" | "hybrid" | "native";
+  compression?: "off" | "transport";
   /** Confidence threshold below which escalation to cloud model is triggered. */
   escalationThreshold?: number;
   /** Cloud model to use when escalating. */
   escalationModel?: string;
+  /** Ordered model fallback chain for hot-swap failover. */
+  fallbackChain?: string[];
+  /** Cooldown in ms before retrying a failed model. */
+  fallbackCooldownMs?: number;
 };
 
 export type AgentModelConfig =

@@ -77,9 +77,9 @@ export interface ClawsPriorityMarker {
   requireBiometric?: boolean;
 }
 
-/** Lexicon / Stenographic Mappings (Block 8) */
+/** Lexicon Mappings (Block 8) */
 export interface ClawsLexicon {
-  /** Stenography mode (e.g., "hybrid_stenography") */
+  /** Lexicon mapping mode (e.g., "lexicon_compact") */
   mode: string;
   /** Pruning aggressiveness */
   pruningLevel?: string;
@@ -240,7 +240,7 @@ export interface ClawsFile {
   stateCheckpoint: ClawsStateCheckpoint | null;
   /** Block 7: Formal Verification Proof */
   verification: ClawsVerificationProof | null;
-  /** Block 8: Lexicon / Stenographic Mappings */
+  /** Block 8: Lexicon Mappings */
   lexicon: ClawsLexicon | null;
   /** Block 9: Neural Fingerprint / Behavioral Signature */
   fingerprint: ClawsNeuralFingerprint | null;

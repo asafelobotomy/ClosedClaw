@@ -155,4 +155,26 @@ describe("legacy migrations", () => {
       "Removed tools.message.allowCrossContextSend (tools.message.crossContext.allowAcrossProviders already set).",
     );
   });
+
+  it("maps deprecated clawtalk compression modes to off", () => {
+    const raw = {
+      agents: {
+        list: [
+          { id: "main", clawtalk: { enabled: true, compression: "hybrid" } },
+          { id: "research", clawtalk: { enabled: true, compression: "native" } },
+          { id: "ops", clawtalk: { enabled: true, compression: "transport" } },
+        ],
+      },
+    };
+
+    const { next, changes } = applyLegacyMigrations(raw);
+
+    const list = (next?.agents as { list?: Array<{ clawtalk?: { compression?: string } }> })?.list;
+    expect(list?.[0]?.clawtalk?.compression).toBe("off");
+    expect(list?.[1]?.clawtalk?.compression).toBe("off");
+    expect(list?.[2]?.clawtalk?.compression).toBe("transport");
+    expect(
+      changes.some((change) => change.includes("clawtalk.compression") && change.includes("off")),
+    ).toBe(true);
+  });
 });

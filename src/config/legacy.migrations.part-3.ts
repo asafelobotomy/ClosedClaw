@@ -303,4 +303,25 @@ export const LEGACY_CONFIG_MIGRATIONS_PART_3: LegacyConfigMigration[] = [
       delete raw.identity;
     },
   },
+  {
+    id: "agents.clawtalk.compression-hybrid-native->off",
+    describe: "Map deprecated clawtalk compression modes to off",
+    apply: (raw, changes) => {
+      const agents = getRecord(raw.agents);
+      const list = getAgentsList(agents);
+      for (let index = 0; index < list.length; index += 1) {
+        const entry = getRecord(list[index]);
+        const clawtalk = getRecord(entry?.clawtalk);
+        if (!clawtalk) {
+          continue;
+        }
+        if (clawtalk.compression === "hybrid" || clawtalk.compression === "native") {
+          clawtalk.compression = "off";
+          changes.push(
+            `Mapped agents.list[${String(index)}].clawtalk.compression to "off" from deprecated value.`,
+          );
+        }
+      }
+    },
+  },
 ];
