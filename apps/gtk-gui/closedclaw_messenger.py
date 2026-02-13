@@ -35,9 +35,14 @@ import html
 # ═══════════════════════════════════════════════════════════════════════════════
 
 DEFAULT_SOCKET_PATH = os.path.join(os.path.expanduser("~"), ".ClosedClaw", "gtk.sock")
-DEFAULT_TOKEN_PATH = os.path.join(os.path.expanduser("~"), ".ClosedClaw", "gtk-session-token")
 APP_ID = "ai.closedclaw.messenger"
 APP_NAME = "ClosedClaw Messenger"
+
+
+def get_token_path(socket_path: str) -> str:
+    """Derive token path from socket path (token is in same directory)"""
+    socket_dir = os.path.dirname(socket_path)
+    return os.path.join(socket_dir, "gtk-session-token")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -78,9 +83,9 @@ class Message:
 class ClosedClawIPC:
     """Unix socket IPC client for communicating with ClosedClaw"""
     
-    def __init__(self, socket_path: str = DEFAULT_SOCKET_PATH, token_path: str = DEFAULT_TOKEN_PATH):
+    def __init__(self, socket_path: str = DEFAULT_SOCKET_PATH):
         self.socket_path = socket_path
-        self.token_path = token_path
+        self.token_path = get_token_path(socket_path)
         self.socket: Optional[socket.socket] = None
         self.connected = False
         self.receive_thread: Optional[threading.Thread] = None
