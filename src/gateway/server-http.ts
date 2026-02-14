@@ -80,21 +80,23 @@ export function createHooksRequestHandler(
       return false;
     }
 
-    const { token, fromQuery } = extractHookToken(req, url);
-    if (!token || token !== hooksConfig.token) {
+    const queryTokenPresent = url.searchParams.has("token");
+    const { token } = extractHookToken(req, url);
+    const tokenMatches = token && token === hooksConfig.token;
+    if (!tokenMatches) {
+      if (queryTokenPresent) {
+        logHooks.warn(
+          "Rejected hook request with token in query parameter; pass the token in Authorization: Bearer or X-ClosedClaw-Token instead.",
+        );
+      }
       res.statusCode = 401;
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.end("Unauthorized");
       return true;
     }
-    if (fromQuery) {
-      // MED-03: Query-param tokens are deprecated. Add Sunset header to signal removal.
-      res.setHeader("Sunset", "Mon, 01 Jun 2026 00:00:00 GMT");
+    if (queryTokenPresent) {
       logHooks.warn(
-        "Hook token provided via query parameter is deprecated for security reasons. " +
-          "Tokens in URLs appear in logs, browser history, and referrer headers. " +
-          "Use Authorization: Bearer <token> or X-ClosedClaw-Token header instead. " +
-          "Query-param token support will be removed after 2026-06-01.",
+        "Hook token detected in query parameter was ignored; remove it to avoid leaking secrets in logs and referrers.",
       );
     }
 

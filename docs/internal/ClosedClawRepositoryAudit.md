@@ -121,13 +121,12 @@
 
 ---
 
-### MED-03: Deprecated hook token via query parameter
+### MED-03: Query-param hook tokens removed (resolved)
 
 - **Severity**: Medium
 - **Category**: Security / Deprecation
 - **File**: `src/gateway/server-http.ts` (around L90)
-- **Problem**: Webhook authentication token can be passed as a URL query parameter. This is a security risk because query strings are logged in server access logs, browser history, and proxy logs.
-- **Fix**: Set a deprecation timeline and remove query-param token support. Enforce `Authorization: Bearer` or `X-ClosedClaw-Token` header only.
+- **Status**: Fixed — query tokens are rejected; only `Authorization: Bearer` or `X-ClosedClaw-Token` headers are accepted. Logs emit a warning when a query token is present to prompt cleanup.
 
 ---
 

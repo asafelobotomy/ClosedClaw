@@ -3219,8 +3219,9 @@ Defaults:
 Requests must include the hook token:
 
 - `Authorization: Bearer <token>` **or**
-- `x-ClosedClaw-token: <token>` **or**
-- `?token=<token>`
+- `x-ClosedClaw-token: <token>`
+
+Query parameters are rejected to avoid leaking secrets in logs and referrers.
 
 Endpoints:
 

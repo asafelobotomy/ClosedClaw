@@ -33,7 +33,8 @@ Every request must include the hook token. Prefer headers:
 
 - `Authorization: Bearer <token>` (recommended)
 - `x-ClosedClaw-token: <token>`
-- `?token=<token>` (deprecated; logs a warning and will be removed in a future major release)
+
+Query parameters are rejected to avoid leaking secrets in logs and referrers.
 
 ## Endpoints
 

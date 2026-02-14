@@ -45,16 +45,15 @@ export function resolveHooksConfig(cfg: ClosedClawConfig): HooksConfigResolved |
 
 export type HookTokenResult = {
   token: string | undefined;
-  fromQuery: boolean;
 };
 
-export function extractHookToken(req: IncomingMessage, url: URL): HookTokenResult {
+export function extractHookToken(req: IncomingMessage, _url: URL): HookTokenResult {
   const auth =
     typeof req.headers.authorization === "string" ? req.headers.authorization.trim() : "";
   if (auth.toLowerCase().startsWith("bearer ")) {
     const token = auth.slice(7).trim();
     if (token) {
-      return { token, fromQuery: false };
+      return { token };
     }
   }
   const headerToken =
@@ -62,13 +61,9 @@ export function extractHookToken(req: IncomingMessage, url: URL): HookTokenResul
       ? req.headers["x-ClosedClaw-token"].trim()
       : "";
   if (headerToken) {
-    return { token: headerToken, fromQuery: false };
+    return { token: headerToken };
   }
-  const queryToken = url.searchParams.get("token");
-  if (queryToken) {
-    return { token: queryToken.trim(), fromQuery: true };
-  }
-  return { token: undefined, fromQuery: false };
+  return { token: undefined };
 }
 
 export async function readJsonBody(

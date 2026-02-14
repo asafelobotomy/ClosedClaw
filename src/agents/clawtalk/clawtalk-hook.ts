@@ -7,6 +7,7 @@
  *   2. Route to the appropriate subagent profile
  *   3. Inject the subagent's system prompt and tool allowlist
  *   4. Optionally override the model (escalation to cloud)
+ *   5. When agent-to-agent, encode message via TPC (default transport)
  *
  * This replaces the self-contained classifier previously duplicated
  * in the GTK extension's clawtalk-bridge.ts.
@@ -17,6 +18,7 @@ import { Directory, type RoutingDecision } from "./directory.js";
 import { shouldEscalate } from "./escalation.js";
 import type { ClawTalkConfig, EncodedMessage } from "./types.js";
 import { DEFAULT_CONFIG } from "./types.js";
+import { TPCRuntime } from "./tpc/index.js";
 import { logVerbose } from "../../globals.js";
 import type {
   PluginHookBeforeAgentStartEvent,
@@ -69,11 +71,22 @@ export interface ClawTalkRouting {
   confidence: number;
   /** CT/1 wire representation */
   wire: string;
+  /** TPC transport status */
+  tpc?: {
+    /** Whether this message uses TPC encoding */
+    active: boolean;
+    /** Reason for text fallback (only set when active=false) */
+    fallbackReason?: string;
+  };
 }
 
 // Module-level singleton directory (no LLM deps, safe to share).
 let sharedDirectory: Directory | null = null;
 let activeConfig: ClawTalkConfig = DEFAULT_CONFIG;
+
+// TPC runtime — lazily initialized when TPC is enabled.
+let tpcRuntime: TPCRuntime | null = null;
+let tpcInitPromise: Promise<void> | null = null;
 
 /**
  * Get or create the shared Directory singleton.
@@ -83,6 +96,52 @@ function getDirectory(): Directory {
     sharedDirectory = new Directory();
   }
   return sharedDirectory;
+}
+
+/**
+ * Get or create the shared TPC runtime. Initializes lazily on first call.
+ */
+async function getTpcRuntime(): Promise<TPCRuntime | null> {
+  const tpcConfig = activeConfig.tpc;
+  if (!tpcConfig?.enabled && tpcConfig?.enabled !== undefined) {
+    return null;
+  }
+
+  if (tpcRuntime?.isReady()) {
+    return tpcRuntime;
+  }
+
+  if (tpcInitPromise) {
+    await tpcInitPromise;
+    return tpcRuntime;
+  }
+
+  tpcRuntime = new TPCRuntime({
+    enabled: tpcConfig?.enabled ?? true,
+    mode: tpcConfig?.mode ?? "file",
+    deadDropPath: tpcConfig?.deadDropPath,
+    maxMessageAge: tpcConfig?.maxMessageAge ?? 300,
+    enforceForAgentToAgent: tpcConfig?.enforceForAgentToAgent ?? true,
+    allowTextFallback: tpcConfig?.allowTextFallback ?? false,
+  });
+
+  tpcInitPromise = tpcRuntime.initialize().catch((err) => {
+    logVerbose(`[clawtalk-tpc] TPC init failed: ${err}`);
+    tpcRuntime = null;
+  }).finally(() => {
+    tpcInitPromise = null;
+  });
+
+  await tpcInitPromise;
+  return tpcRuntime;
+}
+
+/**
+ * Determine if the current agent context represents agent-to-agent communication.
+ * An agentId present in context indicates a sub-agent call.
+ */
+function isAgentToAgent(ctx: PluginHookAgentContext): boolean {
+  return ctx.agentId != null && ctx.agentId !== "";
 }
 
 /**
@@ -101,10 +160,41 @@ export function getClawTalkDirectory(): Directory {
 }
 
 /**
+ * Get the TPC runtime (if initialized).
+ * Returns null if TPC has not been initialized yet.
+ */
+export function getClawTalkTpcRuntime(): TPCRuntime | null {
+  return tpcRuntime;
+}
+
+/**
+ * Initialize the TPC runtime explicitly (for consumers that need it immediately).
+ */
+export async function initClawTalkTpc(): Promise<TPCRuntime | null> {
+  return getTpcRuntime();
+}
+
+/**
+ * Shut down the TPC runtime (for clean process exit).
+ */
+export async function shutdownClawTalkTpc(): Promise<void> {
+  if (tpcRuntime) {
+    await tpcRuntime.shutdown();
+    tpcRuntime = null;
+  }
+}
+
+/**
  * Classify intent and route to subagent, returning a routing result.
  * Exported for use by the GTK bridge and other consumers.
+ *
+ * @param userMessage - The raw user message
+ * @param opts - Optional context for TPC transport decision
  */
-export function routeMessage(userMessage: string): ClawTalkRouting {
+export function routeMessage(
+  userMessage: string,
+  opts?: { agentToAgent?: boolean },
+): ClawTalkRouting {
   const encoded: EncodedMessage = encode(userMessage);
   const directory = getDirectory();
   const routing: RoutingDecision = directory.routeMessage(encoded.message, encoded.intent);
@@ -118,6 +208,34 @@ export function routeMessage(userMessage: string): ClawTalkRouting {
     config: activeConfig,
   });
 
+  // TPC transport decision —
+  // TPC is default for agent-to-agent; text is fallback only.
+  let tpcStatus: ClawTalkRouting["tpc"];
+  if (opts?.agentToAgent) {
+    const runtime = tpcRuntime;
+    if (runtime?.isReady()) {
+      const fallback = runtime.shouldFallbackToText({
+        isAgentToAgent: true,
+        wire: encoded.wire,
+      });
+      tpcStatus = fallback
+        ? { active: false, fallbackReason: "tpc=false in wire or config override" }
+        : { active: true };
+    } else {
+      // TPC runtime not ready — check if text fallback is allowed
+      const allowFallback = activeConfig.tpc?.allowTextFallback ?? false;
+      tpcStatus = {
+        active: false,
+        fallbackReason: allowFallback
+          ? "TPC runtime not initialized, using text fallback"
+          : "TPC runtime not initialized",
+      };
+    }
+  } else {
+    // Human-facing communication — always text
+    tpcStatus = { active: false, fallbackReason: "human-facing message" };
+  }
+
   return {
     agentId: agent.id,
     systemPrompt: agent.systemPrompt,
@@ -129,6 +247,7 @@ export function routeMessage(userMessage: string): ClawTalkRouting {
     intent: encoded.intent,
     confidence: encoded.confidence,
     wire: encoded.wire,
+    tpc: tpcStatus,
   };
 }
 
@@ -137,10 +256,13 @@ export function routeMessage(userMessage: string): ClawTalkRouting {
  *
  * Returns systemPrompt, toolAllowlist, and modelOverride based on
  * intent classification of the user's prompt.
+ *
+ * When agent-to-agent communication is detected, triggers TPC
+ * initialization so messages default to acoustic encoding.
  */
 export function clawtalkBeforeAgentStartHandler(
   event: PluginHookBeforeAgentStartEvent,
-  _ctx: PluginHookAgentContext,
+  ctx: PluginHookAgentContext,
 ): PluginHookBeforeAgentStartResult | void {
   if (!activeConfig.enabled) {
     return;
@@ -151,7 +273,13 @@ export function clawtalkBeforeAgentStartHandler(
     return;
   }
 
-  const routing = routeMessage(prompt);
+  const agentToAgent = isAgentToAgent(ctx);
+  const routing = routeMessage(prompt, { agentToAgent });
+
+  // Lazily initialize TPC runtime for agent-to-agent calls
+  if (agentToAgent && !tpcRuntime) {
+    void getTpcRuntime();
+  }
 
   // For the conversation fallback agent, don't override anything —
   // let the default system prompt and full tool set apply.
@@ -176,8 +304,9 @@ export function clawtalkBeforeAgentStartHandler(
     result.modelOverride = routing.modelOverride;
   }
 
+  const tpcTag = routing.tpc?.active ? " [TPC]" : " [TEXT]";
   logVerbose(
-    `[clawtalk] intent=${routing.intent} -> ${routing.agentId} confidence=${(routing.confidence * 100).toFixed(0)}%`,
+    `[clawtalk] intent=${routing.intent} -> ${routing.agentId} confidence=${(routing.confidence * 100).toFixed(0)}%${tpcTag}`,
   );
 
   return result;

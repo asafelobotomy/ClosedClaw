@@ -66,7 +66,7 @@ export function serveAcpGateway(opts: AcpServerOptions = {}): void {
   gateway.start();
 }
 
-function parseArgs(args: string[]): AcpServerOptions {
+export function parseAcpArgs(args: string[]): AcpServerOptions {
   const opts: AcpServerOptions = {};
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
@@ -139,6 +139,6 @@ Options:
 }
 
 if (isMainModule({ currentFile: fileURLToPath(import.meta.url) })) {
-  const opts = parseArgs(process.argv.slice(2));
+  const opts = parseAcpArgs(process.argv.slice(2));
   serveAcpGateway(opts);
 }

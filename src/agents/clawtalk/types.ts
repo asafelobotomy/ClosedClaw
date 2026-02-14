@@ -80,6 +80,11 @@ export interface SubagentProfile {
   preferredModel?: string;
   /** Priority when multiple agents match (higher = preferred) */
   priority: number;
+  /**
+   * When true, this agent may communicate via plain text instead of TPC.
+   * Default is false — agent-to-agent messages use TPC encoding.
+   */
+  allowTextFallback?: boolean;
 }
 
 /** Escalation decision */
@@ -113,6 +118,21 @@ export interface ClawTalkConfig {
   fallbackChain?: string[];
   /** Cooldown in ms before retrying a failed model (default: 60000) */
   fallbackCooldownMs?: number;
+  /** TPC (Tonal Pulse Communication) configuration */
+  tpc?: {
+    /** Enable TPC encoding for agent-to-agent messages (default: true) */
+    enabled?: boolean;
+    /** TPC transport mode (default: "file") */
+    mode?: "file" | "ultrasonic" | "audible";
+    /** Enforce TPC for all agent-to-agent communication (default: true) */
+    enforceForAgentToAgent?: boolean;
+    /** Allow plain text fallback when TPC is unavailable (default: false) */
+    allowTextFallback?: boolean;
+    /** Path for dead-drop file transport */
+    deadDropPath?: string;
+    /** Maximum message age in seconds before rejection (default: 300) */
+    maxMessageAge?: number;
+  };
 }
 
 /** Default configuration */

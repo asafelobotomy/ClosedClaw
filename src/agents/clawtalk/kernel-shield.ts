@@ -87,6 +87,8 @@ export interface ToolInvocationContext {
   trustScore: number;
   /** Live activation vector (for neural attestation) — dense float array */
   liveActivation?: number[];
+  /** Whether this invocation is agent-to-agent (TPC-mediated) communication */
+  isAgentToAgent?: boolean;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

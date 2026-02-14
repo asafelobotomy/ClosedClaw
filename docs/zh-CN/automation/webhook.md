@@ -21,10 +21,6 @@ Gateway网关可以暴露一个小型 HTTP webhook 端点用于外部触发。
 
 ```json5
 {
-  hooks: {
-    enabled: true,
-    token: "shared-secret",
-    path: "/hooks",
   },
 }
 ```
@@ -40,7 +36,8 @@ Gateway网关可以暴露一个小型 HTTP webhook 端点用于外部触发。
 
 - `Authorization: Bearer <token>`（推荐）
 - `x-ClosedClaw-token: <token>`
-- `?token=<token>`（已弃用；会记录警告，将在未来的主要版本中移除）
+
+URL 查询参数中的 token 不再被接受（返回 401），以避免在日志和引用来源中泄漏机密。
 
 ## 端点
 

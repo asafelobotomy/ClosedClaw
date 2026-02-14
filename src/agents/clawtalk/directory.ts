@@ -136,6 +136,8 @@ const CONVERSATION_PROFILE: SubagentProfile = {
   ].join("\n"),
   tools: ["web_search", "calculator", "current_time"],
   priority: 1,
+  // Conversation agent handles human-facing messages — text fallback is allowed.
+  allowTextFallback: true,
 };
 
 /** Routing decision from the Directory */

@@ -461,6 +461,11 @@ export async function processGtkMessage(
     log?.info?.(
       `[clawtalk] Intent: ${routing.intent} (${(routing.confidence * 100).toFixed(0)}%) → ${routing.agentName} [${routing.agentId}]${routing.escalated ? " ⬆ ESCALATED" : ""}`,
     );
+    if (routing.tpc) {
+      log?.info?.(
+        `[clawtalk-tpc] Transport: ${routing.tpc.active ? "TPC (acoustic)" : "TEXT fallback"}${routing.tpc.fallbackReason ? ` — ${routing.tpc.fallbackReason}` : ""}`,
+      );
+    }
     log?.debug?.(
       `[clawtalk] Wire: ${routing.wire}`,
     );

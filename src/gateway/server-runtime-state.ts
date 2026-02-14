@@ -82,8 +82,9 @@ export async function createGatewayRuntimeState(params: {
       });
       if (handler.rootDir) {
         canvasHost = handler;
+        const canvasProtocol = params.gatewayTls?.enabled ? "https" : "http";
         params.logCanvas.info(
-          `canvas host mounted at http://${params.bindHost}:${params.port}${CANVAS_HOST_PATH}/ (root ${handler.rootDir})`,
+          `canvas host mounted at ${canvasProtocol}://${params.bindHost}:${params.port}${CANVAS_HOST_PATH}/ (root ${handler.rootDir})`,
         );
       }
     } catch (err) {

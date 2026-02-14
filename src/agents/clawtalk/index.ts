@@ -49,6 +49,9 @@ export {
   stripClawTalkArtifacts,
   updateClawTalkHookConfig,
   getClawTalkDirectory,
+  getClawTalkTpcRuntime,
+  initClawTalkTpc,
+  shutdownClawTalkTpc,
   type ClawTalkRouting,
 } from "./clawtalk-hook.js";
 
@@ -113,3 +116,29 @@ export type {
   EscalationDecision,
 } from "./types.js";
 export { DEFAULT_CONFIG } from "./types.js";
+
+// TPC (Tonal Pulse Communication) — default agent-to-agent transport
+export {
+  TPCRuntime,
+  TPCSecurityError,
+  TPCNotInitializedError,
+} from "./tpc/index.js";
+export type {
+  TPCConfig,
+  TPCEncodeResult,
+  TPCDecodeResult,
+  TPCAuditEvent,
+  TPCEnvelope,
+  SignedTPCEnvelope,
+} from "./tpc/index.js";
+export { rsEncode, rsDecode, ReedSolomonError } from "./tpc/reed-solomon.js";
+export { encodeToWav, estimateWavSize } from "./tpc/waveform-encoder.js";
+export { decodeFromWav, WaveformDecodeError } from "./tpc/waveform-decoder.js";
+export { NonceStore } from "./tpc/nonce-store.js";
+export { DeadDropManager } from "./tpc/dead-drop.js";
+export { selectProfile, checkAudioDevices, getAFSKParamsForMode, invalidateCache } from "./tpc/profile-selector.js";
+export { ULTRASONIC_AFSK_PARAMS } from "./tpc/types.js";
+export { CircuitBreaker } from "./tpc/circuit-breaker.js";
+export { KeyRotationManager } from "./tpc/key-rotation.js";
+export { RateLimiter } from "./tpc/rate-limiter.js";
+export { AuditLogger } from "./tpc/audit-logger.js";

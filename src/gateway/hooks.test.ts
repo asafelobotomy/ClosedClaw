@@ -39,7 +39,7 @@ describe("gateway hooks helpers", () => {
     expect(() => resolveHooksConfig(cfg)).toThrow("hooks.path may not be '/'");
   });
 
-  test("extractHookToken prefers bearer > header > query", () => {
+  test("extractHookToken prefers bearer > header and ignores query tokens", () => {
     const req = {
       headers: {
         authorization: "Bearer top",
@@ -49,19 +49,16 @@ describe("gateway hooks helpers", () => {
     const url = new URL("http://localhost/hooks/wake?token=query");
     const result1 = extractHookToken(req, url);
     expect(result1.token).toBe("top");
-    expect(result1.fromQuery).toBe(false);
 
     const req2 = {
       headers: { "x-ClosedClaw-token": "header" },
     } as unknown as IncomingMessage;
     const result2 = extractHookToken(req2, url);
     expect(result2.token).toBe("header");
-    expect(result2.fromQuery).toBe(false);
 
     const req3 = { headers: {} } as unknown as IncomingMessage;
     const result3 = extractHookToken(req3, url);
-    expect(result3.token).toBe("query");
-    expect(result3.fromQuery).toBe(true);
+    expect(result3.token).toBeUndefined();
   });
 
   test("normalizeWakePayload trims + validates", () => {
@@ -101,7 +98,7 @@ describe("gateway hooks helpers", () => {
       ]),
     );
     const imsg = normalizeAgentPayload(
-      { message: "yo", channel: "imsg" },
+      { message: "yo", channel: "imessage" },
       { idFactory: () => "x" },
     );
     expect(imsg.ok).toBe(true);

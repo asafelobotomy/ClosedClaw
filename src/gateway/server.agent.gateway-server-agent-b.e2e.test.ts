@@ -128,7 +128,7 @@ describe("gateway server agent", () => {
     setActivePluginRegistry(emptyRegistry);
   });
 
-  test("agent routes main last-channel msteams", async () => {
+  test("agent falls back to default channel when last-channel is unavailable", async () => {
     const registry = createRegistry([
       {
         pluginId: "msteams",
@@ -161,14 +161,14 @@ describe("gateway server agent", () => {
 
     const spy = vi.mocked(agentCommand);
     const call = spy.mock.calls.at(-1)?.[0] as Record<string, unknown>;
-    expectChannels(call, "msteams");
+    expectChannels(call, "gtk-gui");
     expect(call.to).toBe("conversation:teams-123");
     expect(call.deliver).toBe(true);
     expect(call.bestEffortDeliver).toBe(true);
     expect(call.sessionId).toBe("sess-teams");
   });
 
-  test("agent accepts channel aliases (imsg/teams)", async () => {
+  test("agent accepts channel aliases (teams) and canonical channel ids", async () => {
     const registry = createRegistry([
       {
         pluginId: "msteams",
@@ -185,19 +185,19 @@ describe("gateway server agent", () => {
         main: {
           sessionId: "sess-alias",
           updatedAt: Date.now(),
-          lastChannel: "imessage",
-          lastTo: "chat_id:123",
+          lastChannel: "msteams",
+          lastTo: "conversation:teams-123",
         },
       },
     });
-    const resIMessage = await rpcReq(ws, "agent", {
+    const resCanonical = await rpcReq(ws, "agent", {
       message: "hi",
       sessionKey: "main",
-      channel: "imsg",
+      channel: "msteams",
       deliver: true,
-      idempotencyKey: "idem-agent-imsg",
+      idempotencyKey: "idem-agent-msteams",
     });
-    expect(resIMessage.ok).toBe(true);
+    expect(resCanonical.ok).toBe(true);
 
     const resTeams = await rpcReq(ws, "agent", {
       message: "hi",
@@ -210,9 +210,9 @@ describe("gateway server agent", () => {
     expect(resTeams.ok).toBe(true);
 
     const spy = vi.mocked(agentCommand);
-    const lastIMessageCall = spy.mock.calls.at(-2)?.[0] as Record<string, unknown>;
-    expectChannels(lastIMessageCall, "imessage");
-    expect(lastIMessageCall.to).toBe("chat_id:123");
+    const lastCanonicalCall = spy.mock.calls.at(-2)?.[0] as Record<string, unknown>;
+    expectChannels(lastCanonicalCall, "msteams");
+    expect(lastCanonicalCall.to).toBeUndefined();
 
     const lastTeamsCall = spy.mock.calls.at(-1)?.[0] as Record<string, unknown>;
     expectChannels(lastTeamsCall, "msteams");
@@ -230,7 +230,7 @@ describe("gateway server agent", () => {
     expect(res.error?.code).toBe("INVALID_REQUEST");
   });
 
-  test("agent ignores webchat last-channel for routing", async () => {
+  test("agent ignores webchat last-channel and uses default channel for delivery", async () => {
     testState.allowFrom = ["+1555"];
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "ClosedClaw-gw-"));
     testState.sessionStorePath = path.join(dir, "sessions.json");
@@ -255,8 +255,8 @@ describe("gateway server agent", () => {
 
     const spy = vi.mocked(agentCommand);
     const call = spy.mock.calls.at(-1)?.[0] as Record<string, unknown>;
-    expectChannels(call, "whatsapp");
-    expect(call.to).toBe("+1555");
+    expectChannels(call, "gtk-gui");
+    expect(call.to).toBeUndefined();
     expect(call.deliver).toBe(true);
     expect(call.bestEffortDeliver).toBe(true);
     expect(call.sessionId).toBe("sess-main-webchat");

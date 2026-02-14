@@ -3094,8 +3094,9 @@ ClosedClaw gateway --port 19001
 请求必须包含 hook token：
 
 - `Authorization: Bearer <token>` **或**
-- `x-ClosedClaw-token: <token>` **或**
-- `?token=<token>`
+- `x-ClosedClaw-token: <token>`
+
+URL 查询参数中的 token 不再被接受（返回 401），以避免在日志和引用来源中泄漏机密。
 
 端点：
 

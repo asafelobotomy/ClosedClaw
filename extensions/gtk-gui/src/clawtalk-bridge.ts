@@ -48,6 +48,13 @@ export interface ClawTalkRoutingResult {
   wire: string;
   /** Risk level based on intent classification */
   riskLevel: "low" | "medium" | "high";
+  /** TPC transport status — shows whether acoustic encoding is active */
+  tpc?: {
+    /** Whether TPC encoding is active for this message */
+    active: boolean;
+    /** Reason for text fallback (only set when active=false) */
+    fallbackReason?: string;
+  };
 }
 
 // Intents where tool execution does the work (small model is fine)
@@ -165,6 +172,7 @@ export function routeWithClawTalk(params: {
     intent: routing.intent,
     wire: routing.wire,
     riskLevel: classifyRisk(routing.intent),
+    tpc: routing.tpc,
   };
 }
 
