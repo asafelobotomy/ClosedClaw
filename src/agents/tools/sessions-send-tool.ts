@@ -4,6 +4,8 @@ import crypto from "node:crypto";
 import type { AnyAgentTool } from "./common.js";
 import { loadConfig } from "../../config/config.js";
 import { callGateway } from "../../gateway/call.js";
+import { serialize } from "../clawtalk/parser.js";
+import type { ClawTalkMessage } from "../clawtalk/types.js";
 import {
   isSubagentSessionKey,
   normalizeAgentId,
@@ -27,11 +29,17 @@ import {
 import { buildAgentToAgentMessageContext, resolvePingPongTurns } from "./sessions-send-helpers.js";
 import { runSessionsSendA2AFlow } from "./sessions-send-tool.a2a.js";
 
+const StructuredMessageSchema = Type.Object({
+  action: Type.String({ minLength: 1, maxLength: 64 }),
+  params: Type.Optional(Type.Record(Type.String(), Type.Any())),
+});
+
 const SessionsSendToolSchema = Type.Object({
   sessionKey: Type.Optional(Type.String()),
   label: Type.Optional(Type.String({ minLength: 1, maxLength: SESSION_LABEL_MAX_LENGTH })),
   agentId: Type.Optional(Type.String({ minLength: 1, maxLength: 64 })),
-  message: Type.String(),
+  message: Type.Optional(Type.String()),
+  structuredMessage: Type.Optional(StructuredMessageSchema),
   timeoutSeconds: Type.Optional(Type.Number({ minimum: 0 })),
 });
 
@@ -48,7 +56,44 @@ export function createSessionsSendTool(opts?: {
     parameters: SessionsSendToolSchema,
     execute: async (_toolCallId, args) => {
       const params = args as Record<string, unknown>;
-      const message = readStringParam(params, "message", { required: true });
+      const messageParam = readStringParam(params, "message");
+      const structured = (params.structuredMessage ?? params["structuredMessage"]) as
+        | { action?: unknown; params?: unknown }
+        | undefined;
+
+      let message: string | undefined = messageParam;
+
+      if (!message && structured && typeof structured === "object") {
+        const action = typeof structured.action === "string" ? structured.action.trim() : "";
+        const rawParams = structured.params;
+        if (!action) {
+          return jsonResult({
+            runId: crypto.randomUUID(),
+            status: "error",
+            error: "structuredMessage.action is required",
+          });
+        }
+        const paramsObj =
+          rawParams && typeof rawParams === "object" && !Array.isArray(rawParams)
+            ? (rawParams as Record<string, unknown>)
+            : {};
+
+        const msg: ClawTalkMessage = {
+          version: 1,
+          verb: "REQ",
+          action,
+          params: paramsObj as Record<string, string | number | boolean | string[]>,
+        };
+        message = serialize(msg);
+      }
+
+      if (!message) {
+        return jsonResult({
+          runId: crypto.randomUUID(),
+          status: "error",
+          error: "Either message or structuredMessage is required",
+        });
+      }
       const cfg = loadConfig();
       const { mainKey, alias } = resolveMainSessionAlias(cfg);
       const visibility = cfg.agents?.defaults?.sandbox?.sessionToolsVisibility ?? "spawned";

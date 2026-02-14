@@ -216,6 +216,7 @@ export function createEnvelope(params: {
   payload: string;
   sourceAgent: string;
   targetAgent: string;
+  compressionVersion?: number | null;
 }): TPCEnvelope {
   return {
     version: 1,
@@ -224,6 +225,7 @@ export function createEnvelope(params: {
     nonce: generateNonce(),
     sourceAgent: params.sourceAgent,
     targetAgent: params.targetAgent,
+    compressionVersion: params.compressionVersion ?? undefined,
     payload: params.payload,
   };
 }
@@ -237,11 +239,13 @@ export function createSignedEnvelope(params: {
   targetAgent: string;
   privateKey: crypto.KeyObject;
   scheme?: TPCSignatureScheme;
+  compressionVersion?: number | null;
 }): SignedTPCEnvelope {
   const envelope = createEnvelope({
     payload: params.payload,
     sourceAgent: params.sourceAgent,
     targetAgent: params.targetAgent,
+    compressionVersion: params.compressionVersion,
   });
 
   return signEnvelope(envelope, params.privateKey);

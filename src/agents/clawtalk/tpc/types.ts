@@ -93,6 +93,8 @@ export interface TPCEnvelope {
   sourceAgent: string;
   /** Target agent identifier */
   targetAgent: string;
+  /** Optional compression dictionary version applied to payload */
+  compressionVersion?: number;
   /** The CT/1 wire format payload being transported */
   payload: string;
 }

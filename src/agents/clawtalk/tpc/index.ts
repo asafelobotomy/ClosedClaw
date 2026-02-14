@@ -18,6 +18,7 @@ import type {
   SignedTPCEnvelope,
 } from "./types.js";
 import { DEFAULT_TPC_CONFIG } from "./types.js";
+import { compressWire, decompressWire } from "../compression.js";
 import {
   createEnvelope,
   signEnvelope,
@@ -28,6 +29,7 @@ import {
   generateMessageId,
   type KeyPair,
 } from "./crypto-signer.js";
+import { getAFSKParamsForMode } from "./profile-selector.js";
 import { encodeToWav } from "./waveform-encoder.js";
 import { decodeFromWav, WaveformDecodeError } from "./waveform-decoder.js";
 import { DeadDropManager, type DeadDropConfig } from "./dead-drop.js";
@@ -66,9 +68,10 @@ export class TPCRuntime {
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    if (this.config.mode !== "file") {
+    const supportedModes = new Set(["file", "audible", "ultrasonic", "auto"]);
+    if (!supportedModes.has(this.config.mode)) {
       throw new TPCUnsupportedTransportError(
-        `Unsupported TPC transport: ${this.config.mode}. Only file transport is implemented.`,
+        `Unsupported TPC transport: ${this.config.mode}. Only file-based transports are implemented (file|audible|ultrasonic|auto).`,
       );
     }
 
@@ -138,18 +141,24 @@ export class TPCRuntime {
     this.ensureReady();
     const start = performance.now();
 
+    const afskParams = this.getAfskParams();
+
+    // Compress CT/1 wire header (if applicable)
+    const { wire: compressedWire, version: compressionVersion } = compressWire(params.payload);
+
     // 1. Create TPC envelope
     const envelope = createEnvelope({
-      payload: params.payload,
+      payload: compressedWire,
       sourceAgent: params.sourceAgent,
       targetAgent: params.targetAgent,
+      compressionVersion,
     });
 
     // 2. Sign the envelope
     const signed = signEnvelope(envelope, this.keyPair!.privateKey);
 
     // 3. Encode to WAV (serialization → FEC → AFSK → WAV)
-    const wavData = encodeToWav(signed);
+    const wavData = encodeToWav(signed, afskParams);
 
     // 4. Write to dead-drop inbox
     const filePath = await this.deadDrop!.writeMessage({
@@ -189,14 +198,19 @@ export class TPCRuntime {
   }): { wavData: Buffer; signed: SignedTPCEnvelope } {
     this.ensureReady();
 
+    const afskParams = this.getAfskParams();
+
+    const { wire: compressedWire, version: compressionVersion } = compressWire(params.payload);
+
     const envelope = createEnvelope({
-      payload: params.payload,
+      payload: compressedWire,
       sourceAgent: params.sourceAgent,
       targetAgent: params.targetAgent,
+      compressionVersion,
     });
 
     const signed = signEnvelope(envelope, this.keyPair!.privateKey);
-    const wavData = encodeToWav(signed);
+    const wavData = encodeToWav(signed, afskParams);
 
     return { wavData, signed };
   }
@@ -217,13 +231,15 @@ export class TPCRuntime {
     this.ensureReady();
     const start = performance.now();
 
+    const afskParams = this.getAfskParams();
+
     // 1. Read WAV from dead-drop (moves to archive)
     const wavData = await this.deadDrop!.readMessage(params.filePath);
 
     // 2. Decode WAV → SignedTPCEnvelope
     let signed: SignedTPCEnvelope;
     try {
-      signed = decodeFromWav(wavData);
+      signed = decodeFromWav(wavData, afskParams);
     } catch (e) {
       const reason = e instanceof WaveformDecodeError ? e.message : String(e);
       this.logAudit({
@@ -285,8 +301,13 @@ export class TPCRuntime {
       metadata: { signatureValid, fresh, nonceUnique, decodingMs },
     });
 
+    const decompressedPayload = decompressWire(
+      signed.envelope.payload,
+      signed.envelope.compressionVersion,
+    );
+
     return {
-      payload: signed.envelope.payload,
+      payload: decompressedPayload,
       envelope: signed.envelope,
       signatureValid,
       fresh,
@@ -303,13 +324,43 @@ export class TPCRuntime {
     this.ensureReady();
     const start = performance.now();
 
-    const signed = decodeFromWav(wavData);
+    const afskParams = this.getAfskParams();
+
+    const signed = decodeFromWav(wavData, afskParams);
     const signatureValid = verify(signed, this.keyPair!.publicKey);
     const fresh = isEnvelopeFresh(signed.envelope, this.config.maxMessageAge);
     const nonceUnique = this.nonceStore!.checkAndRecord(signed.envelope.nonce);
 
+    const decompressedPayload = decompressWire(
+      signed.envelope.payload,
+      signed.envelope.compressionVersion,
+    );
+
+    this.logAudit({
+      event: "tpc_decode",
+      timestamp: Date.now(),
+      messageId: signed.envelope.messageId,
+      sourceAgent: signed.envelope.sourceAgent,
+      targetAgent: signed.envelope.targetAgent,
+      metadata: {
+        signatureValid,
+        fresh,
+        nonceUnique,
+        decodingMs: performance.now() - start,
+      },
+    });
+
+    if (!nonceUnique) {
+      this.logAudit({
+        event: "nonce_replay",
+        timestamp: Date.now(),
+        messageId: signed.envelope.messageId,
+        reason: `Nonce replay detected: ${signed.envelope.nonce}`,
+      });
+    }
+
     return {
-      payload: signed.envelope.payload,
+      payload: decompressedPayload,
       envelope: signed.envelope,
       signatureValid,
       fresh,
@@ -357,7 +408,9 @@ export class TPCRuntime {
     wire?: string;
     allowTextFallback?: boolean;
   }): boolean {
-    const transportSupported = this.config.mode === "file";
+    const transportSupported = ["file", "audible", "ultrasonic", "auto"].includes(
+      this.config.mode,
+    );
 
     // Enforced mode: do not permit text fallback for agent-to-agent traffic.
     if (params.isAgentToAgent && this.config.enforceForAgentToAgent) {
@@ -468,9 +521,10 @@ export class TPCRuntime {
     if (!this.config.enabled) {
       throw new TPCDisabledError("TPC is disabled by configuration");
     }
-    if (this.config.mode !== "file") {
+    const supportedModes = new Set(["file", "audible", "ultrasonic", "auto"]);
+    if (!supportedModes.has(this.config.mode)) {
       throw new TPCUnsupportedTransportError(
-        `Unsupported TPC transport: ${this.config.mode}. Only file transport is implemented.`,
+        `Unsupported TPC transport: ${this.config.mode}. Only file-based transports are implemented (file|audible|ultrasonic|auto).`,
       );
     }
     if (!this.initialized) {
@@ -478,6 +532,10 @@ export class TPCRuntime {
         "TPC runtime not initialized. Call initialize() first.",
       );
     }
+  }
+
+  private getAfskParams() {
+    return getAFSKParamsForMode(this.config.mode);
   }
 }
 

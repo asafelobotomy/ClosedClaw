@@ -15,6 +15,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import crypto from "node:crypto";
+import * as encoder from "./waveform-encoder.js";
 
 import {
   generateKeyPair,
@@ -42,7 +43,13 @@ import { encodeToWav, estimateWavSize } from "./waveform-encoder.js";
 import { decodeFromWav, WaveformDecodeError } from "./waveform-decoder.js";
 import { NonceStore } from "./nonce-store.js";
 import { DeadDropManager } from "./dead-drop.js";
-import { TPCRuntime, TPCSecurityError, TPCNotInitializedError } from "./index.js";
+import {
+  TPCRuntime,
+  TPCSecurityError,
+  TPCNotInitializedError,
+  DEFAULT_AFSK_PARAMS,
+  ULTRASONIC_AFSK_PARAMS,
+} from "./index.js";
 import type { TPCEnvelope, SignedTPCEnvelope } from "./types.js";
 
 // ---------------------------------------------------------------------------
@@ -521,6 +528,26 @@ describe("dead-drop", () => {
     expect(fs.existsSync(filePath)).toBe(true);
     expect(filePath).toContain("outbox/research/result-001.wav");
   });
+
+  it("rejects WAV data larger than the safety cap", async () => {
+    const overCap = Buffer.alloc(5 * 1024 * 1024 + 1, 0xff);
+    await expect(
+      mgr.writeMessage({ targetAgent: "research", wavData: overCap, messageId: "msg-cap" }),
+    ).rejects.toThrow(/WAV data exceeds maximum allowed size/);
+  });
+
+  it("accepts WAV data at the safety cap", async () => {
+    const atCap = Buffer.alloc(5 * 1024 * 1024, 0x01);
+    const filePath = await mgr.writeMessage({
+      targetAgent: "research",
+      wavData: atCap,
+      messageId: "msg-cap-ok",
+    });
+
+    expect(fs.existsSync(filePath)).toBe(true);
+    const stats = fs.statSync(filePath);
+    expect(stats.size).toBe(5 * 1024 * 1024);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -592,6 +619,23 @@ describe("TPCRuntime", () => {
     expect(decoded.decodingMs).toBeGreaterThan(0);
   });
 
+  it("preserves compressed parameter payloads", async () => {
+    const payload = 'CT/1 REQ web_search filter=critical limit=5 since=30d target="https://example.com" lang=en';
+
+    const result = await runtime.encode({
+      payload,
+      sourceAgent: "master",
+      targetAgent: "research",
+    });
+
+    const decoded = await runtime.decode({ filePath: result.filePath });
+
+    expect(decoded.payload).toBe(payload);
+    expect(decoded.signatureValid).toBe(true);
+    expect(decoded.fresh).toBe(true);
+    expect(decoded.nonceUnique).toBe(true);
+  });
+
   it("full encode → decode roundtrip via buffer", () => {
     const { wavData, signed } = runtime.encodeToBuffer({
       payload: "buffer roundtrip",
@@ -604,6 +648,187 @@ describe("TPCRuntime", () => {
     expect(decoded.signatureValid).toBe(true);
     expect(decoded.fresh).toBe(true);
     expect(decoded.nonceUnique).toBe(true);
+  });
+
+  it("passes ultrasonic AFSK params into the encoder when mode=ultrasonic", async () => {
+    const encodeSpy = vi.spyOn(encoder, "encodeToWav");
+    const altDir = tmpDir();
+    const ultrasonic = new TPCRuntime({
+      enabled: true,
+      mode: "ultrasonic",
+      deadDropPath: path.join(altDir, "dead-drop"),
+      keyPath: path.join(altDir, "keys", "private.pem"),
+      publicKeyPath: path.join(altDir, "keys", "public.pem"),
+      nonceStorePath: path.join(altDir, "nonce.json"),
+      maxMessageAge: 300,
+      pollingInterval: 100,
+      enforceForAgentToAgent: true,
+      allowTextFallback: false,
+      maxMessagesPerMinute: 100,
+      keyRotationDays: 30,
+    });
+
+    await ultrasonic.initialize();
+    try {
+      ultrasonic.encodeToBuffer({
+        payload: "afsk selection",
+        sourceAgent: "a",
+        targetAgent: "b",
+      });
+
+      expect(encodeSpy).toHaveBeenCalled();
+      const paramsArg = encodeSpy.mock.calls[0][1];
+      expect(paramsArg).toEqual(ULTRASONIC_AFSK_PARAMS);
+    } finally {
+      encodeSpy.mockRestore();
+      await ultrasonic.shutdown();
+      cleanDir(altDir);
+    }
+  });
+
+  it("uses audible/default AFSK params when mode=audible", async () => {
+    const encodeSpy = vi.spyOn(encoder, "encodeToWav");
+    const altDir = tmpDir();
+    const audible = new TPCRuntime({
+      enabled: true,
+      mode: "audible",
+      deadDropPath: path.join(altDir, "dead-drop"),
+      keyPath: path.join(altDir, "keys", "private.pem"),
+      publicKeyPath: path.join(altDir, "keys", "public.pem"),
+      nonceStorePath: path.join(altDir, "nonce.json"),
+      maxMessageAge: 300,
+      pollingInterval: 100,
+      enforceForAgentToAgent: true,
+      allowTextFallback: false,
+      maxMessagesPerMinute: 100,
+      keyRotationDays: 30,
+    });
+
+    await audible.initialize();
+    try {
+      audible.encodeToBuffer({
+        payload: "audible selection",
+        sourceAgent: "a",
+        targetAgent: "b",
+      });
+
+      expect(encodeSpy).toHaveBeenCalled();
+      const paramsArg = encodeSpy.mock.calls[0][1];
+      expect(paramsArg).toEqual(DEFAULT_AFSK_PARAMS);
+    } finally {
+      encodeSpy.mockRestore();
+      await audible.shutdown();
+      cleanDir(altDir);
+    }
+  });
+
+  it("throws when sample rate mismatches expected mode", async () => {
+    const audibleDir = tmpDir();
+    const ultrasonicDir = tmpDir();
+
+    const audible = new TPCRuntime({
+      enabled: true,
+      mode: "audible",
+      deadDropPath: path.join(audibleDir, "dead-drop"),
+      keyPath: path.join(audibleDir, "keys", "private.pem"),
+      publicKeyPath: path.join(audibleDir, "keys", "public.pem"),
+      nonceStorePath: path.join(audibleDir, "nonce.json"),
+      maxMessageAge: 300,
+      pollingInterval: 100,
+      enforceForAgentToAgent: true,
+      allowTextFallback: false,
+      maxMessagesPerMinute: 100,
+      keyRotationDays: 30,
+    });
+
+    const ultrasonic = new TPCRuntime({
+      enabled: true,
+      mode: "ultrasonic",
+      deadDropPath: path.join(ultrasonicDir, "dead-drop"),
+      keyPath: path.join(ultrasonicDir, "keys", "private.pem"),
+      publicKeyPath: path.join(ultrasonicDir, "keys", "public.pem"),
+      nonceStorePath: path.join(ultrasonicDir, "nonce.json"),
+      maxMessageAge: 300,
+      pollingInterval: 100,
+      enforceForAgentToAgent: true,
+      allowTextFallback: false,
+      maxMessagesPerMinute: 100,
+      keyRotationDays: 30,
+    });
+
+    await audible.initialize();
+    await ultrasonic.initialize();
+
+    try {
+      const { wavData } = audible.encodeToBuffer({
+        payload: "mode mismatch",
+        sourceAgent: "a",
+        targetAgent: "b",
+      });
+
+      expect(() => ultrasonic.decodeFromBuffer(wavData)).toThrow(WaveformDecodeError);
+    } finally {
+      await audible.shutdown();
+      await ultrasonic.shutdown();
+      cleanDir(audibleDir);
+      cleanDir(ultrasonicDir);
+    }
+  });
+
+  it("logs nonce replay events during buffer decodes", () => {
+    const { wavData } = runtime.encodeToBuffer({
+      payload: "replay audit",
+      sourceAgent: "a",
+      targetAgent: "b",
+    });
+
+    runtime.clearAuditLog();
+    const first = runtime.decodeFromBuffer(wavData);
+    expect(first.nonceUnique).toBe(true);
+
+    const second = runtime.decodeFromBuffer(wavData);
+    expect(second.nonceUnique).toBe(false);
+
+    const audit = runtime.getAuditLog();
+    expect(audit.some((e) => e.event === "nonce_replay")).toBe(true);
+    const decodeEvents = audit.filter((e) => e.event === "tpc_decode");
+    expect(decodeEvents.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("roundtrips using ultrasonic AFSK params when mode=ultrasonic", async () => {
+    const altDir = tmpDir();
+    const ultrasonic = new TPCRuntime({
+      enabled: true,
+      mode: "ultrasonic",
+      deadDropPath: path.join(altDir, "dead-drop"),
+      keyPath: path.join(altDir, "keys", "private.pem"),
+      publicKeyPath: path.join(altDir, "keys", "public.pem"),
+      nonceStorePath: path.join(altDir, "nonce.json"),
+      maxMessageAge: 300,
+      pollingInterval: 100,
+      enforceForAgentToAgent: true,
+      allowTextFallback: false,
+      maxMessagesPerMinute: 100,
+      keyRotationDays: 30,
+    });
+
+    await ultrasonic.initialize();
+    try {
+      const { wavData } = ultrasonic.encodeToBuffer({
+        payload: "ultrasonic roundtrip",
+        sourceAgent: "a",
+        targetAgent: "b",
+      });
+
+      const decoded = ultrasonic.decodeFromBuffer(wavData);
+      expect(decoded.payload).toBe("ultrasonic roundtrip");
+      expect(decoded.signatureValid).toBe(true);
+      expect(decoded.fresh).toBe(true);
+      expect(decoded.nonceUnique).toBe(true);
+    } finally {
+      await ultrasonic.shutdown();
+      cleanDir(altDir);
+    }
   });
 
   it("detects replay attacks (duplicate nonce)", () => {
