@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { HealthSummary } from "./health.js";
+import {
+  TIMEOUT_TEST_SUITE_SHORT_MS,
+  TIMEOUT_TEST_SUITE_LONG_MS,
+} from "../config/constants/index.js";
 import { formatHealthChannelLines, healthCommand } from "./health.js";
-import { TIMEOUT_TEST_SUITE_SHORT_MS, TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 
 const runtime = {
   log: vi.fn(),

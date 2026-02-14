@@ -9,10 +9,10 @@ status: active
 
 ## Overview
 
-**ClosedClaw defaults to sandboxing all tool execution.** This is a key security enhancement 
+**ClosedClaw defaults to sandboxing all tool execution.** This is a key security enhancement
 over OpenClaw, which defaults to running tools directly on the host system.
 
-When sandboxing is enabled (the default), all tool calls (`exec`, `read`, `write`, `edit`, 
+When sandboxing is enabled (the default), all tool calls (`exec`, `read`, `write`, `edit`,
 `apply_patch`, `process`, etc.) run inside isolated Docker containers with:
 
 - Read-only root filesystem
@@ -23,19 +23,19 @@ When sandboxing is enabled (the default), all tool calls (`exec`, `read`, `write
 
 ## Why Mandatory Sandboxing?
 
-AI models can be manipulated through prompt injection, malicious tool responses, or 
+AI models can be manipulated through prompt injection, malicious tool responses, or
 adversarial inputs. Mandatory sandboxing provides **defense in depth**:
 
-1. **Limits blast radius**: Even if a model is compromised, it cannot directly access 
+1. **Limits blast radius**: Even if a model is compromised, it cannot directly access
    your filesystem, environment variables, or network.
 
-2. **Prevents lateral movement**: Sandbox containers run with minimal privileges and 
+2. **Prevents lateral movement**: Sandbox containers run with minimal privileges and
    cannot escape to the host system easily.
 
-3. **Protects secrets**: API keys and credentials in `~/.ClosedClaw/credentials/` are 
+3. **Protects secrets**: API keys and credentials in `~/.ClosedClaw/credentials/` are
    not visible inside the sandbox by default.
 
-4. **Auditable**: All tool execution happens in containers with defined boundaries, 
+4. **Auditable**: All tool execution happens in containers with defined boundaries,
    making security analysis easier.
 
 ## Default Configuration
@@ -47,13 +47,13 @@ ClosedClaw defaults to:
   agents: {
     defaults: {
       sandbox: {
-        mode: "all",              // All sessions sandboxed
-        scope: "session",         // One container per session
-        workspaceAccess: "none",  // No host filesystem access
+        mode: "all", // All sessions sandboxed
+        scope: "session", // One container per session
+        workspaceAccess: "none", // No host filesystem access
         docker: {
-          readOnlyRoot: true,     // Immutable container filesystem
-          network: "none",        // No network access
-          capDrop: ["ALL"],       // Drop all Linux capabilities
+          readOnlyRoot: true, // Immutable container filesystem
+          network: "none", // No network access
+          capDrop: ["ALL"], // Drop all Linux capabilities
         },
       },
     },
@@ -90,7 +90,7 @@ You might want to disable sandboxing if:
 - **Docker unavailable**: The system doesn't have Docker installed
 - **Performance**: You need faster tool execution (sandboxing adds ~50-200ms overhead)
 
-**Warning**: Disabling sandboxing means AI-generated code runs directly on your host 
+**Warning**: Disabling sandboxing means AI-generated code runs directly on your host
 with full access to your user account, files, and network.
 
 To disable (not recommended for production):
@@ -116,28 +116,28 @@ If you want your personal chat to run on the host but keep group chats sandboxed
   agents: {
     defaults: {
       sandbox: {
-        mode: "non-main",  // Only sandbox non-main sessions
+        mode: "non-main", // Only sandbox non-main sessions
       },
     },
   },
 }
 ```
 
-This gives you convenience for your main interaction while protecting group/channel 
+This gives you convenience for your main interaction while protecting group/channel
 sessions from potential abuse.
 
 ## Workspace Access Modes
 
 Control what the sandbox can see:
 
-- **`"none"`** (default): Sandbox has its own isolated workspace at `~/.ClosedClaw/sandboxes/`. 
+- **`"none"`** (default): Sandbox has its own isolated workspace at `~/.ClosedClaw/sandboxes/`.
   Media and skills are mirrored in, but no host files are accessible.
 
-- **`"ro"`**: Host agent workspace mounted read-only at `/agent`. The sandbox can read 
-  your files but cannot modify them. Tools like `write`, `edit`, and `apply_patch` 
+- **`"ro"`**: Host agent workspace mounted read-only at `/agent`. The sandbox can read
+  your files but cannot modify them. Tools like `write`, `edit`, and `apply_patch`
   are automatically disabled.
 
-- **`"rw"`**: Host workspace mounted read-write at `/workspace`. The sandbox can modify 
+- **`"rw"`**: Host workspace mounted read-write at `/workspace`. The sandbox can modify
   your files. **Use with caution** — only enable for trusted workflows.
 
 Example with read-only access:
@@ -148,7 +148,7 @@ Example with read-only access:
     defaults: {
       sandbox: {
         mode: "all",
-        workspaceAccess: "ro",  // Read-only host workspace
+        workspaceAccess: "ro", // Read-only host workspace
       },
     },
   },
@@ -157,7 +157,7 @@ Example with read-only access:
 
 ## Network Access
 
-By default, sandbox containers have **no network access** (`docker.network="none"`). 
+By default, sandbox containers have **no network access** (`docker.network="none"`).
 This prevents:
 
 - Data exfiltration to attacker-controlled servers
@@ -173,7 +173,7 @@ If your workflow requires network access (e.g., downloading packages, API calls)
     defaults: {
       sandbox: {
         docker: {
-          network: "bridge",  // Enable network (use cautiously)
+          network: "bridge", // Enable network (use cautiously)
         },
       },
     },
@@ -190,21 +190,21 @@ If your workflow requires network access (e.g., downloading packages, API calls)
 ## Related Documentation
 
 - [Sandboxing](/gateway/sandboxing) - Full sandbox configuration reference
-- [Sandbox vs Tool Policy vs Elevated](/gateway/sandbox-vs-tool-policy-vs-elevated) - 
+- [Sandbox vs Tool Policy vs Elevated](/gateway/sandbox-vs-tool-policy-vs-elevated) -
   How different security layers interact
 - [Security Audit](/gateway/doctor) - Running security diagnostics
 
 ## Comparison: ClosedClaw vs OpenClaw
 
-| Feature | ClosedClaw | OpenClaw |
-|---------|-----------|----------|
-| **Default sandbox mode** | `"all"` (mandatory) | `"off"` (disabled) |
-| **Tool execution** | Isolated containers | Host system |
-| **Network access** | Blocked by default | Full access |
-| **Filesystem access** | Isolated workspace | Root filesystem |
-| **Security audit** | Flags disabled sandboxing | Optional warnings |
-| **Setup required** | Docker images | None (Host execution) |
+| Feature                  | ClosedClaw                | OpenClaw              |
+| ------------------------ | ------------------------- | --------------------- |
+| **Default sandbox mode** | `"all"` (mandatory)       | `"off"` (disabled)    |
+| **Tool execution**       | Isolated containers       | Host system           |
+| **Network access**       | Blocked by default        | Full access           |
+| **Filesystem access**    | Isolated workspace        | Root filesystem       |
+| **Security audit**       | Flags disabled sandboxing | Optional warnings     |
+| **Setup required**       | Docker images             | None (Host execution) |
 
-ClosedClaw prioritizes **security by default**, making it suitable for untrusted 
-inputs, shared systems, and production deployments where AI-generated code execution 
+ClosedClaw prioritizes **security by default**, making it suitable for untrusted
+inputs, shared systems, and production deployments where AI-generated code execution
 poses real risks.

@@ -882,8 +882,7 @@ export function isSafeBinUsage(params: {
   if (!execName) {
     return false;
   }
-  const matchesSafeBin =
-    params.safeBins.has(execName);
+  const matchesSafeBin = params.safeBins.has(execName);
   if (!matchesSafeBin) {
     return false;
   }

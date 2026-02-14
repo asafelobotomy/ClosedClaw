@@ -22,13 +22,7 @@
 /**
  * Intent categories for model routing.
  */
-export type IntentCategory =
-  | "triage"
-  | "reasoning"
-  | "creative"
-  | "sensitive"
-  | "code"
-  | "general";
+export type IntentCategory = "triage" | "reasoning" | "creative" | "sensitive" | "code" | "general";
 
 /**
  * Model routing configuration for an agent.
@@ -201,8 +195,12 @@ export function classifyIntent(
   const scores = new Map<IntentCategory, number>();
 
   // Score each intent category by matching patterns
-  for (const [category, patterns] of Object.entries(INTENT_PATTERNS) as Array<[IntentCategory, typeof INTENT_PATTERNS.triage]>) {
-    if (category === "general") {continue;} // General is the baseline fallback
+  for (const [category, patterns] of Object.entries(INTENT_PATTERNS) as Array<
+    [IntentCategory, typeof INTENT_PATTERNS.triage]
+  >) {
+    if (category === "general") {
+      continue;
+    } // General is the baseline fallback
 
     let categoryScore = 0;
 
@@ -240,7 +238,11 @@ export function classifyIntent(
   if (length >= LENGTH_THRESHOLDS.REASONING_BOOST_MIN) {
     const existing = scores.get("reasoning") ?? 0;
     scores.set("reasoning", existing + 0.2);
-    signals.push({ intent: "reasoning", score: 0.2, reason: `Very long message (${length} chars)` });
+    signals.push({
+      intent: "reasoning",
+      score: 0.2,
+      reason: `Very long message (${length} chars)`,
+    });
   }
 
   // Apply question mark boost for reasoning
@@ -248,7 +250,11 @@ export function classifyIntent(
   if (questionCount >= 2) {
     const existing = scores.get("reasoning") ?? 0;
     scores.set("reasoning", existing + 0.2 * Math.min(questionCount, 3));
-    signals.push({ intent: "reasoning", score: 0.2, reason: `Multiple questions (${questionCount})` });
+    signals.push({
+      intent: "reasoning",
+      score: 0.2,
+      reason: `Multiple questions (${questionCount})`,
+    });
   }
 
   // Find the winning intent
@@ -287,7 +293,9 @@ export function classifyIntent(
  * Resolve the model to use for a given intent.
  */
 function resolveModel(intent: IntentCategory, routing?: ModelRoutingConfig): string {
-  if (!routing) {return "default";}
+  if (!routing) {
+    return "default";
+  }
 
   switch (intent) {
     case "triage":

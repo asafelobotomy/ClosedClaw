@@ -4,7 +4,12 @@ import type {
   MediaUnderstandingOutput,
 } from "../media-understanding/types.js";
 // StickerMetadata type inlined — telegram archived.
-type StickerMetadata = { emoji?: string; isAnimated?: boolean; isVideo?: boolean; setName?: string };
+type StickerMetadata = {
+  emoji?: string;
+  isAnimated?: boolean;
+  isVideo?: boolean;
+  setName?: string;
+};
 import type { InternalMessageChannel } from "../utils/message-channel.js";
 import type { CommandArgs } from "./commands-registry.types.js";
 

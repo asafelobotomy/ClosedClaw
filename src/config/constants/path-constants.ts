@@ -1,14 +1,14 @@
 /**
  * Path Constants
- * 
+ *
  * Centralized constants for directory names, file names, and path construction
  * used across ClosedClaw. Use these instead of hardcoding path strings.
- * 
+ *
  * @example
  * ```typescript
  * // Before
  * const dir = path.join(os.homedir(), ".ClosedClaw", "sandboxes");
- * 
+ *
  * // After
  * import { getSandboxesDir } from '@/config/constants';
  * const dir = getSandboxesDir();
@@ -196,7 +196,7 @@ export function getGatewayLockPath(env?: NodeJS.ProcessEnv): string {
 
 /**
  * Resolve user path (expands ~ and resolves relative paths)
- * 
+ *
  * @example
  * ```typescript
  * resolveUserPath("~/my-dir") // "/home/user/my-dir"

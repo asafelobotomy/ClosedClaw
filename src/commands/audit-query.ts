@@ -5,6 +5,7 @@
  * export, and integrity verification capabilities.
  */
 
+import fs from "node:fs/promises";
 import type { RuntimeEnv as Runtime } from "../runtime.js";
 import { resolveStateDir } from "../config/paths.js";
 import {
@@ -17,7 +18,6 @@ import {
   type AuditSeverity,
   type AuditQueryOptions,
 } from "../security/audit-logger.js";
-import fs from "node:fs/promises";
 import { theme } from "../terminal/theme.js";
 import { formatTimestamp } from "../utils.js";
 
@@ -83,7 +83,9 @@ function parseEventTypes(types?: string[]): AuditEventType[] | undefined {
   const result: AuditEventType[] = [];
   for (const t of types) {
     if (!validTypes.has(t as AuditEventType)) {
-      throw new Error(`Invalid event type: ${t}. Valid types: ${Array.from(validTypes).join(", ")}`);
+      throw new Error(
+        `Invalid event type: ${t}. Valid types: ${Array.from(validTypes).join(", ")}`,
+      );
     }
     result.push(t as AuditEventType);
   }
@@ -99,7 +101,9 @@ function parseSeverities(severities?: string[]): AuditSeverity[] | undefined {
   const result: AuditSeverity[] = [];
   for (const s of severities) {
     if (!validSeverities.has(s as AuditSeverity)) {
-      throw new Error(`Invalid severity: ${s}. Valid severities: ${Array.from(validSeverities).join(", ")}`);
+      throw new Error(
+        `Invalid severity: ${s}. Valid severities: ${Array.from(validSeverities).join(", ")}`,
+      );
     }
     result.push(s as AuditSeverity);
   }
@@ -120,7 +124,9 @@ function parseTimeRange(value?: string): Date | undefined {
   // Try relative time (e.g., "1h", "30m", "2d")
   const match = value.match(/^(\d+)([smhd])$/);
   if (!match) {
-    throw new Error(`Invalid time format: ${value}. Use ISO 8601 or relative time (e.g., 1h, 30m, 2d)`);
+    throw new Error(
+      `Invalid time format: ${value}. Use ISO 8601 or relative time (e.g., 1h, 30m, 2d)`,
+    );
   }
 
   const [, amount, unit] = match;
@@ -206,7 +212,9 @@ export async function auditQueryCommand(
             ? theme.warn("WARN")
             : theme.muted("INFO");
 
-    runtime.log(`[${theme.muted(`#${entry.seq}`.padEnd(6))}] ${timestamp} ${sevLabel} ${typeLabel} ${entry.summary}`);
+    runtime.log(
+      `[${theme.muted(`#${entry.seq}`.padEnd(6))}] ${timestamp} ${sevLabel} ${typeLabel} ${entry.summary}`,
+    );
 
     if (entry.actor) {
       runtime.log(`  ${theme.muted("Actor:")} ${entry.actor}`);
@@ -239,7 +247,9 @@ export async function auditQueryCommand(
     runtime.log("");
   }
 
-  runtime.log(theme.muted(`Showing ${entries.length} ${entries.length === 1 ? "entry" : "entries"}`));
+  runtime.log(
+    theme.muted(`Showing ${entries.length} ${entries.length === 1 ? "entry" : "entries"}`),
+  );
 }
 
 /**
@@ -326,7 +336,11 @@ export async function auditStatsCommand(
   }
 
   runtime.log("");
-  runtime.log(theme.muted(`Integrity check: ${stats.integrityOk ? theme.success("✓ OK") : theme.error("✗ FAILED")}`));
+  runtime.log(
+    theme.muted(
+      `Integrity check: ${stats.integrityOk ? theme.success("✓ OK") : theme.error("✗ FAILED")}`,
+    ),
+  );
 }
 
 /**

@@ -1,5 +1,4 @@
 import fs from "node:fs/promises";
-import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import path from "node:path";
 import type { OnboardOptions } from "../commands/onboard-types.js";
 import type { ClosedClawConfig } from "../config/config.js";
@@ -27,6 +26,7 @@ import {
   waitForGatewayReachable,
   resolveControlUiLinks,
 } from "../commands/onboard-helpers.js";
+import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import { resolveGatewayService } from "../daemon/service.js";
 import { isSystemdUserServiceAvailable } from "../daemon/systemd.js";
 import { ensureControlUiAssetsBuilt } from "../infra/control-ui-assets.js";

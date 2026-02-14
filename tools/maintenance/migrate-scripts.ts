@@ -1,6 +1,6 @@
 /**
  * Repository Reorganization: Phase 1 - Scripts Migration
- * 
+ *
  * Migrates scripts from flat scripts/ directory to organized tools/ structure.
  * Safe migration: copies files, updates package.json, creates symlinks for backwards compatibility.
  */
@@ -19,7 +19,11 @@ const MIGRATIONS: Migration[] = [
   // Build & Compilation
   { from: "scripts/bundle-a2ui.sh", to: "tools/build/bundle-a2ui.sh", category: "build" },
   { from: "scripts/canvas-a2ui-copy.ts", to: "tools/build/canvas-a2ui-copy.ts", category: "build" },
-  { from: "scripts/copy-hook-metadata.ts", to: "tools/build/copy-hook-metadata.ts", category: "build" },
+  {
+    from: "scripts/copy-hook-metadata.ts",
+    to: "tools/build/copy-hook-metadata.ts",
+    category: "build",
+  },
   { from: "scripts/write-build-info.ts", to: "tools/build/write-build-info.ts", category: "build" },
   { from: "scripts/build_icon.sh", to: "tools/build/build_icon.sh", category: "build" },
   { from: "scripts/build-docs-list.mjs", to: "tools/docs/build-docs-list.mjs", category: "docs" },
@@ -35,23 +39,55 @@ const MIGRATIONS: Migration[] = [
   { from: "scripts/postinstall.js", to: "tools/dev/postinstall.js", category: "dev" },
 
   // Platform-specific: macOS
-  { from: "scripts/package-mac-dist.sh", to: "tools/platform/macos/package-mac-dist.sh", category: "platform" },
-  { from: "scripts/notarize-mac-artifact.sh", to: "tools/platform/macos/notarize-mac-artifact.sh", category: "platform" },
-  { from: "scripts/make_appcast.sh", to: "tools/platform/macos/make_appcast.sh", category: "platform" },
+  {
+    from: "scripts/package-mac-dist.sh",
+    to: "tools/platform/macos/package-mac-dist.sh",
+    category: "platform",
+  },
+  {
+    from: "scripts/notarize-mac-artifact.sh",
+    to: "tools/platform/macos/notarize-mac-artifact.sh",
+    category: "platform",
+  },
+  {
+    from: "scripts/make_appcast.sh",
+    to: "tools/platform/macos/make_appcast.sh",
+    category: "platform",
+  },
 
   // Platform-specific: Linux
-  { from: "scripts/clawlog-linux.sh", to: "tools/platform/linux/clawlog-linux.sh", category: "platform" },
+  {
+    from: "scripts/clawlog-linux.sh",
+    to: "tools/platform/linux/clawlog-linux.sh",
+    category: "platform",
+  },
 
   // Platform-specific: iOS
   { from: "scripts/ios-team-id.sh", to: "tools/platform/ios/ios-team-id.sh", category: "platform" },
 
   // Platform-specific: Mobile (cross-platform mobile)
-  { from: "scripts/mobile-reauth.sh", to: "tools/platform/mobile/mobile-reauth.sh", category: "platform" },
+  {
+    from: "scripts/mobile-reauth.sh",
+    to: "tools/platform/mobile/mobile-reauth.sh",
+    category: "platform",
+  },
 
   // Docker & Containers
-  { from: "scripts/sandbox-browser-entrypoint.sh", to: "tools/docker/sandbox-browser-entrypoint.sh", category: "docker" },
-  { from: "scripts/sandbox-browser-setup.sh", to: "tools/docker/sandbox-browser-setup.sh", category: "docker" },
-  { from: "scripts/sandbox-common-setup.sh", to: "tools/docker/sandbox-common-setup.sh", category: "docker" },
+  {
+    from: "scripts/sandbox-browser-entrypoint.sh",
+    to: "tools/docker/sandbox-browser-entrypoint.sh",
+    category: "docker",
+  },
+  {
+    from: "scripts/sandbox-browser-setup.sh",
+    to: "tools/docker/sandbox-browser-setup.sh",
+    category: "docker",
+  },
+  {
+    from: "scripts/sandbox-common-setup.sh",
+    to: "tools/docker/sandbox-common-setup.sh",
+    category: "docker",
+  },
   { from: "scripts/sandbox-setup.sh", to: "tools/docker/sandbox-setup.sh", category: "docker" },
 
   // CI/CD & Git
@@ -61,38 +97,134 @@ const MIGRATIONS: Migration[] = [
 
   // Testing
   { from: "scripts/test-parallel.mjs", to: "tools/testing/test-parallel.mjs", category: "testing" },
-  { from: "scripts/test-cleanup-docker.sh", to: "tools/testing/test-cleanup-docker.sh", category: "testing" },
-  { from: "scripts/test-install-sh-docker.sh", to: "tools/testing/test-install-sh-docker.sh", category: "testing" },
-  { from: "scripts/test-install-sh-e2e-docker.sh", to: "tools/testing/test-install-sh-e2e-docker.sh", category: "testing" },
-  { from: "scripts/test-live-gateway-models-docker.sh", to: "tools/testing/test-live-gateway-models-docker.sh", category: "testing" },
-  { from: "scripts/test-live-models-docker.sh", to: "tools/testing/test-live-models-docker.sh", category: "testing" },
+  {
+    from: "scripts/test-cleanup-docker.sh",
+    to: "tools/testing/test-cleanup-docker.sh",
+    category: "testing",
+  },
+  {
+    from: "scripts/test-install-sh-docker.sh",
+    to: "tools/testing/test-install-sh-docker.sh",
+    category: "testing",
+  },
+  {
+    from: "scripts/test-install-sh-e2e-docker.sh",
+    to: "tools/testing/test-install-sh-e2e-docker.sh",
+    category: "testing",
+  },
+  {
+    from: "scripts/test-live-gateway-models-docker.sh",
+    to: "tools/testing/test-live-gateway-models-docker.sh",
+    category: "testing",
+  },
+  {
+    from: "scripts/test-live-models-docker.sh",
+    to: "tools/testing/test-live-models-docker.sh",
+    category: "testing",
+  },
 
   // Documentation
   { from: "scripts/docs-list.js", to: "tools/docs/docs-list.js", category: "docs" },
   { from: "scripts/changelog-to-html.sh", to: "tools/docs/changelog-to-html.sh", category: "docs" },
 
   // Deployment & DevOps
-  { from: "scripts/tailscale-enforce.sh", to: "tools/deployment/cloud/tailscale-enforce.sh", category: "deployment" },
-  { from: "scripts/tailscale-mullvad.sh", to: "tools/deployment/cloud/tailscale-mullvad.sh", category: "deployment" },
-  { from: "scripts/tailscale-preflight.sh", to: "tools/deployment/cloud/tailscale-preflight.sh", category: "deployment" },
-  { from: "scripts/setup-auth-system.sh", to: "tools/deployment/cloud/setup-auth-system.sh", category: "deployment" },
-  { from: "scripts/termux-auth-widget.sh", to: "tools/deployment/cloud/termux-auth-widget.sh", category: "deployment" },
-  { from: "scripts/termux-quick-auth.sh", to: "tools/deployment/cloud/termux-quick-auth.sh", category: "deployment" },
-  { from: "scripts/termux-sync-widget.sh", to: "tools/deployment/cloud/termux-sync-widget.sh", category: "deployment" },
+  {
+    from: "scripts/tailscale-enforce.sh",
+    to: "tools/deployment/cloud/tailscale-enforce.sh",
+    category: "deployment",
+  },
+  {
+    from: "scripts/tailscale-mullvad.sh",
+    to: "tools/deployment/cloud/tailscale-mullvad.sh",
+    category: "deployment",
+  },
+  {
+    from: "scripts/tailscale-preflight.sh",
+    to: "tools/deployment/cloud/tailscale-preflight.sh",
+    category: "deployment",
+  },
+  {
+    from: "scripts/setup-auth-system.sh",
+    to: "tools/deployment/cloud/setup-auth-system.sh",
+    category: "deployment",
+  },
+  {
+    from: "scripts/termux-auth-widget.sh",
+    to: "tools/deployment/cloud/termux-auth-widget.sh",
+    category: "deployment",
+  },
+  {
+    from: "scripts/termux-quick-auth.sh",
+    to: "tools/deployment/cloud/termux-quick-auth.sh",
+    category: "deployment",
+  },
+  {
+    from: "scripts/termux-sync-widget.sh",
+    to: "tools/deployment/cloud/termux-sync-widget.sh",
+    category: "deployment",
+  },
 
   // Maintenance & Release
-  { from: "scripts/release-check.ts", to: "tools/maintenance/release-check.ts", category: "maintenance" },
-  { from: "scripts/sync-labels.ts", to: "tools/maintenance/sync-labels.ts", category: "maintenance" },
-  { from: "scripts/sync-moonshot-docs.ts", to: "tools/maintenance/sync-moonshot-docs.ts", category: "maintenance" },
-  { from: "scripts/sync-plugin-versions.ts", to: "tools/maintenance/sync-plugin-versions.ts", category: "maintenance" },
-  { from: "scripts/protocol-gen-swift.ts", to: "tools/maintenance/protocol-gen-swift.ts", category: "maintenance" },
-  { from: "scripts/protocol-gen.ts", to: "tools/maintenance/protocol-gen.ts", category: "maintenance" },
-  { from: "scripts/firecrawl-compare.ts", to: "tools/maintenance/firecrawl-compare.ts", category: "maintenance" },
-  { from: "scripts/readability-basic-compare.ts", to: "tools/maintenance/readability-basic-compare.ts", category: "maintenance" },
-  { from: "scripts/sqlite-vec-smoke.mjs", to: "tools/maintenance/sqlite-vec-smoke.mjs", category: "maintenance" },
-  { from: "scripts/update-clawtributors.ts", to: "tools/maintenance/update-clawtributors.ts", category: "maintenance" },
-  { from: "scripts/update-clawtributors.types.ts", to: "tools/maintenance/update-clawtributors.types.ts", category: "maintenance" },
-  { from: "scripts/zai-fallback-repro.ts", to: "tools/testing/repro/zai-fallback-repro.ts", category: "testing" },
+  {
+    from: "scripts/release-check.ts",
+    to: "tools/maintenance/release-check.ts",
+    category: "maintenance",
+  },
+  {
+    from: "scripts/sync-labels.ts",
+    to: "tools/maintenance/sync-labels.ts",
+    category: "maintenance",
+  },
+  {
+    from: "scripts/sync-moonshot-docs.ts",
+    to: "tools/maintenance/sync-moonshot-docs.ts",
+    category: "maintenance",
+  },
+  {
+    from: "scripts/sync-plugin-versions.ts",
+    to: "tools/maintenance/sync-plugin-versions.ts",
+    category: "maintenance",
+  },
+  {
+    from: "scripts/protocol-gen-swift.ts",
+    to: "tools/maintenance/protocol-gen-swift.ts",
+    category: "maintenance",
+  },
+  {
+    from: "scripts/protocol-gen.ts",
+    to: "tools/maintenance/protocol-gen.ts",
+    category: "maintenance",
+  },
+  {
+    from: "scripts/firecrawl-compare.ts",
+    to: "tools/maintenance/firecrawl-compare.ts",
+    category: "maintenance",
+  },
+  {
+    from: "scripts/readability-basic-compare.ts",
+    to: "tools/maintenance/readability-basic-compare.ts",
+    category: "maintenance",
+  },
+  {
+    from: "scripts/sqlite-vec-smoke.mjs",
+    to: "tools/maintenance/sqlite-vec-smoke.mjs",
+    category: "maintenance",
+  },
+  {
+    from: "scripts/update-clawtributors.ts",
+    to: "tools/maintenance/update-clawtributors.ts",
+    category: "maintenance",
+  },
+  {
+    from: "scripts/update-clawtributors.types.ts",
+    to: "tools/maintenance/update-clawtributors.types.ts",
+    category: "maintenance",
+  },
+  {
+    from: "scripts/zai-fallback-repro.ts",
+    to: "tools/testing/repro/zai-fallback-repro.ts",
+    category: "testing",
+  },
   { from: "scripts/test-force.ts", to: "tools/testing/test-force.ts", category: "testing" },
   { from: "scripts/ui.js", to: "tools/dev/ui.js", category: "dev" },
   { from: "scripts/claude-auth-status.sh", to: "tools/dev/claude-auth-status.sh", category: "dev" },
@@ -112,13 +244,13 @@ async function copyFile(from: string, to: string): Promise<void> {
   try {
     await fs.mkdir(path.dirname(to), { recursive: true });
     await fs.copyFile(from, to);
-    
+
     // Preserve executable permissions
     const stats = await fs.stat(from);
     if (stats.mode & 0o111) {
       await fs.chmod(to, stats.mode);
     }
-    
+
     console.log(`✓ Copied: ${from} → ${to}`);
   } catch (err) {
     console.error(`✗ Failed: ${from} → ${to}`, err);
@@ -130,11 +262,11 @@ async function copyDirectory(from: string, to: string): Promise<void> {
   try {
     await fs.mkdir(to, { recursive: true });
     const entries = await fs.readdir(from, { withFileTypes: true });
-    
+
     for (const entry of entries) {
       const srcPath = path.join(from, entry.name);
       const destPath = path.join(to, entry.name);
-      
+
       if (entry.isDirectory()) {
         await copyDirectory(srcPath, destPath);
       } else {
@@ -145,7 +277,7 @@ async function copyDirectory(from: string, to: string): Promise<void> {
         }
       }
     }
-    
+
     console.log(`✓ Copied directory: ${from} → ${to}`);
   } catch (err) {
     console.error(`✗ Failed directory: ${from} → ${to}`, err);
@@ -168,10 +300,10 @@ async function createSymlink(from: string, to: string): Promise<void> {
 async function updatePackageJson(): Promise<void> {
   const pkgPath = "package.json";
   const pkg = JSON.parse(await fs.readFile(pkgPath, "utf-8"));
-  
+
   let updatedCount = 0;
   const scriptEntries = Object.entries(pkg.scripts as Record<string, string>);
-  
+
   for (const [key, cmd] of scriptEntries) {
     let updated = cmd;
     for (const { from, to } of MIGRATIONS) {
@@ -188,50 +320,59 @@ async function updatePackageJson(): Promise<void> {
     }
     pkg.scripts[key] = updated;
   }
-  
+
   // Update files array
   if (Array.isArray(pkg.files)) {
     pkg.files = pkg.files.map((file: string) => {
       for (const { from, to } of MIGRATIONS) {
-        if (file === from) {return to;}
+        if (file === from) {
+          return to;
+        }
       }
       return file;
     });
-    
+
     // Add tools directory to files
     if (!pkg.files.includes("tools")) {
       pkg.files.push("tools");
     }
   }
-  
+
   await fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
   console.log(`\n✓ Updated package.json (${updatedCount} script references)`);
 }
 
 async function generateReport(): Promise<void> {
-  const categories = MIGRATIONS.reduce((acc, m) => {
-    acc[m.category] = (acc[m.category] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-  
+  const categories = MIGRATIONS.reduce(
+    (acc, m) => {
+      acc[m.category] = (acc[m.category] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
   console.log("\n📊 Migration Summary:");
   console.log("==================");
-  for (const [category, count] of Object.entries(categories).toSorted(([a], [b]) => a.localeCompare(b))) {
+  for (const [category, count] of Object.entries(categories).toSorted(([a], [b]) =>
+    a.localeCompare(b),
+  )) {
     console.log(`  ${category.padEnd(15)} ${count} files`);
   }
   console.log(`  ${"directories".padEnd(15)} ${DIRECTORY_MIGRATIONS.length} directories`);
   console.log(`  ${"TOTAL".padEnd(15)} ${MIGRATIONS.length + DIRECTORY_MIGRATIONS.length} items`);
 }
 
-async function migrate(options: { dryRun?: boolean; createSymlinks?: boolean } = {}): Promise<void> {
+async function migrate(
+  options: { dryRun?: boolean; createSymlinks?: boolean } = {},
+): Promise<void> {
   const { dryRun = false, createSymlinks = true } = options;
-  
+
   if (dryRun) {
     console.log("🔍 DRY RUN MODE - No files will be modified\n");
   }
-  
+
   console.log("🚀 Starting repository reorganization (Phase 1: Scripts)\n");
-  
+
   // Step 1: Copy files
   console.log("📁 Copying files...\n");
   for (const migration of MIGRATIONS) {
@@ -241,7 +382,7 @@ async function migrate(options: { dryRun?: boolean; createSymlinks?: boolean } =
       console.log(`[DRY RUN] Would copy: ${migration.from} → ${migration.to}`);
     }
   }
-  
+
   // Step 2: Copy directories
   console.log("\n📁 Copying directories...\n");
   for (const migration of DIRECTORY_MIGRATIONS) {
@@ -251,7 +392,7 @@ async function migrate(options: { dryRun?: boolean; createSymlinks?: boolean } =
       console.log(`[DRY RUN] Would copy directory: ${migration.from} → ${migration.to}`);
     }
   }
-  
+
   // Step 3: Update package.json
   console.log("\n📝 Updating package.json...\n");
   if (!dryRun) {
@@ -259,7 +400,7 @@ async function migrate(options: { dryRun?: boolean; createSymlinks?: boolean } =
   } else {
     console.log("[DRY RUN] Would update package.json script references");
   }
-  
+
   // Step 4: Create symlinks for backwards compatibility
   if (createSymlinks) {
     console.log("\n🔗 Creating backwards compatibility symlinks...\n");
@@ -271,9 +412,9 @@ async function migrate(options: { dryRun?: boolean; createSymlinks?: boolean } =
       }
     }
   }
-  
+
   await generateReport();
-  
+
   if (!dryRun) {
     console.log("\n✅ Migration complete!");
     console.log("\nNext steps:");

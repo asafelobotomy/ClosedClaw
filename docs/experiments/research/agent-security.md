@@ -19,6 +19,7 @@ date: "2026-02-09"
 Traditional AI safety relies on "persuading" models to be safe through system prompts. **ClosedClaw's Kernel Shield** enforces safety at the **binary and hardware levels**, acting as an air-lock between the LLM (the Brain) and the operating system (the Host).
 
 This document explores two key innovations:
+
 1. **Kernel Shield Architecture** - Multi-layered defense system
 2. **Neural Fingerprinting** - Behavioral attestation beyond static hashing
 
@@ -33,11 +34,13 @@ The Kernel Shield is the primary security arbiter for ClosedClaw, intercepting a
 When an agent generates a command (using ClawDense shorthand), the Kernel Shield intercepts it before OS execution.
 
 **Process:**
+
 1. **Stenographic Expansion:** Decode shorthand (A-Script, Teeline) using Lexicon (Block 8)
 2. **Proof Verification:** Check against Formal Proofs (Block 7)
 3. **Permission Enforcement:** Kill process if action violates manifested permissions
 
 **Example:**
+
 ```
 Agent generates: !chk($U, "MIG") >>$sub(mgr8)
   ↓
@@ -58,24 +61,25 @@ Execute if permitted, BLOCK if not
 
 #### Layer 2: Semantic Filtering (The Risk Vector)
 
-The Shield calculates a **Risk Vector (V_r)** for every action, evaluating not just *what* is happening, but the *risk* associated with the data involved.
+The Shield calculates a **Risk Vector (V_r)** for every action, evaluating not just _what_ is happening, but the _risk_ associated with the data involved.
 
 **Risk Vector Formula:**
 
 $$V_r = (P_{access} \times S_{data}) + (1 - T_{score})$$
 
 Where:
+
 - **P_access:** Probability of accessing sensitive scopes
-- **S_data:** Sensitivity of targeted data  
+- **S_data:** Sensitivity of targeted data
 - **T_score:** Tool's historical trust score (0.0-1.0)
 
 **Tiered Response:**
 
-| Risk Level | V_r Range | Action |
-|------------|-----------|--------|
-| **Low** | < 0.3 | Silent execution |
-| **Medium** | 0.3-0.7 | Logged execution + monitoring |
-| **High** | > 0.7 | Hardware-in-the-Loop (HITL) - Biometric required |
+| Risk Level | V_r Range | Action                                           |
+| ---------- | --------- | ------------------------------------------------ |
+| **Low**    | < 0.3     | Silent execution                                 |
+| **Medium** | 0.3-0.7   | Logged execution + monitoring                    |
+| **High**   | > 0.7     | Hardware-in-the-Loop (HITL) - Biometric required |
 
 **Example Scenarios:**
 
@@ -97,11 +101,13 @@ V_r = 0.85 → REQUIRE TouchID/FaceID to proceed
 The Shield monitors the model's **internal activation patterns** to detect behavioral anomalies, even when code appears valid.
 
 **Concept:** Every tool has a "safe" execution signature—a neural activation pattern captured during Gold Standard testing. If runtime patterns deviate, it indicates potential:
+
 - Prompt injection attacks
 - Logic hijacking
 - Adversarial manipulation
 
 **Detection Mechanism:**
+
 1. Capture LLM hidden state tensors at decision points
 2. Compare against Neural Fingerprint (Block 9)
 3. Calculate cosine similarity
@@ -128,6 +134,7 @@ Subagent
 **If any link breaks:** System defaults to **Fail-Safe** state (No Access).
 
 **Key Operations:**
+
 - **Signing:** `.claws` files signed by hardware keys
 - **Verification:** Runtime checks hardware signature
 - **Revocation:** Compromised tools have hardware tokens revoked
@@ -136,13 +143,13 @@ Subagent
 
 ### Kernel Shield Responsibilities
 
-| Function | Description |
-|----------|-------------|
-| **Decoding** | Translate ClawDense (including stenographic compression) into system calls |
-| **Verification** | Run Z3 SMT Solver to verify formal logic proofs |
-| **Monitoring** | Measure Neural Drift (S_n) in real-time during execution |
-| **Intervention** | Kill "rogue" processes and wipe state blocks on violation |
-| **Biometric Gate** | Integrate TouchID/FaceID for high-risk operations |
+| Function           | Description                                                                |
+| ------------------ | -------------------------------------------------------------------------- |
+| **Decoding**       | Translate ClawDense (including stenographic compression) into system calls |
+| **Verification**   | Run Z3 SMT Solver to verify formal logic proofs                            |
+| **Monitoring**     | Measure Neural Drift (S_n) in real-time during execution                   |
+| **Intervention**   | Kill "rogue" processes and wipe state blocks on violation                  |
+| **Biometric Gate** | Integrate TouchID/FaceID for high-risk operations                          |
 
 ---
 
@@ -153,7 +160,7 @@ Subagent
 
 ### Problem Statement
 
-Standard OpenClaw uses **SHA-256 hashes** to verify code integrity. However, hashes only detect *bit-level changes*. They cannot detect:
+Standard OpenClaw uses **SHA-256 hashes** to verify code integrity. However, hashes only detect _bit-level changes_. They cannot detect:
 
 - **Logic Hijacking:** Subtle code changes that pass hash checks but alter behavior
 - **Prompt Injection:** Model manipulation that doesn't modify code at all
@@ -172,6 +179,7 @@ A compressed vector representation of the model's **activation patterns** during
 #### Signature Generation
 
 **Phase 1: Calibration**
+
 ```
 1. Execute tool 100 times in controlled environment (Shadow Factory)
 2. Record Hidden State Tensors at key decision points:
@@ -183,6 +191,7 @@ A compressed vector representation of the model's **activation patterns** during
 ```
 
 **Phase 2: Compression**
+
 ```
 1. Apply Locality-Sensitive Hashing (LSH)
 2. Generate Neural Digest (compact vector representation)
@@ -190,6 +199,7 @@ A compressed vector representation of the model's **activation patterns** during
 ```
 
 **Phase 3: Anchoring**
+
 ```
 1. Sign Neural Digest with Hardware Secure Enclave
 2. Store in Block 9 of .claws file
@@ -197,6 +207,7 @@ A compressed vector representation of the model's **activation patterns** during
 ```
 
 **Block 9 Structure:**
+
 ```json
 /* BLOCK 9: NEURAL FINGERPRINT */
 {
@@ -226,14 +237,14 @@ Every time a tool is invoked, the Kernel Shield performs **real-time integrity c
 ```
 1. TOOL INVOCATION
    Agent: >>$sub(stripe_manager)
-   
+
 2. LIVE CAPTURE
    Shield captures current LLM activation states
-   
+
 3. COSINE SIMILARITY
    Compare live vector against S_n (Block 9)
    similarity = cosine(live_state, neural_digest)
-   
+
 4. DRIFT DETECTION
    if similarity < 0.94:
        FLAG_NEURAL_DRIFT
@@ -241,13 +252,14 @@ Every time a tool is invoked, the Kernel Shield performs **real-time integrity c
 
 #### Response to Neural Drift
 
-| Drift Level | Similarity Range | Action |
-|-------------|------------------|--------|
-| **None** | > 0.94 | Execute normally |
-| **Soft Drift** | 0.85-0.93 | Throttle execution + log "Vibe Mismatch" warning |
-| **Hard Drift** | < 0.85 | `!!INTEGRITY_SHUTDOWN` - Suspect adversarial hijacking |
+| Drift Level    | Similarity Range | Action                                                 |
+| -------------- | ---------------- | ------------------------------------------------------ |
+| **None**       | > 0.94           | Execute normally                                       |
+| **Soft Drift** | 0.85-0.93        | Throttle execution + log "Vibe Mismatch" warning       |
+| **Hard Drift** | < 0.85           | `!!INTEGRITY_SHUTDOWN` - Suspect adversarial hijacking |
 
 **Hard Drift Response (< 0.85):**
+
 1. Immediately trigger `!!INTEGRITY_SHUTDOWN`
 2. Revoke subagent's hardware token
 3. Wipe Hydration Block (Block 6) to prevent state leakage
@@ -255,6 +267,7 @@ Every time a tool is invoked, the Kernel Shield performs **real-time integrity c
 5. Quarantine tool for manual inspection
 
 **Example Security Event:**
+
 ```
 [SECURITY EVENT] 2026-02-09T14:30:22Z
 Tool: stripe_manager.claws
@@ -283,6 +296,7 @@ Because A-Script is extremely dense, single-character changes create massive Neu
 
 **Orthic Tiering Security:**
 High-risk Tier 3 commands require **Multi-Modal Fingerprinting** where both:
+
 - Text tokens are verified
 - Reasoning tokens (internal thought process) are checked
 
@@ -300,27 +314,28 @@ When the Mechanic Agent performs self-healing refactors, tools must be re-finger
 1. INVALIDATION
    Old Neural Fingerprint marked as deprecated
    Tool execution suspended
-   
+
 2. SANDBOX RETURN
    Tool returned to Shadow Sandbox (air-gapped)
-   
+
 3. NEW CALIBRATION
    Gold Standard test run (100 iterations)
    Generate new Neural Digest
-   
+
 4. HARDWARE RE-SIGNING
    Secure Enclave signs new Block 9
-   
+
 5. USER NOTIFICATION
    "Tool 'stripe_manager' has been self-healed.
     New Neural Fingerprint anchored to Secure Enclave.
     Review changes: /logs/refactor_2026-02-09.log"
-   
+
 6. REACTIVATION
    Tool available with new S_n baseline
 ```
 
 **Audit Trail:**
+
 ```json
 {
   "tool_id": "stripe_manager",
@@ -338,18 +353,19 @@ When the Mechanic Agent performs self-healing refactors, tools must be re-finger
 
 ### Comparison: Static Hash vs. Neural Fingerprint
 
-| Feature | Static Hash (SHA-256) | Neural Fingerprint (S_n) |
-|---------|----------------------|-------------------------|
-| **Protects Against** | File tampering | Logic hijacking, prompt injection |
-| **Detects** | Bit-level changes | Behavioral anomalies |
-| **Resilience** | Brittle (any change breaks) | Probabilistic & adaptive |
-| **Hardware Link** | Optional | Mandatory (Secure Enclave/TPM) |
-| **Computational Cost** | Negligible (~1ms) | Low (~5-10ms kernel-level LSH) |
-| **Attack Surface** | Code modification | Prompt injection, model manipulation |
-| **False Positives** | None (deterministic) | ~2% (adjustable via thresholds) |
-| **Runtime Overhead** | Zero | Minimal (~0.5% CPU) |
+| Feature                | Static Hash (SHA-256)       | Neural Fingerprint (S_n)             |
+| ---------------------- | --------------------------- | ------------------------------------ |
+| **Protects Against**   | File tampering              | Logic hijacking, prompt injection    |
+| **Detects**            | Bit-level changes           | Behavioral anomalies                 |
+| **Resilience**         | Brittle (any change breaks) | Probabilistic & adaptive             |
+| **Hardware Link**      | Optional                    | Mandatory (Secure Enclave/TPM)       |
+| **Computational Cost** | Negligible (~1ms)           | Low (~5-10ms kernel-level LSH)       |
+| **Attack Surface**     | Code modification           | Prompt injection, model manipulation |
+| **False Positives**    | None (deterministic)        | ~2% (adjustable via thresholds)      |
+| **Runtime Overhead**   | Zero                        | Minimal (~0.5% CPU)                  |
 
 **Combined Approach (Recommended):**
+
 ```
 Layer 1: SHA-256 hash verification (fast, catches obvious tampering)
 Layer 2: Neural Fingerprinting (catches subtle manipulation)
@@ -407,11 +423,7 @@ Stores compressed behavioral attestation signature.
     "hard": 0.75
   },
   "hardware_signature": "secure_enclave_sig...",
-  "decision_points": [
-    "pre_syscall_gate",
-    "post_permission_check",
-    "data_transform_logic"
-  ]
+  "decision_points": ["pre_syscall_gate", "post_permission_check", "data_transform_logic"]
 }
 ```
 
@@ -485,6 +497,7 @@ PII scrubbed: VERIFIED
 ```
 
 **Security Metrics for This Execution:**
+
 - **Structural checks:** 3 passed
 - **Risk assessments:** 2 (medium + high)
 - **Neural verifications:** 2 (start + end)
@@ -498,12 +511,12 @@ PII scrubbed: VERIFIED
 
 ### Performance Impact
 
-| Security Layer | Overhead | When |
-|----------------|----------|------|
-| **Structural Enforcement** | ~2ms | Every command |
-| **Risk Vector Calculation** | ~1ms | Every command |
-| **Neural Fingerprinting** | ~5-10ms | Tool invocation |
-| **Biometric Gate** | 500-2000ms | High-risk only |
+| Security Layer              | Overhead   | When            |
+| --------------------------- | ---------- | --------------- |
+| **Structural Enforcement**  | ~2ms       | Every command   |
+| **Risk Vector Calculation** | ~1ms       | Every command   |
+| **Neural Fingerprinting**   | ~5-10ms    | Tool invocation |
+| **Biometric Gate**          | 500-2000ms | High-risk only  |
 
 **Total:** ~1-3% performance overhead for comprehensive security
 
@@ -512,10 +525,12 @@ PII scrubbed: VERIFIED
 ### Hardware Requirements
 
 **Minimum:**
+
 - TPM 2.0 (on Linux/Windows)
 - T2 chip (on Intel Mac)
 
 **Recommended:**
+
 - Secure Enclave (Apple Silicon)
 - TPM 2.0 with firmware attestation
 - Dedicated security processor
@@ -526,35 +541,39 @@ PII scrubbed: VERIFIED
 
 ### Attack Resistance
 
-| Attack Type | SHA-256 Only | + Neural Fingerprinting | + Kernel Shield |
-|-------------|--------------|------------------------|-----------------|
-| **Code Tampering** | ✅ Detected | ✅ Detected | ✅ Blocked |
-| **Prompt Injection** | ❌ Missed | ✅ Detected | ✅ Blocked |
-| **Logic Hijacking** | ❌ Missed | ✅ Detected | ✅ Blocked |
-| **Model Manipulation** | ❌ Missed | ✅ Detected | ✅ Blocked |
-| **Privilege Escalation** | ❌ Missed | ⚠️ Sometimes | ✅ Blocked |
-| **Data Exfiltration** | ❌ Missed | ⚠️ Sometimes | ✅ Blocked |
+| Attack Type              | SHA-256 Only | + Neural Fingerprinting | + Kernel Shield |
+| ------------------------ | ------------ | ----------------------- | --------------- |
+| **Code Tampering**       | ✅ Detected  | ✅ Detected             | ✅ Blocked      |
+| **Prompt Injection**     | ❌ Missed    | ✅ Detected             | ✅ Blocked      |
+| **Logic Hijacking**      | ❌ Missed    | ✅ Detected             | ✅ Blocked      |
+| **Model Manipulation**   | ❌ Missed    | ✅ Detected             | ✅ Blocked      |
+| **Privilege Escalation** | ❌ Missed    | ⚠️ Sometimes            | ✅ Blocked      |
+| **Data Exfiltration**    | ❌ Missed    | ⚠️ Sometimes            | ✅ Blocked      |
 
 ---
 
 ## Future Research Directions
 
 ### 1. Distributed Neural Fingerprinting
+
 - Share anonymous behavioral signatures across ClosedClaw instances
 - Collective intelligence for detecting novel attack patterns
 - Privacy-preserving aggregation via federated learning
 
 ### 2. Adaptive Thresholds
+
 - Machine learning to adjust drift thresholds based on tool usage patterns
 - Reduce false positives while maintaining security
 - User-specific risk profiles
 
 ### 3. Quantum-Resistant Anchoring
+
 - Prepare for post-quantum cryptography era
 - Lattice-based signatures for hardware anchoring
 - Future-proof security guarantees
 
 ### 4. Multi-Modal Fingerprinting
+
 - Extend beyond activation patterns
 - Include: attention weights, gradient flows, reasoning traces
 - Richer behavioral signatures
@@ -573,16 +592,19 @@ PII scrubbed: VERIFIED
 ## Academic References
 
 ### Security & Formal Verification
+
 - **"Formal Verification of AI-Generated Code"** (Stanford, 2025)
 - **"Trusted Execution Environments for Autonomous Agents"** (Intel/IEEE, 2026)
 - **"AgentGuard Protocol"** (Invariant Labs, 2025) - Hardware-backed agent security
 
 ### Behavioral Attestation
+
 - **"Neural Network Fingerprinting"** (MIT CSAIL, 2024) - Original concept for model identification
 - **"Locality-Sensitive Hashing for Neural States"** (Google Research, 2025)
 - **"Runtime Behavioral Attestation"** (UC Berkeley, 2025) - Drift detection methods
 
 ### Adversarial Robustness
+
 - **"Prompt Injection Detection via Hidden State Analysis"** (Anthropic, 2025)
 - **"Logic Hijacking in Self-Modifying Agents"** (DeepMind, 2025)
 - **"Hardware Root of Trust for AI Systems"** (ARM Research, 2025)

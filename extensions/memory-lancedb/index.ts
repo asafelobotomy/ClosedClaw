@@ -9,9 +9,9 @@
 import type { ClosedClawPluginApi } from "ClosedClaw/plugin-sdk";
 import * as lancedb from "@lancedb/lancedb";
 import { Type } from "@sinclair/typebox";
+import { stringEnum } from "ClosedClaw/plugin-sdk";
 import { randomUUID } from "node:crypto";
 import OpenAI from "openai";
-import { stringEnum } from "ClosedClaw/plugin-sdk";
 import {
   MEMORY_CATEGORIES,
   type MemoryCategory,

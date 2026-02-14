@@ -1,9 +1,9 @@
 /**
  * GTK GUI Channel Plugin Entry Point
- * 
+ *
  * This plugin provides a custom channel for communicating with a GTK GUI
  * desktop application on Linux. It uses Unix sockets or file-based IPC.
- * 
+ *
  * Configuration (in config.json5):
  * {
  *   plugins: {
@@ -33,11 +33,11 @@ const plugin = {
   name: "GTK GUI",
   description: "Custom GTK GUI channel for Linux desktop applications",
   configSchema: emptyPluginConfigSchema(),
-  
+
   register(api: ClosedClawPluginApi) {
     setGtkRuntime(api.runtime);
     api.registerChannel({ plugin: gtkGuiPlugin });
-    
+
     api.log?.info?.("GTK GUI channel plugin registered");
   },
 };

@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { HealthSummary } from "./health.js";
+import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { stripAnsi } from "../terminal/ansi.js";
-import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
 import { healthCommand } from "./health.js";
-import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 
 const callGatewayMock = vi.fn();
 const logWebSelfIdMock = vi.fn();
@@ -106,7 +106,11 @@ describe("healthCommand (coverage)", () => {
             path: "/tmp/sessions.json",
             count: 2,
             recent: [
-              { key: "main", updatedAt: Date.now() - TIMEOUT_TEST_SUITE_LONG_MS, age: TIMEOUT_TEST_SUITE_LONG_MS },
+              {
+                key: "main",
+                updatedAt: Date.now() - TIMEOUT_TEST_SUITE_LONG_MS,
+                age: TIMEOUT_TEST_SUITE_LONG_MS,
+              },
               { key: "foo", updatedAt: null, age: null },
             ],
           },
@@ -116,7 +120,11 @@ describe("healthCommand (coverage)", () => {
         path: "/tmp/sessions.json",
         count: 2,
         recent: [
-          { key: "main", updatedAt: Date.now() - TIMEOUT_TEST_SUITE_LONG_MS, age: TIMEOUT_TEST_SUITE_LONG_MS },
+          {
+            key: "main",
+            updatedAt: Date.now() - TIMEOUT_TEST_SUITE_LONG_MS,
+            age: TIMEOUT_TEST_SUITE_LONG_MS,
+          },
           { key: "foo", updatedAt: null, age: null },
         ],
       },

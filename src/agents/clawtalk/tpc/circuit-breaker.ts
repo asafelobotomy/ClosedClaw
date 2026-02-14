@@ -135,10 +135,7 @@ export class CircuitBreaker {
   // -------------------------------------------------------------------------
 
   private maybeTransitionToHalfOpen(): void {
-    if (
-      this.state === "open" &&
-      Date.now() - this.lastTrippedAt >= this.config.recoveryTimeoutMs
-    ) {
+    if (this.state === "open" && Date.now() - this.lastTrippedAt >= this.config.recoveryTimeoutMs) {
       this.state = "half-open";
       this.successesSinceHalfOpen = 0;
     }

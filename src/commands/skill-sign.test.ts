@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from "vitest";
 import * as fs from "node:fs/promises";
-import * as path from "node:path";
 import * as os from "node:os";
+import * as path from "node:path";
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from "vitest";
+import type { RuntimeEnv } from "../runtime.js";
 import { generateKeyPair, parseSignatureFile } from "../security/skill-signing.js";
 import { removeTrustedKey, getTrustedKey } from "../security/trusted-keyring.js";
 import { generateKeyCommand, signSkillCommand } from "./skill-sign.js";
-import type { RuntimeEnv } from "../runtime.js";
 
 describe("skill-sign commands", () => {
   let testDir: string;
@@ -149,7 +149,10 @@ describe("skill-sign commands", () => {
       // Should produce multiple log calls for formatted output
       expect(vi.mocked(runtime.log).mock.calls.length).toBeGreaterThan(1);
 
-      const allOutput = vi.mocked(runtime.log).mock.calls.map((c) => String(c[0])).join("\n");
+      const allOutput = vi
+        .mocked(runtime.log)
+        .mock.calls.map((c) => String(c[0]))
+        .join("\n");
       expect(allOutput).toContain("Key ID:");
     });
   });
@@ -231,9 +234,7 @@ describe("skill-sign commands", () => {
         }),
       ).rejects.toThrow("process.exit called");
 
-      expect(runtime.error).toHaveBeenCalledWith(
-        expect.stringContaining("Key not found"),
-      );
+      expect(runtime.error).toHaveBeenCalledWith(expect.stringContaining("Key not found"));
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
 

@@ -22,16 +22,16 @@ Add to your `~/.closedclaw/config.json5`:
         config: {
           // Unix socket (recommended)
           socketPath: "/tmp/closedclaw-gtk.sock",
-          
+
           // OR file-based IPC:
           // inboxPath: "/tmp/closedclaw-gtk/inbox.jsonl",
           // outboxPath: "/tmp/closedclaw-gtk/outbox.jsonl",
-          
-          userId: "desktop-user"
-        }
-      }
-    }
-  }
+
+          userId: "desktop-user",
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -79,14 +79,14 @@ class ClosedClawClient:
         self.socket_path = socket_path
         self.sock = None
         self.on_response = None
-    
+
     def connect(self):
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self.sock.connect(self.socket_path)
-        
+
         # Start receiver thread
         threading.Thread(target=self._receive_loop, daemon=True).start()
-    
+
     def send_message(self, text):
         msg = {
             "id": f"gtk-{int(time.time() * 1000)}",
@@ -97,7 +97,7 @@ class ClosedClawClient:
             "timestamp": int(time.time() * 1000)
         }
         self.sock.sendall((json.dumps(msg) + "\n").encode())
-    
+
     def _receive_loop(self):
         buffer = ""
         while True:

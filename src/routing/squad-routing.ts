@@ -14,7 +14,12 @@
  * @module routing/squad-routing
  */
 
-import type { SquadCoordinator, SquadConfig, SquadResult, CoordinationStrategy } from "../agents/squad/coordinator.js";
+import type {
+  SquadCoordinator,
+  SquadConfig,
+  SquadResult,
+  CoordinationStrategy,
+} from "../agents/squad/coordinator.js";
 import type { AgentSpawnConfig } from "../agents/squad/spawner.js";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -114,9 +119,21 @@ const SQUAD_KEYWORDS = [
  * Patterns that indicate high-complexity tasks.
  */
 const COMPLEXITY_PATTERNS = [
-  { pattern: /\b(research|investigate|analyze)\b.*\b(implement|build|create|code)\b/i, weight: 0.4, types: ["research", "code"] },
-  { pattern: /\b(review|audit|check)\b.*\b(test|verify|validate)\b/i, weight: 0.3, types: ["review", "test"] },
-  { pattern: /\b(refactor|restructure|reorganize)\b.*\b(across|multiple|several)\b/i, weight: 0.3, types: ["code", "review"] },
+  {
+    pattern: /\b(research|investigate|analyze)\b.*\b(implement|build|create|code)\b/i,
+    weight: 0.4,
+    types: ["research", "code"],
+  },
+  {
+    pattern: /\b(review|audit|check)\b.*\b(test|verify|validate)\b/i,
+    weight: 0.3,
+    types: ["review", "test"],
+  },
+  {
+    pattern: /\b(refactor|restructure|reorganize)\b.*\b(across|multiple|several)\b/i,
+    weight: 0.3,
+    types: ["code", "review"],
+  },
   { pattern: /\bstep\s*\d+\b.*\bstep\s*\d+\b/i, weight: 0.2, types: ["general"] },
   { pattern: /\b(first|then|after that|finally|next)\b/gi, weight: 0.1, types: ["general"] },
 ] as const;
@@ -143,16 +160,22 @@ export function analyzeSquadTrigger(input: SquadRouteInput): SquadTriggerHint {
 
   // Length-based complexity (longer messages tend to be more complex)
   const wordCount = message.split(/\s+/).length;
-  if (wordCount > 200) {complexityScore += 0.3;}
-  else if (wordCount > 100) {complexityScore += 0.2;}
-  else if (wordCount > 50) {complexityScore += 0.1;}
+  if (wordCount > 200) {
+    complexityScore += 0.3;
+  } else if (wordCount > 100) {
+    complexityScore += 0.2;
+  } else if (wordCount > 50) {
+    complexityScore += 0.1;
+  }
 
   // Pattern-based complexity
   for (const { pattern, weight, types } of COMPLEXITY_PATTERNS) {
     const regex = new RegExp(pattern.source, pattern.flags);
     if (regex.test(message)) {
       complexityScore += weight;
-      for (const t of types) {detectedTaskTypes.add(t);}
+      for (const t of types) {
+        detectedTaskTypes.add(t);
+      }
     }
   }
 
@@ -313,8 +336,12 @@ export function aggregateSquadReply(result: SquadResult, strategy: CoordinationS
  * Format an output value as a string for display.
  */
 function formatOutput(output: unknown): string {
-  if (output === null || output === undefined) {return "(no output)";}
-  if (typeof output === "string") {return output;}
+  if (output === null || output === undefined) {
+    return "(no output)";
+  }
+  if (typeof output === "string") {
+    return output;
+  }
   return JSON.stringify(output, null, 2);
 }
 
@@ -334,17 +361,23 @@ export function findSquadBinding(
   for (const binding of bindings) {
     // Channel match
     if (binding.channels && binding.channels.length > 0) {
-      if (!binding.channels.includes(input.channel)) {continue;}
+      if (!binding.channels.includes(input.channel)) {
+        continue;
+      }
     }
 
     // Peer match
     if (binding.peerIds && binding.peerIds.length > 0) {
-      if (!input.peerId || !binding.peerIds.includes(input.peerId)) {continue;}
+      if (!input.peerId || !binding.peerIds.includes(input.peerId)) {
+        continue;
+      }
     }
 
     // Guild match
     if (binding.guildIds && binding.guildIds.length > 0) {
-      if (!input.guildId || !binding.guildIds.includes(input.guildId)) {continue;}
+      if (!input.guildId || !binding.guildIds.includes(input.guildId)) {
+        continue;
+      }
     }
 
     return binding;
@@ -393,15 +426,12 @@ export async function routeToSquad(
   }
 
   // 3. Build and execute a squad
-  const roles = trigger.detectedTaskTypes.length > 0
-    ? mapTaskTypesToRoles(trigger.detectedTaskTypes)
-    : ["researcher", "coder"];
+  const roles =
+    trigger.detectedTaskTypes.length > 0
+      ? mapTaskTypesToRoles(trigger.detectedTaskTypes)
+      : ["researcher", "coder"];
 
-  const config = buildSquadConfig(
-    `auto-${Date.now()}`,
-    trigger.recommendedStrategy,
-    roles,
-  );
+  const config = buildSquadConfig(`auto-${Date.now()}`, trigger.recommendedStrategy, roles);
 
   const squadId = await coordinator.createSquad(config);
   const result = await coordinator.executeTask(squadId, {
@@ -438,8 +468,12 @@ function mapTaskTypesToRoles(taskTypes: string[]): string[] {
 
   // Ensure at least 2 agents for a meaningful squad
   if (roles.size < 2) {
-    if (!roles.has("researcher")) {roles.add("researcher");}
-    if (!roles.has("coder")) {roles.add("coder");}
+    if (!roles.has("researcher")) {
+      roles.add("researcher");
+    }
+    if (!roles.has("coder")) {
+      roles.add("coder");
+    }
   }
 
   return [...roles];

@@ -17,7 +17,11 @@
  *   - Drift detection with soft/hard thresholds
  */
 
-import type { ClawsManifest, ClawsVerificationProof, ClawsNeuralFingerprint } from "./claws-parser.js";
+import type {
+  ClawsManifest,
+  ClawsVerificationProof,
+  ClawsNeuralFingerprint,
+} from "./claws-parser.js";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -171,7 +175,9 @@ export function computeRiskVector(ctx: ToolInvocationContext): SemanticResult {
  * Compute cosine similarity between two vectors.
  */
 export function cosineSimilarity(a: number[], b: number[]): number {
-  if (a.length !== b.length || a.length === 0) {return 0;}
+  if (a.length !== b.length || a.length === 0) {
+    return 0;
+  }
 
   let dot = 0;
   let magA = 0;
@@ -277,9 +283,8 @@ export function evaluateShield(
 
   // Pick the strictest action across layers 2 and 3
   const ORDER: ShieldAction[] = ["allow", "log", "require_biometric", "block"];
-  const maxAction = ORDER[
-    Math.max(ORDER.indexOf(semantic.action), ORDER.indexOf(attestation.action))
-  ];
+  const maxAction =
+    ORDER[Math.max(ORDER.indexOf(semantic.action), ORDER.indexOf(attestation.action))];
 
   const allowed = maxAction === "allow" || maxAction === "log";
 
@@ -290,8 +295,12 @@ export function evaluateShield(
     reason = `Risk vector ${semantic.riskVector} exceeds threshold — biometric required`;
   } else if (maxAction === "log") {
     const parts: string[] = [];
-    if (semantic.action === "log") {parts.push(`risk=${semantic.riskVector}`);}
-    if (attestation.action === "log") {parts.push(`drift=${attestation.drift}`);}
+    if (semantic.action === "log") {
+      parts.push(`risk=${semantic.riskVector}`);
+    }
+    if (attestation.action === "log") {
+      parts.push(`drift=${attestation.drift}`);
+    }
     reason = `Logged execution: ${parts.join(", ")}`;
   } else {
     reason = "All layers passed";

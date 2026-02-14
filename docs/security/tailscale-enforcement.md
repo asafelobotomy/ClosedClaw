@@ -50,10 +50,10 @@ The gateway is configured to bind exclusively to the Tailscale interface:
 ```json5
 {
   gateway: {
-    bind: "tailnet",           // Only listen on Tailscale IP
+    bind: "tailnet", // Only listen on Tailscale IP
     auth: {
       mode: "token",
-      allowTailscale: true,    // Accept Tailscale identity auth
+      allowTailscale: true, // Accept Tailscale identity auth
     },
   },
 }
@@ -85,7 +85,7 @@ Sandbox containers use a Tailscale-enforced network:
     defaults: {
       sandbox: {
         docker: {
-          network: "closedclaw-tailscale",  // Podman network with TS DNS
+          network: "closedclaw-tailscale", // Podman network with TS DNS
         },
       },
     },
@@ -126,6 +126,7 @@ tailscale status
 ```
 
 Expected output:
+
 ```
 ═══════════════════════════════════════════════════════════════
   ClosedClaw Tailscale Pre-flight Check
@@ -174,41 +175,43 @@ systemctl --user start closedclaw-gateway
 
 Validates Tailscale is ready before starting ClosedClaw.
 
-| Command | Description |
-|---------|-------------|
-| `check` | Full pre-flight validation (default) |
-| `ip` | Output Tailscale IPv4 address |
-| `dns` | Output Tailscale DNS name |
-| `wait [timeout]` | Wait for Tailscale to be ready |
+| Command          | Description                          |
+| ---------------- | ------------------------------------ |
+| `check`          | Full pre-flight validation (default) |
+| `ip`             | Output Tailscale IPv4 address        |
+| `dns`            | Output Tailscale DNS name            |
+| `wait [timeout]` | Wait for Tailscale to be ready       |
 
 ### tailscale-enforce.sh
 
 Manages network enforcement infrastructure.
 
-| Command | Root Required | Description |
-|---------|---------------|-------------|
-| `install` | Yes | Full enforcement setup |
-| `remove` | Yes | Remove all enforcement |
-| `firewall-install` | Yes | Install nftables rules |
-| `firewall-remove` | Yes | Remove nftables rules |
-| `firewall-show` | No | Show current rules |
-| `network-create` | No* | Create Podman Tailscale network |
-| `network-remove` | No* | Remove Podman network |
-| `systemd-install` | No | Install systemd drop-in |
-| `status` | No | Show enforcement status |
+| Command            | Root Required | Description                     |
+| ------------------ | ------------- | ------------------------------- |
+| `install`          | Yes           | Full enforcement setup          |
+| `remove`           | Yes           | Remove all enforcement          |
+| `firewall-install` | Yes           | Install nftables rules          |
+| `firewall-remove`  | Yes           | Remove nftables rules           |
+| `firewall-show`    | No            | Show current rules              |
+| `network-create`   | No\*          | Create Podman Tailscale network |
+| `network-remove`   | No\*          | Remove Podman network           |
+| `systemd-install`  | No            | Install systemd drop-in         |
+| `status`           | No            | Show enforcement status         |
 
-*Rootless Podman doesn't require root
+\*Rootless Podman doesn't require root
 
 ## Troubleshooting
 
 ### Gateway won't start
 
 1. Check Tailscale status:
+
    ```bash
    tailscale status
    ```
 
 2. Run pre-flight check:
+
    ```bash
    ./scripts/tailscale-preflight.sh check
    ```
@@ -221,11 +224,13 @@ Manages network enforcement infrastructure.
 ### No network in sandbox containers
 
 1. Verify network exists:
+
    ```bash
    podman network inspect closedclaw-tailscale
    ```
 
 2. Check container DNS:
+
    ```bash
    podman run --network closedclaw-tailscale alpine nslookup google.com
    ```
@@ -238,6 +243,7 @@ Manages network enforcement infrastructure.
 ### Firewall blocking legitimate traffic
 
 1. Check drop counter:
+
    ```bash
    sudo nft list table inet closedclaw_tailscale
    ```
@@ -365,17 +371,18 @@ sudo ./scripts/tailscale-mullvad.sh dns-protect-enable
 
 ### Enforcement Layers
 
-| Layer | Enforcement | Mullvad-Aware |
-|-------|-------------|---------------|
-| **Application** | Gateway binds to Tailscale IP only | Exit node routes through Mullvad |
-| **Service** | Systemd requires `tailscaled.service` | Pre-flight checks exit node status |
-| **Firewall** | nftables blocks non-tailscale0 egress | Blocks DNS leaks to non-Mullvad servers |
-| **Container** | Podman network uses Tailscale DNS | Traffic inherits exit node |
-| **Namespace** | Optional isolated network namespace | All traffic through VPN |
+| Layer           | Enforcement                           | Mullvad-Aware                           |
+| --------------- | ------------------------------------- | --------------------------------------- |
+| **Application** | Gateway binds to Tailscale IP only    | Exit node routes through Mullvad        |
+| **Service**     | Systemd requires `tailscaled.service` | Pre-flight checks exit node status      |
+| **Firewall**    | nftables blocks non-tailscale0 egress | Blocks DNS leaks to non-Mullvad servers |
+| **Container**   | Podman network uses Tailscale DNS     | Traffic inherits exit node              |
+| **Namespace**   | Optional isolated network namespace   | All traffic through VPN                 |
 
 ### DNS Leak Protection
 
 When using Mullvad, DNS queries should go through:
+
 1. **Tailscale MagicDNS** (100.100.100.100)
 2. **Mullvad DNS** (10.64.0.1 via exit node)
 
@@ -399,13 +406,13 @@ sudo ./scripts/tailscale-mullvad.sh dns-protect-enable
 # ══════════════════════════════════════════════════════
 #   Verifying VPN Connection
 # ══════════════════════════════════════════════════════
-# 
+#
 # Tailscale Status:
 #   State: Running
 #   Tailscale IP: 100.x.x.x
 #   Exit Node: 10.64.x.x
 #   Mullvad: YES
-# 
+#
 # External IP Check:
 #   Public IP: 185.x.x.x
 #   Mullvad VPN: ACTIVE
@@ -431,22 +438,22 @@ sudo ip netns exec closedclaw-vpn node openclaw.mjs gateway
 
 ### Script Reference: tailscale-mullvad.sh
 
-| Command | Description |
-|---------|-------------|
-| `quick-setup [region]` | Full setup with Mullvad exit node |
-| `exit-node <target>` | Set exit node (mullvad:us, auto, IP) |
-| `exit-node-list` | List available Mullvad servers |
-| `exit-node-clear` | Remove exit node |
-| `enforce-enable` | Block all non-Tailscale traffic |
-| `enforce-disable` | Allow normal traffic |
-| `dns-protect-enable` | Force DNS through Tailscale |
-| `dns-protect-disable` | Allow normal DNS |
-| `namespace-create` | Create isolated VPN namespace |
-| `namespace-run <cmd>` | Run command in namespace |
-| `container-network` | Create enforced Podman network |
-| `verify` | Check VPN status |
-| `test-dns` | Test for DNS leaks |
-| `systemd-install` | Install enforcement service |
+| Command                | Description                          |
+| ---------------------- | ------------------------------------ |
+| `quick-setup [region]` | Full setup with Mullvad exit node    |
+| `exit-node <target>`   | Set exit node (mullvad:us, auto, IP) |
+| `exit-node-list`       | List available Mullvad servers       |
+| `exit-node-clear`      | Remove exit node                     |
+| `enforce-enable`       | Block all non-Tailscale traffic      |
+| `enforce-disable`      | Allow normal traffic                 |
+| `dns-protect-enable`   | Force DNS through Tailscale          |
+| `dns-protect-disable`  | Allow normal DNS                     |
+| `namespace-create`     | Create isolated VPN namespace        |
+| `namespace-run <cmd>`  | Run command in namespace             |
+| `container-network`    | Create enforced Podman network       |
+| `verify`               | Check VPN status                     |
+| `test-dns`             | Test for DNS leaks                   |
+| `systemd-install`      | Install enforcement service          |
 
 ### Tailscale ACLs for Mullvad
 

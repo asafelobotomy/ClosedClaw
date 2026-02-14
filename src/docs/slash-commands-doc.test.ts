@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
 import { listChatCommands } from "../auto-reply/commands-registry.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
-import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
 
 beforeEach(() => {
   setActivePluginRegistry(createTestRegistry([]));

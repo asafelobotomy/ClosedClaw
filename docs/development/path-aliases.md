@@ -5,17 +5,19 @@ TypeScript path aliases and barrel exports for cleaner imports and better refact
 ## Quick Start
 
 **Before** (deep relative imports):
+
 ```typescript
-import { loadConfig } from '../../../config/config.js';
-import { doctorCommand } from '../../../commands/doctor.js';
-import { createWebTools } from '../../../agents/tools/web-tools.js';
+import { loadConfig } from "../../../config/config.js";
+import { doctorCommand } from "../../../commands/doctor.js";
+import { createWebTools } from "../../../agents/tools/web-tools.js";
 ```
 
 **After** (path aliases + barrel exports):
+
 ```typescript
-import { loadConfig } from '@/config/config.js';
-import { doctorCommand } from '@/commands';
-import { createWebTools } from '@/agents/tools';
+import { loadConfig } from "@/config/config.js";
+import { doctorCommand } from "@/commands";
+import { createWebTools } from "@/agents/tools";
 ```
 
 ## Path Aliases
@@ -29,44 +31,34 @@ Configured in `tsconfig.json` and all Vitest configs:
 
 ```typescript
 // Config
-import { loadConfig, type ClosedClawConfig } from '@/config/config.js';
+import { loadConfig, type ClosedClawConfig } from "@/config/config.js";
 
 // Commands (via barrel export)
-import { 
-  agentCommand, 
-  doctorCommand, 
-  onboardCommand,
-  gatewayStatusCommand 
-} from '@/commands';
+import { agentCommand, doctorCommand, onboardCommand, gatewayStatusCommand } from "@/commands";
 
 // Agent tools (via barrel export)
 import {
   createWebTools,
   createDiscordActions,
   createMemoryTool,
-  createSessionsSendTool
-} from '@/agents/tools';
+  createSessionsSendTool,
+} from "@/agents/tools";
 
 // Test utilities
-import {
-  createTempHome,
-  findFreePort,
-  createTestConfig,
-  assertValidSessionKey
-} from '@test/utils';
+import { createTempHome, findFreePort, createTestConfig, assertValidSessionKey } from "@test/utils";
 
 // Channels
-import { getChannelPlugin } from '@/channels/plugins';
-import type { ChannelPlugin } from '@/channels/plugins/types.js';
+import { getChannelPlugin } from "@/channels/plugins";
+import type { ChannelPlugin } from "@/channels/plugins/types.js";
 
 // Gateway
-import { GatewayService } from '@/gateway/service.js';
-import type { GatewayConfig } from '@/gateway/types.js';
+import { GatewayService } from "@/gateway/service.js";
+import type { GatewayConfig } from "@/gateway/types.js";
 
 // Security
-import { encrypt, decrypt } from '@/security/crypto.js';
-import { auditLog } from '@/security/audit-log.js';
-import { KeychainBackend } from '@/security/keychain';
+import { encrypt, decrypt } from "@/security/crypto.js";
+import { auditLog } from "@/security/audit-log.js";
+import { KeychainBackend } from "@/security/keychain";
 ```
 
 ## Barrel Exports
@@ -83,43 +75,44 @@ import {
   agentCommand,
   agentViaGatewayCommand,
   agentsCommand,
-  
+
   // Auth & onboarding
   onboardCommand,
   authChoiceCommand,
-  
+
   // Channels
   channelsCommand,
   signalInstallCommand,
-  
+
   // Configuration
   configureCommand,
   configureGatewayCommand,
-  
+
   // Diagnostics
   doctorCommand,
   healthCommand,
-  
+
   // Gateway & status
   gatewayStatusCommand,
   statusCommand,
-  
+
   // Security
   keychainCommand,
   skillSignCommand,
   auditQueryCommand,
-  
+
   // Sandbox
   sandboxCommand,
-  
+
   // Utilities
   setupCommand,
   resetCommand,
   uninstallCommand,
-} from '@/commands';
+} from "@/commands";
 ```
 
 **Categories**:
+
 - Agent Commands (10+ exports)
 - Authentication & Onboarding (30+ exports)
 - Channel Commands
@@ -145,43 +138,44 @@ import {
   jsonResult,
   textResult,
   readStringParam,
-  
+
   // Web & browser
   createWebTools,
   createWebFetchTool,
   createWebSearchTool,
   createBrowserTool,
-  
+
   // Channel-specific actions
   createDiscordActions,
   createSlackActions,
   createTelegramActions,
   createWhatsappActions,
-  
+
   // Session & messaging
   createSessionsListTool,
   createSessionsSendTool,
   createMessageTool,
-  
+
   // Memory & agents
   createMemoryTool,
   createAgentsListTool,
-  
+
   // Gateway & nodes
   createGatewayTool,
   createNodesTool,
-  
+
   // Media & UI
   createImageTool,
   createTtsTool,
   createCanvasTool,
-  
+
   // Automation
   createCronTool,
-} from '@/agents/tools';
+} from "@/agents/tools";
 ```
 
 **Categories**:
+
 - Core Tool Utilities
 - Web & Browser Tools
 - Channel-Specific Action Tools (Discord, Slack, Telegram, WhatsApp)
@@ -202,24 +196,24 @@ import {
   findFreePort,
   createTempHome,
   withTempHome,
-  
+
   // Config factories
   createTestConfig,
   createTestAgentConfig,
   createTestChannelConfig,
   createTestSecurityConfig,
-  
+
   // Session factories
   createTestSession,
   createTestSessionKey,
   parseTestSessionKey,
-  
+
   // Custom assertions
   assertValidSessionKey,
   assertToolSuccess,
   assertValidAuditEntry,
   assertValidSignature,
-} from '@test/utils';
+} from "@test/utils";
 ```
 
 ## Migration Guide
@@ -243,6 +237,7 @@ grep -r "from '\.\./\.\." src/ | wc -l
 **Phase 3**: Gradual migration of remaining files
 
 **Workflow**:
+
 1. Identify file to migrate
 2. Replace deep relative imports with path aliases
 3. Use barrel exports where available
@@ -253,28 +248,31 @@ grep -r "from '\.\./\.\." src/ | wc -l
 ### Example Migration
 
 **Before** (`src/gateway/service.ts`):
+
 ```typescript
-import { loadConfig } from '../config/config.js';
-import { doctorCommand } from '../commands/doctor.js';
-import { healthCommand } from '../commands/health.js';
-import { getChannelPlugin } from '../channels/plugins/index.js';
-import { encrypt } from '../security/crypto.js';
-import { auditLog } from '../security/audit-log.js';
-import { createWebTools } from '../agents/tools/web-tools.js';
-import { createMemoryTool } from '../agents/tools/memory-tool.js';
+import { loadConfig } from "../config/config.js";
+import { doctorCommand } from "../commands/doctor.js";
+import { healthCommand } from "../commands/health.js";
+import { getChannelPlugin } from "../channels/plugins/index.js";
+import { encrypt } from "../security/crypto.js";
+import { auditLog } from "../security/audit-log.js";
+import { createWebTools } from "../agents/tools/web-tools.js";
+import { createMemoryTool } from "../agents/tools/memory-tool.js";
 ```
 
 **After**:
+
 ```typescript
-import { loadConfig } from '@/config/config.js';
-import { doctorCommand, healthCommand } from '@/commands';
-import { getChannelPlugin } from '@/channels/plugins';
-import { encrypt } from '@/security/crypto.js';
-import { auditLog } from '@/security/audit-log.js';
-import { createWebTools, createMemoryTool } from '@/agents/tools';
+import { loadConfig } from "@/config/config.js";
+import { doctorCommand, healthCommand } from "@/commands";
+import { getChannelPlugin } from "@/channels/plugins";
+import { encrypt } from "@/security/crypto.js";
+import { auditLog } from "@/security/audit-log.js";
+import { createWebTools, createMemoryTool } from "@/agents/tools";
 ```
 
 **Benefits**:
+
 - 7 imports → 6 imports (simpler)
 - No `../` navigation
 - Easier to refactor (paths are absolute-like)
@@ -288,6 +286,7 @@ Use VS Code's "Find and Replace in Files" with regex:
 **Replace**: Review case-by-case (context-dependent)
 
 Or use TypeScript's built-in refactoring:
+
 1. Right-click on import path
 2. Select "Convert to ES6 module" or "Organize imports"
 3. Adjust manually to use path aliases
@@ -295,11 +294,13 @@ Or use TypeScript's built-in refactoring:
 ## When to Use Barrel Exports
 
 **✅ Use barrel exports when**:
+
 - Importing multiple related modules from same package
 - Module is part of public API
 - Simplifies common import patterns
 
 **❌ Avoid barrel exports when**:
+
 - Causes circular dependency
 - Large module with many exports (tree-shaking issues)
 - Internal-only utilities (not part of public API)
@@ -307,12 +308,14 @@ Or use TypeScript's built-in refactoring:
 ## When to Use Path Aliases
 
 **✅ Use path aliases when**:
+
 - Importing from 3+ levels up (`../../../`)
 - Cross-cutting concerns (config, security, logging)
 - Common utilities used across many files
 - Test utilities in test files
 
 **❌ Keep relative imports when**:
+
 - Same directory (`./file.js`)
 - One level up (`../sibling.js`)
 - Highly coupled modules in same package
@@ -320,6 +323,7 @@ Or use TypeScript's built-in refactoring:
 ## Testing
 
 Path aliases work in all test configs:
+
 - `vitest.config.ts` (default)
 - `vitest.unit.config.ts`
 - `vitest.gateway.config.ts`
@@ -329,12 +333,12 @@ Path aliases work in all test configs:
 
 ```typescript
 // Test file using path aliases
-import { describe, it, expect } from 'vitest';
-import { loadConfig } from '@/config/config.js';
-import { createTempHome, createTestConfig } from '@test/utils';
+import { describe, it, expect } from "vitest";
+import { loadConfig } from "@/config/config.js";
+import { createTempHome, createTestConfig } from "@test/utils";
 
-describe('My Test', () => {
-  it('should work with path aliases', async () => {
+describe("My Test", () => {
+  it("should work with path aliases", async () => {
     await withTempHome(async (homeDir) => {
       const config = createTestConfig();
       // Test code...
@@ -357,6 +361,7 @@ VS Code, WebStorm, and other TypeScript-aware editors automatically resolve path
 ### Import not found
 
 Check that:
+
 1. Path alias matches `tsconfig.json` configuration
 2. File exists at target path
 3. Export exists in barrel file
@@ -364,6 +369,7 @@ Check that:
 ### Circular dependency
 
 If barrel export causes circular dependencies:
+
 1. Import directly instead: `from '@/path/to/file.js'`
 2. Restructure modules to break cycle
 3. Use dynamic imports for optional dependencies
@@ -377,6 +383,7 @@ If barrel export causes circular dependencies:
 ### Type errors
 
 Ensure:
+
 1. `baseUrl` is set in `tsconfig.json`
 2. `paths` mapping is correct
 3. Run `pnpm build` to check types

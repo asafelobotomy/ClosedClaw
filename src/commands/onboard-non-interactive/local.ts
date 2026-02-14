@@ -1,9 +1,12 @@
 import type { ClosedClawConfig } from "../../config/config.js";
-import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../../config/constants/index.js";
 import type { RuntimeEnv } from "../../runtime.js";
 import type { OnboardOptions } from "../onboard-types.js";
 import { formatCliCommand } from "../../cli/command-format.js";
 import { resolveGatewayPort, writeConfigFile } from "../../config/config.js";
+import {
+  TIMEOUT_HTTP_SHORT_MS,
+  TIMEOUT_TEST_SUITE_MEDIUM_MS,
+} from "../../config/constants/index.js";
 import { logConfigUpdated } from "../../config/logging.js";
 import { DEFAULT_GATEWAY_DAEMON_RUNTIME } from "../daemon-runtime.js";
 import { healthCommand } from "../health.js";

@@ -1,11 +1,8 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import * as fs from "node:fs/promises";
-import * as path from "node:path";
 import * as os from "node:os";
-import {
-  verifySkillSignatureForInstall,
-  getVerificationConfig,
-} from "./skill-verification.js";
+import * as path from "node:path";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import type { ClosedClawConfig } from "../config/config.js";
 import {
   formatPublicKeyPem,
   formatSignatureFile,
@@ -13,7 +10,7 @@ import {
   signSkill,
 } from "../security/skill-signing.js";
 import { addTrustedKey, removeTrustedKey } from "../security/trusted-keyring.js";
-import type { ClosedClawConfig } from "../config/config.js";
+import { verifySkillSignatureForInstall, getVerificationConfig } from "./skill-verification.js";
 
 describe("skill-verification", () => {
   let testDir: string;

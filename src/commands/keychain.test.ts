@@ -6,12 +6,8 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { RuntimeEnv } from "../runtime.js";
-import {
-  keychainStatusCommand,
-  keychainMigrateCommand,
-  keychainListCommand,
-} from "./keychain.js";
 import * as keychainModule from "../security/keychain.js";
+import { keychainStatusCommand, keychainMigrateCommand, keychainListCommand } from "./keychain.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -262,10 +258,7 @@ describe("keychainMigrateCommand", () => {
       migrated: 1,
       skipped: 0,
       failed: 2,
-      errors: [
-        "bad1.json: Missing namespace field",
-        "bad2.json: Invalid JSON syntax",
-      ],
+      errors: ["bad1.json: Missing namespace field", "bad2.json: Invalid JSON syntax"],
     });
 
     const runtime = createMockRuntime();

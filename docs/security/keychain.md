@@ -22,12 +22,14 @@ closedclaw security keychain list
 ## Supported Platforms
 
 ### macOS
+
 - **Backend**: Keychain.app
 - **CLI Tool**: `/usr/bin/security`
 - **Protection**: Protected by login password, locked with screen lock
 - **Access**: View via Keychain Access.app (search for "ClosedClaw")
 
 ### Linux
+
 - **Backend**: Secret Service API (GNOME Keyring, KWallet)
 - **CLI Tool**: `secret-tool` (from `libsecret-tools` package)
 - **Protection**: Protected by keyring password
@@ -35,12 +37,14 @@ closedclaw security keychain list
 - **Installation**: `sudo apt install libsecret-tools` (Debian/Ubuntu)
 
 ### Windows
+
 - **Backend**: Credential Manager
 - **CLI Tool**: `cmdkey` (built-in)
 - **Protection**: Protected by Windows user account
 - **Access**: Control Panel → Credential Manager
 
 ### Fallback (All Platforms)
+
 - **Backend**: Encrypted file store
 - **Location**: `~/.closedclaw/credentials/`
 - **Protection**: Files encrypted at rest (Priority 3)
@@ -55,9 +59,11 @@ closedclaw security keychain list
 Check which keychain backend is being used and whether it's available.
 
 **Options**:
+
 - `--json` - Output as JSON
 
 **Example**:
+
 ```bash
 $ closedclaw security keychain status
 Keychain Status
@@ -77,6 +83,7 @@ List credentials: closedclaw security keychain list
 ```
 
 **JSON Output**:
+
 ```json
 {
   "backend": "macos-keychain",
@@ -93,11 +100,13 @@ List credentials: closedclaw security keychain list
 Migrate credentials from plaintext JSON files in `~/.closedclaw/credentials/` to the OS keychain (or encrypted file store).
 
 **Options**:
+
 - `--dry-run` - Show what would be migrated without making changes
 - `--json` - Output as JSON
 
 **Expected JSON Format**:
 Plaintext credential files should have this structure:
+
 ```json
 {
   "namespace": "anthropic",
@@ -107,6 +116,7 @@ Plaintext credential files should have this structure:
 ```
 
 **Example**:
+
 ```bash
 $ closedclaw security keychain migrate
 Keychain Migration
@@ -128,6 +138,7 @@ Consider removing them once you've verified migration worked:
 ```
 
 **Dry Run**:
+
 ```bash
 $ closedclaw security keychain migrate --dry-run
 Running in dry-run mode (no files will be modified)
@@ -140,9 +151,11 @@ Running in dry-run mode (no files will be modified)
 List stored credentials. Only works with the encrypted-file backend; native OS keychains don't support credential enumeration via CLI.
 
 **Options**:
+
 - `--json` - Output as JSON
 
 **Example (File Backend)**:
+
 ```bash
 $ closedclaw security keychain list
 Stored Credentials
@@ -160,6 +173,7 @@ openai:
 ```
 
 **Example (Native Keychain)**:
+
 ```bash
 $ closedclaw security keychain list
 Stored Credentials
@@ -236,24 +250,28 @@ if (result.errors.length > 0) {
 ## Security Considerations
 
 ### macOS Keychain
+
 - **Access Control**: Credentials are protected by macOS access control lists (ACLs)
 - **User Consent**: First access may prompt for user consent
 - **Screen Lock**: Keychain locks automatically when screen is locked
 - **Recovery**: Lost password = lost credentials (no recovery possible)
 
 ### Linux Secret Service
+
 - **Keyring Password**: Separate from login password (set on first use)
 - **Auto-unlock**: Can be configured to unlock on login
 - **Backend Variety**: GNOME Keyring, KWallet, etc. (depends on desktop environment)
 - **Headless**: May not work in SSH sessions without X11 forwarding
 
 ### Windows Credential Manager
+
 - **User-Specific**: Credentials tied to Windows user account
 - **Domain Integration**: Can sync with Active Directory in enterprise environments
 - **BitLocker**: Enhanced protection when BitLocker is enabled
 - **Admin Access**: Local administrators can access other users' credentials
 
 ### Encrypted File Fallback
+
 - **Encryption**: AES-256-GCM (from Priority 3)
 - **Key Derivation**: PBKDF2 with 100,000 iterations
 - **File Permissions**: chmod 600 (readable only by owner)
@@ -287,6 +305,7 @@ This makes credentials easy to find in native keychain UIs (search for "ClosedCl
 ### Encrypted File Fallback
 
 The fallback to encrypted files ensures ClosedClaw works in:
+
 - **Headless servers**: No window system, no keychain daemon
 - **Docker containers**: Isolated environments without host keychain access
 - **CI/CD pipelines**: Automated environments where keychains aren't available
@@ -305,6 +324,7 @@ closedclaw security keychain status
 ```
 
 If using encrypted-file on a desktop, consider installing OS keychain tools:
+
 - **Linux**: `sudo apt install libsecret-tools`
 - **macOS**: Built-in (always available)
 - **Windows**: Built-in (always available)
@@ -328,6 +348,7 @@ Review the output. Credentials are copied to the keychain; original JSON files r
 ### Step 4: Verify
 
 Test that ClosedClaw still works:
+
 ```bash
 closedclaw doctor
 closedclaw channels status
@@ -338,6 +359,7 @@ If everything works, the migration succeeded.
 ### Step 5: Cleanup (Optional)
 
 Remove original JSON files:
+
 ```bash
 rm -rf ~/.closedclaw/credentials/*.json
 ```
@@ -351,12 +373,14 @@ rm -rf ~/.closedclaw/credentials/*.json
 ### Problem: `secret-tool` not found (Linux)
 
 **Symptom**:
+
 ```
 Backend: Encrypted file store (no OS keychain available)
 ```
 
 **Solution**:
 Install `libsecret-tools`:
+
 ```bash
 # Debian/Ubuntu
 sudo apt install libsecret-tools
@@ -369,6 +393,7 @@ sudo pacman -S libsecret
 ```
 
 After installation, re-run status check:
+
 ```bash
 closedclaw security keychain status
 ```
@@ -380,6 +405,7 @@ closedclaw security keychain status
 **Symptom**: macOS asks for keychain password on every credential access.
 
 **Solution**:
+
 1. Open Keychain Access.app
 2. Find "ClosedClaw" entries
 3. Double-click → Access Control tab
@@ -391,6 +417,7 @@ closedclaw security keychain status
 ### Problem: Migration shows "skipped" or "failed"
 
 **Symptom**:
+
 ```
 ○ Skipped:  3 credential(s) (malformed or missing fields)
 ```
@@ -399,6 +426,7 @@ closedclaw security keychain status
 
 **Solution**:
 Check file structure. Example of correct format:
+
 ```json
 {
   "namespace": "anthropic",
@@ -414,6 +442,7 @@ Files must be valid JSON with all three fields.
 ### Problem: Cannot list credentials on native keychain
 
 **Symptom**:
+
 ```
 ⚠️  Native keychains don't support enumeration.
 ```
@@ -421,6 +450,7 @@ Files must be valid JSON with all three fields.
 **Cause**: This is expected behavior. macOS Keychain, Linux Secret Service, and Windows Credential Manager don't expose CLI-based credential listing (for security reasons).
 
 **Solution**: Use native GUI tools:
+
 - **macOS**: Keychain Access.app → search "ClosedClaw"
 - **Linux**: `seahorse` (GNOME) or `kwalletmanager` (KDE)
 - **Windows**: Control Panel → Credential Manager → Generic Credentials
@@ -434,6 +464,7 @@ Files must be valid JSON with all three fields.
 **Cause**: No keychain daemon running in headless environment.
 
 **Solution**: This is expected. ClosedClaw automatically falls back to encrypted-file backend. Verify:
+
 ```bash
 closedclaw security keychain status
 # Should show: Backend: Encrypted file store
@@ -446,7 +477,9 @@ No action needed; encrypted files provide security in headless environments.
 ## Best Practices
 
 ### 1. Migrate Early
+
 Run migration immediately after installing ClosedClaw:
+
 ```bash
 closedclaw security keychain migrate
 ```
@@ -454,14 +487,18 @@ closedclaw security keychain migrate
 This moves credentials to the most secure storage available on your platform.
 
 ### 2. Use Native Keychains on Desktops
+
 Encrypted files are secure, but native keychains provide:
+
 - Integration with screen lock
 - OS-level access control
 - Biometric unlock (Touch ID, Windows Hello)
 - Centralized credential management
 
 ### 3. Verify After Migration
+
 Always test ClosedClaw functionality after migrating:
+
 ```bash
 closedclaw doctor
 closedclaw channels status
@@ -470,15 +507,19 @@ closedclaw channels status
 If tests fail, credentials may not have migrated correctly.
 
 ### 4. Don't Mix Backends
+
 Avoid manually editing `~/.closedclaw/credentials/` JSON files after migrating to native keychain. ClosedClaw checks keychain first; leftover files may cause confusion.
 
 ### 5. Backup Keychain (macOS)
+
 macOS keychains are backed up to Time Machine. If using FileVault, keychain is encrypted. No additional backup needed.
 
 ### 6. Set Keyring Password (Linux)
+
 On first use, Linux Secret Service will prompt for a keyring password. Use a strong password; it protects all secrets.
 
 ### 7. Headless Servers: Use Encrypted Files
+
 Don't try to force native keychains in Docker/SSH. The encrypted-file backend is designed for headless environments and provides adequate security.
 
 ---
@@ -499,15 +540,18 @@ ClosedClaw stores credentials in the login keychain (default). If you use multip
 ### Linux
 
 **Desktop Environment Dependency**:
+
 - **GNOME**: Uses GNOME Keyring (automatic)
 - **KDE**: Uses KWallet (automatic)
 - **Other DEs**: May need manual keyring daemon setup
 
 **SSH Sessions**:
 Secret Service requires a graphical session. In SSH:
+
 ```bash
 export $(dbus-launch)
 ```
+
 This starts a D-Bus session for Secret Service, but may still fail without X11.
 
 **Snap/Flatpak**:
@@ -531,6 +575,7 @@ First-time credential storage may trigger User Account Control (UAC) prompts.
 ### Namespace
 
 The `namespace` groups related credentials. Common namespaces:
+
 - `anthropic` - Anthropic API keys and tokens
 - `openai` - OpenAI API keys
 - `github` - GitHub tokens
@@ -543,6 +588,7 @@ Use lowercase, dash-separated names: `my-service`, not `My Service`.
 ### Identifier
 
 The `identifier` distinguishes multiple credentials within a namespace:
+
 - `api-key` - Primary API key
 - `oauth-token` - OAuth access token
 - `refresh-token` - OAuth refresh token
@@ -553,6 +599,7 @@ Use lowercase, dash-separated names.
 ### Secret
 
 The actual credential value. Can be:
+
 - API keys: `sk-ant-...`, `sk-...`
 - OAuth tokens: `xoxb-...`, `Bearer ...`
 - Passwords: Any string
@@ -579,6 +626,7 @@ The actual credential value. Can be:
 ### Q: Can I export credentials for backup?
 
 **A**: Native keychains don't expose export. For backup:
+
 - **macOS**: Time Machine backs up keychains automatically
 - **Linux**: Backup `~/.local/share/keyrings/` or use `secret-tool` to extract
 - **Windows**: Use `cmdkey /list` + `cmdkey /export`
@@ -591,6 +639,7 @@ The actual credential value. Can be:
 ### Q: Can I disable keychain and force file storage?
 
 **A**: Yes, via programmatic API:
+
 ```typescript
 await storeCredential("ns", "id", "secret", { backend: "encrypted-file" });
 ```
@@ -608,6 +657,7 @@ But no CLI flag exists (by design; use OS keychain when available).
 ### Q: Can I use ClosedClaw without keychain on macOS/Windows?
 
 **A**: Yes. Set environment variable to force fallback (not officially supported):
+
 ```bash
 export CLOSEDCLAW_KEYCHAIN_BACKEND=encrypted-file
 ```
@@ -626,6 +676,7 @@ export CLOSEDCLAW_KEYCHAIN_BACKEND=encrypted-file
 ## Summary
 
 ClosedClaw's OS keychain integration provides:
+
 - ✅ **Native Security**: Leverages platform keychains (macOS, Linux, Windows)
 - ✅ **Automatic Fallback**: Gracefully degrades to encrypted files
 - ✅ **Simple Migration**: One-command migration from JSON files
@@ -633,6 +684,7 @@ ClosedClaw's OS keychain integration provides:
 - ✅ **No Native Compilation**: Uses CLI tools, not native bindings
 
 **Get Started**:
+
 ```bash
 closedclaw security keychain status
 closedclaw security keychain migrate

@@ -17,12 +17,8 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import type { KeyPair } from "./crypto-signer.js";
-import {
-  generateKeyPair,
-  exportKeyPair,
-  verifyEnvelope,
-} from "./crypto-signer.js";
 import type { SignedTPCEnvelope } from "./types.js";
+import { generateKeyPair, exportKeyPair, verifyEnvelope } from "./crypto-signer.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -51,12 +47,15 @@ interface KeySlot {
 
 interface KeyRotationState {
   currentKeyId: string;
-  keys: Record<string, {
-    generatedAt: number;
-    expiresAt: number | null;
-    privatePath: string;
-    publicPath: string;
-  }>;
+  keys: Record<
+    string,
+    {
+      generatedAt: number;
+      expiresAt: number | null;
+      privatePath: string;
+      publicPath: string;
+    }
+  >;
 }
 
 // ---------------------------------------------------------------------------
@@ -206,10 +205,7 @@ export class KeyRotationManager {
    */
   startAutoRotation(): void {
     this.stopAutoRotation();
-    this.rotationTimer = setInterval(
-      () => void this.rotate(),
-      this.config.rotationIntervalMs,
-    );
+    this.rotationTimer = setInterval(() => void this.rotate(), this.config.rotationIntervalMs);
     // Let Node exit if this is the only thing keeping it alive
     if (this.rotationTimer.unref) {
       this.rotationTimer.unref();
@@ -258,9 +254,7 @@ export class KeyRotationManager {
 
   private pruneGraceSlots(): void {
     const now = Date.now();
-    this.graceSlots = this.graceSlots.filter(
-      (s) => s.expiresAt === null || s.expiresAt > now,
-    );
+    this.graceSlots = this.graceSlots.filter((s) => s.expiresAt === null || s.expiresAt > now);
   }
 
   private loadState(): KeyRotationState | null {
@@ -274,7 +268,9 @@ export class KeyRotationManager {
   }
 
   private saveState(): void {
-    if (!this.activeSlot) return;
+    if (!this.activeSlot) {
+      return;
+    }
 
     const stateFile = path.join(this.keyDir, "rotation-state.json");
     const keyId = crypto.randomBytes(8).toString("hex");

@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 const githubCopilotLoginCommand = vi.fn();
 const modelsStatusCommand = vi.fn().mockResolvedValue(undefined);
@@ -21,32 +20,36 @@ describe("models cli", () => {
     modelsStatusCommand.mockClear();
   });
 
-  it("registers github-copilot login command", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
-    const { Command } = await import("commander");
-    const { registerModelsCli } = await import("./models-cli.js");
+  it(
+    "registers github-copilot login command",
+    { timeout: TIMEOUT_TEST_SUITE_LONG_MS },
+    async () => {
+      const { Command } = await import("commander");
+      const { registerModelsCli } = await import("./models-cli.js");
 
-    const program = new Command();
-    registerModelsCli(program);
+      const program = new Command();
+      registerModelsCli(program);
 
-    const models = program.commands.find((cmd) => cmd.name() === "models");
-    expect(models).toBeTruthy();
+      const models = program.commands.find((cmd) => cmd.name() === "models");
+      expect(models).toBeTruthy();
 
-    const auth = models?.commands.find((cmd) => cmd.name() === "auth");
-    expect(auth).toBeTruthy();
+      const auth = models?.commands.find((cmd) => cmd.name() === "auth");
+      expect(auth).toBeTruthy();
 
-    const login = auth?.commands.find((cmd) => cmd.name() === "login-github-copilot");
-    expect(login).toBeTruthy();
+      const login = auth?.commands.find((cmd) => cmd.name() === "login-github-copilot");
+      expect(login).toBeTruthy();
 
-    await program.parseAsync(["models", "auth", "login-github-copilot", "--yes"], {
-      from: "user",
-    });
+      await program.parseAsync(["models", "auth", "login-github-copilot", "--yes"], {
+        from: "user",
+      });
 
-    expect(githubCopilotLoginCommand).toHaveBeenCalledTimes(1);
-    expect(githubCopilotLoginCommand).toHaveBeenCalledWith(
-      expect.objectContaining({ yes: true }),
-      expect.any(Object),
-    );
-  });
+      expect(githubCopilotLoginCommand).toHaveBeenCalledTimes(1);
+      expect(githubCopilotLoginCommand).toHaveBeenCalledWith(
+        expect.objectContaining({ yes: true }),
+        expect.any(Object),
+      );
+    },
+  );
 
   it("passes --agent to models status", async () => {
     const { Command } = await import("commander");

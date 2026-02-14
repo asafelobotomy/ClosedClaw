@@ -152,10 +152,7 @@ async function auditSystemdUnit(
   }
 }
 
-function auditGatewayCommand(
-  programArguments: string[] | undefined,
-  issues: ServiceConfigIssue[],
-) {
+function auditGatewayCommand(programArguments: string[] | undefined, issues: ServiceConfigIssue[]) {
   if (!programArguments || programArguments.length === 0) {
     return;
   }

@@ -24,7 +24,9 @@ export function execDocker(args: string[], opts?: { allowFailure?: boolean }) {
       stderr += chunk.toString();
     });
     child.on("error", (err) => {
-      if (settled) {return;}
+      if (settled) {
+        return;
+      }
       settled = true;
       if (opts?.allowFailure) {
         resolve({ stdout, stderr: err.message, code: 1 });
@@ -33,7 +35,9 @@ export function execDocker(args: string[], opts?: { allowFailure?: boolean }) {
       }
     });
     child.on("close", (code) => {
-      if (settled) {return;}
+      if (settled) {
+        return;
+      }
       settled = true;
       const exitCode = code ?? 0;
       if (exitCode !== 0 && !opts?.allowFailure) {

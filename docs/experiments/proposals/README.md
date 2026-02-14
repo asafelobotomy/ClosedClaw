@@ -14,11 +14,13 @@ This directory contains **active proposals** for future OpenClaw and ClosedClaw 
 ## Active Proposals
 
 ### [.claws File Format](claws-file-format.md)
+
 **Status:** Active Proposal | **Target:** OpenClaw v3.0
 
 Literate executable format combining semantic intent, executable code, runtime verification, and telemetry. Enables autonomous tool creation, hot-swapping, and self-healing capabilities.
 
 **Key Features:**
+
 - WASM-based sandboxed execution
 - Semantic firewall for input/output
 - Formal verification proofs
@@ -30,11 +32,13 @@ Literate executable format combining semantic intent, executable code, runtime v
 ---
 
 ### [ClawDense Notation](clawdense-notation.md)
+
 **Status:** Active Proposal (Partial Implementation) | **Target:** ClosedClaw v2.2+
 
 Token-optimized shorthand for machine-to-machine communication between Kernel and LLM.
 
 **Key Features:**
+
 - 60% token reduction vs. Markdown
 - Prefix-based syntax (`!`, `@`, `?`, `>>`, `$`)
 - Integration with Kernel Shield
@@ -45,6 +49,7 @@ Token-optimized shorthand for machine-to-machine communication between Kernel an
 ---
 
 ### [Model Configuration](model-config.md)
+
 **Status:** Active Proposal
 
 _[Existing proposal - refer to file for details]_
@@ -79,6 +84,7 @@ Archived ←──────────────────────�
 ### Discussion
 
 For proposal discussions:
+
 - Open GitHub Issues tagged with `proposal`
 - Join Discord #proposals channel
 - Comment on related pull requests
@@ -115,10 +121,12 @@ What other approaches were evaluated?
 ## Implementation Roadmap
 
 ### Phase 1: Foundation
+
 - [ ] Task 1
 - [ ] Task 2
 
 ### Phase 2: Integration
+
 ...
 
 ## Related Documentation

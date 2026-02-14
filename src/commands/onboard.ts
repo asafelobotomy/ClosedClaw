@@ -60,8 +60,6 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
     await handleReset("full", resolveUserPath(workspaceDefault), runtime);
   }
 
-
-
   if (normalizedOpts.nonInteractive) {
     await runNonInteractiveOnboarding(normalizedOpts, runtime);
     return;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { ClosedClawConfig } from "./types.js";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
+import type { ClosedClawConfig } from "./types.js";
 import {
   filterChannelsForGtkOnlyMode,
   formatGtkOnlyModeStatus,
@@ -88,10 +88,7 @@ describe("filterChannelsForGtkOnlyMode", () => {
 
   it("returns empty array when GTK plugin not registered", () => {
     const cfg = makeConfig({ channels: { mode: "gtk-only" } });
-    const result = filterChannelsForGtkOnlyMode(
-      [webchatPlugin, otherPlugin],
-      cfg,
-    );
+    const result = filterChannelsForGtkOnlyMode([webchatPlugin, otherPlugin], cfg);
     expect(result).toEqual([]);
   });
 });

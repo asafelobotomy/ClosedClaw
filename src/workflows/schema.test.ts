@@ -22,7 +22,12 @@ describe("parseWorkflowDefinition", () => {
       trigger: { cron: "0 9 * * FRI" },
       steps: [
         { name: "step1", tool: "fetch_data", params: { url: "https://api.example.com" } },
-        { name: "step2", agent: "main", prompt: "Summarize: {{steps.step1.output}}", dependsOn: ["step1"] },
+        {
+          name: "step2",
+          agent: "main",
+          prompt: "Summarize: {{steps.step1.output}}",
+          dependsOn: ["step1"],
+        },
       ],
     });
 
@@ -107,57 +112,64 @@ describe("parseWorkflowDefinition", () => {
   });
 
   it("throws on missing name", () => {
-    expect(() => parseWorkflowDefinition({ steps: [{ name: "s1", tool: "test" }] }))
-      .toThrow(WorkflowValidationError);
+    expect(() => parseWorkflowDefinition({ steps: [{ name: "s1", tool: "test" }] })).toThrow(
+      WorkflowValidationError,
+    );
   });
 
   it("throws on empty steps", () => {
-    expect(() => parseWorkflowDefinition({ name: "empty", steps: [] }))
-      .toThrow(WorkflowValidationError);
+    expect(() => parseWorkflowDefinition({ name: "empty", steps: [] })).toThrow(
+      WorkflowValidationError,
+    );
   });
 
   it("throws on step without tool or agent", () => {
-    expect(() => parseWorkflowDefinition({ name: "bad", steps: [{ name: "s1" }] }))
-      .toThrow(WorkflowValidationError);
+    expect(() => parseWorkflowDefinition({ name: "bad", steps: [{ name: "s1" }] })).toThrow(
+      WorkflowValidationError,
+    );
   });
 
   it("throws on unknown dependency", () => {
-    expect(() => parseWorkflowDefinition({
-      name: "bad-dep",
-      steps: [
-        { name: "s1", tool: "test", dependsOn: ["nonexistent"] },
-      ],
-    })).toThrow(WorkflowValidationError);
+    expect(() =>
+      parseWorkflowDefinition({
+        name: "bad-dep",
+        steps: [{ name: "s1", tool: "test", dependsOn: ["nonexistent"] }],
+      }),
+    ).toThrow(WorkflowValidationError);
   });
 
   it("throws on self-dependency", () => {
-    expect(() => parseWorkflowDefinition({
-      name: "self-dep",
-      steps: [
-        { name: "s1", tool: "test", dependsOn: ["s1"] },
-      ],
-    })).toThrow(WorkflowValidationError);
+    expect(() =>
+      parseWorkflowDefinition({
+        name: "self-dep",
+        steps: [{ name: "s1", tool: "test", dependsOn: ["s1"] }],
+      }),
+    ).toThrow(WorkflowValidationError);
   });
 
   it("throws on duplicate step names", () => {
-    expect(() => parseWorkflowDefinition({
-      name: "dupes",
-      steps: [
-        { name: "s1", tool: "test" },
-        { name: "s1", tool: "test2" },
-      ],
-    })).toThrow(WorkflowValidationError);
+    expect(() =>
+      parseWorkflowDefinition({
+        name: "dupes",
+        steps: [
+          { name: "s1", tool: "test" },
+          { name: "s1", tool: "test2" },
+        ],
+      }),
+    ).toThrow(WorkflowValidationError);
   });
 
   it("throws on dependency cycle", () => {
-    expect(() => parseWorkflowDefinition({
-      name: "cycle",
-      steps: [
-        { name: "a", tool: "test", dependsOn: ["b"] },
-        { name: "b", tool: "test", dependsOn: ["c"] },
-        { name: "c", tool: "test", dependsOn: ["a"] },
-      ],
-    })).toThrow(/cycle/i);
+    expect(() =>
+      parseWorkflowDefinition({
+        name: "cycle",
+        steps: [
+          { name: "a", tool: "test", dependsOn: ["b"] },
+          { name: "b", tool: "test", dependsOn: ["c"] },
+          { name: "c", tool: "test", dependsOn: ["a"] },
+        ],
+      }),
+    ).toThrow(/cycle/i);
   });
 
   it("throws on non-object input", () => {
@@ -171,9 +183,30 @@ describe("parseWorkflowDefinition", () => {
 describe("topologicalSort", () => {
   it("sorts independent steps into one batch", () => {
     const steps = [
-      { name: "a", type: "tool" as const, tool: "test", timeoutMs: 300000, continueOnError: false, retryCount: 0 },
-      { name: "b", type: "tool" as const, tool: "test", timeoutMs: 300000, continueOnError: false, retryCount: 0 },
-      { name: "c", type: "tool" as const, tool: "test", timeoutMs: 300000, continueOnError: false, retryCount: 0 },
+      {
+        name: "a",
+        type: "tool" as const,
+        tool: "test",
+        timeoutMs: 300000,
+        continueOnError: false,
+        retryCount: 0,
+      },
+      {
+        name: "b",
+        type: "tool" as const,
+        tool: "test",
+        timeoutMs: 300000,
+        continueOnError: false,
+        retryCount: 0,
+      },
+      {
+        name: "c",
+        type: "tool" as const,
+        tool: "test",
+        timeoutMs: 300000,
+        continueOnError: false,
+        retryCount: 0,
+      },
     ];
 
     const batches = topologicalSort(steps);
@@ -183,9 +216,32 @@ describe("topologicalSort", () => {
 
   it("sorts sequential dependencies", () => {
     const steps = [
-      { name: "a", type: "tool" as const, tool: "test", timeoutMs: 300000, continueOnError: false, retryCount: 0 },
-      { name: "b", type: "tool" as const, tool: "test", dependsOn: ["a"], timeoutMs: 300000, continueOnError: false, retryCount: 0 },
-      { name: "c", type: "tool" as const, tool: "test", dependsOn: ["b"], timeoutMs: 300000, continueOnError: false, retryCount: 0 },
+      {
+        name: "a",
+        type: "tool" as const,
+        tool: "test",
+        timeoutMs: 300000,
+        continueOnError: false,
+        retryCount: 0,
+      },
+      {
+        name: "b",
+        type: "tool" as const,
+        tool: "test",
+        dependsOn: ["a"],
+        timeoutMs: 300000,
+        continueOnError: false,
+        retryCount: 0,
+      },
+      {
+        name: "c",
+        type: "tool" as const,
+        tool: "test",
+        dependsOn: ["b"],
+        timeoutMs: 300000,
+        continueOnError: false,
+        retryCount: 0,
+      },
     ];
 
     const batches = topologicalSort(steps);
@@ -197,10 +253,41 @@ describe("topologicalSort", () => {
 
   it("parallelizes independent branches", () => {
     const steps = [
-      { name: "start", type: "tool" as const, tool: "test", timeoutMs: 300000, continueOnError: false, retryCount: 0 },
-      { name: "branch-a", type: "tool" as const, tool: "test", dependsOn: ["start"], timeoutMs: 300000, continueOnError: false, retryCount: 0 },
-      { name: "branch-b", type: "tool" as const, tool: "test", dependsOn: ["start"], timeoutMs: 300000, continueOnError: false, retryCount: 0 },
-      { name: "end", type: "tool" as const, tool: "test", dependsOn: ["branch-a", "branch-b"], timeoutMs: 300000, continueOnError: false, retryCount: 0 },
+      {
+        name: "start",
+        type: "tool" as const,
+        tool: "test",
+        timeoutMs: 300000,
+        continueOnError: false,
+        retryCount: 0,
+      },
+      {
+        name: "branch-a",
+        type: "tool" as const,
+        tool: "test",
+        dependsOn: ["start"],
+        timeoutMs: 300000,
+        continueOnError: false,
+        retryCount: 0,
+      },
+      {
+        name: "branch-b",
+        type: "tool" as const,
+        tool: "test",
+        dependsOn: ["start"],
+        timeoutMs: 300000,
+        continueOnError: false,
+        retryCount: 0,
+      },
+      {
+        name: "end",
+        type: "tool" as const,
+        tool: "test",
+        dependsOn: ["branch-a", "branch-b"],
+        timeoutMs: 300000,
+        continueOnError: false,
+        retryCount: 0,
+      },
     ];
 
     const batches = topologicalSort(steps);
@@ -217,7 +304,7 @@ describe("interpolate", () => {
   const context: InterpolationContext = {
     steps: {
       "fetch-data": { output: "some data result", status: "completed" },
-      "summarize": { output: { key: "value" }, status: "completed" },
+      summarize: { output: { key: "value" }, status: "completed" },
     },
     variables: { title: "Weekly Report", version: "1.0" },
     env: { NODE_ENV: "production" },

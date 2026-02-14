@@ -1,11 +1,10 @@
 import { Type } from "@sinclair/typebox";
-import { TIMEOUT_HTTP_SHORT_MS } from "../../config/constants/index.js";
 import crypto from "node:crypto";
+import type { ClawTalkMessage } from "../clawtalk/types.js";
 import type { AnyAgentTool } from "./common.js";
 import { loadConfig } from "../../config/config.js";
+import { TIMEOUT_HTTP_SHORT_MS } from "../../config/constants/index.js";
 import { callGateway } from "../../gateway/call.js";
-import { serialize } from "../clawtalk/parser.js";
-import type { ClawTalkMessage } from "../clawtalk/types.js";
 import {
   isSubagentSessionKey,
   normalizeAgentId,
@@ -16,6 +15,7 @@ import {
   type GatewayMessageChannel,
   INTERNAL_MESSAGE_CHANNEL,
 } from "../../utils/message-channel.js";
+import { serialize } from "../clawtalk/parser.js";
 import { AGENT_LANE_NESTED } from "../lanes.js";
 import { jsonResult, readStringParam } from "./common.js";
 import {

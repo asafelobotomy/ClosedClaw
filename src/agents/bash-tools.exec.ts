@@ -1,10 +1,10 @@
 import type { AgentTool, AgentToolResult } from "@mariozechner/pi-agent-core";
-import { TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
 import type { ChildProcessWithoutNullStreams } from "node:child_process";
 import { Type } from "@sinclair/typebox";
 import crypto from "node:crypto";
 import path from "node:path";
 import type { BashSandboxConfig } from "./bash-tools.shared.js";
+import { TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
 import {
   type ExecAsk,
   type ExecHost,

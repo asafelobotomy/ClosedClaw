@@ -216,7 +216,7 @@ vi.mock("../process/exec.js", () => ({
   runCommandWithTimeout,
 }));
 
-vi.mock("../infra/openclaw-root.js", () => ({
+vi.mock("../infra/closedclaw-root.js", () => ({
   resolveClosedClawPackageRoot,
 }));
 
@@ -327,64 +327,68 @@ vi.mock("./doctor-state-migrations.js", () => ({
 }));
 
 describe("doctor command", () => {
-  it("warns when per-agent sandbox docker/browser/prune overrides are ignored under shared scope", async () => {
-    readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/ClosedClaw.json",
-      exists: true,
-      raw: "{}",
-      parsed: {},
-      valid: true,
-      config: {
-        agents: {
-          defaults: {
-            sandbox: {
-              mode: "all",
-              scope: "shared",
-            },
-          },
-          list: [
-            {
-              id: "work",
-              workspace: "~/ClosedClaw-work",
+  it(
+    "warns when per-agent sandbox docker/browser/prune overrides are ignored under shared scope",
+    async () => {
+      readConfigFileSnapshot.mockResolvedValue({
+        path: "/tmp/ClosedClaw.json",
+        exists: true,
+        raw: "{}",
+        parsed: {},
+        valid: true,
+        config: {
+          agents: {
+            defaults: {
               sandbox: {
                 mode: "all",
                 scope: "shared",
-                docker: {
-                  setupCommand: "echo work",
-                },
               },
             },
-          ],
+            list: [
+              {
+                id: "work",
+                workspace: "~/ClosedClaw-work",
+                sandbox: {
+                  mode: "all",
+                  scope: "shared",
+                  docker: {
+                    setupCommand: "echo work",
+                  },
+                },
+              },
+            ],
+          },
         },
-      },
-      issues: [],
-      legacyIssues: [],
-    });
+        issues: [],
+        legacyIssues: [],
+      });
 
-    note.mockClear();
+      note.mockClear();
 
-    const { doctorCommand } = await import("./doctor.js");
-    const runtime = {
-      log: vi.fn(),
-      error: vi.fn(),
-      exit: vi.fn(),
-    };
+      const { doctorCommand } = await import("./doctor.js");
+      const runtime = {
+        log: vi.fn(),
+        error: vi.fn(),
+        exit: vi.fn(),
+      };
 
-    await doctorCommand(runtime, { nonInteractive: true });
+      await doctorCommand(runtime, { nonInteractive: true });
 
-    expect(
-      note.mock.calls.some(([message, title]) => {
-        if (title !== "Sandbox" || typeof message !== "string") {
-          return false;
-        }
-        const normalized = message.replace(/\s+/g, " ").trim();
-        return (
-          normalized.includes('agents.list (id "work") sandbox docker') &&
-          normalized.includes('scope resolves to "shared"')
-        );
-      }),
-    ).toBe(true);
-  }, TIMEOUT_HTTP_DEFAULT_MS);
+      expect(
+        note.mock.calls.some(([message, title]) => {
+          if (title !== "Sandbox" || typeof message !== "string") {
+            return false;
+          }
+          const normalized = message.replace(/\s+/g, " ").trim();
+          return (
+            normalized.includes('agents.list (id "work") sandbox docker') &&
+            normalized.includes('scope resolves to "shared"')
+          );
+        }),
+      ).toBe(true);
+    },
+    TIMEOUT_HTTP_DEFAULT_MS,
+  );
 
   it("does not warn when only the active workspace is present", async () => {
     readConfigFileSnapshot.mockResolvedValue({

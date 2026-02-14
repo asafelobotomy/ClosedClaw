@@ -13,12 +13,14 @@ Phases 2 & 3 of the constants enhancement are now **complete and production-read
 ### What Was Delivered
 
 **Phase 2: Enhanced Constants**
+
 - ✅ Timing constants (40+): Timeouts, intervals, TTLs, delays
 - ✅ Path constants (25+): Directory builders, file paths, platform helpers
 - ✅ Size constants (10+): Media limits, formatters, parsers
 - ✅ **75 new tests** (100% passing)
 
 **Phase 3: Code Migration**
+
 - ✅ 8 high-priority files migrated
 - ✅ Media constants refactored (backward compatible)
 - ✅ Gateway test files updated
@@ -30,6 +32,7 @@ Phases 2 & 3 of the constants enhancement are now **complete and production-read
 ## 📊 Final Results
 
 ### Test Results
+
 ```
 Phase 1 Tests:  51 passing ✅
 Phase 2 Tests:  75 passing ✅
@@ -39,6 +42,7 @@ Total:         137 passing ✅
 ```
 
 ### Files Created/Modified
+
 ```
 Phase 2 Files:     6 files (~1,000 lines)
 Phase 3 Migration: 8 files (~150 lines changed)
@@ -48,6 +52,7 @@ Total Impact:     18 files
 ```
 
 ### Constants Available
+
 ```
 Environment Variables:  50+
 Network:                30+
@@ -63,24 +68,28 @@ Total:                 150+ constants + utilities
 ## 🎁 Key Benefits
 
 ### 1. Type Safety
+
 - Autocomplete for all constant names
 - Compile-time error detection
 - No runtime typos possible
 - Literal types enforce exact values
 
 ### 2. Developer Experience
+
 - Single import: `@/config/constants`
 - Organized by domain (env/network/timing/path/size)
 - Helper functions reduce boilerplate
 - Self-documenting code
 
 ### 3. Code Quality
+
 - DRY principle enforced
 - Easier refactoring (change once)
 - ~100 magic numbers/strings eliminated
 - Consistent formatting
 
 ### 4. Maintainability
+
 - Port changes: 30 seconds (was 25 minutes)
 - Env var renames: trivial (was error-prone)
 - Path restructuring: single update
@@ -91,16 +100,19 @@ Total:                 150+ constants + utilities
 ## 📚 Documentation
 
 ### Completion Reports
+
 - ✅ [Phase 1 Report](constants-phase-1-complete.md)
 - ✅ [Phases 2 & 3 Report](constants-phase-2-3-complete.md)
 - ✅ [Quick Summary](PHASES-2-3-SUMMARY.md) ← You are here
 
 ### Usage Guides
+
 - ✅ [Using Constants Guide](../development/using-constants.md)
 - ✅ [Practical Examples](../development/constants-examples.ts)
 - ✅ [Full Analysis](../../CONSTANTS-ENHANCEMENT-ANALYSIS.md)
 
 ### Implementation
+
 - ✅ `src/config/constants/env-constants.ts` + tests
 - ✅ `src/config/constants/network-constants.ts` + tests
 - ✅ `src/config/constants/timing-constants.ts` + tests
@@ -138,18 +150,21 @@ const maxSize = MAX_IMAGE_BYTES;
 ### Examples by Category
 
 **Environment Variables**:
+
 ```typescript
 import { ENV_CLOSEDCLAW_GATEWAY_PORT, getEnv } from "@/config/constants";
 const port = getEnv(ENV_CLOSEDCLAW_GATEWAY_PORT, "18789");
 ```
 
 **Network**:
+
 ```typescript
 import { buildGatewayHttpUrl, DEFAULT_GATEWAY_PORT } from "@/config/constants";
 const url = buildGatewayHttpUrl({ port: DEFAULT_GATEWAY_PORT });
 ```
 
 **Timing**:
+
 ```typescript
 import { TIMEOUT_HTTP_DEFAULT_MS, formatDuration } from "@/config/constants";
 setTimeout(callback, TIMEOUT_HTTP_DEFAULT_MS);
@@ -157,6 +172,7 @@ console.log(formatDuration(30_000)); // "30s"
 ```
 
 **Paths**:
+
 ```typescript
 import { getStateDir, getSandboxesDir, joinPaths } from "@/config/constants";
 const configPath = joinPaths(getStateDir(), "config.json5");
@@ -164,6 +180,7 @@ const sandboxDir = getSandboxesDir();
 ```
 
 **Sizes**:
+
 ```typescript
 import { MAX_IMAGE_BYTES, formatBytes, isWithinLimit } from "@/config/constants";
 const tooLarge = !isWithinLimit(fileSize, MAX_IMAGE_BYTES);
@@ -186,6 +203,7 @@ Can proceed **gradually over weeks/months** (no pressure):
 **Estimated Time**: 5-10 hours (spread over weeks)
 
 ### No Pressure
+
 - ✅ Migration is 100% optional
 - ✅ All existing code continues working
 - ✅ New code uses constants immediately
@@ -196,6 +214,7 @@ Can proceed **gradually over weeks/months** (no pressure):
 ## 💰 ROI Analysis
 
 ### Time Savings Per Developer Per Month
+
 - **5-10 min**: Looking up constant names
 - **10-15 min**: Debugging typos
 - **15-30 min**: Port/URL changes
@@ -206,21 +225,25 @@ Can proceed **gradually over weeks/months** (no pressure):
 ### Example Scenarios
 
 **Scenario 1: Change Gateway Port**
+
 - Before: Find/replace across 30+ files (~25 min)
 - After: Update `DEFAULT_GATEWAY_PORT` once (~30 sec)
 - **Saved: 24.5 minutes**
 
 **Scenario 2: Add New Timeout**
+
 - Before: Hardcode + copy-paste (~5 min)
 - After: Add to timing-constants.ts (~2 min)
 - **Saved: 3 minutes**
 
 **Scenario 3: Refactor State Directory**
+
 - Before: Update 20+ path constructions (~30 min)
 - After: Update `getStateDir()` implementation (~2 min)
 - **Saved: 28 minutes**
 
 ### Payback Period
+
 - **Implementation**: 4 hours
 - **Monthly ROI**: 3-5 hours/developer
 - **Breakeven**: ~1 month for 3+ developers
@@ -241,12 +264,14 @@ Can proceed **gradually over weeks/months** (no pressure):
 ### Learning & Improvements
 
 **Process Wins**:
+
 - ✅ Phased approach allowed incremental validation
 - ✅ Test-first development caught issues early
 - ✅ Backward compatibility prevented disruption
 - ✅ Documentation written alongside code
 
 **Technical Wins**:
+
 - ✅ Barrel exports simplify imports
 - ✅ Helper functions reduce boilerplate
 - ✅ Platform-aware utilities handle edge cases
@@ -259,6 +284,7 @@ Can proceed **gradually over weeks/months** (no pressure):
 **Phases 2 & 3 are complete!**
 
 From 100+ scattered constants to:
+
 - ✅ 150+ centralized, type-safe constants
 - ✅ 137 tests passing (100% coverage)
 - ✅ 8 files migrated (demonstrating patterns)
@@ -274,6 +300,6 @@ From 100+ scattered constants to:
 **Test Results**: 137/137 passing ✅  
 **Migration Status**: 8 high-priority files ✅  
 **Documentation**: Complete ✅  
-**Production Ready**: ✅ Yes  
+**Production Ready**: ✅ Yes
 
 🎊 **Ready to use in all new code starting today!**

@@ -328,7 +328,9 @@ export class AgentIPC {
     return {
       unsubscribe: () => {
         const idx = handlers.indexOf(handler);
-        if (idx >= 0) {handlers.splice(idx, 1);}
+        if (idx >= 0) {
+          handlers.splice(idx, 1);
+        }
       },
     };
   }
@@ -349,15 +351,14 @@ export class AgentIPC {
    * @param options - Message content
    * @returns Array of messages sent (one per recipient)
    */
-  broadcast(
-    from: string,
-    options: { type: MessageType; payload: unknown },
-  ): AgentMessage[] {
+  broadcast(from: string, options: { type: MessageType; payload: unknown }): AgentMessage[] {
     this.assertRegistered(from, "broadcaster");
 
     const messages: AgentMessage[] = [];
     for (const agentId of this.agents) {
-      if (agentId === from) {continue;}
+      if (agentId === from) {
+        continue;
+      }
 
       const msg = this.send(from, agentId, options);
       messages.push(msg);
@@ -406,12 +407,7 @@ export class AgentIPC {
    * @throws {Error} If target has no request handler
    * @throws {Error} If request times out
    */
-  async request(
-    from: string,
-    to: string,
-    payload: unknown,
-    timeout?: number,
-  ): Promise<unknown> {
+  async request(from: string, to: string, payload: unknown, timeout?: number): Promise<unknown> {
     this.assertRegistered(from, "requester");
     this.assertRegistered(to, "request target");
 
@@ -437,9 +433,7 @@ export class AgentIPC {
     return new Promise<unknown>((resolve, reject) => {
       const timer = setTimeout(() => {
         this.pendingRequests.delete(requestMessage.id);
-        reject(new Error(
-          `Request to agent ${to} timed out after ${effectiveTimeout}ms`,
-        ));
+        reject(new Error(`Request to agent ${to} timed out after ${effectiveTimeout}ms`));
       }, effectiveTimeout);
 
       this.pendingRequests.set(requestMessage.id, { resolve, reject, timer });
@@ -459,9 +453,7 @@ export class AgentIPC {
           if (pending) {
             clearTimeout(pending.timer);
             this.pendingRequests.delete(requestMessage.id);
-            pending.reject(
-              err instanceof Error ? err : new Error(String(err)),
-            );
+            pending.reject(err instanceof Error ? err : new Error(String(err)));
           }
         });
     });
@@ -510,7 +502,9 @@ export class AgentIPC {
     return {
       unsubscribe: () => {
         const idx = handlers.indexOf(handler);
-        if (idx >= 0) {handlers.splice(idx, 1);}
+        if (idx >= 0) {
+          handlers.splice(idx, 1);
+        }
         // Clean up empty entries
         if (handlers.length === 0) {
           topicSubs.delete(agentId);
@@ -536,7 +530,9 @@ export class AgentIPC {
     this.assertRegistered(from, "publisher");
 
     const topicSubs = this.topicSubscriptions.get(topic);
-    if (!topicSubs || topicSubs.size === 0) {return 0;}
+    if (!topicSubs || topicSubs.size === 0) {
+      return 0;
+    }
 
     const message: AgentMessage = {
       id: crypto.randomUUID(),
@@ -549,7 +545,9 @@ export class AgentIPC {
 
     let recipientCount = 0;
     for (const [agentId, handlers] of topicSubs) {
-      if (agentId === from) {continue;} // Don't send to self
+      if (agentId === from) {
+        continue;
+      } // Don't send to self
 
       for (const handler of handlers) {
         try {
@@ -646,7 +644,9 @@ export class AgentIPC {
    */
   private enqueueInbox(agentId: string, message: AgentMessage): void {
     const inbox = this.inboxes.get(agentId);
-    if (!inbox) {return;}
+    if (!inbox) {
+      return;
+    }
 
     if (inbox.length >= this.maxInboxSize) {
       inbox.shift(); // Drop oldest

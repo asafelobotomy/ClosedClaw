@@ -1,7 +1,11 @@
 import { existsSync } from "node:fs";
 import { formatCliCommand } from "../cli/command-format.js";
 import { promptYesNo } from "../cli/prompt.js";
-import { secondsToMs, TIMEOUT_TEST_SUITE_MEDIUM_MS, TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
+import {
+  secondsToMs,
+  TIMEOUT_TEST_SUITE_MEDIUM_MS,
+  TIMEOUT_TEST_SUITE_SHORT_MS,
+} from "../config/constants/index.js";
 import { danger, info, logVerbose, shouldLogVerbose, warn } from "../globals.js";
 import { runExec } from "../process/exec.js";
 import { defaultRuntime, type RuntimeEnv } from "../runtime.js";

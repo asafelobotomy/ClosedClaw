@@ -13,8 +13,8 @@ This directory contains internal analysis, reviews, and reference documents that
 ## When to Reference
 
 These documents are helpful for:
+
 - Understanding architectural decisions and trade-offs
 - Planning future refactoring efforts
 - Tracking outstanding work items
 - Historical context on major feature implementations
-

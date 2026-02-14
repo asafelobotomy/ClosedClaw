@@ -1,5 +1,5 @@
-import { runCommandWithTimeout } from "../process/exec.js";
 import { secondsToMs } from "../config/constants/index.js";
+import { runCommandWithTimeout } from "../process/exec.js";
 
 export async function copyToClipboard(value: string): Promise<boolean> {
   const attempts: Array<{ argv: string[] }> = [

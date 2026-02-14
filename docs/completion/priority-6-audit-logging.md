@@ -28,6 +28,7 @@ Four comprehensive CLI commands for audit log access:
 - **Verify**: `closedclaw security log verify` - Hash chain integrity check
 
 **Features**:
+
 - Relative time parsing (1h, 30m, 7d)
 - ISO 8601 absolute times
 - Multiple filter combinations
@@ -43,6 +44,7 @@ Four comprehensive CLI commands for audit log access:
 Centralized audit logging for all security-relevant events:
 
 **Event Types**:
+
 - `tool_exec` - Tool executions (bash, file ops, network requests)
 - `config_change` - Configuration modifications
 - `skill_install`/`skill_uninstall` - Skill lifecycle events
@@ -56,6 +58,7 @@ Centralized audit logging for all security-relevant events:
 - `upstream_sync` - Upstream tracking events
 
 **Design**:
+
 - Singleton audit logger pattern
 - Automatic initialization on first use
 - Graceful failure (never crashes if audit fails)
@@ -64,11 +67,13 @@ Centralized audit logging for all security-relevant events:
 ### 3. Integration Points
 
 **Modified Files**:
+
 - `src/agents/skills-install.ts` (+15 lines) - Logs skill installations with verification status
 - `src/config/io.ts` (+10 lines) - Logs all config writes
 - `src/cli/security-cli.ts` (+80 lines) - Registered audit log subcommands
 
 **Future Integration Points** (documented for later):
+
 - Tool executions in `bash-tools.exec.ts`
 - Credential access in auth modules
 - Gateway lifecycle events
@@ -77,10 +82,12 @@ Centralized audit logging for all security-relevant events:
 ### 4. Comprehensive Tests (830 lines)
 
 **Files**:
+
 - `src/commands/audit-query.test.ts` (450 lines) - 40+ tests for CLI commands
 - `src/security/audit-hooks.test.ts` (380 lines) - 30+ tests for integration hooks
 
 **Test Coverage**:
+
 - Query filtering (type, severity, time, actor, session, text)
 - Statistics and integrity verification
 - CSV/JSON export
@@ -93,10 +100,12 @@ Centralized audit logging for all security-relevant events:
 ### 5. Documentation (710 lines)
 
 **Files**:
+
 - `docs/security/audit-logging.md` (650 lines) - Complete guide
 - `docs/cli/security.md` (+60 lines) - CLI reference update
 
 **Documentation Sections**:
+
 - Quick start guide
 - What gets logged (detailed event type reference)
 - Audit log format and schema
@@ -117,6 +126,7 @@ Centralized audit logging for all security-relevant events:
 **File**: `src/security/audit-logger.ts` (570 lines)
 
 The foundational audit logging infrastructure was already implemented:
+
 - JSONL format (one event per line)
 - SHA-256 hash chain for tamper detection
 - Append-only file writes
@@ -137,11 +147,24 @@ The foundational audit logging infrastructure was already implemented:
 **Location**: `~/.closedclaw/audit.log`
 
 **Format**: JSONL (JSON Lines)
+
 ```json
-{"seq":1,"ts":"2026-02-10T15:30:00.000Z","type":"tool_exec","severity":"info","summary":"Tool: bash | Command: echo hello","details":{"tool":"bash","command":"echo hello","result":"success"},"actor":"agent:main","session":"agent:main:whatsapp:dm:+1234567890","prevHash":"0000...","hash":"a3f2..."}
+{
+  "seq": 1,
+  "ts": "2026-02-10T15:30:00.000Z",
+  "type": "tool_exec",
+  "severity": "info",
+  "summary": "Tool: bash | Command: echo hello",
+  "details": { "tool": "bash", "command": "echo hello", "result": "success" },
+  "actor": "agent:main",
+  "session": "agent:main:whatsapp:dm:+1234567890",
+  "prevHash": "0000...",
+  "hash": "a3f2..."
+}
 ```
 
 **Hash Chain**:
+
 ```
 Genesis → Entry 1 → Entry 2 → Entry 3 → ...
 (000000)   (hash1)    (hash2)    (hash3)
@@ -169,6 +192,7 @@ Each entry's `hash` is computed from all other fields. The `prevHash` links to t
 ### Limitations and Future Work
 
 **Not Currently Implemented** (documented for future):
+
 - Automatic log rotation
 - Built-in encryption (use filesystem encryption)
 - Real-time streaming to SIEM
@@ -176,6 +200,7 @@ Each entry's `hash` is computed from all other fields. The `prevHash` links to t
 - Compression for old logs
 
 **Workarounds Documented**:
+
 - Manual log rotation via scripts
 - Filesystem-level encryption (LUKS)
 - Cron-based exports to SIEM
@@ -261,8 +286,21 @@ await logSkillInstall({
 ```
 
 Logs:
+
 ```json
-{"seq":42,"ts":"2026-02-10T15:30:00Z","type":"skill_install","severity":"info","summary":"Skill install: weather (verified: yes)","details":{"skillId":"weather","skillPath":"~/.closedclaw/workspace/skills/weather/SKILL.md","verified":true,"signer":"publisher@example.com"}}
+{
+  "seq": 42,
+  "ts": "2026-02-10T15:30:00Z",
+  "type": "skill_install",
+  "severity": "info",
+  "summary": "Skill install: weather (verified: yes)",
+  "details": {
+    "skillId": "weather",
+    "skillPath": "~/.closedclaw/workspace/skills/weather/SKILL.md",
+    "verified": true,
+    "signer": "publisher@example.com"
+  }
+}
 ```
 
 ### Config Change
@@ -276,8 +314,16 @@ await logConfigChange({
 ```
 
 Logs:
+
 ```json
-{"seq":43,"ts":"2026-02-10T15:31:00Z","type":"config_change","severity":"info","summary":"Config update: ~/.closedclaw/config.json5","details":{"action":"update","path":"~/.closedclaw/config.json5"}}
+{
+  "seq": 43,
+  "ts": "2026-02-10T15:31:00Z",
+  "type": "config_change",
+  "severity": "info",
+  "summary": "Config update: ~/.closedclaw/config.json5",
+  "details": { "action": "update", "path": "~/.closedclaw/config.json5" }
+}
 ```
 
 ### Tool Execution (Future)
@@ -356,6 +402,7 @@ pnpm test -- src/security src/commands/audit-query
 ### Test Coverage
 
 **Query Commands** (audit-query.test.ts):
+
 - Missing log file handling
 - Query all entries
 - Filter by event type
@@ -373,6 +420,7 @@ pnpm test -- src/security src/commands/audit-query
 - Tamper detection
 
 **Integration Hooks** (audit-hooks.test.ts):
+
 - Successful tool execution logging
 - Failed tool execution with errors
 - Execution duration tracking
@@ -456,11 +504,13 @@ pnpm test -- src/security src/commands/audit-query
 ## Related Priorities
 
 **Completed**:
+
 - Priority 3: Memory Storage Encryption ✅
 - Priority 4: Skill/Plugin Signing & Verification ✅
 - Priority 6: Immutable Audit Logging ✅
 
 **Pending**:
+
 - Priority 7: OS Keychain Integration 🔜
 
 ---

@@ -11,7 +11,9 @@ import { readChannelAllowFromStore } from "../pairing/pairing-store.js";
 import { note } from "../terminal/note.js";
 
 export async function noteSecurityWarnings(cfg: ClosedClawConfig) {
+  const critical: string[] = [];
   const warnings: string[] = [];
+  const infos: string[] = [];
   const auditHint = `- Run: ${formatCliCommand("ClosedClaw security audit --deep")}`;
 
   // ===========================================
@@ -59,7 +61,7 @@ export async function noteSecurityWarnings(cfg: ClosedClawConfig) {
                 "ClosedClaw config set gateway.auth.mode token",
               )}`,
             ];
-      warnings.push(
+        critical.push(
         `- CRITICAL: Gateway bound to ${bindDescriptor} without authentication.`,
         `  Anyone on your network (or internet if port-forwarded) can fully control your agent.`,
         `  Fix: ${formatCliCommand("ClosedClaw config set gateway.bind loopback")}`,
@@ -113,7 +115,7 @@ export async function noteSecurityWarnings(cfg: ClosedClawConfig) {
     }
 
     if (dmPolicy === "disabled") {
-      warnings.push(`- ${params.label} DMs: disabled (${policyPath}="disabled").`);
+      infos.push(`- ${params.label} DMs: disabled (${policyPath}="disabled").`);
       return;
     }
 
@@ -181,7 +183,22 @@ export async function noteSecurityWarnings(cfg: ClosedClawConfig) {
     }
   }
 
-  const lines = warnings.length > 0 ? warnings : ["- No channel security warnings detected."];
+  const lines: string[] = [];
+  if (critical.length > 0) {
+    lines.push("CRITICAL:", ...critical);
+  }
+  if (warnings.length > 0) {
+    if (critical.length > 0) {
+      lines.push("Warnings:");
+    }
+    lines.push(...warnings);
+  }
+  if (infos.length > 0) {
+    lines.push("Info:", ...infos);
+  }
+  if (lines.length === 0) {
+    lines.push("- No channel security warnings detected.");
+  }
   lines.push(auditHint);
   note(lines.join("\n"), "Security");
 

@@ -1,5 +1,5 @@
 import { formatCliCommand } from "../cli/command-format.js";
-import { resolveClosedClawPackageRoot } from "../infra/openclaw-root.js";
+import { resolveClosedClawPackageRoot } from "../infra/closedclaw-root.js";
 import {
   checkUpdateStatus,
   compareSemverStrings,

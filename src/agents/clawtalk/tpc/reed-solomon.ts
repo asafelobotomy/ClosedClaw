@@ -54,13 +54,19 @@ function assertValidNsym(nsym: number): void {
 // ---------------------------------------------------------------------------
 
 function gfMul(a: number, b: number): number {
-  if (a === 0 || b === 0) return 0;
+  if (a === 0 || b === 0) {
+    return 0;
+  }
   return EXP_TABLE[LOG_TABLE[a] + LOG_TABLE[b]];
 }
 
 function gfDiv(a: number, b: number): number {
-  if (b === 0) throw new Error("Division by zero in GF(2^8)");
-  if (a === 0) return 0;
+  if (b === 0) {
+    throw new Error("Division by zero in GF(2^8)");
+  }
+  if (a === 0) {
+    return 0;
+  }
   return EXP_TABLE[(LOG_TABLE[a] - LOG_TABLE[b] + 255) % 255];
 }
 
@@ -233,9 +239,7 @@ function findErrors(errLoc: Uint8Array, msgLen: number): number[] {
   }
 
   if (positions.length !== errs) {
-    throw new ReedSolomonError(
-      `Could not locate all errors: found ${positions.length} of ${errs}`,
-    );
+    throw new ReedSolomonError(`Could not locate all errors: found ${positions.length} of ${errs}`);
   }
 
   return positions;
@@ -430,7 +434,9 @@ export function rsDecodePayload(encoded: Uint8Array, nsym: number = 32): Uint8Ar
 
   for (let i = 0; i < numBlocks; i++) {
     if (offset >= encoded.length) {
-      throw new ReedSolomonError(`Truncated payload: expected ${numBlocks} blocks, ended at block ${i}`);
+      throw new ReedSolomonError(
+        `Truncated payload: expected ${numBlocks} blocks, ended at block ${i}`,
+      );
     }
 
     const dataLen = encoded[offset];
@@ -445,7 +451,9 @@ export function rsDecodePayload(encoded: Uint8Array, nsym: number = 32): Uint8Ar
 
     const blockLen = dataLen + nsym;
     if (offset + blockLen > encoded.length) {
-      throw new ReedSolomonError(`Truncated block ${i}: need ${blockLen} bytes, have ${encoded.length - offset}`);
+      throw new ReedSolomonError(
+        `Truncated block ${i}: need ${blockLen} bytes, have ${encoded.length - offset}`,
+      );
     }
 
     const block = encoded.subarray(offset, offset + blockLen);

@@ -15,7 +15,6 @@ import { loadConfig } from "../config/config.js";
 // Slack HTTP handler removed — channel archived.
 import { handleControlUiAvatarRequest, handleControlUiHttpRequest } from "./control-ui.js";
 import { applyHookMappings } from "./hooks-mapping.js";
-import { validateClientIp } from "./net.js";
 import {
   extractHookToken,
   getHookChannelError,
@@ -28,6 +27,7 @@ import {
   resolveHookChannel,
   resolveHookDeliver,
 } from "./hooks.js";
+import { validateClientIp } from "./net.js";
 import { handleOpenAiHttpRequest } from "./openai-http.js";
 import { handleOpenResponsesHttpRequest } from "./openresponses-http.js";
 import { RateLimiter } from "./rate-limiter.js";
@@ -263,7 +263,7 @@ export function createGatewayHttpServer(opts: {
 
     // --- IP validation (defense-in-depth for bind mode policy) ---
     const configForIp = loadConfig();
-    const bindMode = (configForIp.gateway?.bind ?? "loopback");
+    const bindMode = configForIp.gateway?.bind ?? "loopback";
     const ipCheck = validateClientIp(clientIp, bindMode);
     if (!ipCheck.allowed) {
       res.statusCode = 403;
@@ -275,7 +275,10 @@ export function createGatewayHttpServer(opts: {
     // Apply baseline security headers to all HTTP responses.
     // Baseline CSP — no inline scripts allowed. HTML pages that inject inline
     // scripts (control-ui) override this header with a per-request nonce.
-    res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; frame-ancestors 'none'");
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; frame-ancestors 'none'",
+    );
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "DENY");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");

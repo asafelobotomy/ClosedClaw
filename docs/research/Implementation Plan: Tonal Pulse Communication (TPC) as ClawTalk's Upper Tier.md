@@ -14,6 +14,7 @@ This plan implements **Tonal Pulse Communication (TPC)** as the **default commun
 ### 1.1 Current State: ClawTalk 2.1
 
 ClawTalk provides efficient text-based communication:
+
 - **CT/1 wire protocol**: Structured command format (REQ/RES/TASK/STATUS/ERR/ACK/MULTI)
 - **Telegraphic English**: Compressed natural language for content
 - **Subagent routing**: Directory-based agent selection with skill compilation
@@ -24,6 +25,7 @@ ClawTalk provides efficient text-based communication:
 ### 1.2 Proposed Upper Tier: TPC/GibberLink
 
 TPC adds a non-textual communication layer:
+
 - **State Delta Encoding (SDE)**: Modulates agent state transitions into audio signals
 - **GibberLink protocol**: FSK/GGWave-based encoding with Reed-Solomon FEC and Ed25519 signatures
 - **Transport modes**:
@@ -37,16 +39,17 @@ TPC adds a non-textual communication layer:
 
 **Core principle**: TPC is the default for all agent-to-agent communication. Text is used ONLY when necessary.
 
-| Scenario | Protocol | Rationale |
-|----------|----------|-----------|
-| User → Master Agent | **Text (fallback)** | Human writes natural language; must be readable by LLM |
-| Master Agent → User | **Text (fallback)** | Human must read response; no security risk in final output |
-| Master Agent → SubAgent | **TPC (default)** | ALL directives acoustic-encoded to prevent injection |
-| SubAgent → SubAgent | **TPC (default)** | Inter-agent coordination uses secure channel |
-| SubAgent → Master Agent | **TPC (default)** | Results encoded acoustically, decoded only after validation |
-| Master Agent → SubAgent (emergency) | **Text (fallback)** | TPC infrastructure failure; logged as security event |
+| Scenario                            | Protocol            | Rationale                                                   |
+| ----------------------------------- | ------------------- | ----------------------------------------------------------- |
+| User → Master Agent                 | **Text (fallback)** | Human writes natural language; must be readable by LLM      |
+| Master Agent → User                 | **Text (fallback)** | Human must read response; no security risk in final output  |
+| Master Agent → SubAgent             | **TPC (default)**   | ALL directives acoustic-encoded to prevent injection        |
+| SubAgent → SubAgent                 | **TPC (default)**   | Inter-agent coordination uses secure channel                |
+| SubAgent → Master Agent             | **TPC (default)**   | Results encoded acoustically, decoded only after validation |
+| Master Agent → SubAgent (emergency) | **Text (fallback)** | TPC infrastructure failure; logged as security event        |
 
 **Default policy**:
+
 - **TPC ALWAYS** for agent-to-agent communication
 - **Text ONLY** for human-facing I/O or when TPC infrastructure fails
 - Text fallback triggers security audit log entry
@@ -199,7 +202,14 @@ export async function beforeAgentStart(ctx: BeforeAgentStartContext) {
   const isAgentToAgent = ctx.source === "agent" || ctx.agentInitiated === true;
 
   // SECURE BY DEFAULT: Use TPC unless we must fallback to text
-  if (!shouldFallbackToText({ routing, config: ctx.config, securityContext: kernelShield, isAgentToAgent })) {
+  if (
+    !shouldFallbackToText({
+      routing,
+      config: ctx.config,
+      securityContext: kernelShield,
+      isAgentToAgent,
+    })
+  ) {
     const encoded = await encodeTPC({
       message: routing.wire,
       signingKey: await resolveSigningKey(ctx.config),
@@ -265,22 +275,26 @@ src/agents/clawtalk/tpc/probes/
 ### 3.2 Modified Files
 
 #### `src/agents/clawtalk/clawtalk-hook.ts`
+
 - Add `shouldFallbackToText()` decision logic (inverted from original plan)
 - Add `encodeTPC()` call for ALL agent-to-agent dispatch
 - Add `decodeTPC()` for inbound acoustic payloads
 - Add audit logging for TPC usage and text fallbacks
 
 #### `src/agents/clawtalk/directory.ts`
+
 - Add `allowTextFallback: boolean` field to `SubagentProfile` (default: false)
 - Parse `.claws` manifest Block 1 for text fallback permission
 - Mark legacy/debug agents that explicitly allow text
 
 #### `src/agents/clawtalk/kernel-shield.ts`
+
 - Add TPC as default transport in security layer
 - Log text fallbacks as security events
 - Emit `isAgentToAgent` flag in security context
 
 #### `src/config/types.clawtalk.ts`
+
 - Add TPC configuration schema
 
 ```typescript
@@ -304,6 +318,7 @@ export interface ClawTalkTPCConfig {
 ```
 
 #### `extensions/gtk-gui/src/monitor.ts`
+
 - Add TPC indicator in risk display
 - Show "Acoustic Transport" badge when TPC active
 
@@ -365,6 +380,7 @@ Add to `package.json`:
   - Unit tests: concurrent nonce checks
 
 **Verification**:
+
 ```bash
 pnpm test -- src/agents/clawtalk/tpc
 ```
@@ -395,6 +411,7 @@ pnpm test -- src/agents/clawtalk/tpc
   - Unit tests: agent-to-agent flag detection
 
 **Verification**:
+
 ```bash
 pnpm test -- src/agents/clawtalk
 pnpm test -- src/config/types.clawtalk.test.ts
@@ -419,6 +436,7 @@ pnpm test -- src/config/types.clawtalk.test.ts
   - Integration test: stats accumulate correctly
 
 **Verification**:
+
 ```bash
 pnpm test -- extensions/gtk-gui
 ```
@@ -448,6 +466,7 @@ pnpm test -- extensions/gtk-gui
   - Integration tests: loopback audio test
 
 **Verification**:
+
 ```bash
 python3 src/agents/clawtalk/tpc/probes/sweep.py --start 17000 --end 22000
 python3 src/agents/clawtalk/tpc/probes/analyze.py --ref sweep.wav --rec capture.wav
@@ -485,6 +504,7 @@ pnpm test -- src/agents/clawtalk/tpc/profile-selector.test.ts
   - Tests: rate limit enforcement, burst handling
 
 **Verification**:
+
 ```bash
 pnpm test -- src/agents/clawtalk/tpc/security.test.ts
 ```
@@ -516,6 +536,7 @@ pnpm test -- src/agents/clawtalk/tpc/security.test.ts
   - Test file: `src/agents/clawtalk/tpc/fallback.e2e.test.ts`
 
 **Verification**:
+
 ```bash
 pnpm test -- src/agents/clawtalk/tpc/tpc.e2e.test.ts
 pnpm test -- src/agents/clawtalk/tpc/fallback.e2e.test.ts
@@ -528,40 +549,41 @@ pnpm build
 
 ```json5
 {
-  "clawtalk": {
-    "enabled": true,
-    "tpc": {
+  clawtalk: {
+    enabled: true,
+    tpc: {
       // SECURE BY DEFAULT: TPC enabled for all agent-to-agent communication
-      "enabled": true, // Set false ONLY for debugging or testing
+      enabled: true, // Set false ONLY for debugging or testing
 
-      "mode": "file", // "file" | "ultrasonic" | "audible" | "auto"
-      "deadDropPath": "~/.closedclaw/tpc/dead-drop",
-      "hardwareProbeOnStart": false, // Set true to test ultrasonic on startup
+      mode: "file", // "file" | "ultrasonic" | "audible" | "auto"
+      deadDropPath: "~/.closedclaw/tpc/dead-drop",
+      hardwareProbeOnStart: false, // Set true to test ultrasonic on startup
 
       // Cryptography settings
-      "fecScheme": "reed-solomon", // Error correction
-      "signatureScheme": "ed25519", // Authentication
-      "keyPath": "~/.closedclaw/tpc/keys/private.pem",
-      "publicKeyPath": "~/.closedclaw/tpc/keys/public.pem",
+      fecScheme: "reed-solomon", // Error correction
+      signatureScheme: "ed25519", // Authentication
+      keyPath: "~/.closedclaw/tpc/keys/private.pem",
+      publicKeyPath: "~/.closedclaw/tpc/keys/public.pem",
 
       // Security policies
-      "enforceForAgentToAgent": true, // Block text routing for agent-to-agent
-      "allowTextFallback": false, // Emergency override to allow text (logged)
-      "maxMessageAge": 300, // 5 minutes - reject older messages
-      "keyRotationDays": 30, // Automatic key rotation
+      enforceForAgentToAgent: true, // Block text routing for agent-to-agent
+      allowTextFallback: false, // Emergency override to allow text (logged)
+      maxMessageAge: 300, // 5 minutes - reject older messages
+      keyRotationDays: 30, // Automatic key rotation
 
       // Performance tuning
-      "pollingInterval": 1000, // Check dead-drop every 1 second
-      "maxMessagesPerMinute": 100, // Rate limiting per agent
+      pollingInterval: 1000, // Check dead-drop every 1 second
+      maxMessagesPerMinute: 100, // Rate limiting per agent
 
       // Replay attack prevention
-      "nonceStorePath": "~/.closedclaw/tpc/nonce.db"
-    }
-  }
+      nonceStorePath: "~/.closedclaw/tpc/nonce.db",
+    },
+  },
 }
 ```
 
 **Important notes**:
+
 - **TPC is enabled by default** - this is intentional for security
 - Text fallback only occurs for human-facing I/O or emergency scenarios
 - All text fallbacks are logged as security events in `~/.closedclaw/logs/tpc-audit.jsonl`
@@ -602,12 +624,14 @@ pnpm build
 ### 7.1 Threat Model
 
 **Threats mitigated by TPC**:
+
 1. **Prompt injection in user messages**: Acoustic encoding prevents LLM from parsing injected instructions
 2. **Context pollution from external data**: Web scraping results encoded acoustically before reaching SubAgent
 3. **Multi-agent coordination attacks**: Inter-agent handoffs use authenticated acoustic channels
 4. **Text-based exfiltration**: Sensitive data not visible in text logs or context windows
 
 **Threats NOT mitigated** (require other defenses):
+
 1. **Local filesystem access**: Attacker with access to dead-drop directory can read/write files (mitigated by file permissions)
 2. **Key compromise**: Stolen Ed25519 key allows signature forgery (mitigated by key rotation)
 3. **DoS via TPC flooding**: Rate limiting required
@@ -632,17 +656,17 @@ pnpm build
 
 ### 8.1 Latency Overhead
 
-| Operation | Latency | Notes |
-|-----------|---------|-------|
-| CT/1 → WAV encoding | ~50ms | GGWave modulation |
-| WAV → CT/1 decoding | ~50ms | GGWave demodulation |
-| Reed-Solomon FEC | ~10ms | 10% redundancy |
-| Ed25519 signing | ~2ms | Fast curve |
-| Ed25519 verification | ~3ms | Fast curve |
-| File I/O (write) | ~5ms | SSD assumed |
-| File I/O (read) | ~5ms | SSD assumed |
-| Dead-drop polling | ~10ms | inotify/chokidar |
-| **Total roundtrip** | **~135ms** | Encode + write + poll + read + decode |
+| Operation            | Latency    | Notes                                 |
+| -------------------- | ---------- | ------------------------------------- |
+| CT/1 → WAV encoding  | ~50ms      | GGWave modulation                     |
+| WAV → CT/1 decoding  | ~50ms      | GGWave demodulation                   |
+| Reed-Solomon FEC     | ~10ms      | 10% redundancy                        |
+| Ed25519 signing      | ~2ms       | Fast curve                            |
+| Ed25519 verification | ~3ms       | Fast curve                            |
+| File I/O (write)     | ~5ms       | SSD assumed                           |
+| File I/O (read)      | ~5ms       | SSD assumed                           |
+| Dead-drop polling    | ~10ms      | inotify/chokidar                      |
+| **Total roundtrip**  | **~135ms** | Encode + write + poll + read + decode |
 
 **Comparison to text routing**: ~10ms (no encoding overhead)
 
@@ -668,6 +692,7 @@ pnpm build
 ### 9.1 TPC 2.0: State Delta Encoding
 
 The current implementation encodes full CT/1 messages. Future versions could encode:
+
 - **Latent state deltas**: Agent hidden state transitions instead of text
 - **Tensor diffs**: Only changed weights in small models
 - **Ultrasonic streaming**: Real-time coordination over 18+ kHz carriers
@@ -776,15 +801,15 @@ python3 src/agents/clawtalk/tpc/probes/analyze.py --ref sweep.wav --rec capture.
 
 ## 12. Risk Mitigation
 
-| Risk | Impact | Mitigation | Owner |
-|------|--------|------------|-------|
-| GGWave dependency unavailable | High | Fallback to ggwave-cli subprocess; document installation | Dev |
-| Ultrasonic mode unreliable | Low | Default to file mode; ultrasonic optional | Dev |
-| Key loss/corruption | Medium | Document backup procedure; auto-regenerate | Ops |
-| Dead-drop directory permissions | High | Enforce 0700 at startup; fail loudly if wrong | Dev |
-| Users disable TPC for convenience | High | Loud warnings in logs; audit text fallbacks; educate on security benefits | Ops/Docs |
-| TPC infrastructure failure causes deadlock | High | Circuit breaker with fail-closed behavior; alert on repeated failures | Dev |
-| Compatibility with existing .claws | Low | TPC is transparent; all existing skills work without changes | Dev |
+| Risk                                       | Impact | Mitigation                                                                | Owner    |
+| ------------------------------------------ | ------ | ------------------------------------------------------------------------- | -------- |
+| GGWave dependency unavailable              | High   | Fallback to ggwave-cli subprocess; document installation                  | Dev      |
+| Ultrasonic mode unreliable                 | Low    | Default to file mode; ultrasonic optional                                 | Dev      |
+| Key loss/corruption                        | Medium | Document backup procedure; auto-regenerate                                | Ops      |
+| Dead-drop directory permissions            | High   | Enforce 0700 at startup; fail loudly if wrong                             | Dev      |
+| Users disable TPC for convenience          | High   | Loud warnings in logs; audit text fallbacks; educate on security benefits | Ops/Docs |
+| TPC infrastructure failure causes deadlock | High   | Circuit breaker with fail-closed behavior; alert on repeated failures     | Dev      |
+| Compatibility with existing .claws         | Low    | TPC is transparent; all existing skills work without changes              | Dev      |
 
 ---
 
@@ -795,6 +820,7 @@ This plan implements **Tonal Pulse Communication (TPC) as the default protocol f
 **Core philosophy**: TPC is not optional security — it IS the security model. Text communication exists only for human-facing I/O.
 
 **Key deliverables**:
+
 1. New TPC encoding/decoding modules in `src/agents/clawtalk/tpc/`
 2. Integration with ClawTalk hooks for **default TPC routing** (text fallback only for human I/O)
 3. Dead-drop file-based transport (primary mode, no audio hardware required)
@@ -805,6 +831,7 @@ This plan implements **Tonal Pulse Communication (TPC) as the default protocol f
 8. Documentation emphasizing TPC as the primary protocol, not an add-on
 
 **Security model**:
+
 - **Agent → Agent**: TPC always (enforced)
 - **Human → Agent**: Text (necessary for LLM parsing)
 - **Agent → Human**: Text (necessary for human readability)

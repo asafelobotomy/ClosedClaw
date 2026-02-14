@@ -28,7 +28,7 @@ export type ToolTier = "lite" | "medium" | "full";
  * These are mostly "do one thing and return" tools.
  */
 const LITE_TOOL_NAMES = new Set([
-  // --- Main agent pipeline (pi-tools / openclaw-tools) ---
+  // --- Main agent pipeline (pi-tools / closedclaw-tools) ---
   "read",
   "write",
   "find",

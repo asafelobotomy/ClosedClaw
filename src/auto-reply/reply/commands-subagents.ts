@@ -1,5 +1,4 @@
 import crypto from "node:crypto";
-import { TIMEOUT_HTTP_DEFAULT_MS, TIMEOUT_HTTP_SHORT_MS, secondsToMs } from "../../config/constants/index.js";
 import type { SubagentRunRecord } from "../../agents/subagent-registry.js";
 import type { CommandHandler } from "./commands-types.js";
 import { AGENT_LANE_SUBAGENT } from "../../agents/lanes.js";
@@ -12,6 +11,11 @@ import {
   sanitizeTextContent,
   stripToolMessages,
 } from "../../agents/tools/sessions-helpers.js";
+import {
+  TIMEOUT_HTTP_DEFAULT_MS,
+  TIMEOUT_HTTP_SHORT_MS,
+  secondsToMs,
+} from "../../config/constants/index.js";
 import { loadSessionStore, resolveStorePath, updateSessionStore } from "../../config/sessions.js";
 import { callGateway } from "../../gateway/call.js";
 import { logVerbose } from "../../globals.js";

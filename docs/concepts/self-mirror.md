@@ -130,44 +130,44 @@ extensions/self-mirror/
 ```json5
 // extensions/self-mirror/ClosedClaw.plugin.json
 {
-  "id": "self-mirror",
-  "version": "1.0.0",
-  "description": "Sandboxed observer agent for behavioral analysis and self-diagnostics",
-  "configSchema": {
-    "type": "object",
-    "properties": {
-      "enabled": { "type": "boolean", "default": false },
-      "observeAgents": {
-        "type": "array",
-        "items": { "type": "string" },
-        "default": ["main"],
-        "description": "Agent IDs to observe"
+  id: "self-mirror",
+  version: "1.0.0",
+  description: "Sandboxed observer agent for behavioral analysis and self-diagnostics",
+  configSchema: {
+    type: "object",
+    properties: {
+      enabled: { type: "boolean", default: false },
+      observeAgents: {
+        type: "array",
+        items: { type: "string" },
+        default: ["main"],
+        description: "Agent IDs to observe",
       },
-      "digestInterval": {
-        "type": "number",
-        "default": 300,
-        "description": "Seconds between digest flushes"
+      digestInterval: {
+        type: "number",
+        default: 300,
+        description: "Seconds between digest flushes",
       },
-      "digestMaxEvents": {
-        "type": "number",
-        "default": 50,
-        "description": "Max events before forced flush"
+      digestMaxEvents: {
+        type: "number",
+        default: 50,
+        description: "Max events before forced flush",
       },
-      "mirrorModel": {
-        "type": "string",
-        "default": "openai/gpt-4.1-mini",
-        "description": "Model for the mirror agent (use cheaper models)"
+      mirrorModel: {
+        type: "string",
+        default: "openai/gpt-4.1-mini",
+        description: "Model for the mirror agent (use cheaper models)",
       },
-      "harvestMaxEntries": {
-        "type": "number",
-        "default": 1000,
-        "description": "Max observations to retain"
-      }
-    }
+      harvestMaxEntries: {
+        type: "number",
+        default: 1000,
+        description: "Max observations to retain",
+      },
+    },
   },
-  "uiHints": {
-    "enabled": { "label": "Enable self-mirror observer" }
-  }
+  uiHints: {
+    enabled: { label: "Enable self-mirror observer" },
+  },
 }
 ```
 
@@ -183,18 +183,18 @@ export function register(api: ClosedClawPluginApi) {
 
   // Observe tool usage
   api.on("after_tool_call", {
-    priority: 999,  // low priority — never interfere
+    priority: 999, // low priority — never interfere
     handler: async (event, next) => {
       buffer.push({
         type: "tool_call",
         tool: event.toolName,
-        params: summarizeParams(event.params),  // redact sensitive data
+        params: summarizeParams(event.params), // redact sensitive data
         durationMs: event.durationMs,
         hadError: !!event.error,
         timestamp: Date.now(),
       });
       return next();
-    }
+    },
   });
 
   // Observe outbound messages
@@ -208,7 +208,7 @@ export function register(api: ClosedClawPluginApi) {
         timestamp: Date.now(),
       });
       return next();
-    }
+    },
   });
 
   // Observe agent run completion
@@ -225,14 +225,16 @@ export function register(api: ClosedClawPluginApi) {
       // Flush digest after each agent run completes
       await flushDigest(buffer, store, api);
       return next();
-    }
+    },
   });
 
   // Register /mirror command
   api.registerCommand({
     name: "mirror",
     description: "Query self-mirror observations",
-    handler: async (args) => { /* list, detail, trends, clear */ }
+    handler: async (args) => {
+      /* list, detail, trends, clear */
+    },
   });
 }
 ```
@@ -315,32 +317,32 @@ observations about the quality and patterns of the observed agent's behavior.
 
 ```typescript
 interface MirrorObservation {
-  id: string;                    // UUID
-  timestamp: string;             // ISO 8601
+  id: string; // UUID
+  timestamp: string; // ISO 8601
   category: "behavior" | "anomaly" | "quality" | "performance" | "cost" | "security";
   severity: "info" | "warn" | "action";
-  subjectSession: string;        // observed session key
-  subjectAgent: string;          // observed agent ID
-  summary: string;               // 1-2 sentence summary
-  detail: string;                // full analysis
-  suggestion?: string;           // optional improvement suggestion
-  tags: string[];                // freeform tags
-  digestRef?: string;            // reference to source digest
-  acknowledged?: boolean;        // operator has seen this
-  resolvedAt?: string;           // when/if addressed
+  subjectSession: string; // observed session key
+  subjectAgent: string; // observed agent ID
+  summary: string; // 1-2 sentence summary
+  detail: string; // full analysis
+  suggestion?: string; // optional improvement suggestion
+  tags: string[]; // freeform tags
+  digestRef?: string; // reference to source digest
+  acknowledged?: boolean; // operator has seen this
+  resolvedAt?: string; // when/if addressed
 }
 ```
 
 ## Commands
 
-| Command | Description | Example |
-|---|---|---|
-| `/mirror list [category] [severity]` | List recent observations | `/mirror list anomaly warn` |
-| `/mirror detail <id>` | Full observation detail | `/mirror detail abc123` |
-| `/mirror trends [days]` | Pattern summary over time | `/mirror trends 7` |
-| `/mirror stats` | Observation counts by category | `/mirror stats` |
-| `/mirror ack <id>` | Acknowledge an observation | `/mirror ack abc123` |
-| `/mirror clear [before-date]` | Remove old observations | `/mirror clear 2026-01-01` |
+| Command                              | Description                    | Example                     |
+| ------------------------------------ | ------------------------------ | --------------------------- |
+| `/mirror list [category] [severity]` | List recent observations       | `/mirror list anomaly warn` |
+| `/mirror detail <id>`                | Full observation detail        | `/mirror detail abc123`     |
+| `/mirror trends [days]`              | Pattern summary over time      | `/mirror trends 7`          |
+| `/mirror stats`                      | Observation counts by category | `/mirror stats`             |
+| `/mirror ack <id>`                   | Acknowledge an observation     | `/mirror ack abc123`        |
+| `/mirror clear [before-date]`        | Remove old observations        | `/mirror clear 2026-01-01`  |
 
 ## Feedback Loop Prevention
 
@@ -354,16 +356,17 @@ The mirror agent MUST NOT feed back into the main agent's context. Safeguards:
 
 ## Cost Management
 
-| Parameter | Default | Rationale |
-|---|---|---|
-| Mirror model | gpt-4.1-mini | Cheap model adequate for behavioral analysis |
-| Digest interval | 5 minutes | Batching reduces per-message overhead |
-| Max events/digest | 50 | Keeps digest under ~500 tokens |
-| Digest token budget | ~800 tokens | Compact format, no raw content |
-| Mirror response budget | ~500 tokens | Short, structured observations |
-| Max observations stored | 1000 | FIFO eviction of oldest |
+| Parameter               | Default      | Rationale                                    |
+| ----------------------- | ------------ | -------------------------------------------- |
+| Mirror model            | gpt-4.1-mini | Cheap model adequate for behavioral analysis |
+| Digest interval         | 5 minutes    | Batching reduces per-message overhead        |
+| Max events/digest       | 50           | Keeps digest under ~500 tokens               |
+| Digest token budget     | ~800 tokens  | Compact format, no raw content               |
+| Mirror response budget  | ~500 tokens  | Short, structured observations               |
+| Max observations stored | 1000         | FIFO eviction of oldest                      |
 
 **Estimated daily cost**: With ~50 digests/day at ~1.3k tokens each (input + output), using gpt-4.1-mini:
+
 - ~65k tokens/day × $0.40/M tokens = **~$0.03/day** (~$0.90/month)
 
 ## Implementation Checklist

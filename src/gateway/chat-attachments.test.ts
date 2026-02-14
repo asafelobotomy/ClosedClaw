@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  parseMessageWithAttachments,
-} from "./chat-attachments.js";
+import { parseMessageWithAttachments } from "./chat-attachments.js";
 
 const PNG_1x1 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/woAAn8B9FD5fHAAAAAASUVORK5CYII=";

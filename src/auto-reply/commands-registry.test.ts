@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { ChatCommandDefinition } from "./commands-registry.types.js";
-import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
+import { setActivePluginRegistry } from "../plugins/runtime.js";
 import {
   buildCommandText,
   buildCommandTextFromArgs,

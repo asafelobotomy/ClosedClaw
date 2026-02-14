@@ -1,6 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
-import { ENV_CLOSEDCLAW_RAW_STREAM, ENV_CLOSEDCLAW_RAW_STREAM_PATH } from "../config/constants/index.js";
+import {
+  ENV_CLOSEDCLAW_RAW_STREAM,
+  ENV_CLOSEDCLAW_RAW_STREAM_PATH,
+} from "../config/constants/index.js";
 import { resolveStateDir } from "../config/paths.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 

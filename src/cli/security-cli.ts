@@ -1,15 +1,4 @@
 import type { Command } from "commander";
-import { securityEncryptCommand } from "../commands/security-encrypt.js";
-import {
-  generateKeyCommand,
-  signSkillCommand,
-} from "../commands/skill-sign.js";
-import {
-  listKeysCommand,
-  addKeyCommand,
-  removeKeyCommand,
-  trustKeyCommand,
-} from "../commands/keys-management.js";
 import {
   auditQueryCommand,
   auditStatsCommand,
@@ -21,6 +10,14 @@ import {
   keychainMigrateCommand,
   keychainListCommand,
 } from "../commands/keychain.js";
+import {
+  listKeysCommand,
+  addKeyCommand,
+  removeKeyCommand,
+  trustKeyCommand,
+} from "../commands/keys-management.js";
+import { securityEncryptCommand } from "../commands/security-encrypt.js";
+import { generateKeyCommand, signSkillCommand } from "../commands/skill-sign.js";
 import { loadConfig } from "../config/config.js";
 import { defaultRuntime } from "../runtime.js";
 import { runSecurityAudit } from "../security/audit.js";
@@ -399,7 +396,11 @@ export function registerSecurityCli(program: Command) {
     .description("Add a public key to the trusted keyring")
     .option("--name <name>", "Display name for the key owner", undefined)
     .option("--trust <level>", "Trust level (full|marginal|none)", "marginal")
-    .option("--verified-via <method>", "Verification method (manual|web-of-trust|certificate|self)", "manual")
+    .option(
+      "--verified-via <method>",
+      "Verification method (manual|web-of-trust|certificate|self)",
+      "manual",
+    )
     .option("--notes <text>", "Additional notes about the key", undefined)
     .option("--json", "Print JSON output", false)
     .action(async (keyId: string, publicKeyPath: string, opts) => {

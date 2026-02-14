@@ -13,11 +13,13 @@ When users who previously installed `clawdbot` run `npm install clawdbot` or `pn
 ## Migration
 
 Replace:
+
 ```bash
 npm install -g clawdbot
 ```
 
 With:
+
 ```bash
 npm install -g closedclaw
 ```

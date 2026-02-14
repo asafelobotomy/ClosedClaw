@@ -40,8 +40,7 @@ export type BroadcastConfig = {
   [peerId: string]: string[] | BroadcastStrategy | undefined;
 };
 
-export type AudioConfig = {
-};
+export type AudioConfig = {};
 
 export type MessagesConfig = {
   /**

@@ -11,10 +11,10 @@ Successfully analyzed and documented the channel architecture. **No migration ne
 
 Channels exist in **both** `src/` and `extensions/` directories by design:
 
-| Location | Role | Size | Purpose |
-|----------|------|------|---------|
-| `src/<channel>/` | **Core Implementation** | ~3000 lines | API clients, message handling, heavy logic |
-| `extensions/<channel>/` | **Plugin Wrapper** | ~100 lines | Registration layer, delegates to core |
+| Location                | Role                    | Size        | Purpose                                    |
+| ----------------------- | ----------------------- | ----------- | ------------------------------------------ |
+| `src/<channel>/`        | **Core Implementation** | ~3000 lines | API clients, message handling, heavy logic |
+| `extensions/<channel>/` | **Plugin Wrapper**      | ~100 lines  | Registration layer, delegates to core      |
 
 This is **not duplication** - it's a deliberate architectural pattern for runtime isolation and clean plugin interfaces.
 
@@ -22,15 +22,15 @@ This is **not duplication** - it's a deliberate architectural pattern for runtim
 
 ### Channels with Core + Extension (7)
 
-| Channel | Core Location | Extension Location | Lines (Core) | Lines (Ext) |
-|---------|---------------|-------------------|--------------|-------------|
-| Discord | `src/discord/` | `extensions/discord/` | ~3000 | ~120 |
-| Telegram | `src/telegram/` | `extensions/telegram/` | ~3500 | ~150 |
-| Slack | `src/slack/` | `extensions/slack/` | ~2500 | ~140 |
-| Signal | `src/signal/` | `extensions/signal/` | ~2000 | ~130 |
-| iMessage | `src/imessage/` | `extensions/imessage/` | ~1800 | ~110 |
-| WhatsApp | `src/web/` | `extensions/whatsapp/` | ~4000 | ~160 |
-| LINE | `src/line/` | `extensions/line/` | ~1500 | ~100 |
+| Channel  | Core Location   | Extension Location     | Lines (Core) | Lines (Ext) |
+| -------- | --------------- | ---------------------- | ------------ | ----------- |
+| Discord  | `src/discord/`  | `extensions/discord/`  | ~3000        | ~120        |
+| Telegram | `src/telegram/` | `extensions/telegram/` | ~3500        | ~150        |
+| Slack    | `src/slack/`    | `extensions/slack/`    | ~2500        | ~140        |
+| Signal   | `src/signal/`   | `extensions/signal/`   | ~2000        | ~130        |
+| iMessage | `src/imessage/` | `extensions/imessage/` | ~1800        | ~110        |
+| WhatsApp | `src/web/`      | `extensions/whatsapp/` | ~4000        | ~160        |
+| LINE     | `src/line/`     | `extensions/line/`     | ~1500        | ~100        |
 
 **Total**: ~20,300 lines of core implementation vs ~910 lines of plugin wrappers (95% in core, 5% in extensions)
 
@@ -68,6 +68,7 @@ src/telegram/
 ```
 
 **Characteristics**:
+
 - Heavy, stateful implementations
 - Direct dependencies on core modules (config, routing, logging, infra)
 - Tightly coupled to PluginRuntime
@@ -87,6 +88,7 @@ extensions/telegram/
 ```
 
 **Characteristics**:
+
 - Thin, stateless wrappers
 - Single dependency: `closedclaw/plugin-sdk`
 - Delegates all work to core via runtime
@@ -199,12 +201,14 @@ Comprehensive architecture documentation covering:
 ### Original Proposal Options
 
 **Option A**: Move all channels to `extensions/` (Rejected)
+
 - Would be massive breaking change
 - Loss of tight coupling benefits
 - Increased extension complexity
 - Runtime circular dependencies
 
 **Option B**: Keep as-is, document the pattern ✅ **Selected**
+
 - No breaking changes
 - Preserves architectural benefits
 - Improves developer understanding
@@ -223,8 +227,9 @@ Comprehensive architecture documentation covering:
 ### Copilot Instructions Updated
 
 `.github/copilot-instructions.md` now references:
+
 ```markdown
-**Channel Development Pattern**: Core implementations in `src/` with plugin wrappers 
+**Channel Development Pattern**: Core implementations in `src/` with plugin wrappers
 in `extensions/`. See docs/refactor/CHANNEL-ARCHITECTURE.md for architecture details.
 ```
 
@@ -235,6 +240,7 @@ in `extensions/`. See docs/refactor/CHANNEL-ARCHITECTURE.md for architecture det
 ### Labeler Configuration
 
 `.github/labeler.yml` correctly labels PRs touching either core or extension:
+
 ```yaml
 "channel: telegram":
   - changed-files:
@@ -247,7 +253,7 @@ in `extensions/`. See docs/refactor/CHANNEL-ARCHITECTURE.md for architecture det
 ## 📚 Related Documentation
 
 - [Repository Reorganization Proposal](./REPOSITORY-REORGANIZATION-PROPOSAL.md) - Overall plan
-- [Phase 1 Complete](./PHASE-1-COMPLETE.md) - Scripts → tools reorganization  
+- [Phase 1 Complete](./PHASE-1-COMPLETE.md) - Scripts → tools reorganization
 - [Phase 2 Complete](./PHASE-2-COMPLETE.md) - Test utilities consolidation
 - [Channel Architecture](./CHANNEL-ARCHITECTURE.md) - Comprehensive architecture docs
 - [Channel Plugin Creator Skill](/.github/skills/channel-plugin-creator/SKILL.md) - Adding channels
@@ -263,11 +269,13 @@ in `extensions/`. See docs/refactor/CHANNEL-ARCHITECTURE.md for architecture det
 ## 🚀 Future Recommendations
 
 ### Short Term
+
 - ✅ Keep current architecture (already working well)
 - ✅ Reference architecture docs in onboarding
 - ✅ Use pattern for new channels
 
 ### Long Term (Optional)
+
 - Consider whether new channels need core implementations
 - Evaluate if extension-only pattern can handle more use cases
 - Monitor for true architectural issues vs perceived ones
@@ -298,16 +306,19 @@ extensions/
 ## ✅ Validation
 
 ### Developer Understanding
+
 - ✅ Architecture pattern now documented
 - ✅ New channel guide available
 - ✅ Common questions answered
 
 ### Code Organization
+
 - ✅ No changes needed (already correct)
 - ✅ Pattern is sound and maintainable
 - ✅ Clear separation of concerns
 
 ### Documentation Quality
+
 - ✅ Comprehensive architecture guide (480 lines)
 - ✅ Diagrams and examples included
 - ✅ FAQ addresses common confusion

@@ -1,15 +1,15 @@
 /**
  * Environment Variable Names
- * 
+ *
  * Centralized constants for all environment variable names used in ClosedClaw.
  * Import from here instead of using string literals to prevent typos and enable
  * type-safe environment variable access.
- * 
+ *
  * @example
  * ```typescript
  * // Before
  * const port = process.env.ClosedClaw_GATEWAY_PORT;
- * 
+ *
  * // After
  * import { ENV_CLOSEDCLAW_GATEWAY_PORT } from '@/config/constants';
  * const port = process.env[ENV_CLOSEDCLAW_GATEWAY_PORT];
@@ -51,11 +51,13 @@ export const ENV_CLOSEDCLAW_LIVE_TEST = "ClosedClaw_LIVE_TEST" as const;
 export const ENV_LIVE = "LIVE" as const; // Generic live test flag
 export const ENV_CLOSEDCLAW_LIVE_MODELS = "ClosedClaw_LIVE_MODELS" as const;
 export const ENV_CLOSEDCLAW_LIVE_PROVIDERS = "ClosedClaw_LIVE_PROVIDERS" as const;
-export const ENV_CLOSEDCLAW_LIVE_REQUIRE_PROFILE_KEYS = "ClosedClaw_LIVE_REQUIRE_PROFILE_KEYS" as const;
+export const ENV_CLOSEDCLAW_LIVE_REQUIRE_PROFILE_KEYS =
+  "ClosedClaw_LIVE_REQUIRE_PROFILE_KEYS" as const;
 export const ENV_CLOSEDCLAW_LIVE_MODEL_TIMEOUT_MS = "ClosedClaw_LIVE_MODEL_TIMEOUT_MS" as const;
 export const ENV_CLOSEDCLAW_TEST_SHARDS = "ClosedClaw_TEST_SHARDS" as const;
 export const ENV_CLOSEDCLAW_TEST_WORKERS = "ClosedClaw_TEST_WORKERS" as const;
-export const ENV_CLOSEDCLAW_TEST_HANDSHAKE_TIMEOUT_MS = "ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS" as const;
+export const ENV_CLOSEDCLAW_TEST_HANDSHAKE_TIMEOUT_MS =
+  "ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS" as const;
 export const ENV_CLOSEDCLAW_E2E_MODELS = "ClosedClaw_E2E_MODELS" as const;
 
 // ============================================================================
@@ -93,7 +95,8 @@ export const ENV_FIRECRAWL_BASE_URL = "FIRECRAWL_BASE_URL" as const;
 
 export const ENV_TELEGRAM_BOT_TOKEN = "TELEGRAM_BOT_TOKEN" as const;
 export const ENV_CLOSEDCLAW_TWITCH_ACCESS_TOKEN = "ClosedClaw_TWITCH_ACCESS_TOKEN" as const;
-export const ENV_CLOSEDCLAW_DEBUG_NEXTCLOUD_TALK_ACCOUNTS = "ClosedClaw_DEBUG_NEXTCLOUD_TALK_ACCOUNTS" as const;
+export const ENV_CLOSEDCLAW_DEBUG_NEXTCLOUD_TALK_ACCOUNTS =
+  "ClosedClaw_DEBUG_NEXTCLOUD_TALK_ACCOUNTS" as const;
 
 // ============================================================================
 // Agent & Skills Environment Variables
@@ -154,15 +157,27 @@ export type RunnerOS = "macOS" | "Windows" | "Linux" | "unknown";
 
 export function getRunnerOS(): RunnerOS {
   const runnerOS = process.env[ENV_RUNNER_OS];
-  if (runnerOS === "macOS") {return "macOS";}
-  if (runnerOS === "Windows") {return "Windows";}
-  if (runnerOS === "Linux") {return "Linux";}
-  
+  if (runnerOS === "macOS") {
+    return "macOS";
+  }
+  if (runnerOS === "Windows") {
+    return "Windows";
+  }
+  if (runnerOS === "Linux") {
+    return "Linux";
+  }
+
   // Fallback to platform detection
-  if (process.platform === "darwin") {return "macOS";}
-  if (process.platform === "win32") {return "Windows";}
-  if (process.platform === "linux") {return "Linux";}
-  
+  if (process.platform === "darwin") {
+    return "macOS";
+  }
+  if (process.platform === "win32") {
+    return "Windows";
+  }
+  if (process.platform === "linux") {
+    return "Linux";
+  }
+
   return "unknown";
 }
 

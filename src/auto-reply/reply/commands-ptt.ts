@@ -1,6 +1,6 @@
 import type { ClosedClawConfig } from "../../config/config.js";
-import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../../config/constants/index.js";
 import type { CommandHandler } from "./commands-types.js";
+import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../../config/constants/index.js";
 import { callGateway, randomIdempotencyKey } from "../../gateway/call.js";
 import { logVerbose } from "../../globals.js";
 

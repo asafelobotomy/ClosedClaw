@@ -5,6 +5,7 @@ This directory contains detailed completion reports for major ClosedClaw develop
 ## 📊 Summary
 
 All tracked security priorities (3, 4, 6, 7) have been completed as of **February 10, 2026**, representing:
+
 - **~12,200 lines** of production code, tests, and documentation
 - **70%+ test coverage** (security-critical paths at 90%+)
 - **Enterprise-grade security** with OWASP/NIST compliance
@@ -15,11 +16,13 @@ All tracked security priorities (3, 4, 6, 7) have been completed as of **Februar
 ClosedClaw underwent comprehensive repository improvements based on the [Repository Review (2026-02-10)](../../REPOSITORY-REVIEW-2026-02-10.md).
 
 ### Structural Improvements
+
 - **[Option A: Quick Wins](option-a-complete.md)** ✅ Complete - Root cleanup, docs index, npm scripts (~1 hour)
 - **[Option B: Developer Experience](option-b-complete.md)** ✅ Complete - Contribution guide, extension template, test utils, tools docs (~2 hours)
 - **[Option C: Code Organization](option-c-complete.md)** ✅ Complete - Path aliases, barrel exports, migration guide (~1 hour)
 
 ### Constants Enhancement
+
 - **[Phase 1: Environment & Network Constants](constants-phase-1-complete.md)** ✅ Complete - Type-safe env vars, URL builders, platform detection (~1.5 hours)
 - **[Phases 2 & 3: Timing, Path, Size Constants + Migration](constants-phase-2-3-complete.md)** ✅ Complete - Timing constants, path builders, size utilities, high-priority file migration (~2.5 hours)
 - **[Phase 4: Extended Migration](PHASE-4-COMPLETE.md)** ✅ **COMPLETE** - 22 files migrated (36% of scope), 184 tests passing
@@ -38,6 +41,7 @@ ClosedClaw underwent comprehensive repository improvements based on the [Reposit
 ### [Security Hardening Summary](security-hardening-summary.md)
 
 **Complete overview of all security priorities** with:
+
 - Architecture highlights
 - Implementation statistics
 - Compliance mapping (OWASP/NIST)
@@ -56,6 +60,7 @@ ClosedClaw underwent comprehensive repository improvements based on the [Reposit
 **Cryptographic signature verification for skills and plugins using Ed25519.**
 
 **Key Features**:
+
 - Ed25519 digital signatures
 - Trusted keyring with trust levels (full, marginal, none)
 - CLI tools for key generation and signing
@@ -63,6 +68,7 @@ ClosedClaw underwent comprehensive repository improvements based on the [Reposit
 - PEM-like `.sig` file format
 
 **Implementation**:
+
 - `src/agents/skill-verification.ts` (215 lines) - Core verification logic
 - `src/commands/skill-sign.ts` (212 lines) - CLI keygen + sign commands
 - `src/commands/keys-management.ts` (207 lines) - Key management CLI
@@ -70,6 +76,7 @@ ClosedClaw underwent comprehensive repository improvements based on the [Reposit
 - 1,350+ lines of documentation
 
 **CLI Commands**:
+
 ```bash
 closedclaw security skill keygen --signer "Your Name"
 closedclaw security skill sign path/to/SKILL.md --key ./key.pem
@@ -90,6 +97,7 @@ closedclaw security keys trust <keyId> --trust marginal
 **Tamper-evident audit logging with SHA-256 hash chains in JSONL format.**
 
 **Key Features**:
+
 - JSONL format (one event per line, streamable)
 - SHA-256 hash chains (blockchain-style integrity)
 - 13 event types tracked (tool execution, config changes, credential access, etc.)
@@ -97,6 +105,7 @@ closedclaw security keys trust <keyId> --trust marginal
 - < 1ms overhead per event
 
 **Implementation**:
+
 - `src/security/audit-logger.ts` (570 lines) - Core logger (pre-existing)
 - `src/commands/audit-query.ts` (410 lines) - CLI query commands
 - `src/security/audit-hooks.ts` (420 lines) - Integration hooks
@@ -104,6 +113,7 @@ closedclaw security keys trust <keyId> --trust marginal
 - 710+ lines of documentation
 
 **CLI Commands**:
+
 ```bash
 closedclaw security log query --since 1h --type tool_exec
 closedclaw security log stats --verify
@@ -122,6 +132,7 @@ closedclaw security log verify
 **Native OS keychain integration for credential storage across all platforms.**
 
 **Key Features**:
+
 - macOS: Keychain.app via `security` CLI
 - Linux: Secret Service via `secret-tool` CLI
 - Windows: Credential Manager via `cmdkey` CLI
@@ -129,12 +140,14 @@ closedclaw security log verify
 - No native compilation required (uses CLI tools)
 
 **Implementation**:
+
 - `src/security/keychain.ts` (670 lines) - Core integration (pre-existing)
 - `src/commands/keychain.ts` (370 lines) - CLI commands
 - 929 lines of tests across 2 test files
 - 885+ lines of documentation
 
 **CLI Commands**:
+
 ```bash
 closedclaw security keychain status
 closedclaw security keychain migrate
@@ -154,12 +167,14 @@ closedclaw security keychain list
 **Status**: Pre-existing infrastructure, already production-ready
 
 **Implementation**:
+
 - AES-256-GCM authenticated encryption
 - Argon2id key derivation (OWASP-compliant parameters)
 - XChaCha20-Poly1305 for extended nonce space
 - Encrypted storage for memories, sessions, and sensitive data
 
 **Files**:
+
 - `src/security/crypto.ts` - Core encryption implementation
 - `src/security/passphrase.ts` - Passphrase management
 - `src/constants/security.ts` - Security constants and defaults
@@ -171,12 +186,14 @@ closedclaw security keychain list
 **Status**: Pre-existing infrastructure, fully complete
 
 **Implementation**:
+
 - Centralized constants library in `src/constants/`
 - Type-safe via `as const` assertions
 - OWASP/NIST compliance documented
 - 372 lines of comprehensive tests
 
 **Files** (~1,200 lines total):
+
 - `src/constants/security.ts` (309 lines) - Security defaults
 - `src/constants/limits.ts` (235 lines) - Timeouts, memory, token caps
 - `src/constants/paths.ts` - File system paths
@@ -199,6 +216,7 @@ Historical progress snapshots and working documents are preserved in the [`archi
 ## 📚 Related Documentation
 
 ### Security Documentation
+
 - [Security Overview](/security/README.md) (if exists, otherwise `/gateway/security.md`)
 - [Skill Signing Guide](/security/skill-signing.md)
 - [Trusted Keyring Guide](/security/trusted-keyring.md)
@@ -207,9 +225,11 @@ Historical progress snapshots and working documents are preserved in the [`archi
 - [Encryption Audit](/security/encryption-audit-20260209.md)
 
 ### CLI Reference
+
 - [Security CLI Commands](/cli/security.md)
 
 ### Architecture
+
 - [Fork Roadmap](/refactor/closedclaw-fork-roadmap.md)
 - [Sandboxing Implementation](/refactor/sandboxing-implementation-summary.md)
 - [Upstream Tracking](/refactor/upstream-implementation-summary.md)
@@ -220,23 +240,23 @@ Historical progress snapshots and working documents are preserved in the [`archi
 
 ### Code Contributions
 
-| Category | Lines | Description |
-|----------|-------|-------------|
-| **Implementation** | ~5,000 | Core logic, CLI commands, integration |
-| **Tests** | ~3,200 | Unit, integration, E2E coverage |
-| **Documentation** | ~3,500 | User guides, CLI references, examples |
-| **Infrastructure** | ~1,200 | Constants library, types, utilities |
-| **Total** | **~12,900** | Production-ready, tested, documented code |
+| Category           | Lines       | Description                               |
+| ------------------ | ----------- | ----------------------------------------- |
+| **Implementation** | ~5,000      | Core logic, CLI commands, integration     |
+| **Tests**          | ~3,200      | Unit, integration, E2E coverage           |
+| **Documentation**  | ~3,500      | User guides, CLI references, examples     |
+| **Infrastructure** | ~1,200      | Constants library, types, utilities       |
+| **Total**          | **~12,900** | Production-ready, tested, documented code |
 
 ### Test Coverage
 
-| Priority | Test Lines | Coverage | Description |
-|----------|-----------|----------|-------------|
-| Priority 4 | 1,102 | 90%+ | Signing, verification, key management |
-| Priority 6 | 830 | 85%+ | Query, stats, hooks, integrity |
-| Priority 7 | 929 | 85%+ | Backends, migration, CLI commands |
-| Constants | 372 | 95%+ | Value validation, type safety |
-| **Total** | **3,233** | **70%+** | Comprehensive test suite |
+| Priority   | Test Lines | Coverage | Description                           |
+| ---------- | ---------- | -------- | ------------------------------------- |
+| Priority 4 | 1,102      | 90%+     | Signing, verification, key management |
+| Priority 6 | 830        | 85%+     | Query, stats, hooks, integrity        |
+| Priority 7 | 929        | 85%+     | Backends, migration, CLI commands     |
+| Constants  | 372        | 95%+     | Value validation, type safety         |
+| **Total**  | **3,233**  | **70%+** | Comprehensive test suite              |
 
 ### Security Features
 

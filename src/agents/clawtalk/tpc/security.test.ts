@@ -8,20 +8,15 @@
  * - Audit logger (JSONL structured event logging)
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs";
-import path from "node:path";
 import os from "node:os";
-
+import path from "node:path";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { AuditLogger } from "./audit-logger.js";
 import { CircuitBreaker } from "./circuit-breaker.js";
+import { generateKeyPair, createEnvelope, signEnvelope } from "./crypto-signer.js";
 import { KeyRotationManager } from "./key-rotation.js";
 import { RateLimiter } from "./rate-limiter.js";
-import { AuditLogger } from "./audit-logger.js";
-import {
-  generateKeyPair,
-  createEnvelope,
-  signEnvelope,
-} from "./crypto-signer.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -596,7 +591,11 @@ describe("audit-logger", () => {
     logger.init();
 
     logger.logEncode({
-      source: "a", target: "b", messageId: "m", nonce: "n", transport: "tpc",
+      source: "a",
+      target: "b",
+      messageId: "m",
+      nonce: "n",
+      transport: "tpc",
     });
     expect(logger.getBufferedEvents().length).toBe(1);
 
@@ -615,7 +614,11 @@ describe("audit-logger", () => {
     logger.init();
 
     logger.logEncode({
-      source: "a", target: "b", messageId: "m", nonce: "n", transport: "tpc",
+      source: "a",
+      target: "b",
+      messageId: "m",
+      nonce: "n",
+      transport: "tpc",
     });
 
     // bufferEvents still works (it's independent of file writing)

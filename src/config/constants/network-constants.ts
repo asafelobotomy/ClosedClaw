@@ -1,14 +1,14 @@
 /**
  * Network Constants
- * 
+ *
  * Centralized constants for ports, URLs, and network configuration used across ClosedClaw.
  * Use these instead of hardcoding values to enable easier testing and configuration.
- * 
+ *
  * @example
  * ```typescript
  * // Before
  * const url = "http://127.0.0.1:18789";
- * 
+ *
  * // After
  * import { buildGatewayHttpUrl, DEFAULT_GATEWAY_PORT } from '@/config/constants';
  * const url = buildGatewayHttpUrl();
@@ -55,11 +55,11 @@ export const PROTOCOL_WSS = "wss" as const;
 
 /**
  * Build Gateway HTTP URL
- * 
+ *
  * @param port - Gateway port (defaults to DEFAULT_GATEWAY_PORT)
  * @param host - Host address (defaults to LOCALHOST_IPV4)
  * @returns HTTP URL for gateway
- * 
+ *
  * @example
  * ```typescript
  * buildGatewayHttpUrl() // "http://127.0.0.1:18789"
@@ -76,11 +76,11 @@ export function buildGatewayHttpUrl(
 
 /**
  * Build Gateway WebSocket URL
- * 
+ *
  * @param port - Gateway port (defaults to DEFAULT_GATEWAY_PORT)
  * @param host - Host address (defaults to LOCALHOST_IPV4)
  * @returns WebSocket URL for gateway
- * 
+ *
  * @example
  * ```typescript
  * buildGatewayWsUrl() // "ws://127.0.0.1:18789"
@@ -95,7 +95,7 @@ export function buildGatewayWsUrl(
 
 /**
  * Build Signal HTTP URL
- * 
+ *
  * @param port - Signal port (defaults to DEFAULT_SIGNAL_PORT)
  * @param host - Host address (defaults to LOCALHOST_IPV4)
  * @returns HTTP URL for Signal
@@ -109,7 +109,7 @@ export function buildSignalHttpUrl(
 
 /**
  * Build Ollama HTTP URL
- * 
+ *
  * @param port - Ollama port (defaults to DEFAULT_OLLAMA_PORT)
  * @param host - Host address (defaults to LOCALHOST_IPV4)
  * @returns HTTP URL for Ollama
@@ -123,7 +123,7 @@ export function buildOllamaHttpUrl(
 
 /**
  * Build generic HTTP URL
- * 
+ *
  * @param host - Host address
  * @param port - Port number
  * @param path - Optional path (with leading slash)
@@ -136,7 +136,7 @@ export function buildHttpUrl(host: string, port: number, path?: string): string 
 
 /**
  * Build generic WebSocket URL
- * 
+ *
  * @param host - Host address
  * @param port - Port number
  * @param path - Optional path (with leading slash)
@@ -157,7 +157,7 @@ export const GATEWAY_ENDPOINT_STATUS = "/gateway/status" as const;
 
 /**
  * Build Gateway RPC URL
- * 
+ *
  * @param port - Gateway port (defaults to DEFAULT_GATEWAY_PORT)
  * @param host - Host address (defaults to LOCALHOST_IPV4)
  */
@@ -170,7 +170,7 @@ export function buildGatewayRpcUrl(
 
 /**
  * Build Gateway WebSocket endpoint URL
- * 
+ *
  * @param port - Gateway port (defaults to DEFAULT_GATEWAY_PORT)
  * @param host - Host address (defaults to LOCALHOST_IPV4)
  */
@@ -183,7 +183,7 @@ export function buildGatewayWsEndpointUrl(
 
 /**
  * Build Gateway status endpoint URL
- * 
+ *
  * @param port - Gateway port (defaults to DEFAULT_GATEWAY_PORT)
  * @param host - Host address (defaults to LOCALHOST_IPV4)
  */

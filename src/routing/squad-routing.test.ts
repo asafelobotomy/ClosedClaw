@@ -9,7 +9,7 @@ import type { SquadCoordinator, SquadResult, _SquadConfig } from "../agents/squa
 import {
   analyzeSquadTrigger,
 
-/* oxlint-disable typescript-eslint/unbound-method */
+  /* oxlint-disable typescript-eslint/unbound-method */
   findSquadBinding,
   buildSquadConfig,
   aggregateSquadReply,
@@ -324,7 +324,9 @@ describe("routeToSquad", () => {
     expect(result.reply).toBeTruthy();
     expect(coordinator.createSquad as unknown as ReturnType<typeof vi.fn>).toHaveBeenCalledOnce();
     expect(coordinator.executeTask as unknown as ReturnType<typeof vi.fn>).toHaveBeenCalledOnce();
-    expect(coordinator.terminateSquad as unknown as ReturnType<typeof vi.fn>).toHaveBeenCalledWith("squad-test");
+    expect(coordinator.terminateSquad as unknown as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(
+      "squad-test",
+    );
   });
 
   it("routes to auto squad on high complexity", async () => {

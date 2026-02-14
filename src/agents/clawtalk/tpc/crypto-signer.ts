@@ -9,7 +9,6 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-
 import type { SignedTPCEnvelope, TPCEnvelope, TPCSignatureScheme } from "./types.js";
 
 // ---------------------------------------------------------------------------
@@ -46,8 +45,8 @@ export async function exportKeyPair(
     fs.mkdirSync(pubDir, { recursive: true, mode: 0o700 });
   }
 
-  const privatePem = keyPair.privateKey.export({ type: "pkcs8", format: "pem" }) as string;
-  const publicPem = keyPair.publicKey.export({ type: "spki", format: "pem" }) as string;
+  const privatePem = keyPair.privateKey.export({ type: "pkcs8", format: "pem" });
+  const publicPem = keyPair.publicKey.export({ type: "spki", format: "pem" });
 
   fs.writeFileSync(privatePath, privatePem, { mode: 0o600 });
   fs.writeFileSync(publicPath, publicPem, { mode: 0o644 });
@@ -96,7 +95,7 @@ export function loadPublicKey(publicPath: string): crypto.KeyObject {
  * Fields are sorted alphabetically to ensure deterministic serialization.
  */
 export function canonicalize(envelope: TPCEnvelope): string {
-  return JSON.stringify(envelope, Object.keys(envelope).sort());
+  return JSON.stringify(envelope, Object.keys(envelope).toSorted());
 }
 
 /**
@@ -119,10 +118,7 @@ export function signEnvelope(
 /**
  * Sign a TPC envelope with HMAC-SHA256 (fallback).
  */
-export function signEnvelopeHmac(
-  envelope: TPCEnvelope,
-  secret: Buffer,
-): SignedTPCEnvelope {
+export function signEnvelopeHmac(envelope: TPCEnvelope, secret: Buffer): SignedTPCEnvelope {
   const data = canonicalize(envelope);
   const hmac = crypto.createHmac("sha256", secret);
   hmac.update(data);
@@ -142,11 +138,10 @@ export function signEnvelopeHmac(
 /**
  * Verify an Ed25519-signed TPC envelope.
  */
-export function verifyEnvelope(
-  signed: SignedTPCEnvelope,
-  publicKey: crypto.KeyObject,
-): boolean {
-  if (signed.scheme !== "ed25519") return false;
+export function verifyEnvelope(signed: SignedTPCEnvelope, publicKey: crypto.KeyObject): boolean {
+  if (signed.scheme !== "ed25519") {
+    return false;
+  }
 
   const data = Buffer.from(canonicalize(signed.envelope), "utf-8");
   const signature = Buffer.from(signed.signature, "hex");
@@ -157,21 +152,17 @@ export function verifyEnvelope(
 /**
  * Verify an HMAC-SHA256-signed TPC envelope.
  */
-export function verifyEnvelopeHmac(
-  signed: SignedTPCEnvelope,
-  secret: Buffer,
-): boolean {
-  if (signed.scheme !== "hmac") return false;
+export function verifyEnvelopeHmac(signed: SignedTPCEnvelope, secret: Buffer): boolean {
+  if (signed.scheme !== "hmac") {
+    return false;
+  }
 
   const data = canonicalize(signed.envelope);
   const hmac = crypto.createHmac("sha256", secret);
   hmac.update(data);
   const expected = hmac.digest("hex");
 
-  return crypto.timingSafeEqual(
-    Buffer.from(signed.signature, "hex"),
-    Buffer.from(expected, "hex"),
-  );
+  return crypto.timingSafeEqual(Buffer.from(signed.signature, "hex"), Buffer.from(expected, "hex"));
 }
 
 /**
@@ -258,10 +249,7 @@ export function createSignedEnvelope(params: {
 /**
  * Check whether a TPC envelope is within the allowed time window.
  */
-export function isEnvelopeFresh(
-  envelope: TPCEnvelope,
-  maxAgeSeconds: number,
-): boolean {
+export function isEnvelopeFresh(envelope: TPCEnvelope, maxAgeSeconds: number): boolean {
   const now = Math.floor(Date.now() / 1000);
   const age = now - envelope.timestamp;
   return age >= 0 && age <= maxAgeSeconds;

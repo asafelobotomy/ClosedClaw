@@ -216,7 +216,7 @@ vi.mock("../process/exec.js", () => ({
   runCommandWithTimeout,
 }));
 
-vi.mock("../infra/openclaw-root.js", () => ({
+vi.mock("../infra/closedclaw-root.js", () => ({
   resolveClosedClawPackageRoot,
 }));
 
@@ -331,33 +331,37 @@ vi.mock("./doctor-update.js", () => ({
 }));
 
 describe("doctor command", () => {
-  it("warns when the state directory is missing", async () => {
-    readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/ClosedClaw.json",
-      exists: true,
-      raw: "{}",
-      parsed: {},
-      valid: true,
-      config: {},
-      issues: [],
-      legacyIssues: [],
-    });
+  it(
+    "warns when the state directory is missing",
+    async () => {
+      readConfigFileSnapshot.mockResolvedValue({
+        path: "/tmp/ClosedClaw.json",
+        exists: true,
+        raw: "{}",
+        parsed: {},
+        valid: true,
+        config: {},
+        issues: [],
+        legacyIssues: [],
+      });
 
-    const missingDir = fs.mkdtempSync(path.join(os.tmpdir(), "ClosedClaw-missing-state-"));
-    fs.rmSync(missingDir, { recursive: true, force: true });
-    process.env.ClosedClaw_STATE_DIR = missingDir;
-    note.mockClear();
+      const missingDir = fs.mkdtempSync(path.join(os.tmpdir(), "ClosedClaw-missing-state-"));
+      fs.rmSync(missingDir, { recursive: true, force: true });
+      process.env.ClosedClaw_STATE_DIR = missingDir;
+      note.mockClear();
 
-    const { doctorCommand } = await import("./doctor.js");
-    await doctorCommand(
-      { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
-      { nonInteractive: true, workspaceSuggestions: false },
-    );
+      const { doctorCommand } = await import("./doctor.js");
+      await doctorCommand(
+        { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
+        { nonInteractive: true, workspaceSuggestions: false },
+      );
 
-    const stateNote = note.mock.calls.find((call) => call[1] === "State integrity");
-    expect(stateNote).toBeTruthy();
-    expect(String(stateNote?.[0])).toContain("CRITICAL");
-  }, TIMEOUT_HTTP_DEFAULT_MS);
+      const stateNote = note.mock.calls.find((call) => call[1] === "State integrity");
+      expect(stateNote).toBeTruthy();
+      expect(String(stateNote?.[0])).toContain("CRITICAL");
+    },
+    TIMEOUT_HTTP_DEFAULT_MS,
+  );
 
   it("warns about opencode provider overrides", async () => {
     readConfigFileSnapshot.mockResolvedValue({

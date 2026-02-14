@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { runCommandWithTimeout } from "../process/exec.js";
 import { defaultRuntime, type RuntimeEnv } from "../runtime.js";
-import { resolveClosedClawPackageRoot } from "./openclaw-root.js";
+import { resolveClosedClawPackageRoot } from "./closedclaw-root.js";
 
 export function resolveControlUiRepoRoot(
   argv1: string | undefined = process.argv[1],

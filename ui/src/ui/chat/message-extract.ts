@@ -1,12 +1,7 @@
 import { stripThinkingTags } from "../format";
 
 const ENVELOPE_PREFIX = /^\[([^\]]+)\]\s*/;
-const ENVELOPE_CHANNELS = [
-  "WebChat",
-  "Matrix",
-  "Zalo",
-  "Zalo Personal",
-];
+const ENVELOPE_CHANNELS = ["WebChat", "Matrix", "Zalo", "Zalo Personal"];
 
 const textCache = new WeakMap<object, string | null>();
 const thinkingCache = new WeakMap<object, string | null>();

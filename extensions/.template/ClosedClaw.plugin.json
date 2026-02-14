@@ -35,12 +35,7 @@
       "placeholder": "Enter value"
     }
   },
-  "capabilities": [
-    "tools",
-    "hooks",
-    "channels",
-    "providers"
-  ],
+  "capabilities": ["tools", "hooks", "channels", "providers"],
   "homepage": "https://github.com/ClosedClaw/ClosedClaw/tree/main/extensions/extension-template",
   "repository": "https://github.com/ClosedClaw/ClosedClaw"
 }

@@ -68,18 +68,16 @@ const SIMPLE_INTENTS = new Set([
 ]);
 
 // Intents that benefit from larger models
-const COMPLEX_INTENTS = new Set([
-  "code_generate",
-  "code_review",
-  "code_debug",
-  "code_refactor",
-]);
+const COMPLEX_INTENTS = new Set(["code_generate", "code_review", "code_debug", "code_refactor"]);
 
 // Risk classification by intent — used for UI indicators
 const HIGH_RISK_INTENTS = new Set(["run_command", "write_file"]);
 const MEDIUM_RISK_INTENTS = new Set([
-  "code_generate", "code_refactor", "clipboard_manage",
-  "code_debug", "browse",
+  "code_generate",
+  "code_refactor",
+  "clipboard_manage",
+  "code_debug",
+  "browse",
 ]);
 
 function classifyRisk(intent: string): "low" | "medium" | "high" {

@@ -86,7 +86,9 @@ export async function listKeysCommand(
           ? theme.warn
           : theme.error;
 
-    runtime.log(`${theme.accent("●")} ${keyId.slice(0, 16)}... ${trustColor(`[${key.trustLevel}]`)}`);
+    runtime.log(
+      `${theme.accent("●")} ${keyId.slice(0, 16)}... ${trustColor(`[${key.trustLevel}]`)}`,
+    );
     runtime.log(`  ${theme.muted("Name:")} ${key.name}`);
     runtime.log(`  ${theme.muted("Added:")} ${key.added.split("T")[0]}`);
     runtime.log(`  ${theme.muted("Verified via:")} ${key.verifiedVia}`);

@@ -12,9 +12,14 @@
  * @see {@link /docs/security/audit-logging.md Audit Logging Documentation}
  */
 
-import { AuditLogger, getAuditLogPath, type AuditEventType, type AuditSeverity } from "../security/audit-logger.js";
 import { resolveStateDir } from "../config/paths.js";
 import { logDebug, logWarn } from "../logger.js";
+import {
+  AuditLogger,
+  getAuditLogPath,
+  type AuditEventType,
+  type AuditSeverity,
+} from "../security/audit-logger.js";
 
 // ---------------------------------------------------------------------------
 // Singleton Audit Logger
@@ -92,7 +97,11 @@ export async function logToolExecution(opts: {
   }
 
   const severity: AuditSeverity =
-    opts.result === "failure" ? "warn" : opts.tool === "bash" || opts.tool === "exec" ? "info" : "info";
+    opts.result === "failure"
+      ? "warn"
+      : opts.tool === "bash" || opts.tool === "exec"
+        ? "info"
+        : "info";
 
   const summary = opts.command
     ? `Tool: ${opts.tool} | Command: ${opts.command.slice(0, 100)}${opts.command.length > 100 ? "…" : ""}`

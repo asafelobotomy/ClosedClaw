@@ -9,20 +9,24 @@ This document summarizes the complete security hardening implementation for Clos
 ## Completed Priorities
 
 ### Priority 3: Memory Storage Encryption ✅
+
 **Status**: Pre-existing infrastructure, already production-ready
 
 **Implementation**:
+
 - AES-256-GCM authenticated encryption
 - Argon2id key derivation (OWASP-compliant)
 - XChaCha20-Poly1305 for extended nonce space
 - Encrypted storage for memories, sessions, and sensitive data
 
 **Key Files**:
+
 - `src/security/crypto.ts` - Core encryption implementation
 - `src/security/passphrase.ts` - Passphrase management
 - `src/constants/security.ts` - Security constants and defaults
 
 **Features**:
+
 - 64 MB memory cost (GPU attack resistant)
 - 3 iterations (OWASP minimum exceeded)
 - 256-bit keys
@@ -31,10 +35,12 @@ This document summarizes the complete security hardening implementation for Clos
 ---
 
 ### Priority 4: Skill/Plugin Signing & Verification ✅
+
 **Completed**: February 10, 2026
 **Total Lines**: ~2,200 (implementation + tests + documentation)
 
 **Implementation**:
+
 - Ed25519 digital signatures for skills/plugins
 - Cryptographic verification during installation
 - Trusted keyring for public key management
@@ -42,6 +48,7 @@ This document summarizes the complete security hardening implementation for Clos
 - CLI commands for key generation, signing, and verification
 
 **Key Files**:
+
 - `src/agents/skill-verification.ts` (215 lines) - Core verification logic
 - `src/commands/skill-sign.ts` (212 lines) - Keygen and sign commands
 - `src/commands/keys-management.ts` (207 lines) - Key management CLI
@@ -51,6 +58,7 @@ This document summarizes the complete security hardening implementation for Clos
 - Documentation: 1,350+ lines
 
 **CLI Commands**:
+
 ```bash
 # Generate key pair
 closedclaw security skill keygen --signer "Your Name"
@@ -66,15 +74,16 @@ closedclaw security keys trust <keyId> --trust marginal
 ```
 
 **Configuration**:
+
 ```json5
 {
-  "skills": {
-    "security": {
-      "requireSignature": false,  // Enforce signature requirement
-      "promptOnUnsigned": true,   // Warn on unsigned skills
-      "minTrustLevel": "marginal" // Minimum trust level
-    }
-  }
+  skills: {
+    security: {
+      requireSignature: false, // Enforce signature requirement
+      promptOnUnsigned: true, // Warn on unsigned skills
+      minTrustLevel: "marginal", // Minimum trust level
+    },
+  },
 }
 ```
 
@@ -83,10 +92,12 @@ closedclaw security keys trust <keyId> --trust marginal
 ---
 
 ### Priority 6: Immutable Audit Logging ✅
+
 **Completed**: February 10, 2026
 **Total Lines**: ~2,300 (CLI + integration + tests + docs)
 
 **Implementation**:
+
 - JSONL format (one event per line, streamable)
 - SHA-256 hash chains for tamper detection
 - Blockchain-style integrity verification
@@ -95,6 +106,7 @@ closedclaw security keys trust <keyId> --trust marginal
 - Integration hooks in critical paths
 
 **Key Files**:
+
 - `src/security/audit-logger.ts` (570 lines) - Core logger (pre-existing)
 - `src/commands/audit-query.ts` (410 lines) - CLI commands
 - `src/security/audit-hooks.ts` (420 lines) - Integration hooks
@@ -103,6 +115,7 @@ closedclaw security keys trust <keyId> --trust marginal
 - Documentation: 710+ lines
 
 **Event Types**:
+
 - `tool_exec` - Tool executions (bash, network,file ops)
 - `config_change` - Configuration modifications
 - `skill_install`/`skill_uninstall` - Skill lifecycle
@@ -116,6 +129,7 @@ closedclaw security keys trust <keyId> --trust marginal
 - `upstream_sync` - Upstream tracking
 
 **CLI Commands**:
+
 ```bash
 # Query audit log
 closedclaw security log query --since 1h --type tool_exec
@@ -132,6 +146,7 @@ closedclaw security log verify
 ```
 
 **Log Format**:
+
 ```json
 {
   "seq": 42,
@@ -139,7 +154,7 @@ closedclaw security log verify
   "type": "tool_exec",
   "severity": "info",
   "summary": "Tool: bash | Command: ls -la",
-  "details": {"tool": "bash", "command": "ls -la", "exitCode": 0},
+  "details": { "tool": "bash", "command": "ls -la", "exitCode": 0 },
   "actor": "agent:main",
   "session": "agent:main:whatsapp:dm:+1234567890",
   "prevHash": "a3f2...",
@@ -148,6 +163,7 @@ closedclaw security log verify
 ```
 
 **Performance**:
+
 - < 1ms overhead per event
 - ~50-100 KB per 1000 events
 - Async buffered writes
@@ -157,10 +173,12 @@ closedclaw security log verify
 ---
 
 ### Priority 7: OS Keychain Integration ✅
+
 **Completed**: February 10, 2026
 **Total Lines**: ~2,500 (infrastructure + CLI + tests + docs)
 
 **Implementation**:
+
 - Native OS keychain integration for all platforms
 - CLI tools for backend detection and status
 - Credential migration from JSON files
@@ -168,6 +186,7 @@ closedclaw security log verify
 - No native compilation required (uses CLI tools)
 
 **Key Files**:
+
 - `src/security/keychain.ts` (670 lines) - Core integration (pre-existing)
 - `src/commands/keychain.ts` (370 lines) - CLI commands
 - `src/security/keychain.test.ts` (439 lines) - Infrastructure tests (pre-existing)
@@ -175,12 +194,14 @@ closedclaw security log verify
 - Documentation: 885+ lines
 
 **Supported Backends**:
+
 - **macOS**: Keychain.app via `security` CLI (built-in)
 - **Linux**: Secret Service via `secret-tool` CLI (GNOME Keyring, KWallet)
 - **Windows**: Credential Manager via `cmdkey` CLI (built-in)
 - **Fallback**: Encrypted file store (Priority 3) for headless/CI
 
 **CLI Commands**:
+
 ```bash
 # Check backend status
 closedclaw security keychain status
@@ -194,6 +215,7 @@ closedclaw security keychain list
 ```
 
 **Design Decisions**:
+
 - Native CLI tools instead of FFI bindings (no native compilation)
 - Service format: `ClosedClaw:<namespace>`
 - Account format: `<identifier>`
@@ -201,6 +223,7 @@ closedclaw security keychain list
 - Transparent fallback to encrypted files
 
 **Security Properties**:
+
 - OS-level access control
 - Screen lock integration
 - Biometric unlock support (platform-dependent)
@@ -211,9 +234,11 @@ closedclaw security keychain list
 ---
 
 ### Priority 3.5: Constants Consolidation ✅
+
 **Status**: Pre-existing infrastructure, fully complete
 
 **Implementation**:
+
 - Centralized constants library in `src/constants/`
 - Type-safe via `as const` assertions
 - OWASP/NIST compliance documented
@@ -221,6 +246,7 @@ closedclaw security keychain list
 - 372 lines of tests
 
 **Key Files**:
+
 - `src/constants/security.ts` (309 lines) - Security defaults
 - `src/constants/limits.ts` (235 lines) - Timeouts, memory, token caps
 - `src/constants/paths.ts` - File system paths
@@ -231,8 +257,9 @@ closedclaw security keychain list
 - `src/constants/index.test.ts` (372 lines) - Comprehensive tests
 
 **Usage**:
+
 ```typescript
-import { SECURITY, LIMITS, PATHS, NETWORK, CHANNELS, AGENTS } from '../constants';
+import { SECURITY, LIMITS, PATHS, NETWORK, CHANNELS, AGENTS } from "../constants";
 
 // Security
 const kdfParams = SECURITY.ENCRYPTION.KDF_PARAMS;
@@ -248,6 +275,7 @@ const sessionsDir = PATHS.SUBDIRS.SESSIONS;
 ```
 
 **Benefits**:
+
 - Single source of truth
 - Easy security audits
 - Simplified testing
@@ -260,41 +288,45 @@ const sessionsDir = PATHS.SUBDIRS.SESSIONS;
 ## Total Statistics
 
 ### Code Contributions
-| Category | Lines | Description |
-|----------|-------|-------------|
-| **Implementation** | ~5,000 | Core logic, CLI commands, integration |
-| **Tests** | ~2,500 | Unit, integration, E2E coverage |
-| **Documentation** | ~3,500 | User guides, CLI references, examples |
-| **Infrastructure** | ~1,200 | Constants library, types, utilities |
-| **Total** | **~12,200** | Production-ready, tested, documented code |
+
+| Category           | Lines       | Description                               |
+| ------------------ | ----------- | ----------------------------------------- |
+| **Implementation** | ~5,000      | Core logic, CLI commands, integration     |
+| **Tests**          | ~2,500      | Unit, integration, E2E coverage           |
+| **Documentation**  | ~3,500      | User guides, CLI references, examples     |
+| **Infrastructure** | ~1,200      | Constants library, types, utilities       |
+| **Total**          | **~12,200** | Production-ready, tested, documented code |
 
 ### Documentation Files
-| File | Lines | Description |
-|------|-------|-------------|
-| `docs/security/skill-signing.md` | 600+ | Skill signing guide |
-| `docs/security/trusted-keyring.md` | 550+ | Key management |
-| `docs/security/audit-logging.md` | 650+ | Audit log guide |
-| `docs/security/keychain.md` | 800+ | Keychain integration |
-| `docs/cli/security.md` | 200+ | CLI reference (updated) |
-| `priority-4-skill-signing.md` | 800+ | Priority 4 report |
-| `priority-6-audit-logging.md` | 700+ | Priority 6 report |
-| `priority-7-keychain.md` | 900+ | Priority 7 report |
-| **Total** | **5,200+** | Comprehensive guides |
+
+| File                               | Lines      | Description             |
+| ---------------------------------- | ---------- | ----------------------- |
+| `docs/security/skill-signing.md`   | 600+       | Skill signing guide     |
+| `docs/security/trusted-keyring.md` | 550+       | Key management          |
+| `docs/security/audit-logging.md`   | 650+       | Audit log guide         |
+| `docs/security/keychain.md`        | 800+       | Keychain integration    |
+| `docs/cli/security.md`             | 200+       | CLI reference (updated) |
+| `priority-4-skill-signing.md`      | 800+       | Priority 4 report       |
+| `priority-6-audit-logging.md`      | 700+       | Priority 6 report       |
+| `priority-7-keychain.md`           | 900+       | Priority 7 report       |
+| **Total**                          | **5,200+** | Comprehensive guides    |
 
 ### Test Coverage
-| Priority | Test Lines | Coverage | Description |
-|----------|-----------|----------|-------------|
-| Priority 4 | 1,102 | 90%+ | Signing, verification, key management |
-| Priority 6 | 830 | 85%+ | Query, stats, hooks, integrity |
-| Priority 7 | 929 | 85%+ | Backends, migration, CLI commands |
-| Constants | 372 | 95%+ | Value validation, type safety |
-| **Total** | **3,233** | **70%+** | Comprehensive test suite |
+
+| Priority   | Test Lines | Coverage | Description                           |
+| ---------- | ---------- | -------- | ------------------------------------- |
+| Priority 4 | 1,102      | 90%+     | Signing, verification, key management |
+| Priority 6 | 830        | 85%+     | Query, stats, hooks, integrity        |
+| Priority 7 | 929        | 85%+     | Backends, migration, CLI commands     |
+| Constants  | 372        | 95%+     | Value validation, type safety         |
+| **Total**  | **3,233**  | **70%+** | Comprehensive test suite              |
 
 ---
 
 ## Security Features Summary
 
 ### 🔐 Encryption
+
 - **Algorithm**: AES-256-GCM (authenticated encryption)
 - **KDF**: Argon2id (OWASP-compliant)
 - **Parameters**: 64 MB memory, 3 iterations, 4 parallelism
@@ -302,6 +334,7 @@ const sessionsDir = PATHS.SUBDIRS.SESSIONS;
 - **Status**: Opt-in (becoming default)
 
 ### ✍️ Signing
+
 - **Algorithm**: Ed25519 (elliptic curve signatures)
 - **Key Size**: 256 bits (public + private)
 - **Trust Levels**: Full, marginal, none
@@ -309,6 +342,7 @@ const sessionsDir = PATHS.SUBDIRS.SESSIONS;
 - **Status**: Production-ready with CLI tools
 
 ### 📝 Audit Logging
+
 - **Format**: JSONL (JSON Lines)
 - **Integrity**: SHA-256 hash chains (blockchain-style)
 - **Event Types**: 13 categories tracked
@@ -317,6 +351,7 @@ const sessionsDir = PATHS.SUBDIRS.SESSIONS;
 - **Status**: Operational with integration hooks
 
 ### 🔑 Credential Management
+
 - **Storage**: OS native keychains (macOS/Linux/Windows)
 - **Fallback**: Encrypted files (headless/CI)
 - **Tool**: Native CLI (no FFI compilation)
@@ -324,6 +359,7 @@ const sessionsDir = PATHS.SUBDIRS.SESSIONS;
 - **Status**: Cross-platform, production-ready
 
 ### 📦 Constants
+
 - **Organization**: Centralized library (`src/constants/`)
 - **Type Safety**: `as const` assertions
 - **Compliance**: OWASP/NIST documented
@@ -335,6 +371,7 @@ const sessionsDir = PATHS.SUBDIRS.SESSIONS;
 ## Architecture Highlights
 
 ### Layered Security Model
+
 1. **Storage Layer**: AES-256-GCM encryption at rest
 2. **Code Layer**: Ed25519 signature verification
 3. **Access Layer**: OS keychain with fallback
@@ -342,6 +379,7 @@ const sessionsDir = PATHS.SUBDIRS.SESSIONS;
 5. **Execution Layer**: Sandbox isolation (pre-existing)
 
 ### Cross-Platform Support
+
 - **macOS**: Full native support (Keychain.app)
 - **Linux**: Full native support (Secret Service)
 - **Windows**: Full native support (Credential Manager)
@@ -349,6 +387,7 @@ const sessionsDir = PATHS.SUBDIRS.SESSIONS;
 - **CI/CD**: Complete support (Docker, GitHub Actions)
 
 ### Developer Experience
+
 - **CLI Tools**: 15+ security commands
 - **Documentation**: 5,200+ lines of guides
 - **Error Messages**: Clear with remediation steps
@@ -357,6 +396,7 @@ const sessionsDir = PATHS.SUBDIRS.SESSIONS;
 - **Type Safety**: Zero `any` types, strict TypeScript
 
 ### Production Readiness
+
 - ✅ 70%+ test coverage (security: 90%+)
 - ✅ Zero ESLint/Oxlint warnings
 - ✅ Consistent formatting (Oxfmt)
@@ -370,12 +410,14 @@ const sessionsDir = PATHS.SUBDIRS.SESSIONS;
 ## CLI Command Reference
 
 ### Skill Signing
+
 ```bash
 closedclaw security skill keygen --signer "Your Name"
 closedclaw security skill sign ./SKILL.md --key ./key.pem
 ```
 
 ### Key Management
+
 ```bash
 closedclaw security keys list
 closedclaw security keys add <keyId> <pubkey> --trust full
@@ -384,6 +426,7 @@ closedclaw security keys trust <keyId> --trust marginal
 ```
 
 ### Audit Logging
+
 ```bash
 closedclaw security log query --since 1h --type tool_exec
 closedclaw security log stats --verify
@@ -392,6 +435,7 @@ closedclaw security log verify
 ```
 
 ### Keychain Management
+
 ```bash
 closedclaw security keychain status
 closedclaw security keychain migrate
@@ -399,6 +443,7 @@ closedclaw security keychain list
 ```
 
 ### Security Audit
+
 ```bash
 closedclaw security audit
 closedclaw security audit --deep
@@ -410,32 +455,34 @@ closedclaw security audit --fix
 ## Configuration Examples
 
 ### Skill Security
+
 ```json5
 {
-  "skills": {
-    "security": {
-      "requireSignature": true,    // Require all skills to be signed
-      "promptOnUnsigned": true,    // Prompt user for unsigned skills
-      "minTrustLevel": "full"      // Require full trust level
-    }
-  }
+  skills: {
+    security: {
+      requireSignature: true, // Require all skills to be signed
+      promptOnUnsigned: true, // Prompt user for unsigned skills
+      minTrustLevel: "full", // Require full trust level
+    },
+  },
 }
 ```
 
 ### Encryption
+
 ```json5
 {
-  "encryption": {
-    "enabled": true,               // Enable encryption at rest
-    "algorithm": "xchacha20-poly1305",
-    "kdf": "argon2id",
-    "kdfParams": {
-      "memory": 65536,             // 64 MB
-      "iterations": 3,
-      "parallelism": 4,
-      "keyLength": 32
-    }
-  }
+  encryption: {
+    enabled: true, // Enable encryption at rest
+    algorithm: "xchacha20-poly1305",
+    kdf: "argon2id",
+    kdfParams: {
+      memory: 65536, // 64 MB
+      iterations: 3,
+      parallelism: 4,
+      keyLength: 32,
+    },
+  },
 }
 ```
 
@@ -444,6 +491,7 @@ closedclaw security audit --fix
 ## Testing
 
 ### Run Tests
+
 ```bash
 # Install dependencies
 pnpm install
@@ -453,7 +501,7 @@ pnpm test
 
 # Run specific priority tests
 pnpm test -- src/agents/skill-verification.test.ts
-pnpm test -- src/commands/audit-query.test.ts  
+pnpm test -- src/commands/audit-query.test.ts
 pnpm test -- src/commands/keychain.test.ts
 
 # Coverage report
@@ -464,6 +512,7 @@ pnpm test:e2e
 ```
 
 ### Test Metrics
+
 - **Total Test Files**: 10+ security-focused test files
 - **Total Test Lines**: 3,233 lines
 - **Coverage**: 70%+ overall, 90%+ security-critical paths
@@ -475,12 +524,14 @@ pnpm test:e2e
 ## Known Limitations & Future Work
 
 ### Current Limitations
+
 1. **Encryption**: Opt-in by default (will become mandatory after stability proven)
 2. **Skill Signing**: No central signature registry (users manage trust locally)
 3. **Audit Log**: No automatic rotation (manual management required)
 4. **Keychain**: Native keychains don't support CLI enumeration
 
 ### Future Enhancements (Optional)
+
 1. **Automatic log rotation** with size/time-based policies
 2. **Real-time SIEM integration** for audit streaming
 3. **Signature registry** for centralized trust management
@@ -492,18 +543,21 @@ pnpm test:e2e
 ## Compliance & Standards
 
 ### OWASP Compliance
+
 - ✅ Password Storage Cheat Sheet (Argon2id parameters)
 - ✅ Cryptographic Storage Cheat Sheet (AES-256-GCM)
 - ✅ Key Management Cheat Sheet (Ed25519, OS keychains)
 - ✅ Logging Cheat Sheet (tamper-evident audit logs)
 
 ### NIST Guidelines
+
 - ✅ SP 800-63B (passphrase requirements)
 - ✅ SP 800-131A (cryptographic algorithms)
 - ✅ SP 800-57 (key management)
 - ✅ SP 800-92 (log management)
 
 ### Industry Best Practices
+
 - ✅ Defense in depth (layered security)
 - ✅ Least privilege (minimal permissions)
 - ✅ Fail securely (graceful degradation)
@@ -527,6 +581,7 @@ All security hardening priorities for ClosedClaw have been successfully complete
 Total contribution: **~12,200 lines** of production code, tests, and documentation.
 
 For questions or issues, refer to:
+
 - [Skill Signing Guide](/docs/security/skill-signing.md)
 - [Audit Logging Guide](/docs/security/audit-logging.md)
 - [Keychain Guide](/docs/security/keychain.md)

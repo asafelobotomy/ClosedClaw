@@ -130,7 +130,7 @@ export interface WorkflowDefinition {
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-const DEFAULT_STEP_TIMEOUT_MS = 300_000;    // 5 minutes
+const DEFAULT_STEP_TIMEOUT_MS = 300_000; // 5 minutes
 const DEFAULT_WORKFLOW_TIMEOUT_MS = 1_800_000; // 30 minutes
 
 import { DELAY_RETRY_BASE_MS, DELAY_RETRY_MAX_MS } from "../config/constants/index.js";
@@ -180,21 +180,21 @@ export function parseWorkflowDefinition(raw: unknown): WorkflowDefinition {
   validateDependencies(steps);
 
   // Timeouts
-  const timeoutMs = typeof obj.timeoutMs === "number"
-    ? obj.timeoutMs
-    : typeof obj.timeout === "number"
-      ? obj.timeout
-      : DEFAULT_WORKFLOW_TIMEOUT_MS;
+  const timeoutMs =
+    typeof obj.timeoutMs === "number"
+      ? obj.timeoutMs
+      : typeof obj.timeout === "number"
+        ? obj.timeout
+        : DEFAULT_WORKFLOW_TIMEOUT_MS;
 
   // Default retry
-  const defaultRetry = obj.defaultRetry
-    ? parseRetryPolicy(obj.defaultRetry)
-    : undefined;
+  const defaultRetry = obj.defaultRetry ? parseRetryPolicy(obj.defaultRetry) : undefined;
 
   // Variables
-  const variables = obj.variables && typeof obj.variables === "object"
-    ? obj.variables as Record<string, unknown>
-    : undefined;
+  const variables =
+    obj.variables && typeof obj.variables === "object"
+      ? (obj.variables as Record<string, unknown>)
+      : undefined;
 
   // Tags
   const tags = Array.isArray(obj.tags)
@@ -224,9 +224,10 @@ function parseTrigger(raw: unknown): WorkflowTrigger {
     return {
       kind: "event",
       eventName: (obj.event ?? obj.eventName) as string,
-      filter: obj.filter && typeof obj.filter === "object"
-        ? obj.filter as Record<string, unknown>
-        : undefined,
+      filter:
+        obj.filter && typeof obj.filter === "object"
+          ? (obj.filter as Record<string, unknown>)
+          : undefined,
     };
   }
 
@@ -255,9 +256,7 @@ function parseStep(raw: unknown, index: number): WorkflowStep {
   const hasAgent = typeof obj.agent === "string";
 
   if (!hasTool && !hasAgent) {
-    throw new WorkflowValidationError(
-      `Step "${name}" must have either 'tool' or 'agent'`,
-    );
+    throw new WorkflowValidationError(`Step "${name}" must have either 'tool' or 'agent'`);
   }
 
   const type: "tool" | "agent" = hasTool ? "tool" : "agent";
@@ -272,9 +271,10 @@ function parseStep(raw: unknown, index: number): WorkflowStep {
         : undefined;
 
   // Parse params
-  const params = obj.params && typeof obj.params === "object"
-    ? obj.params as Record<string, unknown>
-    : undefined;
+  const params =
+    obj.params && typeof obj.params === "object"
+      ? (obj.params as Record<string, unknown>)
+      : undefined;
 
   // Parse retry
   const retry = obj.retry ? parseRetryPolicy(obj.retry) : undefined;
@@ -282,19 +282,20 @@ function parseStep(raw: unknown, index: number): WorkflowStep {
   return {
     name,
     type,
-    tool: hasTool ? obj.tool as string : undefined,
-    agent: hasAgent ? obj.agent as string : undefined,
+    tool: hasTool ? (obj.tool as string) : undefined,
+    agent: hasAgent ? (obj.agent as string) : undefined,
     params,
     prompt: typeof obj.prompt === "string" ? obj.prompt : undefined,
     model: typeof obj.model === "string" ? obj.model : undefined,
     dependsOn,
     continueOnError: obj.continueOnError === true || obj.continue_on_error === true,
     retry,
-    timeoutMs: typeof obj.timeoutMs === "number"
-      ? obj.timeoutMs
-      : typeof obj.timeout === "number"
-        ? obj.timeout
-        : DEFAULT_STEP_TIMEOUT_MS,
+    timeoutMs:
+      typeof obj.timeoutMs === "number"
+        ? obj.timeoutMs
+        : typeof obj.timeout === "number"
+          ? obj.timeout
+          : DEFAULT_STEP_TIMEOUT_MS,
     condition: typeof obj.condition === "string" ? obj.condition : undefined,
   };
 }
@@ -310,10 +311,16 @@ function parseRetryPolicy(raw: unknown): RetryPolicy {
 
   const obj = raw as Record<string, unknown>;
   return {
-    maxRetries: typeof obj.maxRetries === "number" ? obj.maxRetries : DEFAULT_RETRY_POLICY.maxRetries,
-    baseDelayMs: typeof obj.baseDelayMs === "number" ? obj.baseDelayMs : DEFAULT_RETRY_POLICY.baseDelayMs,
-    maxDelayMs: typeof obj.maxDelayMs === "number" ? obj.maxDelayMs : DEFAULT_RETRY_POLICY.maxDelayMs,
-    backoffMultiplier: typeof obj.backoffMultiplier === "number" ? obj.backoffMultiplier : DEFAULT_RETRY_POLICY.backoffMultiplier,
+    maxRetries:
+      typeof obj.maxRetries === "number" ? obj.maxRetries : DEFAULT_RETRY_POLICY.maxRetries,
+    baseDelayMs:
+      typeof obj.baseDelayMs === "number" ? obj.baseDelayMs : DEFAULT_RETRY_POLICY.baseDelayMs,
+    maxDelayMs:
+      typeof obj.maxDelayMs === "number" ? obj.maxDelayMs : DEFAULT_RETRY_POLICY.maxDelayMs,
+    backoffMultiplier:
+      typeof obj.backoffMultiplier === "number"
+        ? obj.backoffMultiplier
+        : DEFAULT_RETRY_POLICY.backoffMultiplier,
   };
 }
 
@@ -341,14 +348,10 @@ function validateDependencies(steps: WorkflowStep[]): void {
     if (step.dependsOn) {
       for (const dep of step.dependsOn) {
         if (!stepNames.has(dep)) {
-          throw new WorkflowValidationError(
-            `Step "${step.name}" depends on unknown step "${dep}"`,
-          );
+          throw new WorkflowValidationError(`Step "${step.name}" depends on unknown step "${dep}"`);
         }
         if (dep === step.name) {
-          throw new WorkflowValidationError(
-            `Step "${step.name}" depends on itself`,
-          );
+          throw new WorkflowValidationError(`Step "${step.name}" depends on itself`);
         }
       }
     }
@@ -374,12 +377,12 @@ function detectCycles(steps: WorkflowStep[]): void {
     if (inStack.has(node)) {
       const cycleStart = path.indexOf(node);
       const cycle = path.slice(cycleStart).concat(node);
-      throw new WorkflowValidationError(
-        `Dependency cycle detected: ${cycle.join(" → ")}`,
-      );
+      throw new WorkflowValidationError(`Dependency cycle detected: ${cycle.join(" → ")}`);
     }
 
-    if (visited.has(node)) {return;}
+    if (visited.has(node)) {
+      return;
+    }
 
     inStack.add(node);
     path.push(node);
@@ -418,13 +421,12 @@ const TEMPLATE_PATTERN = /\{\{([^}]+)\}\}/g;
  * @param context - Available variables for interpolation
  * @returns Interpolated string
  */
-export function interpolate(
-  template: string,
-  context: InterpolationContext,
-): string {
+export function interpolate(template: string, context: InterpolationContext): string {
   return template.replace(TEMPLATE_PATTERN, (match, expr: string) => {
     const resolved = resolveExpression(expr.trim(), context);
-    if (resolved === undefined) {return match;} // Leave unresolved as-is
+    if (resolved === undefined) {
+      return match;
+    } // Leave unresolved as-is
     return typeof resolved === "string" ? resolved : JSON.stringify(resolved);
   });
 }
@@ -485,8 +487,12 @@ function resolveExpression(expr: string, context: InterpolationContext): unknown
 
   // Walk the dotted path
   for (let i = 1; i < parts.length; i++) {
-    if (current === null || current === undefined) {return undefined;}
-    if (typeof current !== "object") {return undefined;}
+    if (current === null || current === undefined) {
+      return undefined;
+    }
+    if (typeof current !== "object") {
+      return undefined;
+    }
     current = (current as Record<string, unknown>)[parts[i]];
   }
 

@@ -1,5 +1,6 @@
 import { cancel, confirm, isCancel, select } from "@clack/prompts";
 import type { RuntimeEnv } from "../runtime.js";
+import type { ResetScope } from "./onboard-types.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import {
   isNixMode,
@@ -16,7 +17,6 @@ import {
   listAgentSessionDirs,
   removePath,
 } from "./cleanup-utils.js";
-import type { ResetScope } from "./onboard-types.js";
 export type { ResetScope } from "./onboard-types.js";
 
 export type ResetOptions = {

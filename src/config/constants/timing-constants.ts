@@ -1,14 +1,14 @@
 /**
  * Timing Constants
- * 
+ *
  * Centralized constants for timeouts, intervals, delays, and TTLs used across ClosedClaw.
  * Use these instead of magic numbers to make timing values discoverable and maintainable.
- * 
+ *
  * @example
  * ```typescript
  * // Before
  * const timeout = 30_000;
- * 
+ *
  * // After
  * import { TIMEOUT_HTTP_DEFAULT_MS } from '@/config/constants';
  * const timeout = TIMEOUT_HTTP_DEFAULT_MS;
@@ -162,7 +162,7 @@ export function msToHours(ms: number): number {
 
 /**
  * Format milliseconds to human-readable string
- * 
+ *
  * @example
  * ```typescript
  * formatDuration(30_000) // "30s"

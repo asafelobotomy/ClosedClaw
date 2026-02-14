@@ -2,8 +2,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { SsrFPolicy } from "../infra/net/ssrf.js";
-import { logVerbose, shouldLogVerbose } from "../globals.js";
 import { type MediaKind, maxBytesForKind, mediaKindFromMime } from "../config/constants/index.js";
+import { logVerbose, shouldLogVerbose } from "../globals.js";
 import { fetchRemoteMedia } from "../media/fetch.js";
 import {
   convertHeicToJpeg,

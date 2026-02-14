@@ -2,18 +2,18 @@
  * Tests for audit query CLI commands.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs/promises";
-import path from "node:path";
 import os from "node:os";
+import path from "node:path";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import type { Runtime } from "../runtime.js";
+import { AuditLogger } from "../security/audit-logger.js";
 import {
   auditQueryCommand,
   auditStatsCommand,
   auditExportCommand,
   auditVerifyCommand,
 } from "./audit-query.js";
-import { AuditLogger } from "../security/audit-logger.js";
-import type { Runtime } from "../runtime.js";
 
 // Mock resolveStateDir to use temp directory
 vi.mock("../config/paths.js", async (importOriginal) => {
@@ -32,7 +32,7 @@ describe("audit query commands", () => {
 
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "audit-query-test-"));
-    const logPath = path. join(tmpDir, "audit.log");
+    const logPath = path.join(tmpDir, "audit.log");
     auditLogger = new AuditLogger(logPath);
     await auditLogger.init();
 
@@ -70,7 +70,7 @@ describe("audit query commands", () => {
       await auditQueryCommand(testRuntime, {});
 
       expect(logOutput.some((l) => l.includes("not found"))).toBe(true);
-      
+
       // Restore for other tests
       vi.mocked(resolveStateDir).mockReturnValue(tmpDir);
     });

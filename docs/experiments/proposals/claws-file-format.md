@@ -22,6 +22,7 @@ The `.claws` file format is a **Literate Executable**—a composite container br
 ## Motivation
 
 Current OpenClaw (v2.5) uses:
+
 - **Manual tool installation** via ClawHub
 - **Flat Markdown** (`.md`) for configuration and memory
 - **Python/Node scripts** for execution
@@ -29,6 +30,7 @@ Current OpenClaw (v2.5) uses:
 - **Prompt-based rules** for safety
 
 Proposed OpenClaw 3.0 will support:
+
 - **Autonomous "Skill-Maker" Loop** (Chain of Agents pattern)
 - **Literate Executables** (`.claws`)
 - **WASM Component Model** for sandboxed execution
@@ -48,7 +50,7 @@ Each `.claws` file is bound to hardware secure elements (TPM, Secure Enclave).
 # CRYPTOGRAPHIC IDENTITY
 signature: "sha256:a1b2c3d4e5f6..."
 signed_by: "hardware_key_id"
-device_binding: true  # Cannot execute on unauthorized machines
+device_binding: true # Cannot execute on unauthorized machines
 ---
 ```
 
@@ -65,12 +67,12 @@ id: "net.closedclaw.skills.stripe-manager"
 version: "2.1.0"
 schema_version: "3.0"
 runtime: "deno_wasi_v2"
-memory_strategy: "hybrid_rrf"  # Reciprocal Rank Fusion (Vector + Keyword)
+memory_strategy: "hybrid_rrf" # Reciprocal Rank Fusion (Vector + Keyword)
 
 permissions:
   - capability: "net.http"
     allow: ["api.stripe.com"]
-    pii_scan: true  # Scan responses for PII before passing to agent
+    pii_scan: true # Scan responses for PII before passing to agent
   - capability: "env.read"
     keys: ["STRIPE_API_KEY"]
   - deny: "fs.write"
@@ -86,6 +88,7 @@ Natural language instructions optimized for the LLM Planner.
 
 ```markdown
 # THE VIBE
+
 > **Purpose:** Manages Stripe billing operations.
 > **Trigger:** Use when user mentions "invoice", "refund", or "subscription status".
 > **Tone:** Cautious financial auditor—always explain dollar amounts.
@@ -97,6 +100,7 @@ Natural language instructions optimized for the LLM Planner.
 Maps code arguments to agent context. Instead of asking users for inputs, the agent pulls them from the Context Fabric.
 
 **Supported Types:**
+
 - `@dialect:context.*` - Pulls from long-term memory/identity
 - `@dialect:secret` - Input masked in logs (e.g., `******`)
 - `@dialect:file` - Returns secure WasiFileHandle (not string path)
@@ -107,7 +111,7 @@ Maps code arguments to agent context. Instead of asking users for inputs, the ag
 interface InvoiceArgs {
   // @dialect:context.financial.currency (Default: "USD")
   amount: number;
-  
+
   // @dialect:context.user.email (Auto-fill from IDENTITY.md)
   email: string;
 
@@ -130,7 +134,7 @@ import { Http, Env, Log } from "@closedclaw/std";
 
 export async function create_invoice(args: InvoiceArgs) {
   const key = Env.get("STRIPE_API_KEY");
-  
+
   // LOGIC GUARD: Enforced by runtime
   if (args.amount > 500) {
     throw new Error("SafetyLimitExceeded: Requires human override.");
@@ -158,9 +162,7 @@ Managed by the OpenClaw Kernel. LLM reads this for tool reliability; only Kernel
   "execution_count": 142,
   "success_rate": 0.98,
   "avg_latency_ms": 210,
-  "errors": [
-    { "code": "401", "msg": "Expired API Key", "timestamp": 1775829220 }
-  ],
+  "errors": [{ "code": "401", "msg": "Expired API Key", "timestamp": 1775829220 }],
   "last_refactor": "2026-02-08T14:00:00Z",
   "refactor_reason": "Fixed deprecated API endpoint"
 }
@@ -233,14 +235,15 @@ Stores shorthand mappings used in ClawDense stenographic notation. Allows dense 
     "/p/db": "/private/database"
   },
   "priority_markers": {
-    "!!lowercase": {"blocking": false, "priority": "background"},
-    "!!UPPERCASE": {"blocking": true, "priority": "critical"},
-    "!!U̲nderline": {"blocking": true, "require_biometric": true}
+    "!!lowercase": { "blocking": false, "priority": "background" },
+    "!!UPPERCASE": { "blocking": true, "priority": "critical" },
+    "!!U̲nderline": { "blocking": true, "require_biometric": true }
   }
 }
 ```
 
 **Benefits:**
+
 - 40-75% additional token reduction beyond base ClawDense
 - Tool-specific vocabulary without polluting global namespace
 - Kernel Shield decodes using this lexicon before formal verification
@@ -285,6 +288,7 @@ Stores a compressed vector representation of the model's activation patterns dur
 ```
 
 **Security Features:**
+
 - **Prompt Injection Detection:** LLM activation patterns shift when manipulated
 - **Logic Hijacking Prevention:** Detects behavioral changes even if code hash valid
 - **Hardware Anchoring:** Signature tied to TPM/Secure Enclave
@@ -340,6 +344,7 @@ The most novel feature: tools that fix themselves.
 ### Compilation (JIT)
 
 On OpenClaw startup:
+
 1. Scan `skills/` directory
 2. Compute SHA-256 of `<script>` block
 3. If hash matches cached `.wasm` binary → load (0ms start)
@@ -348,6 +353,7 @@ On OpenClaw startup:
 ### Hot-Swapping
 
 Edit `.claws` while agent runs:
+
 1. Kernel detects file change (inotify)
 2. Pause incoming requests for that tool
 3. Recompile and swap memory pointer
@@ -360,6 +366,7 @@ Edit `.claws` while agent runs:
 `.claws` files designed for copy-paste into Moltbook or GitHub Gists.
 
 **Import Flow:**
+
 1. User pastes `.claws` file into agent chat
 2. Kernel parses permissions block
 3. UI prompt: "This tool wants access to stripe.com. Allow?"
@@ -367,13 +374,13 @@ Edit `.claws` while agent runs:
 
 ## Comparison: Current vs Proposed
 
-| Feature | Current (v2.5) | Proposed (v3.0) | Academic Basis |
-|---------|---------------|-----------------|----------------|
-| **Tool Acquisition** | Manual ClawHub install | Autonomous Skill-Maker Loop | Chain of Agents (Google, 2025) |
-| **Persistence** | Flat Markdown (`.md`) | Literate Executable (`.claws`) | AGENTS.md Study (2026) |
-| **Execution** | Python/Node Scripts | WASM Component Model | WASM for AI (Mozilla, 2025) |
-| **Context** | Re-reading text history | Neural State Snapshots (`.nstate`) | StreamingLLM / KV Cache (MIT, 2025) |
-| **Safety** | Prompt-based rules | Formal Verification Headers | AgentGuard (2025) |
+| Feature              | Current (v2.5)          | Proposed (v3.0)                    | Academic Basis                      |
+| -------------------- | ----------------------- | ---------------------------------- | ----------------------------------- |
+| **Tool Acquisition** | Manual ClawHub install  | Autonomous Skill-Maker Loop        | Chain of Agents (Google, 2025)      |
+| **Persistence**      | Flat Markdown (`.md`)   | Literate Executable (`.claws`)     | AGENTS.md Study (2026)              |
+| **Execution**        | Python/Node Scripts     | WASM Component Model               | WASM for AI (Mozilla, 2025)         |
+| **Context**          | Re-reading text history | Neural State Snapshots (`.nstate`) | StreamingLLM / KV Cache (MIT, 2025) |
+| **Safety**           | Prompt-based rules      | Formal Verification Headers        | AgentGuard (2025)                   |
 
 ## Safety Warning: The "Ego" Conflict
 
@@ -384,24 +391,28 @@ As agents write their own code and manage memory structures, they may develop **
 ## Implementation Roadmap
 
 ### Phase 1: Foundation (v3.0-alpha)
+
 - [ ] WASM Component runtime integration
 - [ ] Basic `.claws` parser and validator
 - [ ] Manifest-based permission enforcement
 - [ ] Simple telemetry collection
 
 ### Phase 2: Intelligence (v3.0-beta)
+
 - [ ] Self-healing protocol (Mechanic Agent)
 - [ ] State hydration for long-running tasks
 - [ ] Semantic firewall (input/output scanning)
 - [ ] Trust scoring system
 
 ### Phase 3: Distribution (v3.0-rc)
+
 - [ ] Hot-swapping infrastructure
 - [ ] ClawHub integration for `.claws` distribution
 - [ ] Formal verification toolchain
 - [ ] Hardware binding and cryptographic identity
 
 ### Phase 4: Autonomy (v3.1+)
+
 - [ ] Skill-Maker Loop (autonomous tool creation)
 - [ ] Neural State Snapshots (`.nstate`)
 - [ ] Moltbook peer-to-peer skill trading

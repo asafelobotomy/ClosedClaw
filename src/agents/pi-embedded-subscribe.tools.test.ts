@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
-import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
+import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { extractMessagingToolSend } from "./pi-embedded-subscribe.tools.js";
 
 const testPlugin: ChannelPlugin = {

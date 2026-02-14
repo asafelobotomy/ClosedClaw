@@ -1,6 +1,10 @@
 import crypto from "node:crypto";
-import { TIMEOUT_HTTP_LONG_MS, TIMEOUT_HTTP_SHORT_MS, secondsToMs } from "../../config/constants/index.js";
 import type { GatewayMessageChannel } from "../../utils/message-channel.js";
+import {
+  TIMEOUT_HTTP_LONG_MS,
+  TIMEOUT_HTTP_SHORT_MS,
+  secondsToMs,
+} from "../../config/constants/index.js";
 import { callGateway } from "../../gateway/call.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";

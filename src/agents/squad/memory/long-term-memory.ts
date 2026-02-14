@@ -168,7 +168,12 @@ export class EpisodicStore {
       ensureDir: true,
       config: passphrase
         ? undefined // Use default encryption config
-        : { enabled: false, algorithm: "xchacha20-poly1305", kdf: "argon2id", kdfParams: { memory: 65536, iterations: 3, parallelism: 4, keyLength: 32 } },
+        : {
+            enabled: false,
+            algorithm: "xchacha20-poly1305",
+            kdf: "argon2id",
+            kdfParams: { memory: 65536, iterations: 3, parallelism: 4, keyLength: 32 },
+          },
     };
   }
 
@@ -177,7 +182,9 @@ export class EpisodicStore {
    * Safe to call multiple times (no-op after first load).
    */
   async load(): Promise<void> {
-    if (this.loaded) {return;}
+    if (this.loaded) {
+      return;
+    }
 
     const data = await readEncryptedStore<SerializedEpisode[]>(this.storeOptions);
 
@@ -258,10 +265,18 @@ export class EpisodicStore {
     const lowerQuery = query.toLowerCase();
 
     const matches = this.episodes.filter((ep) => {
-      if (ep.taskDescription.toLowerCase().includes(lowerQuery)) {return true;}
-      if (ep.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery))) {return true;}
-      if (ep.squadId.toLowerCase().includes(lowerQuery)) {return true;}
-      if (ep.agentsInvolved.some((a) => a.toLowerCase().includes(lowerQuery))) {return true;}
+      if (ep.taskDescription.toLowerCase().includes(lowerQuery)) {
+        return true;
+      }
+      if (ep.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery))) {
+        return true;
+      }
+      if (ep.squadId.toLowerCase().includes(lowerQuery)) {
+        return true;
+      }
+      if (ep.agentsInvolved.some((a) => a.toLowerCase().includes(lowerQuery))) {
+        return true;
+      }
       return false;
     });
 
@@ -375,8 +390,12 @@ export class EpisodicStore {
     let totalTokens = 0;
 
     for (const ep of this.episodes) {
-      if (ep.outcome === "success") {successCount++;}
-      if (ep.outcome === "failure") {failureCount++;}
+      if (ep.outcome === "success") {
+        successCount++;
+      }
+      if (ep.outcome === "failure") {
+        failureCount++;
+      }
       totalDuration += ep.durationMs;
       totalTokens += ep.tokensUsed;
     }
@@ -387,7 +406,8 @@ export class EpisodicStore {
       failureCount,
       avgDurationMs: this.episodes.length > 0 ? totalDuration / this.episodes.length : 0,
       totalTokensUsed: totalTokens,
-      oldestTimestamp: this.episodes.length > 0 ? this.episodes[this.episodes.length - 1].timestamp : null,
+      oldestTimestamp:
+        this.episodes.length > 0 ? this.episodes[this.episodes.length - 1].timestamp : null,
       newestTimestamp: this.episodes.length > 0 ? this.episodes[0].timestamp : null,
     };
   }

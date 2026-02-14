@@ -15,7 +15,7 @@
  */
 
 import { execFile } from "node:child_process";
-import { readFile, writeFile, mkdir, stat } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import type { HardwareProfile, TPCTransportMode, AFSKParams } from "./types.js";
 import { DEFAULT_AFSK_PARAMS } from "./types.js";
@@ -140,7 +140,9 @@ export async function selectProfile(params: {
   // 3. Check numpy/sounddevice availability
   const depsAvailable = await checkPythonDeps(pythonBin);
   if (!depsAvailable) {
-    log?.warn?.("Python audio dependencies (numpy/sounddevice) not available — defaulting to file mode");
+    log?.warn?.(
+      "Python audio dependencies (numpy/sounddevice) not available — defaulting to file mode",
+    );
     const profile = FILE_MODE_PROFILE;
     await saveCachedProfile(cachePath, profile);
     return profile;
@@ -153,7 +155,8 @@ export async function selectProfile(params: {
   try {
     const output = await runProbe(pythonBin, "decide.py", [
       "--auto",
-      "--sample-rate", String(sampleRate),
+      "--sample-rate",
+      String(sampleRate),
     ]);
     probeResult = JSON.parse(output) as DecideProbeResult;
   } catch (err) {
@@ -168,8 +171,8 @@ export async function selectProfile(params: {
   const profile = parseProbeResult(probeResult);
   log?.info?.(
     `Hardware probe complete: mode=${profile.selectedMode}, ` +
-    `SNR=${profile.snrDb?.toFixed(1) ?? "N/A"} dB, ` +
-    `PER=${profile.packetErrorRate !== undefined ? (profile.packetErrorRate * 100).toFixed(1) + "%" : "N/A"}`,
+      `SNR=${profile.snrDb?.toFixed(1) ?? "N/A"} dB, ` +
+      `PER=${profile.packetErrorRate !== undefined ? (profile.packetErrorRate * 100).toFixed(1) + "%" : "N/A"}`,
   );
 
   // 6. Cache the result
@@ -256,9 +259,7 @@ function parseProbeResult(result: DecideProbeResult): HardwareProfile {
     ultrasonicSupported: mode === "ultrasonic",
     selectedMode: mode,
     carrierFrequencies:
-      decision.freq0_hz && decision.freq1_hz
-        ? [decision.freq0_hz, decision.freq1_hz]
-        : undefined,
+      decision.freq0_hz && decision.freq1_hz ? [decision.freq0_hz, decision.freq1_hz] : undefined,
     snrDb: result.snr_db,
     packetErrorRate: result.per,
   };
@@ -339,7 +340,11 @@ function runProbe(pythonBin: string, script: string, args: string[]): Promise<st
       },
       (err, stdout, stderr) => {
         if (err) {
-          reject(new Error(`Probe ${script} failed: ${err.message}${stderr ? ` — ${stderr.trim()}` : ""}`));
+          reject(
+            new Error(
+              `Probe ${script} failed: ${err.message}${stderr ? ` — ${stderr.trim()}` : ""}`,
+            ),
+          );
           return;
         }
         resolve(stdout);

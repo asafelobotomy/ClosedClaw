@@ -1,9 +1,9 @@
 /**
  * ClosedClaw Constants
- * 
+ *
  * Centralized export for all constants used across the codebase.
  * Import from here to access environment variables, network config, paths, timing, etc.
- * 
+ *
  * @example
  * ```typescript
  * import {
@@ -11,7 +11,7 @@
  *   buildGatewayHttpUrl,
  *   DEFAULT_GATEWAY_PORT,
  * } from '@/config/constants';
- * 
+ *
  * const port = process.env[ENV_CLOSEDCLAW_GATEWAY_PORT] ?? DEFAULT_GATEWAY_PORT;
  * const url = buildGatewayHttpUrl(port);
  * ```
@@ -28,7 +28,7 @@ export {
   ENV_CLOSEDCLAW_PROFILE,
   ENV_CLOSEDCLAW_DEBUG,
   ENV_CLOSEDCLAW_LOG_LEVEL,
-  
+
   // Gateway
   ENV_CLOSEDCLAW_GATEWAY_PORT,
   ENV_CLOSEDCLAW_GATEWAY_TOKEN,
@@ -36,7 +36,7 @@ export {
   ENV_CLOSEDCLAW_GATEWAY_LOCK,
   ENV_CLOSEDCLAW_SKIP_CHANNELS,
   ENV_CLOSEDCLAW_CONTROL_UI_BASE_PATH,
-  
+
   // Testing
   ENV_VITEST,
   ENV_NODE_ENV,
@@ -53,7 +53,7 @@ export {
   ENV_CLOSEDCLAW_TEST_WORKERS,
   ENV_CLOSEDCLAW_TEST_HANDSHAKE_TIMEOUT_MS,
   ENV_CLOSEDCLAW_E2E_MODELS,
-  
+
   // Provider API Keys
   ENV_ANTHROPIC_API_KEY,
   ENV_ANTHROPIC_OAUTH_TOKEN,
@@ -70,18 +70,18 @@ export {
   ENV_BRAVE_API_KEY,
   ENV_FIRECRAWL_API_KEY,
   ENV_FIRECRAWL_BASE_URL,
-  
+
   // Channels
   ENV_TELEGRAM_BOT_TOKEN,
   ENV_CLOSEDCLAW_TWITCH_ACCESS_TOKEN,
   ENV_CLOSEDCLAW_DEBUG_NEXTCLOUD_TALK_ACCOUNTS,
-  
+
   // Agent & Skills
   ENV_CLOSEDCLAW_BUNDLED_SKILLS_DIR,
   ENV_CLOSEDCLAW_BUNDLED_PLUGINS_DIR,
   ENV_CLOSEDCLAW_RAW_STREAM,
   ENV_CLOSEDCLAW_RAW_STREAM_PATH,
-  
+
   // System
   ENV_SHELL,
   ENV_PATH,
@@ -89,11 +89,11 @@ export {
   ENV_NODE_OPTIONS,
   ENV_HOME,
   ENV_USERPROFILE,
-  
+
   // Build & Deployment
   ENV_VERSIONS_JSON,
   ENV_LATEST_VERSION,
-  
+
   // Utility Functions
   isCI,
   isTest,
@@ -115,7 +115,7 @@ export {
   LOCALHOST_IPV6,
   LOCALHOST_HOSTNAME,
   BIND_ALL_INTERFACES,
-  
+
   // Default Ports
   DEFAULT_GATEWAY_PORT,
   DEFAULT_SIGNAL_PORT,
@@ -126,13 +126,13 @@ export {
   DEFAULT_IPFS_API_PORT,
   TEST_PORT_GATEWAY,
   TEST_PORT_CUSTOM_GATEWAY,
-  
+
   // Protocol Schemes
   PROTOCOL_HTTP,
   PROTOCOL_HTTPS,
   PROTOCOL_WS,
   PROTOCOL_WSS,
-  
+
   // URL Builders
   buildGatewayHttpUrl,
   buildGatewayWsUrl,
@@ -140,7 +140,7 @@ export {
   buildOllamaHttpUrl,
   buildHttpUrl,
   buildWsUrl,
-  
+
   // Gateway Endpoints
   GATEWAY_ENDPOINT_RPC,
   GATEWAY_ENDPOINT_WS,
@@ -148,7 +148,7 @@ export {
   buildGatewayRpcUrl,
   buildGatewayWsEndpointUrl,
   buildGatewayStatusUrl,
-  
+
   // Timeouts & Limits
   HTTP_TIMEOUT_DEFAULT_MS,
   HTTP_TIMEOUT_SHORT_MS,
@@ -156,7 +156,7 @@ export {
   WS_RECONNECT_DELAY_MS,
   WS_PING_INTERVAL_MS,
   WS_PONG_TIMEOUT_MS,
-  
+
   // External Service URLs
   DEFAULT_FIRECRAWL_BASE_URL,
   DEFAULT_BRAVE_SEARCH_BASE_URL,
@@ -194,7 +194,7 @@ export {
   TIMEOUT_WORKFLOW_DEFAULT_MS,
   TIMEOUT_IMESSAGE_PROBE_MS,
   TIMEOUT_WEB_LOGIN_QR_MS,
-  
+
   // Intervals
   INTERVAL_TICK_MS,
   INTERVAL_HEALTH_REFRESH_MS,
@@ -203,7 +203,7 @@ export {
   INTERVAL_WS_PING_MS,
   INTERVAL_WS_PONG_TIMEOUT_MS,
   INTERVAL_AUTH_CHECK_MIN_MS,
-  
+
   // Delays
   DELAY_SESSION_STORE_SAVE_MS,
   DELAY_WS_CLOSE_MS,
@@ -215,7 +215,7 @@ export {
   DELAY_RECONNECT_MAX_MS,
   DELAY_RETRY_BASE_MS,
   DELAY_RETRY_MAX_MS,
-  
+
   // TTLs
   TTL_EXTERNAL_CLI_SYNC_MS,
   TTL_EXTERNAL_CLI_NEAR_EXPIRY_MS,
@@ -226,7 +226,7 @@ export {
   TTL_DEDUPE_MS,
   TTL_MESSAGE_TIMEOUT_MS,
   TTL_SESSION_STALE_MS,
-  
+
   // Utility Functions
   secondsToMs,
   minutesToMs,
@@ -246,17 +246,17 @@ export {
   STATE_DIRNAME,
   LEGACY_STATE_DIRNAMES,
   SUBDIRS,
-  
+
   // File Names
   CONFIG_FILENAME,
   CONFIG_FILENAME_JSON5,
   LEGACY_CONFIG_FILENAMES,
   GATEWAY_LOCK_FILENAME,
-  
+
   // Platform Helpers
   getPathSeparator,
   getHomeEnvVar,
-  
+
   // Path Builders
   getHomeDir,
   getStateDir,
@@ -272,7 +272,7 @@ export {
   getTempDir,
   getConfigPath,
   getGatewayLockPath,
-  
+
   // Utility Functions
   resolveUserPath,
   joinPaths,
@@ -290,17 +290,17 @@ export {
   MAX_AUDIO_BYTES,
   MAX_VIDEO_BYTES,
   MAX_DOCUMENT_BYTES,
-  
+
   // Size Units
   BYTES_PER_KB,
   BYTES_PER_MB,
   BYTES_PER_GB,
-  
+
   // Media Type Detection
   mediaKindFromMime,
   maxBytesForKind,
   type MediaKind,
-  
+
   // Size Formatting
   formatBytes,
   parseBytes,

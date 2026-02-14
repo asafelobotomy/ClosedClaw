@@ -11,12 +11,12 @@ The modern successor to Frequency-Shift Keying (FSK) is **State Delta Encoding (
 
 ### Why Move Beyond Plain Text
 
-| Feature | Plain English (.md) | Acoustic/Latent Transfer (2026) |
-| --- | --- | --- |
-| **Injection risk** | High; text goal hijacking is trivial. | Low; requires precise signal modulation. |
-| **Data privacy** | Context stored in plaintext on disk. | Context exists as ephemeral audio/vector bursts. |
-| **Reasoning loss** | High; text is a lossy summary of intent. | Low; transfers the raw logic trajectory. |
-| **Latency** | "WiFi speed" (API round-trips). | "CPU speed" (local zero-copy audio/memory). |
+| Feature            | Plain English (.md)                      | Acoustic/Latent Transfer (2026)                  |
+| ------------------ | ---------------------------------------- | ------------------------------------------------ |
+| **Injection risk** | High; text goal hijacking is trivial.    | Low; requires precise signal modulation.         |
+| **Data privacy**   | Context stored in plaintext on disk.     | Context exists as ephemeral audio/vector bursts. |
+| **Reasoning loss** | High; text is a lossy summary of intent. | Low; transfers the raw logic trajectory.         |
+| **Latency**        | "WiFi speed" (API round-trips).          | "CPU speed" (local zero-copy audio/memory).      |
 
 ### Developer Roadmap for an Acoustic Gateway
 
@@ -38,12 +38,12 @@ Use uncompressed WAV or PCM streams as the interchange container.
 
 **GibberLink** replaces human language once peers mutually verify they are AIs.
 
-| Component | Function |
-| --- | --- |
-| **Transport layer** | GGWave handles multi-frequency FSK audio. |
-| **Error correction** | Reed-Solomon preserves payloads under noise/compression. |
-| **Protocol switch** | Mutual recognition via audio fingerprints triggers GibberLink mode. |
-| **Efficiency** | Up to 80% faster by skipping human-syntax parsing. |
+| Component            | Function                                                            |
+| -------------------- | ------------------------------------------------------------------- |
+| **Transport layer**  | GGWave handles multi-frequency FSK audio.                           |
+| **Error correction** | Reed-Solomon preserves payloads under noise/compression.            |
+| **Protocol switch**  | Mutual recognition via audio fingerprints triggers GibberLink mode. |
+| **Efficiency**       | Up to 80% faster by skipping human-syntax parsing.                  |
 
 ### Deployment Patterns (Preference Order)
 
@@ -65,14 +65,14 @@ When physical acoustics are undesirable, exchange GibberLink payloads as WAV/PCM
 
 ### Alternatives and Profiles
 
-| Capability | GGWave (GibberLink) | libquiet profile | AFSK baseline |
-| --- | --- | --- | --- |
-| Throughput | Low (small tokens/commands) | Low–mid (configurable OFDM/FSK/PSK) | Very low |
-| Footprint | Tiny, easy to embed | Heavier DSP deps (LiquidDSP) | Minimal |
-| Bands | Audible/ultrasonic (18–20 kHz if hardware allows) | Flexible; audible or ultrasonic with tuning | Audible-first |
-| Best use | Bootstrap, file-based control tokens | Higher robustness/bitrate in tougher rooms | Maximum simplicity/compatibility |
-| Robustness | Moderate; add FEC/MAC | Higher with FEC, adaptive profiles | High SNR needed; tolerant due to simplicity |
-| License | MIT | LGPL (LiquidDSP) | Varies (often MIT/BSD) |
+| Capability | GGWave (GibberLink)                               | libquiet profile                            | AFSK baseline                               |
+| ---------- | ------------------------------------------------- | ------------------------------------------- | ------------------------------------------- |
+| Throughput | Low (small tokens/commands)                       | Low–mid (configurable OFDM/FSK/PSK)         | Very low                                    |
+| Footprint  | Tiny, easy to embed                               | Heavier DSP deps (LiquidDSP)                | Minimal                                     |
+| Bands      | Audible/ultrasonic (18–20 kHz if hardware allows) | Flexible; audible or ultrasonic with tuning | Audible-first                               |
+| Best use   | Bootstrap, file-based control tokens              | Higher robustness/bitrate in tougher rooms  | Maximum simplicity/compatibility            |
+| Robustness | Moderate; add FEC/MAC                             | Higher with FEC, adaptive profiles          | High SNR needed; tolerant due to simplicity |
+| License    | MIT                                               | LGPL (LiquidDSP)                            | Varies (often MIT/BSD)                      |
 
 ### Recommended Defaults
 

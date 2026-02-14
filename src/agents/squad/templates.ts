@@ -101,7 +101,14 @@ export const RESEARCHER_TEMPLATE: AgentTemplate = {
     "3. **Sources**: URLs and references",
     "4. **Caveats**: Uncertainties or conflicting information",
   ].join("\n"),
-  tools: ["web_search", "web_fetch", "read_file", "squad_memory_write", "squad_memory_read", "squad_broadcast"],
+  tools: [
+    "web_search",
+    "web_fetch",
+    "read_file",
+    "squad_memory_write",
+    "squad_memory_read",
+    "squad_broadcast",
+  ],
   suggestedModel: undefined, // Use default
   defaultTokenBudget: 50_000,
   capabilities: ["research", "search", "analysis", "fact-checking"],
@@ -142,7 +149,15 @@ export const CODER_TEMPLATE: AgentTemplate = {
     "3. List any assumptions or dependencies",
     "4. Suggest test cases for the implementation",
   ].join("\n"),
-  tools: ["read_file", "write_file", "bash", "grep", "squad_memory_read", "squad_memory_write", "squad_broadcast"],
+  tools: [
+    "read_file",
+    "write_file",
+    "bash",
+    "grep",
+    "squad_memory_read",
+    "squad_memory_write",
+    "squad_broadcast",
+  ],
   suggestedModel: undefined,
   defaultTokenBudget: 100_000,
   capabilities: ["code", "implementation", "debugging", "refactoring"],
@@ -184,7 +199,14 @@ export const REVIEWER_TEMPLATE: AgentTemplate = {
     "4. **Suggestions**: Optional improvements",
     "5. **Verdict**: APPROVE / REQUEST_CHANGES / COMMENT",
   ].join("\n"),
-  tools: ["read_file", "grep", "web_search", "squad_memory_read", "squad_memory_write", "squad_broadcast"],
+  tools: [
+    "read_file",
+    "grep",
+    "web_search",
+    "squad_memory_read",
+    "squad_memory_write",
+    "squad_broadcast",
+  ],
   suggestedModel: undefined,
   defaultTokenBudget: 50_000,
   capabilities: ["review", "audit", "security", "quality"],
@@ -225,7 +247,14 @@ export const TESTER_TEMPLATE: AgentTemplate = {
     "3. **Coverage**: Which lines/branches are not covered",
     "4. **Recommendations**: Additional tests to write",
   ].join("\n"),
-  tools: ["read_file", "write_file", "bash", "squad_memory_read", "squad_memory_write", "squad_broadcast"],
+  tools: [
+    "read_file",
+    "write_file",
+    "bash",
+    "squad_memory_read",
+    "squad_memory_write",
+    "squad_broadcast",
+  ],
   suggestedModel: undefined,
   defaultTokenBudget: 50_000,
   capabilities: ["test", "testing", "validation", "verification"],
@@ -267,7 +296,14 @@ export const DOCUMENTER_TEMPLATE: AgentTemplate = {
     "4. **Examples**: Common use cases with code",
     "5. **Troubleshooting**: Common issues and solutions",
   ].join("\n"),
-  tools: ["read_file", "write_file", "grep", "squad_memory_read", "squad_memory_write", "squad_broadcast"],
+  tools: [
+    "read_file",
+    "write_file",
+    "grep",
+    "squad_memory_read",
+    "squad_memory_write",
+    "squad_broadcast",
+  ],
   suggestedModel: undefined,
   defaultTokenBudget: 50_000,
   capabilities: ["documentation", "writing", "docs"],
@@ -308,7 +344,15 @@ export const DEVOPS_TEMPLATE: AgentTemplate = {
     "3. **Verification**: How to verify the changes work",
     "4. **Rollback**: How to undo if something goes wrong",
   ].join("\n"),
-  tools: ["read_file", "write_file", "bash", "grep", "squad_memory_read", "squad_memory_write", "squad_broadcast"],
+  tools: [
+    "read_file",
+    "write_file",
+    "bash",
+    "grep",
+    "squad_memory_read",
+    "squad_memory_write",
+    "squad_broadcast",
+  ],
   suggestedModel: undefined,
   defaultTokenBudget: 75_000,
   capabilities: ["devops", "infrastructure", "deployment", "monitoring", "security"],
@@ -374,9 +418,7 @@ export function spawnConfigFromTemplate(
 ): AgentSpawnConfig {
   const template = getAgentTemplate(templateId);
 
-  const tools = opts.extraTools
-    ? [...template.tools, ...opts.extraTools]
-    : [...template.tools];
+  const tools = opts.extraTools ? [...template.tools, ...opts.extraTools] : [...template.tools];
 
   return {
     role: template.id,

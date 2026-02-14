@@ -49,8 +49,12 @@ describe("AGENT_TEMPLATES", () => {
 
   it("all templates include squad collaboration tools", () => {
     for (const template of Object.values(AGENT_TEMPLATES)) {
-      expect(template.tools, `${template.id} missing squad_memory_write`).toContain("squad_memory_write");
-      expect(template.tools, `${template.id} missing squad_memory_read`).toContain("squad_memory_read");
+      expect(template.tools, `${template.id} missing squad_memory_write`).toContain(
+        "squad_memory_write",
+      );
+      expect(template.tools, `${template.id} missing squad_memory_read`).toContain(
+        "squad_memory_read",
+      );
       expect(template.tools, `${template.id} missing squad_broadcast`).toContain("squad_broadcast");
     }
   });
@@ -193,9 +197,9 @@ describe("spawnConfigFromTemplate", () => {
   });
 
   it("throws for unknown template", () => {
-    expect(() =>
-      spawnConfigFromTemplate("fake", { squadId: "squad-1" }),
-    ).toThrow("Unknown agent template");
+    expect(() => spawnConfigFromTemplate("fake", { squadId: "squad-1" })).toThrow(
+      "Unknown agent template",
+    );
   });
 });
 

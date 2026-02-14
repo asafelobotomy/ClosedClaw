@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
-import { TIMEOUT_HTTP_SHORT_MS, secondsToMs } from "../config/constants/index.js";
 import os from "node:os";
 import path from "node:path";
+import { TIMEOUT_HTTP_SHORT_MS, secondsToMs } from "../config/constants/index.js";
 import { runCommandWithTimeout } from "../process/exec.js";
 import { isSubagentSessionKey } from "../routing/session-key.js";
 import { resolveUserPath } from "../utils.js";

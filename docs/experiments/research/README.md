@@ -14,11 +14,13 @@ This directory contains **active research** on agent systems, exploring new conc
 ## Active Research
 
 ### [Autonomous Evolution & Self-Healing](autonomous-evolution.md)
+
 **Status:** Active Research | **Target:** ClosedClaw v2.2+
 
 Explores autonomous agent evolution, self-healing tools, Shadow Factory for tool creation, and Kernel Shield for hardware-level security.
 
 **Key Concepts:**
+
 - Encapsulated Living Binaries (ELB)
 - Shadow Factory autonomous development
 - Kernel Shield hardware protection
@@ -30,11 +32,13 @@ Explores autonomous agent evolution, self-healing tools, Shadow Factory for tool
 ---
 
 ### [Scaling Memory Beyond Markdown](scaling-memory.md)
+
 **Status:** Active Research
 
 Evaluates memory alternatives (vector databases, knowledge graphs, SQLite, JSONL) for agent systems as they scale beyond simple Markdown files.
 
 **Comparison:**
+
 - Vector DBs → Semantic search (RAG-native)
 - Knowledge Graphs → Relational intelligence
 - JSONL → High-speed streaming
@@ -47,11 +51,13 @@ Evaluates memory alternatives (vector databases, knowledge graphs, SQLite, JSONL
 ---
 
 ### [Orchestration Dialect](orchestration-dialect.md)
+
 **Status:** Active Research | **Current:** OpenClaw v2026.2
 
 Documents OpenClaw communication layers: Markdown context files, XML-style orchestration tags, Moltbook agent-to-agent dialect, and MCP (JSON-RPC) protocol.
 
 **Communication Layers:**
+
 1. **Intent:** Natural language
 2. **Planning:** Markdown tags (`<thought>`, `<plan>`, `<call>`)
 3. **Execution:** MCP (JSON-RPC)
@@ -63,6 +69,7 @@ Documents OpenClaw communication layers: Markdown context files, XML-style orche
 ---
 
 ### [Workspace Memory](memory.md)
+
 **Status:** Active Research
 
 _[Existing research - refer to file for details]_
@@ -72,11 +79,13 @@ Proposes offline-first memory architecture for Clawd-style workspaces, keeping M
 ---
 
 ### [Agent Security: Neural Fingerprinting & Kernel Shield](agent-security.md)
+
 **Status:** Active Research | **Target:** ClosedClaw v2.2+
 
 Explores hardware-backed security beyond prompt-based safety: Kernel Shield architecture (three-layer defense), Neural Fingerprinting for behavioral attestation, and integration with stenographic ClawDense.
 
 **Key Concepts:**
+
 - **Kernel Shield Layers:** Structural enforcement, semantic filtering, neural attestation
 - **Neural Fingerprinting:** Activation pattern signatures to detect prompt injection
 - **Hardware Anchoring:** TPM/Secure Enclave binding for trust chain
@@ -91,13 +100,13 @@ Explores hardware-backed security beyond prompt-based safety: Kernel Shield arch
 
 ### Research vs. Proposals
 
-| Research | Proposals |
-|----------|-----------|
-| **Exploratory** | **Prescriptive** |
-| Evaluates options | Specifies solution |
-| Compares alternatives | Defines implementation |
-| Asks questions | Answers questions |
-| Academic tone | Technical specification |
+| Research              | Proposals               |
+| --------------------- | ----------------------- |
+| **Exploratory**       | **Prescriptive**        |
+| Evaluates options     | Specifies solution      |
+| Compares alternatives | Defines implementation  |
+| Asks questions        | Answers questions       |
+| Academic tone         | Technical specification |
 
 ### Contributing Research
 

@@ -16,8 +16,8 @@
  *   and a new calibration must be performed before reactivation.
  */
 
-import { cosineSimilarity } from "./kernel-shield.js";
 import type { ClawsNeuralFingerprint } from "./claws-parser.js";
+import { cosineSimilarity } from "./kernel-shield.js";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -110,10 +110,7 @@ export class AttestationMonitor {
   private _state: FingerprintState = "active";
   private _quarantinedTools: Set<string> = new Set();
 
-  constructor(
-    fingerprint: ClawsNeuralFingerprint,
-    config?: Partial<AttestationConfig>,
-  ) {
+  constructor(fingerprint: ClawsNeuralFingerprint, config?: Partial<AttestationConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config };
 
     // Override thresholds from fingerprint if available
@@ -220,7 +217,13 @@ export class AttestationMonitor {
     }
 
     // Record event
-    this.recordEvent({ timestamp: Date.now(), toolName, similarity: round(similarity), drift, action });
+    this.recordEvent({
+      timestamp: Date.now(),
+      toolName,
+      similarity: round(similarity),
+      drift,
+      action,
+    });
 
     return { similarity: round(similarity), drift, allow, throttle, shutdown, message };
   }
@@ -292,7 +295,9 @@ export class AttestationMonitor {
  * Parse a neural digest string (comma-separated floats) into a number array.
  */
 export function parseDigest(digest: string): number[] {
-  if (!digest || !digest.includes(",")) {return [];}
+  if (!digest || !digest.includes(",")) {
+    return [];
+  }
   return digest
     .split(",")
     .map((s) => parseFloat(s.trim()))

@@ -85,24 +85,24 @@ export function register(api: ClosedClawPluginApi) {
   const channel: ChannelPlugin = {
     id: "my-channel",
     name: "My Channel",
-    
+
     // Implement required channel methods
     async start(config) {
       // Initialize channel connection
       console.log("Starting My Channel...");
     },
-    
+
     async stop() {
       // Clean up resources
       console.log("Stopping My Channel...");
     },
-    
+
     async sendMessage(params) {
       // Send message implementation
       const { to, message } = params;
       // ... send logic
     },
-    
+
     async getStatus() {
       return {
         connected: true,
@@ -110,7 +110,7 @@ export function register(api: ClosedClawPluginApi) {
       };
     },
   };
-  
+
   api.registerChannel(channel);
 }
 ```
@@ -159,16 +159,16 @@ export async function sendMessageMyChannel(params: {
   config?: ClosedClawConfig;
 }): Promise<void> {
   const { to, message, config } = params;
-  
+
   // Validate config
   const channelConfig = config?.myChannel;
   if (!channelConfig?.enabled) {
     throw new Error("My Channel is not enabled in config");
   }
-  
+
   // Send message logic
   console.log(`Sending to ${to}: ${message}`);
-  
+
   // ... implementation
 }
 ```
@@ -178,6 +178,7 @@ export async function sendMessageMyChannel(params: {
 Update `src/routing/` to handle your channel's message format and session keys.
 
 Session key format: `agent:<agentId>:<channel>:<kind>:<peerId>`
+
 - Channel: `"my-channel"`
 - Kind: `"dm"` | `"group"` | `"channel"`
 - PeerId: Platform-specific identifier
@@ -199,17 +200,17 @@ describe("sendMessageMyChannel", () => {
         myChannel: { enabled: true, botToken: "test-token" },
       },
     };
-    
+
     await expect(sendMessageMyChannel(params)).resolves.toBeUndefined();
   });
-  
+
   it("throws when channel disabled", async () => {
     const params = {
       to: "test-user-id",
       message: "Test",
       config: { myChannel: { enabled: false } },
     };
-    
+
     await expect(sendMessageMyChannel(params)).rejects.toThrow(/not enabled/);
   });
 });
@@ -247,16 +248,19 @@ pnpm closedclaw channels status
 ## Common Patterns
 
 ### Authentication
+
 - OAuth tokens: Store in `~/.closedclaw/credentials/my-channel/`
 - Sessions: Store in `~/.closedclaw/sessions/my-channel/`
 - Config keys: Use `configSchema` in `ClosedClaw.plugin.json`
 
 ### Message Handling
+
 - Direct messages: `kind: "dm"`, `peerId: userId`
 - Groups/channels: `kind: "group"`, `peerId: groupId`
 - Threads: Use routing layer for session isolation
 
 ### Error Handling
+
 - Create custom error class extending `Error`
 - Reference pattern in `src/discord/send.types.ts` and `src/media/fetch.ts`
 

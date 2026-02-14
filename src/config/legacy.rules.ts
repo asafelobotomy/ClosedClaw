@@ -139,7 +139,9 @@ export const LEGACY_CONFIG_RULES: LegacyConfigRule[] = [
         });
       };
 
-      return [media.audio, media.image, media.video].some((section) => hasDeepgramInSection(section));
+      return [media.audio, media.image, media.video].some((section) =>
+        hasDeepgramInSection(section),
+      );
     },
   },
   {

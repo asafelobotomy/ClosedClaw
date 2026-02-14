@@ -1,4 +1,3 @@
-import { fetchBrowserJson } from "./client-fetch.js";
 import {
   TIMEOUT_BROWSER_PAGE_MS,
   TIMEOUT_HTTP_SHORT_MS,
@@ -7,6 +6,7 @@ import {
   TIMEOUT_TEST_SUITE_MEDIUM_MS,
   secondsToMs,
 } from "../config/constants/index.js";
+import { fetchBrowserJson } from "./client-fetch.js";
 
 export type BrowserStatus = {
   enabled: boolean;

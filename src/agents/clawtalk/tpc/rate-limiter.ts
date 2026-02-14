@@ -62,7 +62,9 @@ export class RateLimiter {
    */
   getWeightedCount(agentId: string): number {
     const bucket = this.buckets.get(agentId);
-    if (!bucket) return 0;
+    if (!bucket) {
+      return 0;
+    }
 
     this.maybeRotateWindow(bucket);
 

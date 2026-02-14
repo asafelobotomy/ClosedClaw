@@ -1,9 +1,9 @@
 /**
  * GTK GUI IPC Module
- * 
+ *
  * Provides communication between ClosedClaw and a GTK GUI application
  * using either Unix sockets or file-based IPC.
- * 
+ *
  * Message Format (JSON lines):
  * {
  *   "id": "unique-message-id",
@@ -16,12 +16,12 @@
  * }
  */
 
-import { createServer, type Server, type Socket } from "node:net";
+import crypto from "node:crypto";
+import { EventEmitter } from "node:events";
 import { watch, type FSWatcher, chmodSync } from "node:fs";
 import { readFile, writeFile, appendFile, access, mkdir } from "node:fs/promises";
-import crypto from "node:crypto";
+import { createServer, type Server, type Socket } from "node:net";
 import { dirname, join } from "node:path";
-import { EventEmitter } from "node:events";
 
 export interface GtkMessage {
   id: string;
@@ -144,7 +144,7 @@ export class GtkIpcBridge extends EventEmitter {
   private async startSocketServer(): Promise<void> {
     const socketPath = this.config.socketPath!;
     const requireAuth = this.config.requireAuth !== false;
-    
+
     // Ensure socket directory exists with restricted permissions
     const socketDir = dirname(socketPath);
     await this.ensureDir(socketDir);
@@ -183,7 +183,7 @@ export class GtkIpcBridge extends EventEmitter {
             try {
               const message = JSON.parse(line) as GtkMessage;
               this.handleIncomingMessage(message);
-            } catch  {
+            } catch {
               this.emit("error", new Error(`Invalid JSON: ${line}`));
             }
           }
@@ -244,9 +244,9 @@ export class GtkIpcBridge extends EventEmitter {
 
   private async startFileWatcher(): Promise<void> {
     const inboxPath = this.config.inboxPath!;
-    
+
     await this.ensureDir(dirname(inboxPath));
-    
+
     // Create inbox file if it doesn't exist
     try {
       await access(inboxPath);
@@ -269,19 +269,19 @@ export class GtkIpcBridge extends EventEmitter {
 
   private async processNewMessages(): Promise<void> {
     const inboxPath = this.config.inboxPath!;
-    
+
     try {
       const content = await readFile(inboxPath, "utf-8");
       const newContent = content.slice(this.lastInboxPosition);
       this.lastInboxPosition = content.length;
 
       const lines = newContent.split("\n").filter((line) => line.trim());
-      
+
       for (const line of lines) {
         try {
           const message = JSON.parse(line) as GtkMessage;
           this.handleIncomingMessage(message);
-        } catch  {
+        } catch {
           this.emit("error", new Error(`Invalid JSON in inbox: ${line}`));
         }
       }

@@ -1,10 +1,10 @@
 import type { RuntimeEnv } from "../runtime.js";
 import type { DoctorOptions } from "./doctor-prompter.js";
 import { formatCliCommand } from "../cli/command-format.js";
+import { TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { runGatewayUpdate } from "../infra/update-runner.js";
 import { runCommandWithTimeout } from "../process/exec.js";
-import { TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
 import { note } from "../terminal/note.js";
 
 async function detectClosedClawGitCheckout(root: string): Promise<"git" | "not-git" | "unknown"> {

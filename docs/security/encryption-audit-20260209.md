@@ -4,6 +4,7 @@
 **Auditor**: DevOps Subagent (ClosedClaw v2026.2.2-dev)  
 **Scope**: Priority 3 end-to-end encrypted memory storage  
 **Files Analyzed**:
+
 - `src/security/crypto.ts` (199 lines)
 - `src/security/passphrase.ts` (200 lines)
 - `src/security/encrypted-store.ts` (190 lines)
@@ -25,8 +26,9 @@
 The Priority 3 encryption implementation demonstrates security-first design with industry best practices. The choice of XChaCha20-Poly1305 + Argon2id is excellent, parameters exceed OWASP minimums, and the code is well-structured with good test coverage.
 
 **Findings Breakdown**:
+
 - 🔴 **0 Critical** issues
-- 🟠 **2 High** severity issues  
+- 🟠 **2 High** severity issues
 - 🟡 **4 Medium** severity issues
 - 🔵 **6 Low** severity issues
 
@@ -51,6 +53,7 @@ None found. Excellent work! 🎉
 **Location**: [`src/security/encrypted-store.ts:78`](src/security/encrypted-store.ts#L78)
 
 **Issue**:
+
 ```typescript
 // Current implementation:
 await fs.writeFile(path, data, { encoding: "utf-8" });
@@ -59,12 +62,14 @@ await fs.chmod(path, 0o600); // Permissions set AFTER file is written
 
 Race condition window (~1-5ms) where sensitive encrypted data is created with default permissions (typically 0o644 on Linux, world-readable). An attacker with local access could read the file before chmod executes.
 
-**Evidence**: 
+**Evidence**:
+
 - `atomicWrite()` calls `fs.writeFile` without mode option
 - Permissions corrected in separate `fs.chmod` call
 - No atomic guarantee between write and chmod
 
 **Attack Scenario**:
+
 1. Attacker runs inotify watch on `~/.closedclaw/sessions/`
 2. File is created with 0o644 (readable by attacker)
 3. Attacker's script reads file immediately
@@ -72,9 +77,10 @@ Race condition window (~1-5ms) where sensitive encrypted data is created with de
 5. Attacker now has encrypted session data (can attempt offline brute-force)
 
 **Recommendation**:
+
 ```typescript
 // Fix: Set permissions atomically during file creation
-await fs.writeFile(path, data, { 
+await fs.writeFile(path, data, {
   encoding: "utf-8",
   mode: 0o600, // Owner read/write only
 });
@@ -91,6 +97,7 @@ if (actualMode !== 0o600) {
 **Priority**: This Week (before enabling encryption by default)
 
 **References**:
+
 - OWASP: Insecure File Permissions (ASVS V14.5.1)
 - CWE-378: Creation of Temporary File With Insecure Permissions
 
@@ -106,6 +113,7 @@ if (actualMode !== 0o600) {
 Passphrase validation (`validatePassphrase()`) runs in CLI command before encryption but NOT in `deriveKey()` function. A malicious or misconfigured client could bypass validation and use a weak passphrase.
 
 **Code Flow**:
+
 ```typescript
 // CLI validates (good):
 const validation = validatePassphrase(passphrase);
@@ -119,12 +127,14 @@ export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
 ```
 
 **Attack Scenario**:
+
 1. Attacker modifies CLI to skip validation
 2. Sets passphrase to "abc123" (weak)
 3. Encryption proceeds with weak key
 4. Offline dictionary attack likely succeeds
 
 **Recommendation**:
+
 ```typescript
 // Add validation inside deriveKey (defense in depth):
 export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
@@ -133,7 +143,7 @@ export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
   if (validation) {
     throw new Error(`Passphrase validation failed: ${validation}`);
   }
-  
+
   return argon2id(utf8ToBytes(passphrase), salt, {
     m: SECURITY.ENCRYPTION.KDF_PARAMS.memory,
     t: SECURITY.ENCRYPTION.KDF_PARAMS.iterations,
@@ -147,6 +157,7 @@ export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
 **Priority**: This Week
 
 **References**:
+
 - OWASP: Client-Side Enforcement (ASVS V1.2.2)
 - CWE-602: Client-Side Enforcement of Server-Side Security
 
@@ -164,6 +175,7 @@ export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
 The `deriveKey()` function accepts a salt but doesn't enforce that callers generate a NEW salt for every encryption. If a caller reuses the same salt with the same passphrase, the derived key will be identical, weakening security.
 
 **Current Code**:
+
 ```typescript
 export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
   // Accepts salt but doesn't validate uniqueness
@@ -171,36 +183,38 @@ export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
 }
 ```
 
-**Risk**: 
+**Risk**:
+
 - Same passphrase + same salt = same key
 - Attacker can identify identical keys by comparing salts
 - Reduces entropy, narrows brute-force search space
 
 **Recommendation**:
 Add documentation warning + runtime check:
+
 ```typescript
 /**
  * Derive encryption key from passphrase using Argon2id.
- * 
+ *
  * ⚠️ IMPORTANT: Always generate a fresh random salt for each encryption operation.
  * Reusing salts with the same passphrase produces identical keys.
- * 
+ *
  * @param passphrase - User passphrase (will be validated)
  * @param salt - Random salt (MUST be unique per encryption, at least 16 bytes)
  * @returns 32-byte encryption key
- * 
+ *
  * @throws {Error} If salt is too short or passphrase is invalid
  */
 export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
   if (salt.length < 16) {
     throw new Error(`Salt must be at least 16 bytes, got ${salt.length}`);
   }
-  
+
   const validation = validatePassphrase(passphrase);
   if (validation) {
     throw new Error(`Passphrase validation failed: ${validation}`);
   }
-  
+
   return argon2id(utf8ToBytes(passphrase), salt, { ...params });
 }
 ```
@@ -220,27 +234,29 @@ export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
 XChaCha20-Poly1305 requires unique nonces for security (nonce reuse = catastrophic failure). Current code generates nonces via `randomBytes(24)` but doesn't track used nonces or detect collisions.
 
 **Why it matters**:
+
 - Birthday paradox: With 2^48 256-bit nonces, collision probability is ~50% after 2^32 encryptions
 - 24-byte nonce reduces risk but doesn't eliminate it
 - Nonce reuse with same key leaks plaintext XOR
 
 **Recommendation**:
+
 ```typescript
 // Add nonce tracking (in-memory for current session):
 const usedNonces = new Set<string>();
 
 export function encrypt(plaintext: string, key: Uint8Array): EncryptedPayload {
   const nonce = randomBytes(XCHACHA_NONCE_LENGTH);
-  const nonceHex = Buffer.from(nonce).toString('hex');
-  
+  const nonceHex = Buffer.from(nonce).toString("hex");
+
   // Collision detection (defense in depth)
   if (usedNonces.has(nonceHex)) {
     // Astronomically unlikely, but if it happens, regenerate
-    console.warn('[security] Nonce collision detected (extremely rare), regenerating');
+    console.warn("[security] Nonce collision detected (extremely rare), regenerating");
     return encrypt(plaintext, key); // Recursive retry
   }
   usedNonces.add(nonceHex);
-  
+
   // ... rest of encryption
 }
 ```
@@ -260,6 +276,7 @@ export function encrypt(plaintext: string, key: Uint8Array): EncryptedPayload {
 
 **Issue**:
 Error messages reveal whether a file is encrypted vs plaintext:
+
 ```typescript
 const parsed = JSON.parse(content);
 if (parsed.$encrypted) {
@@ -271,6 +288,7 @@ if (parsed.$encrypted) {
 ```
 
 If decryption fails, error message contains: `"Failed to decrypt: authentication tag mismatch"` which tells an attacker:
+
 1. File is encrypted
 2. Using authenticated encryption (AEAD)
 3. Wrong key was tried
@@ -278,13 +296,14 @@ If decryption fails, error message contains: `"Failed to decrypt: authentication
 **Attack Information Gain**: Attacker can distinguish authentication failures from system errors, enabling targeted attacks.
 
 **Recommendation**:
+
 ```typescript
 // Generic error messages:
 try {
   return await decryptJson(parsed, passphrase);
 } catch (err) {
   // Don't reveal WHY decryption failed
-  throw new Error('Unable to read encrypted store (wrong passphrase?)');
+  throw new Error("Unable to read encrypted store (wrong passphrase?)");
 }
 ```
 
@@ -292,6 +311,7 @@ try {
 **Priority**: This Month
 
 **References**:
+
 - OWASP: Information Leakage (ASVS V8.3.4)
 - CWE-209: Information Exposure Through an Error Message
 
@@ -307,14 +327,16 @@ try {
 No rate limiting on decryption attempts. An attacker with physical access could attempt brute-force attacks on encrypted stores by repeatedly calling `decrypt()` with different passphrases.
 
 **Current State**:
+
 - Argon2id slows down each attempt (3 iterations, 64 MB memory = ~50-100ms per attempt)
 - But no limit on total attempts
 - Attacker can run offline attack by copying encrypted files
 
 **Recommendation**:
+
 ```typescript
 // Add rate limiting to CLI:
-import { RateLimiter } from '../security/rate-limit';
+import { RateLimiter } from "../security/rate-limit";
 
 const decryptLimiter = new RateLimiter({
   maxAttempts: 5,
@@ -324,9 +346,9 @@ const decryptLimiter = new RateLimiter({
 
 async function attemptDecrypt(passphrase: string): Promise<void> {
   if (!decryptLimiter.allowAttempt(userId)) {
-    throw new Error('Too many decrypt attempts. Try again in 1 minute.');
+    throw new Error("Too many decrypt attempts. Try again in 1 minute.");
   }
-  
+
   try {
     await decrypt(data, passphrase);
     decryptLimiter.reset(userId);
@@ -354,6 +376,7 @@ async function attemptDecrypt(passphrase: string): Promise<void> {
 
 **Issue**:
 Public functions like `deriveKey()`, `encryptJson()`, `decryptJson()` lack comprehensive JSDoc comments. Current docs are minimal:
+
 ```typescript
 /**
  * Derive encryption key from passphrase using Argon2id.
@@ -362,35 +385,36 @@ export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
 ```
 
 **Recommendation**:
-```typescript
+
+````typescript
 /**
  * Derive encryption key from passphrase using Argon2id KDF.
- * 
+ *
  * Uses OWASP-recommended parameters:
  * - Memory: 64 MB (resistant to GPU attacks)
  * - Iterations: 3 (interactive use balance)
  * - Parallelism: 4 (multi-core utilization)
- * 
+ *
  * ⚠️ SECURITY: Always use a unique random salt for each key derivation.
- * 
+ *
  * @param passphrase - User-provided passphrase (min 12 chars, validated)
  * @param salt - Random salt, at least 16 bytes (preferably 32 bytes)
  * @returns 32-byte (256-bit) encryption key for XChaCha20
- * 
+ *
  * @throws {Error} If passphrase validation fails
  * @throws {Error} If salt is too short
- * 
+ *
  * @example
  * ```typescript
  * const salt = randomBytes(32);
  * const key = deriveKey("my-secure-passphrase-123", salt);
  * const encrypted = encrypt(plaintext, key);
  * ```
- * 
+ *
  * @see {@link https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html OWASP Argon2 Guidance}
  */
 export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
-```
+````
 
 **Effort**: Moderate (1 hour for all functions)  
 **Priority**: This Month
@@ -405,6 +429,7 @@ export function deriveKey(passphrase: string, salt: Uint8Array): Uint8Array {
 
 **Issue**:
 Current test suite (5 tests) covers happy path + basic error case but missing:
+
 - Empty passphrase handling
 - Very long passphrases (>1MB)
 - Corrupted ciphertext (bit flipping)
@@ -416,26 +441,27 @@ Current test suite (5 tests) covers happy path + basic error case but missing:
 
 **Recommendation**:
 Add edge case tests:
+
 ```typescript
-describe('edge cases', () => {
-  it('should reject empty passphrase', async () => {
-    await expect(deriveKey('', salt)).rejects.toThrow('Passphrase validation failed');
+describe("edge cases", () => {
+  it("should reject empty passphrase", async () => {
+    await expect(deriveKey("", salt)).rejects.toThrow("Passphrase validation failed");
   });
-  
-  it('should handle very long passphrases', async () => {
-    const longPass = 'a'.repeat(1024 * 1024); // 1 MB
+
+  it("should handle very long passphrases", async () => {
+    const longPass = "a".repeat(1024 * 1024); // 1 MB
     const key = deriveKey(longPass, salt);
     expect(key).toHaveLength(32);
   });
-  
-  it('should detect corrupted ciphertext', async () => {
-    const encrypted = await encryptJson({ data: 'test' }, 'passphrase');
+
+  it("should detect corrupted ciphertext", async () => {
+    const encrypted = await encryptJson({ data: "test" }, "passphrase");
     encrypted.ciphertext = encrypted.ciphertext.slice(0, -1); // Truncate
-    await expect(decryptJson(encrypted, 'passphrase')).rejects.toThrow();
+    await expect(decryptJson(encrypted, "passphrase")).rejects.toThrow();
   });
-  
-  it('should handle unicode passphrases', async () => {
-    const unicodePass = '密码🔐パスワード';
+
+  it("should handle unicode passphrases", async () => {
+    const unicodePass = "密码🔐パスワード";
     const key = deriveKey(unicodePass, salt);
     expect(key).toHaveLength(32);
   });
@@ -457,20 +483,22 @@ describe('edge cases', () => {
 Argon2id parameters (64 MB memory, 3 iterations) are OWASP-recommended but not benchmarked on target hardware. Performance may vary significantly across dev machines, servers, Raspberry Pi, etc.
 
 **Current State**:
+
 - Observed: ~3.5 seconds per encryption on test machine
 - No data on: mobile devices, low-memory systems, cloud VMs
 
 **Recommendation**:
 Add benchmark script:
+
 ```typescript
 // scripts/bench-argon2.ts
-import { deriveKey } from '../src/security/crypto';
-import { randomBytes } from '@noble/ciphers/webcrypto';
+import { deriveKey } from "../src/security/crypto";
+import { randomBytes } from "@noble/ciphers/webcrypto";
 
-const passphrase = 'test-passphrase-123';
+const passphrase = "test-passphrase-123";
 const salt = randomBytes(32);
 
-console.log('Benchmarking Argon2id...');
+console.log("Benchmarking Argon2id...");
 const iterations = 10;
 const start = performance.now();
 
@@ -501,21 +529,22 @@ Run on representative hardware and document results.
 When reading passphrase from `~/.closedclaw/.passphrase`, code doesn't verify file permissions before reading. A misconfigured file (world-readable) could leak the passphrase.
 
 **Recommendation**:
+
 ```typescript
 async function readPassphraseFile(path: string): Promise<string> {
   // Verify permissions before reading
   const stats = await fs.stat(path);
   const mode = stats.mode & 0o777;
-  
+
   if (mode !== 0o600) {
     throw new Error(
       `Insecure passphrase file permissions: ${mode.toString(8)}. ` +
-      `Expected 0600 (owner read/write only). ` +
-      `Fix: chmod 600 ${path}`
+        `Expected 0600 (owner read/write only). ` +
+        `Fix: chmod 600 ${path}`,
     );
   }
-  
-  return await fs.readFile(path, 'utf-8');
+
+  return await fs.readFile(path, "utf-8");
 }
 ```
 
@@ -532,6 +561,7 @@ async function readPassphraseFile(path: string): Promise<string> {
 
 **Issue**:
 When checking if a payload is encrypted, code uses standard string comparison:
+
 ```typescript
 if (parsed.$encrypted === true) {
 ```
@@ -541,11 +571,12 @@ Standard comparison can leak timing information. For defense-in-depth, use const
 **Note**: This is extremely low risk (marker is not secret), but security-critical code should avoid timing leaks as a principle.
 
 **Recommendation**:
+
 ```typescript
-import { timingSafeEqual } from 'node:crypto';
+import { timingSafeEqual } from "node:crypto";
 
 function isEncryptedMarker(value: unknown): boolean {
-  if (typeof value !== 'boolean') return false;
+  if (typeof value !== "boolean") return false;
   // Not really needed for boolean, but principle of const-time ops
   return value === true;
 }
@@ -566,18 +597,26 @@ function isEncryptedMarker(value: unknown): boolean {
 Constants use TypeScript `as const` for compile-time immutability but not `Object.freeze()` for runtime protection. A malicious actor with runtime access could mutate values.
 
 **Current:**
+
 ```typescript
 export const SECURITY = {
-  ENCRYPTION: { /* ... */ },
+  ENCRYPTION: {
+    /* ... */
+  },
   // ...
 } as const;
 ```
 
 **Recommendation:**
+
 ```typescript
 export const SECURITY = Object.freeze({
-  ENCRYPTION: Object.freeze({ /* ... */ }),
-  PASSPHRASE: Object.freeze({ /* ... */ }),
+  ENCRYPTION: Object.freeze({
+    /* ... */
+  }),
+  PASSPHRASE: Object.freeze({
+    /* ... */
+  }),
   // ...
 });
 ```
@@ -686,16 +725,13 @@ Attack Resistance:
 ### Recommended Next Steps
 
 **Before Enabling by Default** (Required):
+
 1. ✅ Fix HIGH #1 and #2 (15 minutes total)
 2. ✅ Expand test suite to 80%+ coverage (2 hours)
 3. ✅ Security review by second developer (1 hour)
 4. ✅ Penetration testing with weak passphrases (2 hours)
 
-**Before v1.0 Release** (Recommended):
-5. ✅ Fix all MEDIUM severity issues (3-4 hours)
-6. ✅ Add performance benchmarks (30 minutes)
-7. ✅ User documentation review (1 hour)
-8. ✅ Consider external security audit (optional)
+**Before v1.0 Release** (Recommended): 5. ✅ Fix all MEDIUM severity issues (3-4 hours) 6. ✅ Add performance benchmarks (30 minutes) 7. ✅ User documentation review (1 hour) 8. ✅ Consider external security audit (optional)
 
 ---
 
@@ -704,16 +740,19 @@ Attack Resistance:
 The Priority 3 encryption implementation is **production-ready after addressing the 2 HIGH severity issues**. The code demonstrates strong security practices, modern cryptographic choices, and thoughtful design.
 
 **Key Strengths**:
+
 - ✅ Excellent cryptographic foundation (XChaCha20-Poly1305 + Argon2id)
 - ✅ Security-first architecture (opt-in, validation, atomic operations)
 - ✅ Well-documented and tested
 - ✅ Maintainable and extensible
 
 **Required Fixes** (15 minutes):
+
 - 🔧 Atomic file permission setting
 - 🔧 Server-side passphrase validation
 
 **Recommended Improvements** (4 hours):
+
 - 📝 Enhanced documentation and test coverage
 - 🛡️ Defense-in-depth hardening (info leakage, salt validation)
 

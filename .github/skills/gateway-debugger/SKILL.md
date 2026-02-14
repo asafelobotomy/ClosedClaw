@@ -61,11 +61,13 @@ tail -f ~/.closedclaw/logs/gateway-$(date +%Y-%m-%d).log
 ### Issue 1: Port Already in Use
 
 **Symptoms**:
+
 - Error: "EADDRINUSE: address already in use :::18789"
 - Gateway fails to start
 - Cannot bind to port
 
 **Diagnosis**:
+
 ```bash
 # Find process using the port
 lsof -i :18789
@@ -76,6 +78,7 @@ lsof -i :18789
 ```
 
 **Solutions**:
+
 ```bash
 # Solution 1: Kill the process
 kill -9 12345
@@ -90,23 +93,26 @@ closedclaw gateway --verbose
 ```
 
 **Prevention**:
+
 ```json5
 // ~/.closedclaw/config.json5
 {
-  "gateway": {
-    "port": 18790  // Use non-default port
-  }
+  gateway: {
+    port: 18790, // Use non-default port
+  },
 }
 ```
 
 ### Issue 2: Stale Lock File
 
 **Symptoms**:
+
 - Error: "Gateway is already running"
 - GatewayLockError thrown
 - Lock file exists but no process running
 
 **Diagnosis**:
+
 ```bash
 # Check lock file
 cat ~/.closedclaw/gateway.lock
@@ -117,6 +123,7 @@ ps -p $PID 2>/dev/null || echo "Process not running"
 ```
 
 **Solutions**:
+
 ```bash
 # Solution 1: Remove stale lock file
 rm ~/.closedclaw/gateway.lock
@@ -131,6 +138,7 @@ closedclaw gateway --verbose
 ```
 
 **Prevention**:
+
 - Always use Ctrl+C for graceful shutdown
 - Avoid `kill -9` unless necessary
 - Use daemon management (launchd/systemd)
@@ -138,11 +146,13 @@ closedclaw gateway --verbose
 ### Issue 3: Config Validation Errors
 
 **Symptoms**:
+
 - Gateway fails to start with config error
 - "Unknown key" errors
 - Schema validation failures
 
 **Diagnosis**:
+
 ```bash
 # Run diagnostics
 closedclaw doctor
@@ -155,6 +165,7 @@ closedclaw config validate
 ```
 
 **Solutions**:
+
 ```bash
 # Solution 1: Check for typos
 closedclaw doctor | grep -i "unknown"
@@ -171,6 +182,7 @@ closedclaw gateway --dry-run  # If available
 ```
 
 **Common Config Issues**:
+
 - Unknown keys (strict validation)
 - Missing required fields
 - Invalid JSON5 syntax
@@ -180,12 +192,14 @@ closedclaw gateway --dry-run  # If available
 ### Issue 4: WebSocket Connection Failures
 
 **Symptoms**:
+
 - Clients cannot connect
 - "WebSocket connection failed"
 - Auth failures
 - Timeout errors
 
 **Diagnosis**:
+
 ```bash
 # Test WebSocket connection
 wscat -c ws://localhost:18789
@@ -201,6 +215,7 @@ tail -f ~/.closedclaw/logs/gateway-*.log | grep -i websocket
 ```
 
 **Solutions**:
+
 ```bash
 # Solution 1: Check auth configuration
 cat ~/.closedclaw/config.json5 | grep -A5 "gateway"
@@ -225,11 +240,13 @@ sudo firewall-cmd --add-port=18789/tcp  # CentOS
 ### Issue 5: Channel Disconnections
 
 **Symptoms**:
+
 - Channels show as disconnected in status
 - Messages not being received
 - Channel-specific errors
 
 **Diagnosis**:
+
 ```bash
 # Check channel status
 closedclaw channels status
@@ -245,6 +262,7 @@ ls -la ~/.closedclaw/credentials/
 ```
 
 **Solutions**:
+
 ```bash
 # Solution 1: Restart channel
 closedclaw channels restart --channel telegram
@@ -263,11 +281,13 @@ closedclaw gateway restart
 ### Issue 6: High Memory/CPU Usage
 
 **Symptoms**:
+
 - Gateway process using excessive resources
 - Slow response times
 - System lag
 
 **Diagnosis**:
+
 ```bash
 # Monitor gateway process
 top -p $(pgrep -f "closedclaw.*gateway")
@@ -284,6 +304,7 @@ node --prof-process isolate-*.log > processed.txt
 ```
 
 **Solutions**:
+
 ```bash
 # Solution 1: Check for memory leaks
 closedclaw gateway --inspect
@@ -314,11 +335,13 @@ closedclaw gateway --inspect
 ### Issue 7: Config Hot-Reload Failures
 
 **Symptoms**:
+
 - Changes to config.json5 not applied
 - Gateway crashes on reload
 - SIGUSR1 signal ignored
 
 **Diagnosis**:
+
 ```bash
 # Find gateway PID
 pgrep -f "closedclaw.*gateway"
@@ -331,6 +354,7 @@ tail -f ~/.closedclaw/logs/gateway-*.log | grep -i reload
 ```
 
 **Solutions**:
+
 ```bash
 # Solution 1: Manual restart
 closedclaw gateway restart

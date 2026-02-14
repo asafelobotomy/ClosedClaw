@@ -11,37 +11,41 @@ const LIVE = isTruthyEnvValue(process.env.MINIMAX_LIVE_TEST) || isTruthyEnvValue
 const describeLive = LIVE && MINIMAX_KEY ? describe : describe.skip;
 
 describeLive("minimax live", () => {
-  it("returns assistant text", async () => {
-    const model: Model<"anthropic-messages"> = {
-      id: MINIMAX_MODEL,
-      name: `MiniMax ${MINIMAX_MODEL}`,
-      api: "anthropic-messages",
-      provider: "minimax",
-      baseUrl: MINIMAX_BASE_URL,
-      reasoning: false,
-      input: ["text"],
-      // Pricing: placeholder values (per 1M tokens, multiplied by 1000 for display)
-      cost: { input: 15, output: 60, cacheRead: 2, cacheWrite: 10 },
-      contextWindow: 200000,
-      maxTokens: 8192,
-    };
-    const res = await completeSimple(
-      model,
-      {
-        messages: [
-          {
-            role: "user",
-            content: "Reply with the word ok.",
-            timestamp: Date.now(),
-          },
-        ],
-      },
-      { apiKey: MINIMAX_KEY, maxTokens: 64 },
-    );
-    const text = res.content
-      .filter((block) => block.type === "text")
-      .map((block) => block.text.trim())
-      .join(" ");
-    expect(text.length).toBeGreaterThan(0);
-  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
+  it(
+    "returns assistant text",
+    async () => {
+      const model: Model<"anthropic-messages"> = {
+        id: MINIMAX_MODEL,
+        name: `MiniMax ${MINIMAX_MODEL}`,
+        api: "anthropic-messages",
+        provider: "minimax",
+        baseUrl: MINIMAX_BASE_URL,
+        reasoning: false,
+        input: ["text"],
+        // Pricing: placeholder values (per 1M tokens, multiplied by 1000 for display)
+        cost: { input: 15, output: 60, cacheRead: 2, cacheWrite: 10 },
+        contextWindow: 200000,
+        maxTokens: 8192,
+      };
+      const res = await completeSimple(
+        model,
+        {
+          messages: [
+            {
+              role: "user",
+              content: "Reply with the word ok.",
+              timestamp: Date.now(),
+            },
+          ],
+        },
+        { apiKey: MINIMAX_KEY, maxTokens: 64 },
+      );
+      const text = res.content
+        .filter((block) => block.type === "text")
+        .map((block) => block.text.trim())
+        .join(" ");
+      expect(text.length).toBeGreaterThan(0);
+    },
+    TIMEOUT_TEST_SUITE_STANDARD_MS,
+  );
 });

@@ -11,10 +11,7 @@ import {
   verifySkillSignature,
   getSignatureFilePath,
 } from "../security/skill-signing.js";
-import {
-  getTrustedKey,
-  type TrustLevel,
-} from "../security/trusted-keyring.js";
+import { getTrustedKey, type TrustLevel } from "../security/trusted-keyring.js";
 
 export type VerificationConfig = {
   /** Require cryptographic signatures for installation. */

@@ -1,8 +1,8 @@
 import type { AddressInfo } from "node:net";
-import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import { createServer } from "node:http";
 import { afterEach, describe, expect, it } from "vitest";
 import WebSocket from "ws";
+import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import {
   ensureChromeExtensionRelayServer,
   getChromeExtensionRelayAuthHeaders,
@@ -183,121 +183,127 @@ describe("chrome extension relay server", () => {
     expect(err.message).toContain("401");
   });
 
-  it("tracks attached page targets and exposes them via CDP + /json/list", async () => {
-    const port = await getFreePort();
-    cdpUrl = `http://127.0.0.1:${port}`;
-    await ensureChromeExtensionRelayServer({ cdpUrl });
+  it(
+    "tracks attached page targets and exposes them via CDP + /json/list",
+    async () => {
+      const port = await getFreePort();
+      cdpUrl = `http://127.0.0.1:${port}`;
+      await ensureChromeExtensionRelayServer({ cdpUrl });
 
-    const ext = new WebSocket(`ws://127.0.0.1:${port}/extension`);
-    await waitForOpen(ext);
+      const ext = new WebSocket(`ws://127.0.0.1:${port}/extension`);
+      await waitForOpen(ext);
 
-    // Simulate a tab attach coming from the extension.
-    ext.send(
-      JSON.stringify({
-        method: "forwardCDPEvent",
-        params: {
-          method: "Target.attachedToTarget",
+      // Simulate a tab attach coming from the extension.
+      ext.send(
+        JSON.stringify({
+          method: "forwardCDPEvent",
           params: {
-            sessionId: "cb-tab-1",
-            targetInfo: {
-              targetId: "t1",
-              type: "page",
-              title: "Example",
-              url: "https://example.com",
-            },
-            waitingForDebugger: false,
-          },
-        },
-      }),
-    );
-
-    const list = (await fetch(`${cdpUrl}/json/list`, {
-      headers: relayAuthHeaders(cdpUrl),
-    }).then((r) => r.json())) as Array<{
-      id?: string;
-      url?: string;
-      title?: string;
-    }>;
-    expect(list.some((t) => t.id === "t1" && t.url === "https://example.com")).toBe(true);
-
-    // Simulate navigation updating tab metadata.
-    ext.send(
-      JSON.stringify({
-        method: "forwardCDPEvent",
-        params: {
-          method: "Target.targetInfoChanged",
-          params: {
-            targetInfo: {
-              targetId: "t1",
-              type: "page",
-              title: "DER STANDARD",
-              url: "https://www.derstandard.at/",
+            method: "Target.attachedToTarget",
+            params: {
+              sessionId: "cb-tab-1",
+              targetInfo: {
+                targetId: "t1",
+                type: "page",
+                title: "Example",
+                url: "https://example.com",
+              },
+              waitingForDebugger: false,
             },
           },
-        },
-      }),
-    );
+        }),
+      );
 
-    const list2 = await waitForListMatch(
-      async () =>
-        (await fetch(`${cdpUrl}/json/list`, {
-          headers: relayAuthHeaders(cdpUrl),
-        }).then((r) => r.json())) as Array<{
-          id?: string;
-          url?: string;
-          title?: string;
-        }>,
-      (list) =>
-        list.some(
+      const list = (await fetch(`${cdpUrl}/json/list`, {
+        headers: relayAuthHeaders(cdpUrl),
+      }).then((r) => r.json())) as Array<{
+        id?: string;
+        url?: string;
+        title?: string;
+      }>;
+      expect(list.some((t) => t.id === "t1" && t.url === "https://example.com")).toBe(true);
+
+      // Simulate navigation updating tab metadata.
+      ext.send(
+        JSON.stringify({
+          method: "forwardCDPEvent",
+          params: {
+            method: "Target.targetInfoChanged",
+            params: {
+              targetInfo: {
+                targetId: "t1",
+                type: "page",
+                title: "DER STANDARD",
+                url: "https://www.derstandard.at/",
+              },
+            },
+          },
+        }),
+      );
+
+      const list2 = await waitForListMatch(
+        async () =>
+          (await fetch(`${cdpUrl}/json/list`, {
+            headers: relayAuthHeaders(cdpUrl),
+          }).then((r) => r.json())) as Array<{
+            id?: string;
+            url?: string;
+            title?: string;
+          }>,
+        (list) =>
+          list.some(
+            (t) =>
+              t.id === "t1" &&
+              t.url === "https://www.derstandard.at/" &&
+              t.title === "DER STANDARD",
+          ),
+      );
+      expect(
+        list2.some(
           (t) =>
             t.id === "t1" && t.url === "https://www.derstandard.at/" && t.title === "DER STANDARD",
         ),
-    );
-    expect(
-      list2.some(
-        (t) =>
-          t.id === "t1" && t.url === "https://www.derstandard.at/" && t.title === "DER STANDARD",
-      ),
-    ).toBe(true);
+      ).toBe(true);
 
-    const cdp = new WebSocket(`ws://127.0.0.1:${port}/cdp`, {
-      headers: relayAuthHeaders(`ws://127.0.0.1:${port}/cdp`),
-    });
-    await waitForOpen(cdp);
-    const q = createMessageQueue(cdp);
+      const cdp = new WebSocket(`ws://127.0.0.1:${port}/cdp`, {
+        headers: relayAuthHeaders(`ws://127.0.0.1:${port}/cdp`),
+      });
+      await waitForOpen(cdp);
+      const q = createMessageQueue(cdp);
 
-    cdp.send(JSON.stringify({ id: 1, method: "Target.getTargets" }));
-    const res1 = JSON.parse(await q.next()) as { id: number; result?: unknown };
-    expect(res1.id).toBe(1);
-    expect(JSON.stringify(res1.result ?? {})).toContain("t1");
+      cdp.send(JSON.stringify({ id: 1, method: "Target.getTargets" }));
+      const res1 = JSON.parse(await q.next()) as { id: number; result?: unknown };
+      expect(res1.id).toBe(1);
+      expect(JSON.stringify(res1.result ?? {})).toContain("t1");
 
-    cdp.send(
-      JSON.stringify({
-        id: 2,
-        method: "Target.attachToTarget",
-        params: { targetId: "t1" },
-      }),
-    );
-    const received: Array<{
-      id?: number;
-      method?: string;
-      result?: unknown;
-      params?: unknown;
-    }> = [];
-    received.push(JSON.parse(await q.next()) as never);
-    received.push(JSON.parse(await q.next()) as never);
+      cdp.send(
+        JSON.stringify({
+          id: 2,
+          method: "Target.attachToTarget",
+          params: { targetId: "t1" },
+        }),
+      );
+      const received: Array<{
+        id?: number;
+        method?: string;
+        result?: unknown;
+        params?: unknown;
+      }> = [];
+      received.push(JSON.parse(await q.next()) as never);
+      received.push(JSON.parse(await q.next()) as never);
 
-    const res2 = received.find((m) => m.id === 2);
-    expect(res2?.id).toBe(2);
-    expect(JSON.stringify(res2?.result ?? {})).toContain("cb-tab-1");
+      const res2 = received.find((m) => m.id === 2);
+      expect(res2?.id).toBe(2);
+      expect(JSON.stringify(res2?.result ?? {})).toContain("cb-tab-1");
 
-    const evt = received.find((m) => m.method === "Target.attachedToTarget");
-    expect(evt?.method).toBe("Target.attachedToTarget");
-    expect(JSON.stringify(evt?.params ?? {})).toContain("t1");
+      const evt = received.find((m) => m.method === "Target.attachedToTarget");
+      expect(evt?.method).toBe("Target.attachedToTarget");
+      expect(JSON.stringify(evt?.params ?? {})).toContain("t1");
 
-    cdp.close();
-    ext.close();
-  }, TIMEOUT_TEST_SUITE_MEDIUM_MS);
+      cdp.close();
+      ext.close();
+    },
+    TIMEOUT_TEST_SUITE_MEDIUM_MS,
+  );
 
   it("rebroadcasts attach when a session id is reused for a new target", async () => {
     const port = await getFreePort();

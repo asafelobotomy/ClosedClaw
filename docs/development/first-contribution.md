@@ -52,6 +52,7 @@ pnpm build
 ```
 
 **Troubleshooting**:
+
 - If `pnpm install` fails, try `pnpm install --force`
 - If native modules fail, check platform-specific docs in `docs/platforms/`
 - On Windows, use WSL2 for best compatibility
@@ -88,6 +89,7 @@ git checkout -b feature/add-awesome-feature
 ```
 
 **Branch naming conventions**:
+
 - `feature/` - New features
 - `fix/` - Bug fixes
 - `docs/` - Documentation updates
@@ -98,13 +100,14 @@ git checkout -b feature/add-awesome-feature
 
 1. **Make your changes** in the appropriate files
 2. **Test your changes**:
+
    ```bash
    # Run relevant tests
    pnpm test -- src/path/to/changed-file.test.ts
-   
+
    # Run full test suite
    pnpm test
-   
+
    # Check code quality
    pnpm check
    ```
@@ -117,12 +120,14 @@ git checkout -b feature/add-awesome-feature
 ### Code Style Guidelines
 
 ClosedClaw uses:
+
 - **TypeScript strict mode** - No `any` types
 - **ESM imports** - Always use `.js` extensions in imports
 - **Oxlint** for linting
 - **Oxfmt** for formatting
 
 **Auto-fix issues**:
+
 ```bash
 pnpm lint:fix
 ```
@@ -141,6 +146,7 @@ git commit -m "feat: add awesome feature"
 ```
 
 **Commit message format**:
+
 ```
 <type>: <short description>
 
@@ -150,6 +156,7 @@ git commit -m "feat: add awesome feature"
 ```
 
 **Types**:
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -159,6 +166,7 @@ git commit -m "feat: add awesome feature"
 - `security`: Security improvements
 
 **Examples**:
+
 ```bash
 feat: add skill signature verification
 fix: resolve keychain access on Linux
@@ -175,6 +183,7 @@ test: add audit logging integration tests
 See detailed guide: [Adding Tools](adding-tools.md)
 
 **Quick steps**:
+
 1. Create `src/agents/tools/my-tool.ts`
 2. Implement factory function returning `AnyAgentTool`
 3. Add tests in `src/agents/tools/my-tool.test.ts`
@@ -186,6 +195,7 @@ See detailed guide: [Adding Tools](adding-tools.md)
 See detailed guide: [Adding Channels](adding-channels.md)
 
 **Quick steps**:
+
 1. Create extension: `extensions/my-channel/`
 2. Implement `ChannelPlugin` interface
 3. Add `ClosedClaw.plugin.json` manifest
@@ -195,6 +205,7 @@ See detailed guide: [Adding Channels](adding-channels.md)
 ### Fixing a Bug
 
 **Quick steps**:
+
 1. Create a failing test that reproduces the bug
 2. Fix the bug
 3. Verify the test passes
@@ -204,6 +215,7 @@ See detailed guide: [Adding Channels](adding-channels.md)
 ### Writing Documentation
 
 **Quick steps**:
+
 1. Create/edit markdown files in `docs/`
 2. Follow existing structure and style
 3. Add internal links (root-relative, no `.md` extensions)
@@ -242,22 +254,23 @@ ClosedClaw uses **Vitest**. Tests are co-located with source files:
 
 ```typescript
 // src/my-module.test.ts
-import { describe, it, expect } from 'vitest';
-import { myFunction } from './my-module';
+import { describe, it, expect } from "vitest";
+import { myFunction } from "./my-module";
 
-describe('myFunction', () => {
-  it('should do something', () => {
-    const result = myFunction('input');
-    expect(result).toBe('expected output');
+describe("myFunction", () => {
+  it("should do something", () => {
+    const result = myFunction("input");
+    expect(result).toBe("expected output");
   });
 
-  it('should handle edge cases', () => {
-    expect(() => myFunction('')).toThrow();
+  it("should handle edge cases", () => {
+    expect(() => myFunction("")).toThrow();
   });
 });
 ```
 
 **Test types**:
+
 - `*.test.ts` - Unit tests (fast, no networking)
 - `*.e2e.test.ts` - End-to-end tests (networking, multi-instance)
 - `*.live.test.ts` - Live provider tests (requires credentials, costs money)
@@ -329,6 +342,7 @@ Create `.vscode/launch.json`:
 ### Before Submitting
 
 **Pre-flight checklist**:
+
 - [ ] Code builds without errors: `pnpm build`
 - [ ] All tests pass: `pnpm test`
 - [ ] Linter passes: `pnpm lint`
@@ -337,6 +351,7 @@ Create `.vscode/launch.json`:
 - [ ] Commit messages follow convention
 
 **Quick check**:
+
 ```bash
 pnpm build && pnpm check && pnpm test
 ```
@@ -380,6 +395,7 @@ git push origin feature/add-awesome-feature
 ### Good First Issues
 
 Look for issues labeled:
+
 - `good first issue` - Perfect for newcomers
 - `help wanted` - Community contributions welcome
 - `documentation` - Doc improvements
@@ -390,18 +406,21 @@ Look for issues labeled:
 ### Contribution Ideas
 
 **Easy**:
+
 - Fix typos in documentation
 - Add examples to existing docs
 - Improve error messages
 - Add unit tests for uncovered code
 
 **Medium**:
+
 - Implement new agent tools
 - Add platform-specific features
 - Improve CLI output formatting
 - Add integration tests
 
 **Challenging**:
+
 - New channel integrations
 - Performance optimizations
 - Security enhancements
@@ -412,6 +431,7 @@ Look for issues labeled:
 ## 📚 Additional Resources
 
 ### Documentation
+
 - [Main Documentation Index](../README.md)
 - [Contributing Guidelines](../../CONTRIBUTING.md)
 - [Testing Guide](../testing.md)
@@ -419,12 +439,14 @@ Look for issues labeled:
 - [Security Documentation](../security/)
 
 ### Development Guides
-- [Adding Tools](adding-tools.md) *(coming soon)*
-- [Adding Channels](adding-channels.md) *(coming soon)*
-- [Extension Development](../plugins/creating-extensions.md) *(coming soon)*
+
+- [Adding Tools](adding-tools.md) _(coming soon)_
+- [Adding Channels](adding-channels.md) _(coming soon)_
+- [Extension Development](../plugins/creating-extensions.md) _(coming soon)_
 - [Architecture Overview](../refactor/closedclaw-fork-roadmap.md)
 
 ### Community
+
 - [Discord Server](https://discord.gg/clawd) - #dev-help channel
 - [GitHub Discussions](https://github.com/ClosedClaw/ClosedClaw/discussions)
 - [DeepWiki](https://deepwiki.com/ClosedClaw/ClosedClaw)
@@ -434,16 +456,19 @@ Look for issues labeled:
 ## 🆘 Getting Help
 
 ### Stuck on Setup?
+
 - Check [platform-specific docs](../platforms/)
 - Ask in Discord #dev-help
 - Open a GitHub Discussion
 
 ### Code Questions?
+
 - Review [architecture docs](../refactor/)
 - Search existing issues/PRs
 - Ask in Discord #dev-help
 
 ### Not Sure Where to Start?
+
 - Look for `good first issue` labels
 - Ask maintainers in Discord
 - Read other contributors' PRs
@@ -473,21 +498,27 @@ Look for issues labeled:
 ## 📝 Common Questions
 
 ### Q: How long does review take?
+
 **A**: Usually 1-7 days. Ping maintainers in Discord if > 1 week.
 
 ### Q: Can I work on multiple issues?
+
 **A**: Yes, but finish one before starting another for best results.
 
 ### Q: What if I can't finish?
+
 **A**: No problem! Comment on the issue/PR letting us know.
 
 ### Q: How do I become a maintainer?
+
 **A**: Consistent, quality contributions + active community participation.
 
 ### Q: Can I contribute to docs only?
+
 **A**: Absolutely! Documentation is crucial and very welcome.
 
 ### Q: What's the code of conduct?
+
 **A**: Be respectful, inclusive, and constructive. See [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ---

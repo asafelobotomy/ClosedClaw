@@ -1,10 +1,10 @@
 /**
  * Config Test Utilities
- * 
+ *
  * Helper functions for creating and manipulating test configurations.
  */
 
-import type { ClosedClawConfig } from '../../src/config/config.js';
+import type { ClosedClawConfig } from "../../src/config/config.js";
 
 /**
  * Create a minimal valid test config
@@ -13,8 +13,8 @@ export function createTestConfig(overrides: Partial<ClosedClawConfig> = {}): Clo
   return {
     agents: {
       main: {
-        model: 'claude-3.5-sonnet',
-        systemPrompt: 'You are a test assistant.',
+        model: "claude-3.5-sonnet",
+        systemPrompt: "You are a test assistant.",
       },
     },
     channels: {},
@@ -33,12 +33,12 @@ export function createTestConfig(overrides: Partial<ClosedClawConfig> = {}): Clo
  */
 export function createTestAgentConfig(
   agentId: string,
-  config: Partial<ClosedClawConfig['agents'][string]> = {}
+  config: Partial<ClosedClawConfig["agents"][string]> = {},
 ): ClosedClawConfig {
   return createTestConfig({
     agents: {
       [agentId]: {
-        model: 'claude-3.5-sonnet',
+        model: "claude-3.5-sonnet",
         systemPrompt: `Test agent: ${agentId}`,
         ...config,
       },
@@ -51,7 +51,7 @@ export function createTestAgentConfig(
  */
 export function createTestChannelConfig(
   channelId: string,
-  config: Record<string, unknown> = {}
+  config: Record<string, unknown> = {},
 ): ClosedClawConfig {
   return createTestConfig({
     channels: {
@@ -72,7 +72,7 @@ export function createTestSecurityConfig(
     signing?: boolean;
     audit?: boolean;
     keychain?: boolean;
-  } = {}
+  } = {},
 ): ClosedClawConfig {
   return createTestConfig({
     security: {
@@ -82,7 +82,7 @@ export function createTestSecurityConfig(
       signing: features.signing
         ? {
             requireSignature: true,
-            minTrustLevel: 'full',
+            minTrustLevel: "full",
           }
         : undefined,
       audit: features.audit
@@ -92,7 +92,7 @@ export function createTestSecurityConfig(
         : undefined,
       keychain: features.keychain
         ? {
-            backend: 'auto',
+            backend: "auto",
           }
         : undefined,
     },

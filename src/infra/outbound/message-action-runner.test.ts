@@ -1,14 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChannelPlugin } from "../../channels/plugins/types.js";
 import type { ClosedClawConfig } from "../../config/config.js";
+import {
+  createIMessageTestPlugin,
+  createTestRegistry,
+} from "../../../test/helpers/channel-plugins.js";
 import { jsonResult } from "../../agents/tools/common.js";
-import { setActivePluginRegistry } from "../../plugins/runtime.js";
-import { createIMessageTestPlugin, createTestRegistry } from "../../../test/helpers/channel-plugins.js";
 import { loadWebMedia } from "../../media/load-web-media.js";
+import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import { runMessageAction } from "./message-action-runner.js";
 
 vi.mock("../../media/load-web-media.js", async () => {
-  const actual = await vi.importActual<typeof import("../../media/load-web-media.js")>("../../media/load-web-media.js");
+  const actual = await vi.importActual<typeof import("../../media/load-web-media.js")>(
+    "../../media/load-web-media.js",
+  );
   return {
     ...actual,
     loadWebMedia: vi.fn(actual.loadWebMedia),

@@ -113,12 +113,7 @@ export function formatPublicKeyPem(publicKey: string): string {
   if (trimmed.includes("BEGIN PUBLIC KEY")) {
     return trimmed + "\n";
   }
-  return [
-    "-----BEGIN PUBLIC KEY-----",
-    trimmed,
-    "-----END PUBLIC KEY-----",
-    "",
-  ].join("\n");
+  return ["-----BEGIN PUBLIC KEY-----", trimmed, "-----END PUBLIC KEY-----", ""].join("\n");
 }
 
 /**
@@ -272,7 +267,10 @@ export function formatSignatureFile(signature: SkillSignature): string {
  */
 export function parseSignatureFile(sigContent: string): SkillSignature | null {
   try {
-    const lines = sigContent.trim().split("\n").map((l) => l.trim());
+    const lines = sigContent
+      .trim()
+      .split("\n")
+      .map((l) => l.trim());
 
     // Validate envelope
     const beginIdx = lines.indexOf(SIGNATURE_BEGIN);

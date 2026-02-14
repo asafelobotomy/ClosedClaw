@@ -1,5 +1,4 @@
 import type { ClosedClawConfig } from "../config/config.js";
-import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type {
   ChannelsWizardMode,
@@ -8,6 +7,7 @@ import type {
 } from "./configure.shared.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { readConfigFileSnapshot, resolveGatewayPort, writeConfigFile } from "../config/config.js";
+import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import { logConfigUpdated } from "../config/logging.js";
 import { ensureControlUiAssetsBuilt } from "../infra/control-ui-assets.js";
 import { defaultRuntime } from "../runtime.js";

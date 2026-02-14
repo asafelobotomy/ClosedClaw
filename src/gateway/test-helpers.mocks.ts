@@ -8,10 +8,10 @@ import type { ChannelPlugin, ChannelOutboundAdapter } from "../channels/plugins/
 import type { AgentBinding } from "../config/types.agents.js";
 import type { HooksConfig } from "../config/types.hooks.js";
 import type { PluginRegistry } from "../plugins/registry.js";
+import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "../agents/defaults.js";
 import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { DEFAULT_ACCOUNT_ID } from "../routing/session-key.js";
-import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "../agents/defaults.js";
 
 type StubChannelOptions = {
   id: ChannelPlugin["id"];

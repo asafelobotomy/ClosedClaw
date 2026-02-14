@@ -11,12 +11,14 @@
 **Results**: All paths correctly updated, no broken references
 
 #### Scripts Directory References
+
 - ✅ No active code references to `scripts/` directory
 - ✅ Only historical/documentation references remain (expected):
   - `tools/maintenance/migrate-scripts.ts` (migration tool)
   - `tools/dev/ui.js` (usage message string - cosmetic)
 
-#### Remote Deployment Paths  
+#### Remote Deployment Paths
+
 - ✅ Updated 6 remote script references in termux deployment tools:
   - `termux-sync-widget.sh`: Updated to `tools/deployment/cloud/sync-claude-code-auth.sh`
   - `termux-quick-auth.sh`: Updated to `tools/dev/claude-auth-status.sh`
@@ -24,6 +26,7 @@
   - Mobile reauth paths: Updated to `tools/platform/mobile/mobile-reauth.sh`
 
 #### Documentation References
+
 - ✅ Updated `.github/labeler.yml`: Removed reference to `docs.acp.md` (now covered by `docs/**` glob)
 - ✅ No broken references to `.pi/` directory
 - ✅ All phase documentation references correctly point to new locations
@@ -33,15 +36,18 @@
 **Critical Fix**: Build scripts path resolution corrected for `tools/build/` depth
 
 #### Path Resolution Fixes
+
 Scripts moved from `scripts/` (1 level) to `tools/build/` (2 levels) required updating path resolution:
 
 1. **canvas-a2ui-copy.ts**:
+
    ```typescript
    - const repoRoot = path.resolve(..., "..");
    + const repoRoot = path.resolve(..., "../..");
    ```
 
 2. **copy-hook-metadata.ts**:
+
    ```typescript
    - const projectRoot = path.resolve(__dirname, "..");
    + const projectRoot = path.resolve(__dirname, "../..");
@@ -54,6 +60,7 @@ Scripts moved from `scripts/` (1 level) to `tools/build/` (2 levels) required up
    ```
 
 #### Build Test Results
+
 ```bash
 $ pnpm build
 > ClosedClaw@2026.2.1 build
@@ -85,8 +92,9 @@ A2UI sources missing; keeping prebuilt bundle.
 ```
 
 This properly excludes:
+
 - `test-helpers.ts`
-- `test-helpers.e2e.ts`  
+- `test-helpers.e2e.ts`
 - `test-helpers.server.ts`
 - `test-helpers.mocks.ts`
 
@@ -98,24 +106,27 @@ This properly excludes:
 All npm/pnpm scripts verified and working:
 
 - ✅ `pnpm build` - TypeScript compilation + build scripts
-- ✅ `pnpm canvas:a2ui:bundle` - Canvas A2UI bundling  
+- ✅ `pnpm canvas:a2ui:bundle` - Canvas A2UI bundling
 - ✅ `pnpm mac:package` - macOS packaging (updated path)
 - ❌ `pnpm mac:restart` - **Removed** (script deleted in previous commit)
 
 ### 5. File Organization ✅
 
 **Root Directory**: Properly decluttered
+
 - ✅ `scripts/` removed (~320KB saved)
 - ✅ `docs.acp.md` moved to `docs/reference/`
 - ✅ `.pi/` archived to `archive/.pi/`
 - ✅ `.gitignore` updated (added `.directory` patterns)
 
 **Archive Directory**: Organized with README
+
 - ✅ `archive/README.md` created
 - ✅ `.pi/` directory preserved with context
 - ✅ `update_clawdbot.md` documented
 
 **Tools Directory**: Complete and organized
+
 - ✅ All build scripts in `tools/build/`
 - ✅ Path resolution corrected for 2-level depth
 - ✅ All scripts executable and functional
@@ -123,6 +134,7 @@ All npm/pnpm scripts verified and working:
 ### 6. Git Status Check ✅
 
 **Total Changed Files**: 258
+
 - Added: 85 files (skills, archive, docs, tools)
 - Modified: 6 files (.gitignore, labeler.yml, package.json, tsconfig.json, build scripts)
 - Deleted: 167 files (90 scripts, 75 skills from root)
@@ -133,41 +145,49 @@ All npm/pnpm scripts verified and working:
 ### 7. Dependency Path Checks ✅
 
 **Module Paths Updated**:
+
 - ✅ `tools/docs/i18n/go.mod`: Module path updated from `scripts/docs-i18n` to `tools/docs/i18n`
 - ✅ `tools/maintenance/update-clawtributors.ts`: Map path updated to `tools/maintenance/`
 - ✅ `tools/maintenance/protocol-gen-swift.ts`: Generated-by comment updated
 
 **Data Files Restored**:
+
 - ✅ `tools/maintenance/clawtributors-map.json` restored from git history (was missing after Phase 1)
 
 ## Issue Discoveries & Fixes
 
 ### Issue 1: Incomplete Phase 1 ✅ FIXED
+
 **Problem**: Phase 1 claimed to remove `scripts/` but directory was never actually deleted  
 **Impact**: ~320KB of duplicate content, broken references  
 **Fix**: Removed `scripts/` via `git rm -r`
 
 ### Issue 2: Broken package.json References ✅ FIXED
+
 **Problem**: References to non-existent or renamed scripts  
 **Impact**: `mac:package` and `mac:restart` commands broken  
 **Fix**: Updated `mac:package` path, removed `mac:restart`
 
 ### Issue 3: Build Script Path Resolution ✅ FIXED
+
 **Problem**: Scripts moved from 1-level to 2-level depth but path resolution not updated  
 **Impact**: Build failures - couldn't find source files  
 **Fix**: Updated path.resolve() to go up 2 levels (`../..`)
 
 ### Issue 4: TypeScript Exclude Pattern ✅ FIXED
+
 **Problem**: Only excluded `test-helpers.ts`, missed variants  
 **Impact**: Build failed when encountering test-helpers.e2e.ts importing from outside rootDir  
 **Fix**: Changed pattern to `test-helpers*.ts`
 
 ### Issue 5: Remote Deployment Paths ✅ FIXED
+
 **Problem**: Termux scripts referenced old `scripts/` paths on remote servers  
 **Impact**: Remote auth checking and sync would fail  
 **Fix**: Updated all 6 remote path references to `tools/` structure
 
 ### Issue 6: Missing Data File ✅ FIXED
+
 **Problem**: `clawtributors-map.json` missing after Phase 1 migration  
 **Impact**: Contributor update script would fail  
 **Fix**: Restored file from git history commit e040f6338
@@ -221,7 +241,7 @@ Beyond the original Phase 5 plan, the following issues were discovered and fixed
 All paths are properly organized and correctly referenced. The repository is in a clean, maintainable state with:
 
 - No duplicate directories
-- All references pointing to correct locations  
+- All references pointing to correct locations
 - Build system fully functional
 - Remote deployment scripts updated
 - Root directory properly organized

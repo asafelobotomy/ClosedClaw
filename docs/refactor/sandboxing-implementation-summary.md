@@ -19,11 +19,13 @@ Implemented mandatory sandboxing by default for all tool execution in ClosedClaw
 **File**: `src/agents/sandbox/config.ts` (line 151)
 
 **Before**:
+
 ```typescript
 mode: agentSandbox?.mode ?? agent?.mode ?? "off",
 ```
 
 **After**:
+
 ```typescript
 mode: agentSandbox?.mode ?? agent?.mode ?? "all",
 ```
@@ -38,14 +40,14 @@ mode: agentSandbox?.mode ?? agent?.mode ?? "all",
 
 **Added**: `collectSandboxSecurityFindings()` function with 6 security checks:
 
-| Check ID | Severity | Condition | Message |
-|----------|----------|-----------|---------|
-| `sandbox.mode_disabled` | **Critical** | `mode="off"` | Sandbox disabled; arbitrary code runs on host |
-| `sandbox.mode_non_main` | **Warning** | `mode="non-main"` | Main session not sandboxed |
-| `sandbox.workspace_writable` | **Warning** | `workspaceAccess="rw"` | Sandbox can modify host files |
-| `sandbox.network_enabled` | **Warning** | `network != "none"` | Sandbox has network access |
-| `sandbox.capabilities_not_dropped` | **Warning** | `capDrop` missing "ALL" | Linux capabilities not fully dropped |
-| `sandbox.filesystem_writable` | **Warning** | `readOnlyRoot=false` | Container filesystem is mutable |
+| Check ID                           | Severity     | Condition               | Message                                       |
+| ---------------------------------- | ------------ | ----------------------- | --------------------------------------------- |
+| `sandbox.mode_disabled`            | **Critical** | `mode="off"`            | Sandbox disabled; arbitrary code runs on host |
+| `sandbox.mode_non_main`            | **Warning**  | `mode="non-main"`       | Main session not sandboxed                    |
+| `sandbox.workspace_writable`       | **Warning**  | `workspaceAccess="rw"`  | Sandbox can modify host files                 |
+| `sandbox.network_enabled`          | **Warning**  | `network != "none"`     | Sandbox has network access                    |
+| `sandbox.capabilities_not_dropped` | **Warning**  | `capDrop` missing "ALL" | Linux capabilities not fully dropped          |
+| `sandbox.filesystem_writable`      | **Warning**  | `readOnlyRoot=false`    | Container filesystem is mutable               |
 
 **Integration**: Added to main audit runner in `runSecurityAudit()` function.
 
@@ -54,6 +56,7 @@ mode: agentSandbox?.mode ?? agent?.mode ?? "all",
 ### 3. Documentation
 
 #### Created
+
 - **`docs/security/mandatory-sandboxing.md`** (new)
   - Comprehensive guide explaining the security-first approach
   - Comparison table: ClosedClaw vs OpenClaw
@@ -61,6 +64,7 @@ mode: agentSandbox?.mode ?? agent?.mode ?? "all",
   - Guidance on when to disable (and risks)
 
 #### Updated
+
 - **`docs/gateway/sandboxing.md`**
   - Updated intro: "optional" → "by default"
   - Added "ClosedClaw vs OpenClaw" callout
@@ -69,12 +73,14 @@ mode: agentSandbox?.mode ?? agent?.mode ?? "all",
   - Added explicit opt-out example
 
 #### Updated
+
 - **`CHANGELOG.md`**
   - Added "Security Enhancements" section under "Unreleased"
   - Documented breaking change from OpenClaw
   - Listed all audit checks
 
 #### Updated
+
 - **`docs/refactor/closedclaw-fork-roadmap.md`**
   - Marked Priority 2 as ✅ COMPLETED
   - Added implementation details and impact summary
@@ -90,14 +96,14 @@ mode: agentSandbox?.mode ?? agent?.mode ?? "all",
   agents: {
     defaults: {
       sandbox: {
-        mode: "all",              // All sessions sandboxed
-        scope: "session",         // One container per session
-        workspaceAccess: "none",  // No host filesystem access
+        mode: "all", // All sessions sandboxed
+        scope: "session", // One container per session
+        workspaceAccess: "none", // No host filesystem access
         docker: {
           image: "closedclaw-sandbox:bookworm-slim",
-          readOnlyRoot: true,     // Immutable container filesystem
-          network: "none",        // No network access
-          capDrop: ["ALL"],       // Drop all Linux capabilities
+          readOnlyRoot: true, // Immutable container filesystem
+          network: "none", // No network access
+          capDrop: ["ALL"], // Drop all Linux capabilities
           tmpfs: ["/tmp", "/var/tmp", "/run"],
           workdir: "/workspace",
         },
@@ -109,13 +115,13 @@ mode: agentSandbox?.mode ?? agent?.mode ?? "all",
 
 ### Comparison: ClosedClaw vs OpenClaw
 
-| Feature | ClosedClaw | OpenClaw |
-|---------|-----------|----------|
-| **Default mode** | `"all"` | `"off"` |
-| **Tool execution** | Isolated containers | Host system |
-| **Network access** | Blocked | Full access |
-| **Filesystem** | Isolated workspace | Root filesystem |
-| **Security audit** | Flags if disabled | Optional warnings |
+| Feature            | ClosedClaw          | OpenClaw          |
+| ------------------ | ------------------- | ----------------- |
+| **Default mode**   | `"all"`             | `"off"`           |
+| **Tool execution** | Isolated containers | Host system       |
+| **Network access** | Blocked             | Full access       |
+| **Filesystem**     | Isolated workspace  | Root filesystem   |
+| **Security audit** | Flags if disabled   | Optional warnings |
 
 ---
 
@@ -146,7 +152,7 @@ Users who need to disable sandboxing (e.g., development, Docker unavailable):
   agents: {
     defaults: {
       sandbox: {
-        mode: "off",  // Not recommended; flagged by audit
+        mode: "off", // Not recommended; flagged by audit
       },
     },
   },
@@ -174,6 +180,7 @@ $ pnpm build
 Run `closedclaw doctor` or `closedclaw security audit`:
 
 **Before** (OpenClaw-style config):
+
 ```
 ⚠ sandbox.mode_disabled (critical): Sandbox is disabled by default
   agents.defaults.sandbox.mode="off" disables sandboxing for all tool execution
@@ -181,6 +188,7 @@ Run `closedclaw doctor` or `closedclaw security audit`:
 ```
 
 **After** (ClosedClaw defaults):
+
 ```
 ✓ No sandbox security issues found
 ```
@@ -189,14 +197,14 @@ Run `closedclaw doctor` or `closedclaw security audit`:
 
 ## Files Modified
 
-| File | Changes | Lines |
-|------|---------|-------|
-| `src/agents/sandbox/config.ts` | Changed default mode "off" → "all" | 1 |
-| `src/security/audit.ts` | Added `collectSandboxSecurityFindings()` + integration | +75 |
-| `docs/security/mandatory-sandboxing.md` | Created comprehensive security documentation | +248 (new) |
-| `docs/gateway/sandboxing.md` | Updated for security-first defaults | 3 sections |
-| `CHANGELOG.md` | Documented breaking change | +13 |
-| `docs/refactor/closedclaw-fork-roadmap.md` | Marked Priority 2 complete | +20 |
+| File                                       | Changes                                                | Lines      |
+| ------------------------------------------ | ------------------------------------------------------ | ---------- |
+| `src/agents/sandbox/config.ts`             | Changed default mode "off" → "all"                     | 1          |
+| `src/security/audit.ts`                    | Added `collectSandboxSecurityFindings()` + integration | +75        |
+| `docs/security/mandatory-sandboxing.md`    | Created comprehensive security documentation           | +248 (new) |
+| `docs/gateway/sandboxing.md`               | Updated for security-first defaults                    | 3 sections |
+| `CHANGELOG.md`                             | Documented breaking change                             | +13        |
+| `docs/refactor/closedclaw-fork-roadmap.md` | Marked Priority 2 complete                             | +20        |
 
 **Total impact**: ~350 lines added/modified
 

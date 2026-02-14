@@ -7,8 +7,8 @@
 
 import { type ChildProcess, spawn } from "node:child_process";
 import type { ClosedClawConfig } from "../config/config.js";
-import { TIMEOUT_TEST_SUITE_SHORT_MS, minutesToMs } from "../config/constants/index.js";
 import { hasBinary } from "../agents/skills.js";
+import { TIMEOUT_TEST_SUITE_SHORT_MS, minutesToMs } from "../config/constants/index.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { runCommandWithTimeout } from "../process/exec.js";
 import { ensureTailscaleEndpoint } from "./gmail-setup-utils.js";

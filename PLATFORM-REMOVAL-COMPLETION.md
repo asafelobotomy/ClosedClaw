@@ -14,8 +14,10 @@ Successfully removed 6 messaging platforms (Discord, WhatsApp, Telegram, Signal,
 ## Completed Phases
 
 ### ✅ Phase 1: Extension Removal
+
 **Status**: Complete  
 **Deleted**: 6 complete extension directories
+
 - `-extensions/discord/` (complete channel implementation)
 - `-extensions/whatsapp/` (complete channel implementation)
 - `-extensions/telegram/` (complete channel implementation)
@@ -26,12 +28,15 @@ Successfully removed 6 messaging platforms (Discord, WhatsApp, Telegram, Signal,
 **Metrics**: 11 files, ~4,000+ lines removed
 
 ### ✅ Phase 2: Config Types & Schemas
+
 **Status**: Complete  
 **Deleted**:
-- 7 config type files (types.*.ts)
+
+- 7 config type files (types.\*.ts)
 - 1 WhatsApp schema file (zod-schema.providers-whatsapp.ts)
 
 **Modified**:
+
 - types.channels.ts: Removed 6 channel definitions
 - zod-schema.providers.ts: Removed field definitions
 - legacy.rules.ts: Removed 8 migration rules
@@ -40,38 +45,48 @@ Successfully removed 6 messaging platforms (Discord, WhatsApp, Telegram, Signal,
 **Metrics**: 8 files deleted, 4 files modified, ~1,500 lines removed
 
 ### ✅ Phase 3: Utilities & Exports
+
 **Status**: Complete  
 **Modified**:
+
 - src/utils.ts: Removed 140+ lines of WhatsApp-specific helpers
 - src/index.ts: Removed toWhatsappJid export
 
 **Kept**:
+
 - `normalizeE164()`: Generalized to platform-agnostic phone normalization
 
 **Metrics**: 140+ lines deleted, 2 files modified
 
 ### ✅ Phase 4: UI Components
+
 **Status**: Complete  
 **Deleted**: 6 channel card component files
 **Modified**:
+
 - channels.ts: Updated render cases
 - channels.types.ts: Updated type definitions
 
 **Metrics**: 6 files deleted, 2 files modified, ~1,200 lines removed
 
 ### ✅ Phase 5: Config Test Data
+
 **Status**: Complete (merged into Phase 6)
 
 ### ✅ Phase 6.1: Category A Test Files
+
 **Status**: Complete  
 **Deleted**: 5 platform-exclusive test files
+
 - Removed ~2,789 lines of platform-specific tests
 
 **Modified**: 2+ test files (removed platform-specific test scenarios)
 
 ### ✅ Phase 6.2: Category B Test Import Cleanup
+
 **Status**: Complete  
 **Cleaned**: 20+ test files
+
 - Removed all imports from deleted platform extensions
 - Replaced platform references with remaining platforms
 - Updated test fixtures and configs
@@ -79,20 +94,25 @@ Successfully removed 6 messaging platforms (Discord, WhatsApp, Telegram, Signal,
 **Verified**: ✅ ZERO import errors from removed platform extensions (TypeScript validation)
 
 ### ✅ Phase 7: Validation
+
 **Status**: Complete  
 **Verified**:
+
 - ✅ TypeScript compilation: No import errors
 - ✅ No remaining direct imports from removed platform extensions
 - ✅ All test files updated to use remaining platforms
 
 ### ✅ Phase 8: Documentation
+
 **Status**: Complete  
 **Removed**:
+
 - 6 English channel documentation files
 - 6 Chinese channel documentation files
 - 3 promotional images
 
 **Updated**:
+
 - CHANGELOG.md: Added v2026.2.12 platform removal entry
 - BOOTSTRAP.md: Updated setup instructions for remaining platforms
 - AGENTS.md: Removed platform-specific formatting tips
@@ -103,6 +123,7 @@ Successfully removed 6 messaging platforms (Discord, WhatsApp, Telegram, Signal,
 ## Code Metrics
 
 ### Files Deleted
+
 - 6 extension directories (complete)
 - 7 config type files
 - 1 schema file
@@ -113,12 +134,14 @@ Successfully removed 6 messaging platforms (Discord, WhatsApp, Telegram, Signal,
 - **Total: 40+ files**
 
 ### Files Modified
+
 - 15+ source files (config, utils, UI, exports)
 - 20+ test files (import cleanup, fixture updates)
 - 4 documentation files
 - **Total: 39+ files**
 
 ### Lines Removed
+
 - Extensions: ~4,000+ lines
 - Config: ~1,500 lines
 - Utils: 140+ lines
@@ -128,6 +151,7 @@ Successfully removed 6 messaging platforms (Discord, WhatsApp, Telegram, Signal,
 - **Total: ~14,000+ lines**
 
 ### Git Commits
+
 - 11 major checkpoint commits
 - Clean, progressive history
 - Each phase documented
@@ -137,20 +161,24 @@ Successfully removed 6 messaging platforms (Discord, WhatsApp, Telegram, Signal,
 ## Quality Assurance
 
 ✅ **TypeScript Validation**
+
 - No import errors from removed platforms
 - Full type safety maintained
 
 ✅ **Import Cleanup**
+
 - All removed platform extensions purged from imports
 - Remaining platforms verified in references
 - Test fixtures updated
 
 ✅ **Backward Compatibility**
+
 - No breaking changes to remaining platforms
 - Config migrations cleaned up (removed platforms no longer need conversion)
 - Utility functions generalized (not removed)
 
 ✅ **Documentation**
+
 - Platform removal documented in CHANGELOG
 - Setup guides updated for remaining platforms
 - Reference docs marked as archived where applicable
@@ -163,24 +191,27 @@ Successfully removed 6 messaging platforms (Discord, WhatsApp, Telegram, Signal,
 ✅ **MSTeams** - Fully functional  
 ✅ **BlueBubbles** - Fully functional  
 ✅ **Nostr** - Fully functional  
-✅ **Web Chat (GTK-GUI)** - Primary focus  
+✅ **Web Chat (GTK-GUI)** - Primary focus
 
 ---
 
 ## Risk Assessment
 
 ### LOW RISK ✅
+
 - All changes tracked in git history
 - Extensions completely removed (no partial references)
 - Config schemas properly updated
 - TypeScript validation passed
 
 ### MITIGATIONS
+
 - Each phase is independently revertible via git
 - Removed platforms can be restored from git if needed
 - Core functionality unchanged for remaining platforms
 
 ### Rollback (if needed)
+
 ```bash
 git log --oneline | grep "Phase"
 git revert <commit-hash>
@@ -193,6 +224,7 @@ git revert <commit-hash>
 The ClosedClaw platform removal is **complete and verified**. All 6 messaging platforms have been systematically removed, tests have been updated, documentation has been cleaned, and the codebase remains type-safe and functional.
 
 **Next Steps**:
+
 1. Run full test suite: `pnpm test`
 2. Build verification: `pnpm build`
 3. Lint check: `pnpm check`

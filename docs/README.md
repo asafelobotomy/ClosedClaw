@@ -38,6 +38,7 @@ Understanding ClosedClaw's architecture:
 ClosedClaw implements comprehensive security infrastructure with OWASP/NIST compliance:
 
 ### Security Overview
+
 - **[Security Model](gateway/security.md)** - Architecture and principles
 - **[Encrypted Storage](security/encrypted-memory.md)** - AES-256-GCM at rest (Priority 3)
 - **[Skill Signing](security/skill-signing.md)** - Ed25519 cryptographic verification (Priority 4)
@@ -47,6 +48,7 @@ ClosedClaw implements comprehensive security infrastructure with OWASP/NIST comp
 - **[Encryption Audit](security/encryption-audit-20260209.md)** - Independent security review
 
 ### Security Features
+
 - ✅ AES-256-GCM encryption at rest
 - ✅ Argon2id key derivation (OWASP-compliant)
 - ✅ Ed25519 digital signatures for skills
@@ -56,6 +58,7 @@ ClosedClaw implements comprehensive security infrastructure with OWASP/NIST comp
 - ✅ Sandbox isolation (Docker/Firejail)
 
 ### Additional Security
+
 - **[Sandboxing](refactor/sandboxing-implementation-summary.md)** - Process isolation
 - **[Network Egress](security/)** - Network policy enforcement
 - **[Formal Verification](security/formal-verification.md)** - Cryptographic proofs (if available)
@@ -104,6 +107,7 @@ closedclaw health
 Platform-specific integration guides:
 
 ### Built-in Channels
+
 - **[WhatsApp](channels/whatsapp/)** - WhatsApp Web integration
 - **[Telegram](channels/telegram.md)** - Telegram Bot API
 - **[Discord](channels/discord/)** - Discord bot integration
@@ -113,6 +117,7 @@ Platform-specific integration guides:
 - **[Web Chat](web/)** - Browser-based interface
 
 ### Extension Channels
+
 - **[Microsoft Teams](channels/)** - MS Teams connector (extension)
 - **[Google Chat](channels/)** - Google Chat integration (extension)
 - **[Matrix](channels/)** - Matrix protocol (extension)
@@ -127,18 +132,21 @@ Platform-specific integration guides:
 Contributing to ClosedClaw:
 
 ### Getting Started
+
 - **[Contributing Guide](../CONTRIBUTING.md)** - How to contribute
 - **[Development Setup](development/)** - Local development environment
 - **[Testing Guide](testing.md)** - Running and writing tests
 - **[Debugging](debugging.md)** - Troubleshooting and debugging tools
 
 ### Architecture
+
 - **[Fork Roadmap](refactor/closedclaw-fork-roadmap.md)** - Project history and direction
 - **[Architecture Overview](refactor/)** - System design and components
 - **[Plugin System](plugin.md)** - Extension architecture
 - **[Hooks System](hooks.md)** - Event hooks and lifecycle
 
 ### Guides
+
 - **[First Contribution](development/first-contribution.md)** - Step-by-step guide for new contributors (~600 lines)
 - **[Path Aliases & Barrel Exports](development/path-aliases.md)** - Import patterns and migration guide (~500 lines)
 - **Adding Tools** - Create new agent tools (see First Contribution guide)
@@ -203,6 +211,7 @@ Detailed reports on completed development priorities:
 ## 🔧 Troubleshooting
 
 ### Diagnostics
+
 - **[Doctor Command](diagnostics/)** - Automated diagnostics (`closedclaw doctor`)
 - **[Health Check](diagnostics/)** - System health monitoring
 - **[Debugging Guide](debugging.md)** - Debug tools and techniques
@@ -210,6 +219,7 @@ Detailed reports on completed development priorities:
 - **[Logging](logging.md)** - Log collection and analysis
 
 ### Getting Help
+
 - **[Discord Community](https://discord.gg/clawd)** - Real-time community support
 - **[GitHub Issues](https://github.com/ClosedClaw/ClosedClaw/issues)** - Bug reports and feature requests
 - **[FAQ](start/faq.md)** - Frequently asked questions
@@ -220,6 +230,7 @@ Detailed reports on completed development priorities:
 ## 📖 Additional Resources
 
 ### Reference
+
 - **[Token Usage](token-use.md)** - Managing token consumption
 - **[Environment Variables](environment.md)** - Configuration via env vars
 - **[Network Configuration](network.md)** - Proxy, firewall, networking
@@ -230,6 +241,7 @@ Detailed reports on completed development priorities:
 - **[Scripts](scripts.md)** - Automation and scripting
 
 ### Advanced Topics
+
 - **[Multi-Agent Sandbox](multi-agent-sandbox-tools.md)** - Agent collaboration
 - **[Broadcast Groups](broadcast-groups.md)** - Multi-channel messaging
 - **[Brave Search](brave-search.md)** - Search integration
@@ -238,17 +250,10 @@ Detailed reports on completed development priorities:
 - **[Experiments](experiments/)** - Experimental features
 
 ### Automation
+
 - **[Cron Jobs](automation/)** - Scheduled tasks
 - **[Auto-Reply](automation/)** - Automated responses
 - **[Workflows](automation/)** - Task automation
-
----
-
-## 🌐 Internationalization
-
-- **[中文文档 (Chinese)](zh-CN/)** - Chinese documentation
-
----
 
 ## 📝 Project Files
 

@@ -7,6 +7,7 @@ Technical implementation details, design decisions, and threat model for Tonal P
 ### Why AFSK over modern digital modulation?
 
 Bell 202 AFSK was chosen because:
+
 - **Simplicity**: Two tones (1200/2400 Hz) with standard UART framing. No complex DSP stack.
 - **Robustness**: 50+ years of proven reliability in telephony, packet radio, and fax.
 - **Hardware-agnostic**: Works with any speaker/microphone capable of audible frequencies.
@@ -17,6 +18,7 @@ The ultrasonic variant (18/20 kHz) trades audibility for stealth while keeping t
 ### Why dead-drop over direct RPC?
 
 File-based message exchange (dead-drop) was chosen over direct IPC because:
+
 - **Security boundary**: No shared memory or sockets between agents.
 - **Auditable**: Every message is a WAV file that can be archived and forensically analyzed.
 - **Process isolation**: Agents can run in different containers/VMs.
@@ -28,6 +30,7 @@ File-based message exchange (dead-drop) was chosen over direct IPC because:
 The user directive was: "TPC should be the default communication, all other communication being a fallback."
 
 This means `shouldFallbackToText()` is the decision function (not `shouldUseTPC()`). The security model is fail-closed:
+
 - Agent-to-agent messages default to TPC (acoustic/file)
 - Text-based CT/1 requires explicit `allowTextFallback: true` in the agent profile
 - Human-facing agents (conversation) explicitly opt into text fallback
@@ -37,51 +40,52 @@ This means `shouldFallbackToText()` is the decision function (not `shouldUseTPC(
 
 ### Threats mitigated by TPC
 
-| Threat | Mitigation |
-|--------|-----------|
+| Threat                                   | Mitigation                                                  |
+| ---------------------------------------- | ----------------------------------------------------------- |
 | Prompt injection via shared text context | CT/1 payloads are AFSK-encoded, not stored as readable text |
-| Message tampering | Ed25519 signatures on every envelope |
-| Replay attacks | 128-bit random nonces tracked in persistent store |
-| Stale/delayed messages | Timestamp freshness check (configurable window) |
-| Silent text degradation | Circuit breaker blocks rather than falls back |
-| Key compromise | Automatic key rotation with grace period |
-| Agent flooding | Per-agent sliding window rate limiter |
-| Forensic gaps | JSONL audit logging of every TPC operation |
+| Message tampering                        | Ed25519 signatures on every envelope                        |
+| Replay attacks                           | 128-bit random nonces tracked in persistent store           |
+| Stale/delayed messages                   | Timestamp freshness check (configurable window)             |
+| Silent text degradation                  | Circuit breaker blocks rather than falls back               |
+| Key compromise                           | Automatic key rotation with grace period                    |
+| Agent flooding                           | Per-agent sliding window rate limiter                       |
+| Forensic gaps                            | JSONL audit logging of every TPC operation                  |
 
 ### Threats NOT mitigated by TPC
 
-| Threat | Status |
-|--------|--------|
-| Side-channel timing analysis | Not addressed (future work) |
-| Physical audio eavesdropping | Ultrasonic mode reduces risk but not eliminated |
-| Compromised Node.js runtime | Out of scope (OS-level concern) |
+| Threat                             | Status                                                         |
+| ---------------------------------- | -------------------------------------------------------------- |
+| Side-channel timing analysis       | Not addressed (future work)                                    |
+| Physical audio eavesdropping       | Ultrasonic mode reduces risk but not eliminated                |
+| Compromised Node.js runtime        | Out of scope (OS-level concern)                                |
 | Disk access to dead-drop directory | Mitigated by file permissions (0700) but not encrypted at rest |
 
 ## Performance Characteristics
 
 ### Encoding pipeline
 
-| Stage | Time (typical) | Notes |
-|-------|---------------|-------|
-| JSON serialization | <1 ms | Small CT/1 payloads |
-| Ed25519 signing | <1 ms | Node.js native crypto |
-| Reed-Solomon FEC (32 ECC bytes) | ~2 ms | GF(2^8) polynomial arithmetic |
-| AFSK modulation | ~5-15 ms | Depends on payload size |
-| WAV file write | ~1-5 ms | Sequential I/O |
+| Stage                           | Time (typical) | Notes                         |
+| ------------------------------- | -------------- | ----------------------------- |
+| JSON serialization              | <1 ms          | Small CT/1 payloads           |
+| Ed25519 signing                 | <1 ms          | Node.js native crypto         |
+| Reed-Solomon FEC (32 ECC bytes) | ~2 ms          | GF(2^8) polynomial arithmetic |
+| AFSK modulation                 | ~5-15 ms       | Depends on payload size       |
+| WAV file write                  | ~1-5 ms        | Sequential I/O                |
 
 ### Decoding pipeline
 
-| Stage | Time (typical) | Notes |
-|-------|---------------|-------|
-| WAV file read | ~1-5 ms | Sequential I/O |
-| Goertzel demodulation | ~5-15 ms | Per-bit frequency detection |
-| Reed-Solomon correction | ~2-5 ms | Berlekamp-Massey + Forney |
-| Ed25519 verification | <1 ms | Node.js native crypto |
-| Nonce + freshness check | <1 ms | In-memory lookup |
+| Stage                   | Time (typical) | Notes                       |
+| ----------------------- | -------------- | --------------------------- |
+| WAV file read           | ~1-5 ms        | Sequential I/O              |
+| Goertzel demodulation   | ~5-15 ms       | Per-bit frequency detection |
+| Reed-Solomon correction | ~2-5 ms        | Berlekamp-Massey + Forney   |
+| Ed25519 verification    | <1 ms          | Node.js native crypto       |
+| Nonce + freshness check | <1 ms          | In-memory lookup            |
 
 ### File sizes
 
 A typical CT/1 message (~200 bytes payload) produces:
+
 - ~45 KB WAV file at audible (300 baud, 44.1 kHz)
 - ~90 KB WAV file at ultrasonic (150 baud, 48 kHz)
 

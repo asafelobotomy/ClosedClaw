@@ -16,7 +16,7 @@ import { logConfigUpdated } from "../config/logging.js";
 import { resolveGatewayService } from "../daemon/service.js";
 import { resolveGatewayAuth } from "../gateway/auth.js";
 import { buildGatewayConnectionDetails } from "../gateway/call.js";
-import { resolveClosedClawPackageRoot } from "../infra/openclaw-root.js";
+import { resolveClosedClawPackageRoot } from "../infra/closedclaw-root.js";
 import { defaultRuntime } from "../runtime.js";
 import { note } from "../terminal/note.js";
 import { stylePromptTitle } from "../terminal/prompt-style.js";
@@ -181,7 +181,10 @@ export async function doctorCommand(
     }
   }
 
-  await noteStateIntegrity(cfg, prompter, configResult.path ?? CONFIG_PATH);
+  await noteStateIntegrity(cfg, prompter, configResult.path ?? CONFIG_PATH, {
+    skipCrossHomeScan:
+      options.nonInteractive === true || process.env.CLOSEDCLAW_DOCTOR_SKIP_STATE_SCAN === "1",
+  });
 
   cfg = await maybeRepairSandboxImages(cfg, runtime, prompter);
   noteSandboxScopeWarnings(cfg);

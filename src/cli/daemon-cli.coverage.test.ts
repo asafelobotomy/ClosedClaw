@@ -122,69 +122,77 @@ describe("daemon-cli coverage", () => {
     }
   });
 
-  it("probes gateway status by default", async () => {
-    runtimeLogs.length = 0;
-    runtimeErrors.length = 0;
-    callGateway.mockClear();
+  it(
+    "probes gateway status by default",
+    async () => {
+      runtimeLogs.length = 0;
+      runtimeErrors.length = 0;
+      callGateway.mockClear();
 
-    const { registerDaemonCli } = await import("./daemon-cli.js");
-    const program = new Command();
-    program.exitOverride();
-    registerDaemonCli(program);
+      const { registerDaemonCli } = await import("./daemon-cli.js");
+      const program = new Command();
+      program.exitOverride();
+      registerDaemonCli(program);
 
-    await program.parseAsync(["daemon", "status"], { from: "user" });
+      await program.parseAsync(["daemon", "status"], { from: "user" });
 
-    expect(callGateway).toHaveBeenCalledTimes(1);
-    expect(callGateway).toHaveBeenCalledWith(expect.objectContaining({ method: "status" }));
-    expect(findExtraGatewayServices).toHaveBeenCalled();
-    expect(inspectPortUsage).toHaveBeenCalled();
-  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
+      expect(callGateway).toHaveBeenCalledTimes(1);
+      expect(callGateway).toHaveBeenCalledWith(expect.objectContaining({ method: "status" }));
+      expect(findExtraGatewayServices).toHaveBeenCalled();
+      expect(inspectPortUsage).toHaveBeenCalled();
+    },
+    TIMEOUT_TEST_SUITE_STANDARD_MS,
+  );
 
-  it("derives probe URL from service args + env (json)", async () => {
-    runtimeLogs.length = 0;
-    runtimeErrors.length = 0;
-    callGateway.mockClear();
-    inspectPortUsage.mockClear();
+  it(
+    "derives probe URL from service args + env (json)",
+    async () => {
+      runtimeLogs.length = 0;
+      runtimeErrors.length = 0;
+      callGateway.mockClear();
+      inspectPortUsage.mockClear();
 
-    serviceReadCommand.mockResolvedValueOnce({
-      programArguments: ["/bin/node", "cli", "gateway", "--port", "19001"],
-      environment: {
-        ClosedClaw_PROFILE: "dev",
-        ClosedClaw_STATE_DIR: "/tmp/ClosedClaw-daemon-state",
-        ClosedClaw_CONFIG_PATH: "/tmp/ClosedClaw-daemon-state/ClosedClaw.json",
-        ClosedClaw_GATEWAY_PORT: "19001",
-      },
-      sourcePath: "/tmp/bot.molt.gateway.plist",
-    });
+      serviceReadCommand.mockResolvedValueOnce({
+        programArguments: ["/bin/node", "cli", "gateway", "--port", "19001"],
+        environment: {
+          ClosedClaw_PROFILE: "dev",
+          ClosedClaw_STATE_DIR: "/tmp/ClosedClaw-daemon-state",
+          ClosedClaw_CONFIG_PATH: "/tmp/ClosedClaw-daemon-state/ClosedClaw.json",
+          ClosedClaw_GATEWAY_PORT: "19001",
+        },
+        sourcePath: "/tmp/bot.molt.gateway.plist",
+      });
 
-    const { registerDaemonCli } = await import("./daemon-cli.js");
-    const program = new Command();
-    program.exitOverride();
-    registerDaemonCli(program);
+      const { registerDaemonCli } = await import("./daemon-cli.js");
+      const program = new Command();
+      program.exitOverride();
+      registerDaemonCli(program);
 
-    await program.parseAsync(["daemon", "status", "--json"], { from: "user" });
+      await program.parseAsync(["daemon", "status", "--json"], { from: "user" });
 
-    expect(callGateway).toHaveBeenCalledWith(
-      expect.objectContaining({
-        url: "ws://127.0.0.1:19001",
-        method: "status",
-      }),
-    );
-    expect(inspectPortUsage).toHaveBeenCalledWith(19001);
+      expect(callGateway).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: "ws://127.0.0.1:19001",
+          method: "status",
+        }),
+      );
+      expect(inspectPortUsage).toHaveBeenCalledWith(19001);
 
-    const jsonLine = runtimeLogs.find((line) => line.trim().startsWith("{"));
-    const parsed = JSON.parse(jsonLine ?? "{}") as {
-      gateway?: { port?: number; portSource?: string; probeUrl?: string };
-      config?: { mismatch?: boolean };
-      rpc?: { url?: string; ok?: boolean };
-    };
-    expect(parsed.gateway?.port).toBe(19001);
-    expect(parsed.gateway?.portSource).toBe("service args");
-    expect(parsed.gateway?.probeUrl).toBe("ws://127.0.0.1:19001");
-    expect(parsed.config?.mismatch).toBe(true);
-    expect(parsed.rpc?.url).toBe("ws://127.0.0.1:19001");
-    expect(parsed.rpc?.ok).toBe(true);
-  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
+      const jsonLine = runtimeLogs.find((line) => line.trim().startsWith("{"));
+      const parsed = JSON.parse(jsonLine ?? "{}") as {
+        gateway?: { port?: number; portSource?: string; probeUrl?: string };
+        config?: { mismatch?: boolean };
+        rpc?: { url?: string; ok?: boolean };
+      };
+      expect(parsed.gateway?.port).toBe(19001);
+      expect(parsed.gateway?.portSource).toBe("service args");
+      expect(parsed.gateway?.probeUrl).toBe("ws://127.0.0.1:19001");
+      expect(parsed.config?.mismatch).toBe(true);
+      expect(parsed.rpc?.url).toBe("ws://127.0.0.1:19001");
+      expect(parsed.rpc?.ok).toBe(true);
+    },
+    TIMEOUT_TEST_SUITE_STANDARD_MS,
+  );
 
   it("passes deep scan flag for daemon status", async () => {
     findExtraGatewayServices.mockClear();

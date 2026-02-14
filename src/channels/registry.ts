@@ -5,9 +5,7 @@ import { requireActivePluginRegistry } from "../plugins/runtime.js";
 // Channel docking: core channels registered here.
 // Third-party channels (Telegram, WhatsApp, Discord, etc.) have been archived.
 // Only GTK GUI remains as the primary communication interface.
-export const CHAT_CHANNEL_ORDER = [
-  "gtk-gui",
-] as const;
+export const CHAT_CHANNEL_ORDER = ["gtk-gui"] as const;
 
 export type ChatChannelId = (typeof CHAT_CHANNEL_ORDER)[number];
 

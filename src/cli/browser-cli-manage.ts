@@ -7,10 +7,17 @@ import type {
   BrowserTab,
   ProfileStatus,
 } from "../browser/client.js";
+import {
+  TIMEOUT_BROWSER_PAGE_MS,
+  TIMEOUT_HTTP_SHORT_MS,
+  TIMEOUT_TEST_SHORT_MS,
+  TIMEOUT_TEST_SUITE_MEDIUM_MS,
+  TIMEOUT_TEST_SUITE_SHORT_MS,
+  secondsToMs,
+} from "../config/constants/index.js";
 import { danger, info } from "../globals.js";
 import { defaultRuntime } from "../runtime.js";
 import { shortenHomePath } from "../utils.js";
-import { TIMEOUT_BROWSER_PAGE_MS, TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SHORT_MS, TIMEOUT_TEST_SUITE_MEDIUM_MS, TIMEOUT_TEST_SUITE_SHORT_MS, secondsToMs } from "../config/constants/index.js";
 import { callBrowserRequest, type BrowserParentOpts } from "./browser-cli-shared.js";
 import { runCommandWithRuntime } from "./cli-utils.js";
 

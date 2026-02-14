@@ -8,7 +8,8 @@ import {
   resolveUpdateAvailability,
 } from "../commands/status.update.js";
 import { readConfigFileSnapshot, writeConfigFile } from "../config/config.js";
-import { resolveClosedClawPackageRoot } from "../infra/openclaw-root.js";
+import { getStateDir } from "../config/constants/index.js";
+import { resolveClosedClawPackageRoot } from "../infra/closedclaw-root.js";
 import { trimLogTail } from "../infra/restart-sentinel.js";
 import { parseSemver } from "../infra/runtime-guard.js";
 import {
@@ -33,7 +34,6 @@ import {
   resolveGlobalPackageRoot,
   type GlobalInstallManager,
 } from "../infra/update-global.js";
-import { getStateDir } from "../config/constants/index.js";
 import {
   runGatewayUpdate,
   type UpdateRunResult,

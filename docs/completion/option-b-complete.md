@@ -17,6 +17,7 @@ Completed all developer experience improvements from Phase 2 of the [Repository 
 **Impact**: High
 
 Comprehensive guide for new contributors covering:
+
 - Prerequisites and environment setup
 - Fork/clone/install workflow
 - Development patterns (config, DI, channels, tools)
@@ -26,6 +27,7 @@ Comprehensive guide for new contributors covering:
 - Finding good first issues
 
 **Benefits**:
+
 - Clear onboarding path for contributors
 - Documents common patterns and conventions
 - Reduces maintainer burden answering basic questions
@@ -40,6 +42,7 @@ Comprehensive guide for new contributors covering:
 Complete boilerplate for creating new extensions:
 
 **Structure**:
+
 ```
 extensions/.template/
 ├── README.md                    # Template usage guide
@@ -53,6 +56,7 @@ extensions/.template/
 ```
 
 **Features**:
+
 - Complete registration examples (tools, hooks, commands, channels, providers)
 - Config schema with JSON Schema validation
 - UI hints for sensitive fields
@@ -60,6 +64,7 @@ extensions/.template/
 - Clear documentation structure
 
 **Example Code Included**:
+
 - Tool registration with parameter validation
 - Hook registration with priority
 - CLI command with argument parsing
@@ -67,6 +72,7 @@ extensions/.template/
 - Provider integration pattern
 
 **Benefits**:
+
 - Reduces extension setup time from hours to minutes
 - Ensures consistent structure across extensions
 - Documents all plugin API capabilities
@@ -81,6 +87,7 @@ extensions/.template/
 Organized test utilities with barrel exports:
 
 **Structure**:
+
 ```
 test/utils/
 ├── index.ts          # Barrel export (re-exports helpers/mocks/fixtures)
@@ -91,6 +98,7 @@ test/utils/
 ```
 
 **Utilities Added**:
+
 - `createTestConfig()` - Minimal valid config
 - `createTestAgentConfig()` - Agent-specific config
 - `createTestChannelConfig()` - Channel-specific config
@@ -104,6 +112,7 @@ test/utils/
 - 12+ custom assertions for ClosedClaw-specific types
 
 **Benefits**:
+
 - Single import path for all test utilities
 - Consistent test data across suites
 - Reduces test boilerplate
@@ -111,14 +120,16 @@ test/utils/
 - Clear documentation of test patterns
 
 **Before**:
+
 ```typescript
-import { findFreePort } from '../../test/helpers/ports.js';
-import { createTempHome } from '../../test/helpers/temp-home.js';
+import { findFreePort } from "../../test/helpers/ports.js";
+import { createTempHome } from "../../test/helpers/temp-home.js";
 ```
 
 **After**:
+
 ```typescript
-import { findFreePort, createTempHome } from '../test/utils/index.js';
+import { findFreePort, createTempHome } from "../test/utils/index.js";
 ```
 
 ### 4. Tools/Scripts Documentation ✅
@@ -130,6 +141,7 @@ import { findFreePort, createTempHome } from '../test/utils/index.js';
 Comprehensive documentation for 50+ utility scripts:
 
 **Coverage**:
+
 - **Quick Reference**: Common commands with examples
 - **Organization**: 9 categories documented:
   - `build/` (5 scripts) - Compilation and asset bundling
@@ -146,6 +158,7 @@ Comprehensive documentation for 50+ utility scripts:
 - **Troubleshooting**: Common issues and resolutions
 
 **Benefits**:
+
 - Discoverability of existing tools
 - Clear usage examples for each category
 - Reduces duplication (find existing before writing new)
@@ -155,21 +168,25 @@ Comprehensive documentation for 50+ utility scripts:
 ## Impact Analysis
 
 ### Developer Onboarding
+
 - **Before**: No contributor guide, scattered docs, unclear patterns
 - **After**: Clear onboarding path, comprehensive examples, documented conventions
 - **Time Saved**: Estimated 4-8 hours per new contributor
 
 ### Extension Development
+
 - **Before**: Manual scaffold from existing extensions, inconsistent structure
 - **After**: Complete template with all patterns, copy-paste-modify workflow
 - **Time Saved**: Estimated 2-4 hours per new extension
 
 ### Test Development
+
 - **Before**: Deep imports, scattered helpers, no factory functions
 - **After**: Centralized utilities, single import path, type-safe factories
 - **Time Saved**: Estimated 30 minutes per test file
 
 ### Script Discovery
+
 - **Before**: No documentation, trial-and-error, reading package.json
 - **After**: Comprehensive tool docs with categories and examples
 - **Time Saved**: Estimated 15-30 minutes per task
@@ -197,12 +214,14 @@ Comprehensive documentation for 50+ utility scripts:
 ## Related Work
 
 ### Option A (Complete)
+
 - [docs/completion/README.md](../docs/completion/README.md) - Completion reports index
 - [docs/README.md](../docs/README.md) - Master documentation index
 - [package.json](../package.json) - 13+ new npm scripts
 - [TODO.md](../TODO.md) - Rewritten with current focus
 
 ### Option C (Next)
+
 - Add TypeScript path aliases (`@/` mapping)
 - Create barrel exports for `src/commands/`, `src/agents/tools/`
 - Migrate deep imports (`../../../`) to barrel exports

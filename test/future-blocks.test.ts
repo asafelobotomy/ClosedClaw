@@ -15,10 +15,7 @@ import {
   evaluateShield,
   type ToolInvocationContext,
 } from "../src/agents/clawtalk/kernel-shield.js";
-import {
-  AttestationMonitor,
-  parseDigest,
-} from "../src/agents/clawtalk/neural-attestation.js";
+import { AttestationMonitor, parseDigest } from "../src/agents/clawtalk/neural-attestation.js";
 import {
   analyzeGaps,
   generateDraft,
@@ -490,11 +487,16 @@ describe("Kernel Shield — Layer 1 (Structural)", () => {
 
   it("marks proof verified when proof is VERIFIED", () => {
     const proof: ClawsVerificationProof = {
-      theorem: "test", status: "VERIFIED", raw: "",
+      theorem: "test",
+      status: "VERIFIED",
+      raw: "",
     };
     const ctx: ToolInvocationContext = {
-      toolName: "t", requestedCapabilities: ["fs.read"],
-      accessProbability: 0, dataSensitivity: 0, trustScore: 1,
+      toolName: "t",
+      requestedCapabilities: ["fs.read"],
+      accessProbability: 0,
+      dataSensitivity: 0,
+      trustScore: 1,
     };
     const result = checkStructural(manifest, proof, ctx);
     expect(result.proofVerified).toBe(true);
@@ -502,11 +504,16 @@ describe("Kernel Shield — Layer 1 (Structural)", () => {
 
   it("marks proof not verified when status is FAILED", () => {
     const proof: ClawsVerificationProof = {
-      theorem: "test", status: "FAILED", raw: "",
+      theorem: "test",
+      status: "FAILED",
+      raw: "",
     };
     const ctx: ToolInvocationContext = {
-      toolName: "t", requestedCapabilities: ["fs.read"],
-      accessProbability: 0, dataSensitivity: 0, trustScore: 1,
+      toolName: "t",
+      requestedCapabilities: ["fs.read"],
+      accessProbability: 0,
+      dataSensitivity: 0,
+      trustScore: 1,
     };
     const result = checkStructural(manifest, proof, ctx);
     expect(result.proofVerified).toBe(false);
@@ -516,8 +523,11 @@ describe("Kernel Shield — Layer 1 (Structural)", () => {
 describe("Kernel Shield — Layer 2 (Semantic)", () => {
   it("returns low risk for trusted tool with low access", () => {
     const result = computeRiskVector({
-      toolName: "t", requestedCapabilities: [],
-      accessProbability: 0.1, dataSensitivity: 0.1, trustScore: 0.9,
+      toolName: "t",
+      requestedCapabilities: [],
+      accessProbability: 0.1,
+      dataSensitivity: 0.1,
+      trustScore: 0.9,
     });
     expect(result.level).toBe("low");
     expect(result.action).toBe("allow");
@@ -527,8 +537,11 @@ describe("Kernel Shield — Layer 2 (Semantic)", () => {
 
   it("returns medium risk for moderate scenario", () => {
     const result = computeRiskVector({
-      toolName: "t", requestedCapabilities: [],
-      accessProbability: 0.5, dataSensitivity: 0.5, trustScore: 0.7,
+      toolName: "t",
+      requestedCapabilities: [],
+      accessProbability: 0.5,
+      dataSensitivity: 0.5,
+      trustScore: 0.7,
     });
     // Vr = 0.5*0.5 + (1-0.7) = 0.25 + 0.3 = 0.55
     expect(result.level).toBe("medium");
@@ -537,8 +550,11 @@ describe("Kernel Shield — Layer 2 (Semantic)", () => {
 
   it("returns high risk for untrusted tool with sensitive data", () => {
     const result = computeRiskVector({
-      toolName: "t", requestedCapabilities: [],
-      accessProbability: 0.9, dataSensitivity: 0.9, trustScore: 0.1,
+      toolName: "t",
+      requestedCapabilities: [],
+      accessProbability: 0.9,
+      dataSensitivity: 0.9,
+      trustScore: 0.1,
     });
     // Vr = 0.9*0.9 + (1-0.1) = 0.81 + 0.9 = 1.71
     expect(result.level).toBe("high");
@@ -584,12 +600,15 @@ describe("Kernel Shield — Layer 3 (Attestation)", () => {
 
 describe("Kernel Shield — Combined evaluateShield", () => {
   const manifest = {
-    id: "test", version: "1.0",
+    id: "test",
+    version: "1.0",
     permissions: [{ capability: "net.http" }],
     raw: "",
   };
   const proof: ClawsVerificationProof = {
-    theorem: "test", status: "VERIFIED" as const, raw: "",
+    theorem: "test",
+    status: "VERIFIED" as const,
+    raw: "",
   };
   const fingerprint = {
     signatureVersion: "1.0",
@@ -786,21 +805,23 @@ describe("parseDigest", () => {
 
 describe("Shadow Factory — analyzeGaps", () => {
   it("identifies a gap when no existing tool matches", () => {
-    const result = analyzeGaps(
-      "Generate invoice from Stripe data",
-      ["web_search", "calculator"],
-      { cliTools: [], apis: ["stripe.com"], databases: [], repositories: [] },
-    );
+    const result = analyzeGaps("Generate invoice from Stripe data", ["web_search", "calculator"], {
+      cliTools: [],
+      apis: ["stripe.com"],
+      databases: [],
+      repositories: [],
+    });
     expect(result.gaps.length).toBe(1);
     expect(result.gaps[0].name).toContain("generate_invoice");
   });
 
   it("reports no gaps when existing tool names overlap", () => {
-    const result = analyzeGaps(
-      "Use web search to find recipes",
-      ["web_search", "calculator"],
-      { cliTools: [], apis: [], databases: [], repositories: [] },
-    );
+    const result = analyzeGaps("Use web search to find recipes", ["web_search", "calculator"], {
+      cliTools: [],
+      apis: [],
+      databases: [],
+      repositories: [],
+    });
     expect(result.gaps.length).toBe(0);
   });
 
@@ -808,7 +829,12 @@ describe("Shadow Factory — analyzeGaps", () => {
     const result = analyzeGaps(
       "Complex multi-step data pipeline integrating multiple services and orchestrating transforms",
       [],
-      { cliTools: ["kubectl"], apis: ["api1.com", "api2.com", "api3.com", "api4.com"], databases: ["pg", "redis"], repositories: ["repo1"] },
+      {
+        cliTools: ["kubectl"],
+        apis: ["api1.com", "api2.com", "api3.com", "api4.com"],
+        databases: ["pg", "redis"],
+        repositories: ["repo1"],
+      },
     );
     expect(result.gaps[0].complexity).toBe("complex");
   });
@@ -831,8 +857,11 @@ describe("Shadow Factory — generateDraft", () => {
 
   it("records fuzz results", () => {
     const gap = {
-      name: "test_tool", intent: "test", dataSources: [],
-      reason: "test", complexity: "simple" as const,
+      name: "test_tool",
+      intent: "test",
+      dataSources: [],
+      reason: "test",
+      complexity: "simple" as const,
     };
     let draft = generateDraft(gap);
     draft = recordFuzzResults(draft, 1000, 1000, []);
@@ -842,8 +871,11 @@ describe("Shadow Factory — generateDraft", () => {
 
   it("marks fuzz as failed when not all pass", () => {
     const gap = {
-      name: "test_tool", intent: "test", dataSources: [],
-      reason: "test", complexity: "simple" as const,
+      name: "test_tool",
+      intent: "test",
+      dataSources: [],
+      reason: "test",
+      complexity: "simple" as const,
     };
     let draft = generateDraft(gap);
     draft = recordFuzzResults(draft, 1000, 990, ["null input crash"]);
@@ -859,7 +891,7 @@ describe("Shadow Factory — evaluateOptimization", () => {
   });
 
   it("recommends rewrite on low success rate", () => {
-    const signal = evaluateOptimization(0.70, 0.1, 200);
+    const signal = evaluateOptimization(0.7, 0.1, 200);
     expect(signal.rewriteRecommended).toBe(true);
     expect(signal.reason).toContain("success rate");
   });

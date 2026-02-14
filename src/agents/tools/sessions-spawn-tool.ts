@@ -1,10 +1,10 @@
 import { Type } from "@sinclair/typebox";
-import { TIMEOUT_HTTP_SHORT_MS } from "../../config/constants/index.js";
 import crypto from "node:crypto";
 import type { GatewayMessageChannel } from "../../utils/message-channel.js";
 import type { AnyAgentTool } from "./common.js";
 import { formatThinkingLevels, normalizeThinkLevel } from "../../auto-reply/thinking.js";
 import { loadConfig } from "../../config/config.js";
+import { TIMEOUT_HTTP_SHORT_MS } from "../../config/constants/index.js";
 import { callGateway } from "../../gateway/call.js";
 import {
   isSubagentSessionKey,

@@ -10,13 +10,11 @@
  * - TPCRuntime (full pipeline integration)
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import fs from "node:fs";
-import path from "node:path";
-import os from "node:os";
 import crypto from "node:crypto";
-import * as encoder from "./waveform-encoder.js";
-
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   generateKeyPair,
   exportKeyPair,
@@ -32,6 +30,14 @@ import {
   generateMessageId,
   canonicalize,
 } from "./crypto-signer.js";
+import { DeadDropManager } from "./dead-drop.js";
+import {
+  TPCRuntime,
+  TPCNotInitializedError,
+  DEFAULT_AFSK_PARAMS,
+  ULTRASONIC_AFSK_PARAMS,
+} from "./index.js";
+import { NonceStore } from "./nonce-store.js";
 import {
   rsEncode,
   rsDecode,
@@ -39,18 +45,9 @@ import {
   rsDecodePayload,
   ReedSolomonError,
 } from "./reed-solomon.js";
-import { encodeToWav, estimateWavSize } from "./waveform-encoder.js";
 import { decodeFromWav, WaveformDecodeError } from "./waveform-decoder.js";
-import { NonceStore } from "./nonce-store.js";
-import { DeadDropManager } from "./dead-drop.js";
-import {
-  TPCRuntime,
-  TPCSecurityError,
-  TPCNotInitializedError,
-  DEFAULT_AFSK_PARAMS,
-  ULTRASONIC_AFSK_PARAMS,
-} from "./index.js";
-import type { TPCEnvelope, SignedTPCEnvelope } from "./types.js";
+import * as encoder from "./waveform-encoder.js";
+import { encodeToWav, estimateWavSize } from "./waveform-encoder.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -285,7 +282,9 @@ describe("reed-solomon", () => {
   it("handles multi-block payload encoding", () => {
     // Create a payload larger than 1 RS block
     const data = new Uint8Array(300);
-    for (let i = 0; i < data.length; i++) data[i] = i & 0xff;
+    for (let i = 0; i < data.length; i++) {
+      data[i] = i & 0xff;
+    }
 
     const encoded = rsEncodePayload(data, 16);
     const decoded = rsDecodePayload(encoded, 16);
@@ -620,7 +619,8 @@ describe("TPCRuntime", () => {
   });
 
   it("preserves compressed parameter payloads", async () => {
-    const payload = 'CT/1 REQ web_search filter=critical limit=5 since=30d target="https://example.com" lang=en';
+    const payload =
+      'CT/1 REQ web_search filter=critical limit=5 since=30d target="https://example.com" lang=en';
 
     const result = await runtime.encode({
       payload,
@@ -637,7 +637,7 @@ describe("TPCRuntime", () => {
   });
 
   it("full encode → decode roundtrip via buffer", () => {
-    const { wavData, signed } = runtime.encodeToBuffer({
+    const { wavData } = runtime.encodeToBuffer({
       payload: "buffer roundtrip",
       sourceAgent: "a",
       targetAgent: "b",

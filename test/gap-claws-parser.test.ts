@@ -7,10 +7,7 @@
  */
 
 import { strict as assert } from "node:assert";
-import {
-  parseClawsFile,
-  splitBlocks,
-} from "../src/agents/clawtalk/claws-parser.js";
+import { parseClawsFile, splitBlocks } from "../src/agents/clawtalk/claws-parser.js";
 
 let passed = 0;
 let failed = 0;
@@ -192,7 +189,7 @@ test("parseFingerprint — drift thresholds with snake_case → camelCase", () =
   assert.ok(dt, "drift thresholds should exist");
   assert.equal(dt.softDrift, 0.85);
   assert.equal(dt.hardDrift, 0.75);
-  assert.equal(dt.criticalShutdown, 0.50);
+  assert.equal(dt.criticalShutdown, 0.5);
 });
 
 test("parseFingerprint — monitored decision points", () => {

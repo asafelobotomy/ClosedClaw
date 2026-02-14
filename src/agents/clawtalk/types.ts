@@ -113,7 +113,7 @@ export interface ClawTalkConfig {
   /**
    * Ordered model fallback chain for hot-swap failover.
    * When a model fails (rate limit, down, auth error), the next model
-  * in the chain is tried automatically. Uses circuit breaker + cooldown.
+   * in the chain is tried automatically. Uses circuit breaker + cooldown.
    */
   fallbackChain?: string[];
   /** Cooldown in ms before retrying a failed model (default: 60000) */

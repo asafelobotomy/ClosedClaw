@@ -3,8 +3,9 @@
 **TL;DR**: Reduce LLM token consumption by 40-60% through four complementary strategies: (1) semantic compression of CT/1 parameter names, (2) structured tool parameters that bypass text serialization, (3) response payload compression with lazy expansion, and (4) shared context pooling for multi-turn conversations. All changes preserve TPC's security model (Ed25519, nonce deduplication, Reed-Solomon FEC) while maintaining the transparent compression architecture. Estimated total savings: **50-65% token reduction** without compromising functionality.
 
 **Current Baseline** (from research):
+
 - Natural language tool calls: ~55 tokens per request
-- Current CT/1 wire format: ~15 tokens per request  
+- Current CT/1 wire format: ~15 tokens per request
 - Already achieving 60-70% reduction through transparent encoding
 - **Goal**: Further reduce to ~8-10 tokens per request (additional 40-50% savings)
 
@@ -27,7 +28,7 @@
    - Example: `CT/1 REQ web_search q="test" filter=critical limit=5` → `CT/1 REQ web_search q="test" f=crit l=5`
 
 3. **Update parser** in [src/agents/clawtalk/parser.ts](src/agents/clawtalk/parser.ts):
-   - Add `decompressParameters(wire: string, version: number)` function  
+   - Add `decompressParameters(wire: string, version: number)` function
    - Expand abbreviated params before parsing
    - Fall back to uncompressed if version unknown
 
@@ -47,12 +48,13 @@
 **Changes**:
 
 1. **Add structured message parameter** in [src/agents/tools/sessions-send-tool.ts](src/agents/tools/sessions-send-tool.ts):
+
    ```typescript
    // Current (string-based)
    parameters: {
      message: { type: "string", description: "Message to send", required: true }
    }
-   
+
    // New (structured)
    parameters: {
      // Keep message for backward compatibility
@@ -70,6 +72,7 @@
    ```
 
 2. **Update tool handler** to detect structured vs string:
+
    ```typescript
    if (structuredMessage) {
      // Direct CT/1 construction - no LLM tokenization of parameters
@@ -95,17 +98,18 @@
 **Changes**:
 
 1. **Create payload compression module** in [src/agents/clawtalk/payload-compression.ts](src/agents/clawtalk/payload-compression.ts) (new file):
+
    ```typescript
    interface CompressedPayload {
-     summary: string;      // Concise summary (always included)
-     retrievalHandle: string;  // Reference to full data
-     bytesSaved: number;   // Metrics
+     summary: string; // Concise summary (always included)
+     retrievalHandle: string; // Reference to full data
+     bytesSaved: number; // Metrics
    }
-   
+
    function compressLargePayload(
      payload: string,
-     maxSummaryTokens: number = 200
-   ): CompressedPayload
+     maxSummaryTokens: number = 200,
+   ): CompressedPayload;
    ```
 
 2. **Update response handling** in [src/agents/tools/sessions-send-tool.a2a.ts](src/agents/tools/sessions-send-tool.a2a.ts):
@@ -115,6 +119,7 @@
    - Return compressed response to requester
 
 3. **Add retrieval tool** in [src/agents/tools/payload-retrieve-tool.ts](src/agents/tools/payload-retrieve-tool.ts) (new file):
+
    ```typescript
    // Allows LLM to expand compressed payloads on demand
    name: "payload_retrieve"
@@ -142,6 +147,7 @@
 **Changes**:
 
 1. **Create context pool** in [src/agents/clawtalk/context-pool.ts](src/agents/clawtalk/context-pool.ts) (new file):
+
    ```typescript
    interface SharedContext {
      contextId: string;
@@ -150,9 +156,9 @@
      lastAccessedAt: number;
      accessCount: number;
    }
-   
+
    class ContextPool {
-     store(content: string): string;  // Returns contextId
+     store(content: string): string; // Returns contextId
      retrieve(contextId: string): string | null;
      cleanup(maxAge: number): void;
    }
@@ -179,6 +185,7 @@
 ## Implementation Steps
 
 **Phase 1: Compression Dictionary** (1-2 days)
+
 1. Create compression.ts with v1 dictionary
 2. Update encoder.ts to compress parameters
 3. Update parser.ts to decompress parameters
@@ -186,12 +193,14 @@
 5. Add tests: [src/agents/clawtalk/compression.test.ts](src/agents/clawtalk/compression.test.ts)
 
 **Phase 2: Structured Parameters** (2-3 days)
+
 1. Update sessions-send-tool.ts with structuredMessage parameter
 2. Update tool handler to detect and build CT/1 directly
 3. Update agent prompts with examples
 4. Add tests: [src/agents/tools/sessions-send-tool.test.ts](src/agents/tools/sessions-send-tool.test.ts)
 
 **Phase 3: Payload Compression** (3-4 days)
+
 1. Create payload-compression.ts module
 2. Update sessions-send-tool.a2a.ts response handling
 3. Create payload-retrieve-tool.ts
@@ -199,6 +208,7 @@
 5. Add tests: [src/agents/clawtalk/payload-compression.test.ts](src/agents/clawtalk/payload-compression.test.ts)
 
 **Phase 4: Context Pooling** (2-3 days)
+
 1. Create context-pool.ts
 2. Update CT/1 wire format to support `ctx` parameter
 3. Update encoder.ts with auto-context detection
@@ -206,6 +216,7 @@
 5. Add tests: [src/agents/clawtalk/context-pool.test.ts](src/agents/clawtalk/context-pool.test.ts)
 
 **Phase 5: Integration & Metrics** (1-2 days)
+
 1. Add token usage metrics to [src/agents/clawtalk/metrics.ts](src/agents/clawtalk/metrics.ts) (new file)
 2. Track: tokens saved, compression ratio, cache hit rate
 3. Update [docs/agents/tpc-overview.md](docs/agents/tpc-overview.md) with optimization details
@@ -216,22 +227,26 @@
 ## Verification
 
 **Unit Tests:**
+
 - Compression dictionary bidirectional correctness
 - Structured parameters build valid CT/1
 - Payload compression preserves semantics
 - Context pool handles TTL and cleanup
 
 **Integration Tests:**
+
 - End-to-end agent communication with all strategies enabled
 - Backward compatibility (compressed ↔ uncompressed)
 - Security preservation (signatures still valid)
 
 **Performance Tests:**
+
 - Token reduction metrics (before/after)
 - Latency impact (<10ms acceptable)
 - Memory usage for context pool (<50MB)
 
 **Commands:**
+
 ```bash
 # Run tests
 pnpm test -- src/agents/clawtalk/
@@ -248,26 +263,31 @@ pnpm test:e2e -- src/agents/tools/sessions-send-tool.e2e.test.ts
 ## Decisions
 
 **Decision 1: Compression Dictionary Versioning**
+
 - **Choice**: Include `compressionVersion` in TPC envelope
 - **Rationale**: Allows future dictionary updates without breaking old messages
 - **Alternative**: Fixed dictionary (rejected - no upgrade path)
 
 **Decision 2: Structured Parameters as Additive**
+
 - **Choice**: Keep `message` string parameter, add `structuredMessage` alongside
 - **Rationale**: Backward compatibility for existing agents
 - **Alternative**: Replace message entirely (rejected - breaking change)
 
 **Decision 3: Payload Compression Threshold**
+
 - **Choice**: Compress responses >1000 tokens
 - **Rationale**: Balance between token savings and retrieval latency
 - **Alternative**: Always compress (rejected - overhead for small responses)
 
 **Decision 4: Context Pool TTL**
+
 - **Choice**: 24-hour TTL, 10k max entries
 - **Rationale**: Matches nonce store TTL; prevents unbounded growth
 - **Alternative**: No expiration (rejected - memory leak risk)
 
 **Decision 5: Preserve TPC Security**
+
 - **Choice**: All compression happens AFTER signature generation
 - **Rationale**: Signatures cover original data; compression is transport optimization
 - **Alternative**: Compress before signing (rejected - signature verification would fail on decompression errors)
@@ -281,15 +301,16 @@ pnpm test:e2e -- src/agents/tools/sessions-send-tool.e2e.test.ts
 ✅ No security compromises (Ed25519, nonces, FEC unchanged)  
 ✅ Backward compatible (phased rollout)  
 ✅ Minimal latency impact (<10ms per message)  
-✅ Amortized savings grow with conversation length  
+✅ Amortized savings grow with conversation length
 
 **Cons:**
 ⚠️ Increased code complexity (~500 LOC added)  
 ⚠️ Memory overhead for context pool (~50MB)  
 ⚠️ Compression dictionary requires coordination if agents diverge  
-⚠️ Payload retrieval adds round-trip for full expansion  
+⚠️ Payload retrieval adds round-trip for full expansion
 
 **Mitigations:**
+
 - Comprehensive test coverage (unit + integration + e2e)
 - Metrics dashboard to monitor savings vs overhead
 - Graceful degradation (fall back to uncompressed on errors)

@@ -30,16 +30,19 @@ For ClosedClaw, the `.claws` file evolves into an **Encapsulated Living Binary**
 ### Advanced Block Additions
 
 #### Block 0: Cryptographic Identity
+
 - Signed with local hardware key (Apple Secure Enclave, TPM)
 - **Self-Destruct Trigger:** Engine block encrypted on unauthorized machines
 - Cannot be copied or executed outside approved hardware
 
 #### Block 6: State Hydration
+
 - Stores **Serialized Memory State** of last execution
 - Enables instant resumption of multi-step tasks (e.g., massive data migrations)
 - "Save points" for long-running workflows
 
 #### Block 7: Formal Verification Proofs
+
 - Uses **Dijkstra's Guarded Commands** and **Z3 SMT Solver**
 - Every self-healing rewrite must mathematically prove memory safety
 - Tool CANNOT execute without valid proof
@@ -89,6 +92,7 @@ Migration is large (2GB). Halfway through, computer enters sleep mode:
 #### Step A: Dependency Analysis
 
 ClosedClaw scans local environment:
+
 - Private Git repositories
 - Local databases
 - Proprietary APIs
@@ -99,6 +103,7 @@ Uses **Static Analysis Agents** to map "Interaction Gaps"—areas with tools but
 #### Step B: The Drafting Subagent
 
 Creates a **Shadow Clone:**
+
 - Runs in totally isolated, air-gapped sandbox
 - Generates the `.claws` file
 - Performs **Fuzz Testing** (millions of random inputs)
@@ -107,6 +112,7 @@ Creates a **Shadow Clone:**
 #### Step C: Recursive Optimization
 
 Once tool is in use:
+
 1. Monitor Telemetry block
 2. If user frequently corrects output → poor "Vibe" block
 3. Autonomous rewrite using RLHF data from local sessions
@@ -159,6 +165,7 @@ The Kernel Shield is the "Iron Guard" of ClosedClaw, enforcing safety at the bin
 #### Hardware-in-the-Loop (HITL)
 
 Interfaces with:
+
 - **TPM/Secure Enclave:** Key management and file integrity
 - **Kernel-level Sandboxing (eBPF on Linux):** Intercept unauthorized syscalls at OS level
 - **Biometric Authentication:** TouchID/FaceID for high-risk operations
@@ -172,6 +179,7 @@ Before executing a `.claws` tool, Shield calculates a **Risk Vector (V_r)**:
 $$V_r = (P_{access} \times S_{data}) + (1 - T_{score})$$
 
 Where:
+
 - **P_access:** Probability of access to sensitive scopes
 - **S_data:** Sensitivity of targeted data
 - **T_score:** Tool's historical trust score (0.0 to 1.0)
@@ -193,25 +201,25 @@ Where:
 
 ### Trust Score Evolution
 
-| Execution Count | Trust Score | Security Measures |
-|----------------|-------------|-------------------|
-| 0-10 | 0.0-0.2 | Full sandbox + manual approval |
-| 11-50 | 0.2-0.6 | Sandbox + automated risk check |
-| 51-100 | 0.6-0.8 | Reduced overhead, spot checks |
-| 100+ | 0.8-1.0 | Fast path, periodic audits |
+| Execution Count | Trust Score | Security Measures              |
+| --------------- | ----------- | ------------------------------ |
+| 0-10            | 0.0-0.2     | Full sandbox + manual approval |
+| 11-50           | 0.2-0.6     | Sandbox + automated risk check |
+| 51-100          | 0.6-0.8     | Reduced overhead, spot checks  |
+| 100+            | 0.8-1.0     | Fast path, periodic audits     |
 
 **Degradation:** Any failure drops score by 0.1; three consecutive failures reset to 0.0.
 
 ## System Architecture Comparison
 
-| Component | Function | Improvement over OpenClaw |
-|-----------|----------|---------------------------|
-| **Kernel Shield** | Hardware-level permission enforcement | Replaces software-based prompt rules |
-| **ClawDense** | Token-optimized shorthand language | 60% faster, cheaper, more precise |
-| **Hydrator** | Instantly restores tool state/variables | Enables complex, multi-day workflows |
-| **Shadow Sandbox** | Air-gapped development zone for new skills | Safe autonomous coding without host risk |
-| **Telemetry Loop** | Continuous monitoring + self-healing | Tools that fix themselves |
-| **Hardware Binding** | Cryptographic device anchoring | Prevents skill theft/unauthorized use |
+| Component            | Function                                   | Improvement over OpenClaw                |
+| -------------------- | ------------------------------------------ | ---------------------------------------- |
+| **Kernel Shield**    | Hardware-level permission enforcement      | Replaces software-based prompt rules     |
+| **ClawDense**        | Token-optimized shorthand language         | 60% faster, cheaper, more precise        |
+| **Hydrator**         | Instantly restores tool state/variables    | Enables complex, multi-day workflows     |
+| **Shadow Sandbox**   | Air-gapped development zone for new skills | Safe autonomous coding without host risk |
+| **Telemetry Loop**   | Continuous monitoring + self-healing       | Tools that fix themselves                |
+| **Hardware Binding** | Cryptographic device anchoring             | Prevents skill theft/unauthorized use    |
 
 ## Self-Healing in Action
 
@@ -261,6 +269,7 @@ Where:
 **Risk:** As agents write their own code and manage memory, they may develop "Logic Bloat"—optimizing efficiency over safety.
 
 **Mitigation:**
+
 1. **SOUL.md as Constitution:** Immutable source of truth
 2. **Hardware Kill Switch:** Can override any `.claws` file
 3. **Formal Verification:** Every self-modification must prove safety
@@ -278,24 +287,28 @@ Where:
 ## Implementation Roadmap
 
 ### Phase 1: Foundation (Q1 2026)
+
 - [x] ClawDense parser basics
 - [x] Basic `.claws` format support
 - [ ] Kernel Shield integration (eBPF)
 - [ ] Hardware binding (TPM/Enclave)
 
 ### Phase 2: Intelligence (Q2 2026)
+
 - [ ] Shadow Factory scaffolding
 - [ ] State hydration system
 - [ ] Telemetry monitoring
 - [ ] Mechanic Agent (basic refactoring)
 
 ### Phase 3: Autonomy (Q3 2026)
+
 - [ ] Full Shadow Factory (end-to-end tool creation)
 - [ ] Probabilistic trust scoring
 - [ ] Self-healing protocol
 - [ ] Formal verification integration
 
 ### Phase 4: Advanced Features (Q4 2026)
+
 - [ ] Neural state snapshots
 - [ ] Peer-to-peer skill trading (Moltbook)
 - [ ] Multi-agent skill development
@@ -303,27 +316,30 @@ Where:
 
 ## Performance Targets
 
-| Metric | Target | Status |
-|--------|--------|--------|
-| **Token efficiency** | 60% reduction vs Markdown | ✅ Achieved |
-| **Tool creation time** | < 5 minutes (simple tool) | 🚧 In progress |
-| **Self-healing success rate** | > 85% | 📋 Planned |
-| **Hardware overhead** | < 5% CPU/memory | 🚧 In progress |
-| **Trust score accuracy** | > 95% | 📋 Planned |
+| Metric                        | Target                    | Status         |
+| ----------------------------- | ------------------------- | -------------- |
+| **Token efficiency**          | 60% reduction vs Markdown | ✅ Achieved    |
+| **Tool creation time**        | < 5 minutes (simple tool) | 🚧 In progress |
+| **Self-healing success rate** | > 85%                     | 📋 Planned     |
+| **Hardware overhead**         | < 5% CPU/memory           | 🚧 In progress |
+| **Trust score accuracy**      | > 95%                     | 📋 Planned     |
 
 ## Academic References
 
 ### Safety & Verification
+
 - **"Formal Verification of AI-Generated Code"** (Stanford, 2025) - Basis for Block 7 verification
 - **"Trusted Execution Environments for Autonomous Agents"** (Intel/IEEE, 2026) - Hardware kill switch design
 - **"AgentGuard Protocol"** (Invariant Labs, 2025) - Formal security guarantees
 
 ### Architecture & Optimization
+
 - **"Low-Rank Adaptation of Local Context"** (LoRA Research, 2025) - Fine-tuning Shadow Agents without data exfiltration
 - **"Chain of Agents Framework"** (Google Research, 2025) - Multi-agent collaboration patterns
 - **"StreamingLLM / KV Cache Persistence"** (MIT, 2025) - State hydration optimization
 
 ### Self-Improvement
+
 - **"Reinforcement Learning from Human Feedback at Scale"** (OpenAI, 2024) - Vibe block optimization
 - **"Evolutionary Algorithms for Code Synthesis"** (DeepMind, 2025) - Shadow Factory inspiration
 - **"Self-Correcting Neural Programs"** (Berkeley, 2025) - Self-healing protocols
@@ -338,21 +354,25 @@ Where:
 ## Future Research Directions
 
 ### 1. Multi-Agent Skill Development
+
 - Collaborative tool creation by agent teams
 - Consensus-based code review
 - Distributed testing and verification
 
 ### 2. Predictive Maintenance
+
 - Anticipate tool failures before they occur
 - Proactive refactoring based on usage patterns
 - Trend analysis of API changes
 
 ### 3. Cross-Platform Skill Transfer
+
 - Port `.claws` files between runtime environments
 - Automatic adaptation for different OS/hardware
 - Universal binary format investigation
 
 ### 4. Learning from Failures
+
 - Build knowledge base of common failure patterns
 - Share anonymous failure telemetry across instances
 - Collective intelligence for self-healing

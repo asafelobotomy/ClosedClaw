@@ -3,6 +3,7 @@
 **Quick Guide** for using the new centralized constants library.
 
 ## Table of Contents
+
 - [Quick Start](#quick-start)
 - [Environment Variables](#environment-variables)
 - [Network Configuration](#network-configuration)
@@ -20,7 +21,7 @@ import {
   buildGatewayHttpUrl,
   isCI,
   isTest,
-} from '@/config/constants';
+} from "@/config/constants";
 
 // Use type-safe environment variable names
 const port = parseInt(process.env[ENV_CLOSEDCLAW_GATEWAY_PORT] ?? String(DEFAULT_GATEWAY_PORT), 10);
@@ -43,7 +44,7 @@ import {
   ENV_CLOSEDCLAW_GATEWAY_PORT,
   ENV_ANTHROPIC_API_KEY,
   ENV_CLOSEDCLAW_STATE_DIR,
-} from '@/config/constants';
+} from "@/config/constants";
 
 // ❌ Before (prone to typos)
 const port = process.env.ClosedClaw_GATEWAY_PORT;
@@ -57,7 +58,7 @@ const key = process.env[ENV_ANTHROPIC_API_KEY];
 ### Environment Detection
 
 ```typescript
-import { isCI, isTest, isLiveTest } from '@/config/constants';
+import { isCI, isTest, isLiveTest } from "@/config/constants";
 
 // ❌ Before
 const ci = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
@@ -85,7 +86,7 @@ import {
   buildGatewayWsUrl,
   buildGatewayRpcUrl,
   DEFAULT_GATEWAY_PORT,
-} from '@/config/constants';
+} from "@/config/constants";
 
 // ❌ Before (repeated across 30+ files)
 const httpUrl = "http://127.0.0.1:18789";
@@ -106,7 +107,7 @@ import {
   DEFAULT_SIGNAL_PORT,
   DEFAULT_OLLAMA_PORT,
   ENV_CLOSEDCLAW_GATEWAY_PORT,
-} from '@/config/constants';
+} from "@/config/constants";
 
 // ❌ Before (magic numbers)
 const gatewayPort = parseInt(process.env.ClosedClaw_GATEWAY_PORT ?? "18789", 10);
@@ -115,7 +116,7 @@ const signalPort = 8080;
 // ✅ After (named constants)
 const gatewayPort = parseInt(
   process.env[ENV_CLOSEDCLAW_GATEWAY_PORT] ?? String(DEFAULT_GATEWAY_PORT),
-  10
+  10,
 );
 const signalPort = DEFAULT_SIGNAL_PORT;
 ```
@@ -123,7 +124,7 @@ const signalPort = DEFAULT_SIGNAL_PORT;
 ### Custom Hosts and Ports
 
 ```typescript
-import { buildGatewayHttpUrl, buildHttpUrl } from '@/config/constants';
+import { buildGatewayHttpUrl, buildHttpUrl } from "@/config/constants";
 
 // Default (127.0.0.1:18789)
 const localUrl = buildGatewayHttpUrl();
@@ -143,7 +144,7 @@ const customUrl = buildHttpUrl("example.com", 9999, "/api/v1");
 ### OS Detection
 
 ```typescript
-import { isWindows, isMacOS, isLinux, getRunnerOS } from '@/config/constants';
+import { isWindows, isMacOS, isLinux, getRunnerOS } from "@/config/constants";
 
 // ❌ Before
 const isWin = process.platform === "win32" || process.env.RUNNER_OS === "Windows";
@@ -172,7 +173,7 @@ const configPath = isWindows()
 // Before
 describe("gateway tests", () => {
   const gatewayUrl = "http://127.0.0.1:18789";
-  
+
   beforeAll(async () => {
     if (process.env.CI === "true") {
       // CI-specific setup
@@ -181,11 +182,11 @@ describe("gateway tests", () => {
 });
 
 // After
-import { buildGatewayHttpUrl, isCI } from '@/config/constants';
+import { buildGatewayHttpUrl, isCI } from "@/config/constants";
 
 describe("gateway tests", () => {
   const gatewayUrl = buildGatewayHttpUrl();
-  
+
   beforeAll(async () => {
     if (isCI()) {
       // CI-specific setup
@@ -210,13 +211,10 @@ import {
   ENV_ANTHROPIC_API_KEY,
   ENV_NODE_ENV,
   DEFAULT_GATEWAY_PORT,
-} from '@/config/constants';
+} from "@/config/constants";
 
 export const config = {
-  port: parseInt(
-    process.env[ENV_CLOSEDCLAW_GATEWAY_PORT] ?? String(DEFAULT_GATEWAY_PORT),
-    10
-  ),
+  port: parseInt(process.env[ENV_CLOSEDCLAW_GATEWAY_PORT] ?? String(DEFAULT_GATEWAY_PORT), 10),
   apiKey: process.env[ENV_ANTHROPIC_API_KEY],
   isProduction: process.env[ENV_NODE_ENV] === "production",
 };
@@ -238,12 +236,9 @@ import {
   DEFAULT_GATEWAY_PORT,
   LOCALHOST_IPV4,
   buildGatewayHttpUrl,
-} from '@/config/constants';
+} from "@/config/constants";
 
-const port = parseInt(
-  process.env[ENV_CLOSEDCLAW_GATEWAY_PORT] ?? String(DEFAULT_GATEWAY_PORT),
-  10
-);
+const port = parseInt(process.env[ENV_CLOSEDCLAW_GATEWAY_PORT] ?? String(DEFAULT_GATEWAY_PORT), 10);
 const server = createServer();
 server.listen(port, LOCALHOST_IPV4, () => {
   console.log(`Gateway listening on ${buildGatewayHttpUrl(port)}`);
@@ -260,7 +255,7 @@ const port = 18789;
 const url = "http://127.0.0.1:18789";
 
 // ✅ Good
-import { DEFAULT_GATEWAY_PORT, buildGatewayHttpUrl } from '@/config/constants';
+import { DEFAULT_GATEWAY_PORT, buildGatewayHttpUrl } from "@/config/constants";
 const port = DEFAULT_GATEWAY_PORT;
 const url = buildGatewayHttpUrl(port);
 ```
@@ -273,7 +268,7 @@ const url1 = `http://127.0.0.1:${port}`;
 const url2 = "http://localhost:" + port;
 
 // ✅ Good (consistent)
-import { buildGatewayHttpUrl } from '@/config/constants';
+import { buildGatewayHttpUrl } from "@/config/constants";
 const url1 = buildGatewayHttpUrl(port);
 const url2 = buildGatewayHttpUrl(port, "localhost");
 ```
@@ -285,7 +280,7 @@ const url2 = buildGatewayHttpUrl(port, "localhost");
 const isWindowsCI = process.env.RUNNER_OS === "Windows" || process.platform === "win32";
 
 // ✅ Good (clear intent)
-import { isWindows } from '@/config/constants';
+import { isWindows } from "@/config/constants";
 const isWindowsCI = isWindows();
 ```
 
@@ -298,7 +293,7 @@ if (process.env.VITEST || process.env.NODE_ENV === "test") {
 }
 
 // ✅ Good
-import { isTest } from '@/config/constants';
+import { isTest } from "@/config/constants";
 if (isTest()) {
   // Test-specific logic
 }
@@ -312,17 +307,17 @@ import {
   // Environment variables
   ENV_CLOSEDCLAW_GATEWAY_PORT,
   ENV_ANTHROPIC_API_KEY,
-  
+
   // Default values
   DEFAULT_GATEWAY_PORT,
-  
+
   // URL builders
   buildGatewayHttpUrl,
-  
+
   // Platform detection
   isCI,
   isTest,
-} from '@/config/constants';
+} from "@/config/constants";
 ```
 
 ## Finding Constants to Use
@@ -331,13 +326,14 @@ import {
 
 ```typescript
 // See all available constants
-import * as constants from '@/config/constants';
+import * as constants from "@/config/constants";
 console.log(Object.keys(constants));
 ```
 
 ### 2. Search Before Hardcoding
 
 Before writing a hardcoded value:
+
 1. Check if a constant already exists
 2. If not, add it to the appropriate constants file
 3. Update the barrel export in `index.ts`

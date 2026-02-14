@@ -77,7 +77,7 @@ vi.mock("../infra/provider-usage.js", () => ({
 }));
 
 import "./test-helpers/fast-core-tools.js";
-import { createClosedClawTools } from "./openclaw-tools.js";
+import { createClosedClawTools } from "./closedclaw-tools.js";
 
 describe("session_status tool", () => {
   it("returns a status card for the current session", async () => {

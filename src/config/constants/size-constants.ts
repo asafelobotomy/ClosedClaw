@@ -1,14 +1,14 @@
 /**
  * Size Constants
- * 
+ *
  * Centralized constants for file sizes, byte limits, and size calculations
  * used across ClosedClaw.
- * 
+ *
  * @example
  * ```typescript
  * // Before
  * const maxSize = 6 * 1024 * 1024; // 6MB
- * 
+ *
  * // After
  * import { MAX_IMAGE_BYTES } from '@/config/constants';
  * const maxSize = MAX_IMAGE_BYTES;
@@ -40,7 +40,7 @@ export type MediaKind = "image" | "audio" | "video" | "document" | "unknown";
 
 /**
  * Determine media kind from MIME type
- * 
+ *
  * @example
  * ```typescript
  * mediaKindFromMime("image/png") // "image"
@@ -72,7 +72,7 @@ export function mediaKindFromMime(mime?: string | null): MediaKind {
 
 /**
  * Get maximum byte limit for a given media kind
- * 
+ *
  * @example
  * ```typescript
  * maxBytesForKind("image") // 6291456 (6MB)
@@ -100,7 +100,7 @@ export function maxBytesForKind(kind: MediaKind): number {
 
 /**
  * Format bytes to human-readable string
- * 
+ *
  * @example
  * ```typescript
  * formatBytes(1024) // "1 KB"
@@ -110,7 +110,9 @@ export function maxBytesForKind(kind: MediaKind): number {
  * ```
  */
 export function formatBytes(bytes: number, decimals: number = 2): string {
-  if (bytes === 0) {return "0 Bytes";}
+  if (bytes === 0) {
+    return "0 Bytes";
+  }
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
@@ -124,7 +126,7 @@ export function formatBytes(bytes: number, decimals: number = 2): string {
 
 /**
  * Parse human-readable size string to bytes
- * 
+ *
  * @example
  * ```typescript
  * parseBytes("1KB") // 1024

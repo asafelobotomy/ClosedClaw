@@ -73,7 +73,9 @@ describe("legacy migrations", () => {
       deepgram: { smartFormat: true },
     });
 
-    expect(changes).toContain("Moved tools.media.audio.deepgram → tools.media.audio.providerOptions.deepgram.");
+    expect(changes).toContain(
+      "Moved tools.media.audio.deepgram → tools.media.audio.providerOptions.deepgram.",
+    );
     expect(changes).toContain(
       "Moved tools.media.audio.models[0].deepgram → tools.media.audio.models[0].providerOptions.deepgram.",
     );
@@ -104,7 +106,9 @@ describe("legacy migrations", () => {
       },
     });
 
-    expect(changes).toContain("Merged tools.media.audio.deepgram → tools.media.audio.providerOptions.deepgram.");
+    expect(changes).toContain(
+      "Merged tools.media.audio.deepgram → tools.media.audio.providerOptions.deepgram.",
+    );
   });
 
   it("moves tools.message.allowCrossContextSend to crossContext.allowAcrossProviders", () => {

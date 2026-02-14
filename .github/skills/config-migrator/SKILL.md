@@ -74,7 +74,7 @@ Config ready for use
 
 export type AgentConfig = {
   // ... existing fields
-  
+
   // New field
   newFeature?: {
     enabled: boolean;
@@ -91,12 +91,14 @@ export type AgentConfig = {
 
 const agentConfigSchema = z.object({
   // ... existing schemas
-  
-  newFeature: z.object({
-    enabled: z.boolean(),
-    threshold: z.number().min(0).max(100).optional(),
-    mode: z.enum(["fast", "accurate"]).optional(),
-  }).optional(),
+
+  newFeature: z
+    .object({
+      enabled: z.boolean(),
+      threshold: z.number().min(0).max(100).optional(),
+      mode: z.enum(["fast", "accurate"]).optional(),
+    })
+    .optional(),
 });
 ```
 
@@ -107,7 +109,7 @@ const agentConfigSchema = z.object({
 
 export function applyAgentDefaults(config: ClosedClawConfig): void {
   // ... existing defaults
-  
+
   if (config.agents?.main?.newFeature === undefined) {
     config.agents.main.newFeature = {
       enabled: true,
@@ -123,16 +125,16 @@ export function applyAgentDefaults(config: ClosedClawConfig): void {
 ```json5
 // Example in config.json5 comments or docs
 {
-  "agents": {
-    "main": {
+  agents: {
+    main: {
       // New feature configuration
-      "newFeature": {
-        "enabled": true,      // Enable new feature
-        "threshold": 50,      // Threshold value (0-100)
-        "mode": "fast"        // Mode: "fast" or "accurate"
-      }
-    }
-  }
+      newFeature: {
+        enabled: true, // Enable new feature
+        threshold: 50, // Threshold value (0-100)
+        mode: "fast", // Mode: "fast" or "accurate"
+      },
+    },
+  },
 }
 ```
 
@@ -152,20 +154,20 @@ export function migrateLegacyConfig(config: unknown): {
   issues: LegacyConfigIssue[];
 } {
   const issues: LegacyConfigIssue[] = [];
-  
+
   // ... existing migrations
-  
+
   // Migrate oldField to newField
   if (isObject(config) && isObject(config.agents)) {
     const agents = config.agents as Record<string, unknown>;
-    
+
     for (const [agentId, agentConfig] of Object.entries(agents)) {
       if (isObject(agentConfig) && "oldField" in agentConfig) {
         // Move to new name
         const value = agentConfig.oldField;
         delete agentConfig.oldField;
         agentConfig.newField = value;
-        
+
         // Record issue
         issues.push({
           level: "warning",
@@ -176,7 +178,7 @@ export function migrateLegacyConfig(config: unknown): {
       }
     }
   }
-  
+
   return { config, issues };
 }
 ```
@@ -190,11 +192,11 @@ export function detectConfigVersion(config: unknown): string {
   // Add detection for old format
   if (isObject(config) && isObject(config.agents)) {
     const agents = config.agents as Record<string, unknown>;
-    if (Object.values(agents).some(a => isObject(a) && "oldField" in a)) {
+    if (Object.values(agents).some((a) => isObject(a) && "oldField" in a)) {
       return "2025.12.0"; // Version before change
     }
   }
-  
+
   return "latest";
 }
 ```
@@ -213,9 +215,9 @@ describe("migrateLegacyConfig", () => {
         },
       },
     };
-    
+
     const { config, issues } = migrateLegacyConfig(oldConfig);
-    
+
     expect(config).toMatchObject({
       agents: {
         main: {
@@ -223,7 +225,7 @@ describe("migrateLegacyConfig", () => {
         },
       },
     });
-    
+
     expect(issues).toHaveLength(1);
     expect(issues[0].message).toMatch(/renamed.*oldField.*newField/);
   });
@@ -237,6 +239,7 @@ The most common mistake is updating types but not Zod schemas, or vice versa.
 #### Workflow
 
 1. **Update TypeScript type first**:
+
    ```typescript
    // src/config/types.agents.ts
    export type AgentConfig = {
@@ -245,6 +248,7 @@ The most common mistake is updating types but not Zod schemas, or vice versa.
    ```
 
 2. **Update Zod schema immediately**:
+
    ```typescript
    // src/config/zod-schema.ts
    const agentConfigSchema = z.object({
@@ -253,6 +257,7 @@ The most common mistake is updating types but not Zod schemas, or vice versa.
    ```
 
 3. **Run tests to catch mismatches**:
+
    ```bash
    pnpm test -- src/config/
    ```
@@ -271,9 +276,9 @@ Config supports `${ENV_VAR}` substitution:
 ```json5
 // config.json5
 {
-  "telegram": {
-    "botToken": "${TELEGRAM_BOT_TOKEN}"
-  }
+  telegram: {
+    botToken: "${TELEGRAM_BOT_TOKEN}",
+  },
 }
 ```
 
@@ -303,8 +308,10 @@ Support for splitting config across files:
 ```json5
 // config.json5
 {
-  "$include": ["./agents.json5", "./channels.json5"],
-  "gateway": { /* ... */ }
+  $include: ["./agents.json5", "./channels.json5"],
+  gateway: {
+    /* ... */
+  },
 }
 ```
 
@@ -358,9 +365,7 @@ type Mode = "fast" | "accurate" | "balanced";
 const modeSchema = z.enum(["fast", "accurate", "balanced"]);
 
 // Discriminated union
-type Result = 
-  | { success: true; data: string }
-  | { success: false; error: string };
+type Result = { success: true; data: string } | { success: false; error: string };
 
 const resultSchema = z.discriminatedUnion("success", [
   z.object({ success: z.literal(true), data: z.string() }),
@@ -420,18 +425,15 @@ const schema = z.object({
 
 ```typescript
 const schema = z.object({
-  port: z.number()
-    .min(1024, "Port must be >= 1024")
-    .max(65535, "Port must be <= 65535"),
-  
-  url: z.string()
+  port: z.number().min(1024, "Port must be >= 1024").max(65535, "Port must be <= 65535"),
+
+  url: z
+    .string()
     .url("Must be valid URL")
-    .refine(
-      (url) => url.startsWith("https://"),
-      "Must use HTTPS"
-    ),
-  
-  password: z.string()
+    .refine((url) => url.startsWith("https://"), "Must use HTTPS"),
+
+  password: z
+    .string()
     .min(8, "Password must be at least 8 characters")
     .regex(/[A-Z]/, "Must contain uppercase letter")
     .regex(/[0-9]/, "Must contain number"),
@@ -441,16 +443,15 @@ const schema = z.object({
 ### Conditional Validation
 
 ```typescript
-const schema = z.object({
-  enabled: z.boolean(),
-  apiKey: z.string().optional(),
-}).refine(
-  (data) => !data.enabled || data.apiKey !== undefined,
-  {
+const schema = z
+  .object({
+    enabled: z.boolean(),
+    apiKey: z.string().optional(),
+  })
+  .refine((data) => !data.enabled || data.apiKey !== undefined, {
     message: "apiKey required when enabled is true",
     path: ["apiKey"],
-  }
-);
+  });
 ```
 
 ### Transform and Coerce
@@ -487,11 +488,11 @@ describe("Agent config schema", () => {
         },
       },
     };
-    
+
     const result = ClosedClawSchema.safeParse(config);
     expect(result.success).toBe(true);
   });
-  
+
   it("rejects invalid config", () => {
     const config = {
       agents: {
@@ -500,19 +501,19 @@ describe("Agent config schema", () => {
         },
       },
     };
-    
+
     const result = ClosedClawSchema.safeParse(config);
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues[0].path).toEqual(["agents", "main", "model"]);
     }
   });
-  
+
   it("applies defaults", () => {
     const config = { agents: { main: {} } };
     const validated = ClosedClawSchema.parse(config);
     applyAgentDefaults(validated);
-    
+
     expect(validated.agents.main.thinking).toBe("medium");
   });
 });
@@ -528,18 +529,18 @@ describe("Config migration", () => {
     const v1Config = {
       oldStructure: "value",
     };
-    
+
     const { config, issues } = migrateLegacyConfig(v1Config);
-    
+
     expect(config).toMatchObject({
       newStructure: "value",
     });
-    
+
     expect(issues).toContainEqual(
       expect.objectContaining({
         level: "warning",
         message: expect.stringMatching(/migrated/i),
-      })
+      }),
     );
   });
 });
@@ -579,6 +580,7 @@ cp ~/.closedclaw/config.json5 ~/.closedclaw/config.backup.json5
 **Problem**: Types updated but Zod not, or vice versa
 
 **Detection**:
+
 ```bash
 pnpm test -- src/config/
 pnpm build  # TypeScript will catch some issues
@@ -603,8 +605,13 @@ pnpm build  # TypeScript will catch some issues
 **Problem**: Users can't add experimental fields
 
 **Solution**: Document that unknown keys will fail, or add `passthrough()`:
+
 ```typescript
-const schema = z.object({ /* ... */ }).passthrough();
+const schema = z
+  .object({
+    /* ... */
+  })
+  .passthrough();
 ```
 
 ## Checklist

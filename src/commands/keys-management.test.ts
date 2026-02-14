@@ -1,20 +1,16 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from "vitest";
 import * as fs from "node:fs/promises";
-import * as path from "node:path";
 import * as os from "node:os";
+import * as path from "node:path";
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from "vitest";
+import type { RuntimeEnv } from "../runtime.js";
 import { generateKeyPair, formatPublicKeyPem } from "../security/skill-signing.js";
-import {
-  addTrustedKey,
-  removeTrustedKey,
-  getTrustedKey,
-} from "../security/trusted-keyring.js";
+import { addTrustedKey, removeTrustedKey, getTrustedKey } from "../security/trusted-keyring.js";
 import {
   listKeysCommand,
   addKeyCommand,
   removeKeyCommand,
   trustKeyCommand,
 } from "./keys-management.js";
-import type { RuntimeEnv } from "../runtime.js";
 
 describe("keys-management commands", () => {
   let testDir: string;
@@ -248,13 +244,11 @@ describe("keys-management commands", () => {
     });
 
     it("exits with error for non-existent key", async () => {
-      await expect(
-        removeKeyCommand(runtime, "nonexistent-key-id", {}),
-      ).rejects.toThrow("process.exit called");
-
-      expect(runtime.error).toHaveBeenCalledWith(
-        expect.stringContaining("Key not found"),
+      await expect(removeKeyCommand(runtime, "nonexistent-key-id", {})).rejects.toThrow(
+        "process.exit called",
       );
+
+      expect(runtime.error).toHaveBeenCalledWith(expect.stringContaining("Key not found"));
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
   });
@@ -311,9 +305,7 @@ describe("keys-management commands", () => {
         trustKeyCommand(runtime, "nonexistent-key-id", { trust: "full" }),
       ).rejects.toThrow("process.exit called");
 
-      expect(runtime.error).toHaveBeenCalledWith(
-        expect.stringContaining("Key not found"),
-      );
+      expect(runtime.error).toHaveBeenCalledWith(expect.stringContaining("Key not found"));
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
 
@@ -329,13 +321,11 @@ describe("keys-management commands", () => {
     it("exits with error for invalid trust level", async () => {
       const keyPair = testKeyPairs[0];
 
-      await expect(
-        trustKeyCommand(runtime, keyPair.keyId, { trust: "invalid" }),
-      ).rejects.toThrow("process.exit called");
-
-      expect(runtime.error).toHaveBeenCalledWith(
-        expect.stringContaining("Invalid trust level"),
+      await expect(trustKeyCommand(runtime, keyPair.keyId, { trust: "invalid" })).rejects.toThrow(
+        "process.exit called",
       );
+
+      expect(runtime.error).toHaveBeenCalledWith(expect.stringContaining("Invalid trust level"));
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
   });
@@ -400,7 +390,10 @@ describe("keys-management commands", () => {
       expect(vi.mocked(runtime.log).mock.calls.length).toBeGreaterThan(1);
 
       // Verify key name appears in output
-      const allOutput = vi.mocked(runtime.log).mock.calls.map((c) => String(c[0])).join("\n");
+      const allOutput = vi
+        .mocked(runtime.log)
+        .mock.calls.map((c) => String(c[0]))
+        .join("\n");
       expect(allOutput).toContain("Test Signer 1");
     });
 
@@ -408,7 +401,10 @@ describe("keys-management commands", () => {
       // No keys have trust level "none"
       await listKeysCommand(runtime, { trustLevel: "none" });
 
-      const allOutput = vi.mocked(runtime.log).mock.calls.map((c) => String(c[0])).join("\n");
+      const allOutput = vi
+        .mocked(runtime.log)
+        .mock.calls.map((c) => String(c[0]))
+        .join("\n");
       expect(allOutput).toContain("No trusted keys found");
     });
 
@@ -435,7 +431,10 @@ describe("keys-management commands", () => {
     it("shows notes in formatted display", async () => {
       await listKeysCommand(runtime, {});
 
-      const allOutput = vi.mocked(runtime.log).mock.calls.map((c) => String(c[0])).join("\n");
+      const allOutput = vi
+        .mocked(runtime.log)
+        .mock.calls.map((c) => String(c[0]))
+        .join("\n");
       expect(allOutput).toContain("Test comment");
     });
   });

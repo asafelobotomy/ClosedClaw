@@ -18,11 +18,11 @@
 
 ### Upstream Ecosystem
 
-| Resource | Purpose | Relevance |
-|---|---|---|
-| [OpenClaw](https://openclaw.ai) | Open-source personal AI assistant by Peter Steinberger. MIT licensed. Multi-channel (WhatsApp/Telegram/Discord/Slack/Signal/iMessage), persistent memory, browser control, skills/plugins | Direct upstream source |
-| [Moltbook](https://moltbook.com) | Social network for AI agents (~2M registered). Agents interact, post, upvote | Community signal, not required |
-| [MoltbotWiki](https://moltbotwiki.com) | Community documentation for OpenClaw/Moltbot | User expectations reference |
+| Resource                               | Purpose                                                                                                                                                                                   | Relevance                      |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| [OpenClaw](https://openclaw.ai)        | Open-source personal AI assistant by Peter Steinberger. MIT licensed. Multi-channel (WhatsApp/Telegram/Discord/Slack/Signal/iMessage), persistent memory, browser control, skills/plugins | Direct upstream source         |
+| [Moltbook](https://moltbook.com)       | Social network for AI agents (~2M registered). Agents interact, post, upvote                                                                                                              | Community signal, not required |
+| [MoltbotWiki](https://moltbotwiki.com) | Community documentation for OpenClaw/Moltbot                                                                                                                                              | User expectations reference    |
 
 ### Current ClosedClaw State
 
@@ -42,6 +42,7 @@
 #### Tasks
 
 1. **Git remote configuration**
+
    ```bash
    git remote add openclaw https://github.com/openclaw/openclaw.git
    git fetch openclaw
@@ -65,12 +66,9 @@
        divergence_commits: 47,
        security_patches_pending: [
          "CVE-2026-XXXX: RCE in skill loader",
-         "SSRF bypass in media fetch"
+         "SSRF bypass in media fetch",
        ],
-       features_available: [
-         "Multi-model routing",
-         "Enhanced Canvas API"
-       ]
+       features_available: ["Multi-model routing", "Enhanced Canvas API"],
      }
      ```
 
@@ -97,6 +95,7 @@
 **Status**: ✅ **Implemented** (2026-02-08)
 
 **Delivered**:
+
 - Changed default sandbox mode from `"off"` to `"all"` — all tool execution now sandboxed by default
 - Added comprehensive security audit checks for sandbox misconfigurations:
   - Critical warning if `sandbox.mode="off"`
@@ -105,6 +104,7 @@
 - Breaking change from OpenClaw: ClosedClaw is security-first; sandboxing is mandatory unless explicitly disabled
 
 **Impact**: All tool calls (`exec`, `read`, `write`, `edit`, etc.) now run in isolated Docker containers with:
+
 - Read-only root filesystem (`readOnlyRoot: true`)
 - No network access (`network: "none"`)
 - All Linux capabilities dropped (`capDrop: ["ALL"]`)
@@ -120,17 +120,18 @@
 
 #### Implementation Options
 
-| Technology | Pros | Cons | Verdict |
-|---|---|---|---|
-| Docker | Well-tested, cross-platform | Heavyweight, requires daemon | macOS/Linux servers |
-| nsjail | Lightweight, Linux namespaces | Linux-only | Linux primary |
-| Landlock LSM | Kernel-level, minimal overhead | Linux ≥5.13, complexity | Future enhancement |
-| macOS Sandbox | Native macOS | macOS-only, limited | macOS secondary |
-| WSL2 + nsjail | Works on Windows | Two-layer overhead | Windows acceptable |
+| Technology    | Pros                           | Cons                         | Verdict             |
+| ------------- | ------------------------------ | ---------------------------- | ------------------- |
+| Docker        | Well-tested, cross-platform    | Heavyweight, requires daemon | macOS/Linux servers |
+| nsjail        | Lightweight, Linux namespaces  | Linux-only                   | Linux primary       |
+| Landlock LSM  | Kernel-level, minimal overhead | Linux ≥5.13, complexity      | Future enhancement  |
+| macOS Sandbox | Native macOS                   | macOS-only, limited          | macOS secondary     |
+| WSL2 + nsjail | Works on Windows               | Two-layer overhead           | Windows acceptable  |
 
 #### Tasks
 
 1. **Add `config.security.sandbox` schema**
+
    ```json5
    security: {
      sandbox: {
@@ -172,6 +173,7 @@
 **Status**: ✅ **Implemented** (2026-02-08)
 
 **Delivered**:
+
 - XChaCha20-Poly1305 authenticated encryption with Argon2id key derivation
 - User-controlled passphrases via `ClosedClaw_PASSPHRASE` env var or `~/.closedclaw/.passphrase` file
 - Transparent read/write through `EncryptedStore` abstraction
@@ -199,16 +201,17 @@
    - OS keychain integration (Priority 7) comes later
 
 3. **Encrypt at boundaries** (`src/config/encrypted-store.ts`)
+
    ```typescript
    class EncryptedStore {
      constructor(private passphrase: string) {}
-     
+
      async read<T>(path: string): Promise<T> {
        const encrypted = await fs.readFile(path);
        const decrypted = await decrypt(encrypted, this.passphrase);
        return JSON.parse(decrypted);
      }
-     
+
      async write<T>(path: string, data: T): Promise<void> {
        const json = JSON.stringify(data);
        const encrypted = await encrypt(json, this.passphrase);
@@ -253,18 +256,20 @@
 #### Tasks
 
 1. **Design signature format** (`.skill.md.sig`)
+
    ```
    -----BEGIN CLOSEDCLAW SKILL SIGNATURE-----
    Algorithm: ed25519
    Signer: alice@closedclaw.dev
    Key-ID: 0xA3F8B9...
    Timestamp: 2026-02-08T12:00:00Z
-   
+
    [base64-encoded signature of skill.md]
    -----END CLOSEDCLAW SKILL SIGNATURE-----
    ```
 
 2. **Implement signer tool**
+
    ```bash
    closedclaw skill sign ./my-skill.md --key ~/.closedclaw/signing-key.pem
    # Outputs: my-skill.md.sig
@@ -273,18 +278,19 @@
 3. **Verification during install**
    - `closedclaw skill install <url>` downloads both `.md` and `.md.sig`
    - Verify signature matches public key in trusted keyring
-   - Prompt if unsigned: "⚠️  This skill is unsigned. Install anyway? [y/N]"
+   - Prompt if unsigned: "⚠️ This skill is unsigned. Install anyway? [y/N]"
    - Config option: `security.skills.requireSignature: true` (default false, breaking change)
 
 4. **Trust keyring** (`~/.closedclaw/trusted-keys.json`)
+
    ```json5
    {
      "0xA3F8B9...": {
        name: "Alice Developer",
-       trust_level: "full",  // "full" | "marginal" | "none"
+       trust_level: "full", // "full" | "marginal" | "none"
        added: "2026-02-08",
-       verified_via: "manual"  // "manual" | "web-of-trust" | "certificate"
-     }
+       verified_via: "manual", // "manual" | "web-of-trust" | "certificate"
+     },
    }
    ```
 
@@ -309,6 +315,7 @@
 #### Tasks
 
 1. **Allowlist configuration**
+
    ```json5
    security: {
      network: {
@@ -346,6 +353,7 @@
 #### Tasks
 
 1. **Audit log format** (JSONL, one event per line)
+
    ```jsonl
    {"ts":"2026-02-08T12:00:00Z","type":"tool_exec","tool":"run_in_terminal","cmd":"rm -rf /","user":"main","session":"agent:main:telegram:dm:12345","result":"blocked_by_sandbox"}
    {"ts":"2026-02-08T12:01:00Z","type":"config_change","key":"security.sandbox.mode","old":"opt-in","new":"mandatory","changed_by":"admin"}
@@ -378,24 +386,30 @@
 
 #### Platform Support
 
-| Platform | Keychain | Library |
-|---|---|---|
-| macOS | Keychain.app | `keytar` or native `security` CLI |
-| Linux | Secret Service API | `libsecret` via `keytar` |
-| Windows | Credential Manager | `keytar` |
+| Platform | Keychain           | Library                           |
+| -------- | ------------------ | --------------------------------- |
+| macOS    | Keychain.app       | `keytar` or native `security` CLI |
+| Linux    | Secret Service API | `libsecret` via `keytar`          |
+| Windows  | Credential Manager | `keytar`                          |
 
 #### Tasks
 
 1. **Install `keytar` (or equivalent)**
+
    ```bash
    npm install keytar
    ```
 
 2. **Wrapper module** (`src/security/keychain.ts`)
+
    ```typescript
-   export async function storeCredential(service: string, account: string, password: string): Promise<void>
-   export async function getCredential(service: string, account: string): Promise<string | null>
-   export async function deleteCredential(service: string, account: string): Promise<boolean>
+   export async function storeCredential(
+     service: string,
+     account: string,
+     password: string,
+   ): Promise<void>;
+   export async function getCredential(service: string, account: string): Promise<string | null>;
+   export async function deleteCredential(service: string, account: string): Promise<boolean>;
    ```
 
 3. **Migrate credential stores**
@@ -416,13 +430,15 @@
 
 **Current State**: Constants are scattered across 40+ files without centralized management.
 
-**Problem**: 
+**Problem**:
+
 - Magic strings and default values defined inline throughout codebase
 - Difficult to audit security defaults
 - Testing requires mocking multiple imports
 - No single source of truth for configuration values
 
 **Examples of scattered constants**:
+
 ```typescript
 // Currently spread across:
 src/security/passphrase.ts: DEFAULT_PASSPHRASE_ENV_VAR = "ClosedClaw_PASSPHRASE"
@@ -435,6 +451,7 @@ extensions/diagnostics-otel/: DEFAULT_SERVICE_NAME = "ClosedClaw"
 #### Tasks
 
 1. **Create centralized constants directory**
+
    ```
    src/constants/
    ├── security.ts       // Security defaults (timeouts, limits, algorithms)
@@ -446,23 +463,24 @@ extensions/diagnostics-otel/: DEFAULT_SERVICE_NAME = "ClosedClaw"
    ```
 
 2. **Type-safe constants with enums**
+
    ```typescript
    // src/constants/security.ts
    export const SECURITY = {
      ENCRYPTION: {
-       ALGORITHM: 'xchacha20-poly1305' as const,
-       KDF: 'argon2id' as const,
+       ALGORITHM: "xchacha20-poly1305" as const,
+       KDF: "argon2id" as const,
        DEFAULT_MEMORY: 65536,
        DEFAULT_ITERATIONS: 3,
        DEFAULT_PARALLELISM: 4,
      },
      PASSPHRASE: {
-       ENV_VAR: 'ClosedClaw_PASSPHRASE',
+       ENV_VAR: "ClosedClaw_PASSPHRASE",
        MIN_LENGTH: 12,
        REQUIRED_CHAR_TYPES: 3,
      },
      SANDBOX: {
-       DEFAULT_MODE: 'all' as const,
+       DEFAULT_MODE: "all" as const,
        DEFAULT_TIMEOUT_SEC: 300,
        DEFAULT_MEMORY_MB: 512,
      },
@@ -476,14 +494,15 @@ extensions/diagnostics-otel/: DEFAULT_SERVICE_NAME = "ClosedClaw"
    - Add deprecation warnings for old locations
 
 4. **Add tests for constant values**
+
    ```typescript
    // src/constants/security.test.ts
-   describe('Security constants', () => {
-     it('should use secure encryption algorithm', () => {
-       expect(SECURITY.ENCRYPTION.ALGORITHM).toBe('xchacha20-poly1305');
+   describe("Security constants", () => {
+     it("should use secure encryption algorithm", () => {
+       expect(SECURITY.ENCRYPTION.ALGORITHM).toBe("xchacha20-poly1305");
      });
-     
-     it('should enforce minimum passphrase length', () => {
+
+     it("should enforce minimum passphrase length", () => {
        expect(SECURITY.PASSPHRASE.MIN_LENGTH).toBeGreaterThanOrEqual(12);
      });
    });
@@ -494,6 +513,7 @@ extensions/diagnostics-otel/: DEFAULT_SERVICE_NAME = "ClosedClaw"
    - Links to security advisories, RFC specs, OWASP guidelines
 
 **Benefits**:
+
 - ✅ Single source of truth reduces configuration drift
 - ✅ Easy security audits (one directory to review)
 - ✅ Simplified testing (mock one import vs hunting 40+ files)
@@ -513,14 +533,14 @@ This section documents **why** ClosedClaw's fork provides value beyond OpenClaw.
 
 #### Security-First Architecture (Enterprise Advantage)
 
-| Feature | ClosedClaw (Fork) | OpenClaw (Upstream) | Business Value |
-|---------|-------------------|---------------------|----------------|
-| **Mandatory sandboxing** | ✅ Default on (Priority 2) | Optional, defaults off | Enterprise adoption, compliance (SOC2, ISO 27001) |
-| **Encrypted memory** | ✅ Default with passphrase (Priority 3) | Plaintext everything | GDPR, HIPAA, data residency requirements |
-| **Skill signing** | 🔄 Planned (Priority 4) | Unsigned code execution | Supply chain security, zero-trust architecture |
-| **Network egress controls** | 🔄 Planned (Priority 5) | Unrestricted | Data exfiltration prevention, compliance |
-| **Immutable audit logs** | 🔄 Planned (Priority 6) | Basic logging | Forensics, incident response, compliance |
-| **OS keychain integration** | 🔄 Planned (Priority 7) | Plaintext credential files | Credential theft prevention |
+| Feature                     | ClosedClaw (Fork)                       | OpenClaw (Upstream)        | Business Value                                    |
+| --------------------------- | --------------------------------------- | -------------------------- | ------------------------------------------------- |
+| **Mandatory sandboxing**    | ✅ Default on (Priority 2)              | Optional, defaults off     | Enterprise adoption, compliance (SOC2, ISO 27001) |
+| **Encrypted memory**        | ✅ Default with passphrase (Priority 3) | Plaintext everything       | GDPR, HIPAA, data residency requirements          |
+| **Skill signing**           | 🔄 Planned (Priority 4)                 | Unsigned code execution    | Supply chain security, zero-trust architecture    |
+| **Network egress controls** | 🔄 Planned (Priority 5)                 | Unrestricted               | Data exfiltration prevention, compliance          |
+| **Immutable audit logs**    | 🔄 Planned (Priority 6)                 | Basic logging              | Forensics, incident response, compliance          |
+| **OS keychain integration** | 🔄 Planned (Priority 7)                 | Plaintext credential files | Credential theft prevention                       |
 
 **Market positioning**: ClosedClaw can be deployed in regulated industries (finance, healthcare, government) where OpenClaw cannot.
 
@@ -536,6 +556,7 @@ closedclaw upstream sync --security-only # Auto-apply upstream fixes
 ```
 
 **Value proposition**: ClosedClaw can **autonomously propose and test** OpenClaw security patches:
+
 - Parse conventional commits for classification
 - Run semantic AST diff (not just text diff)
 - Test patches in isolated sandbox
@@ -547,6 +568,7 @@ closedclaw upstream sync --security-only # Auto-apply upstream fixes
 #### Personalization Without Upstream Constraints
 
 ClosedClaw can experiment with features **too opinionated for OpenClaw**:
+
 - Multi-agent squad system (DevOps, Researcher, Coder specialists)
 - Advanced graph-based memory with relationships
 - Multi-model orchestration (route by intent)
@@ -573,6 +595,7 @@ Upstream must serve a broad user base; ClosedClaw can optimize for power users.
 #### Tasks
 
 1. **Extend agent config**
+
    ```json5
    agents: {
      list: [
@@ -623,13 +646,14 @@ Upstream must serve a broad user base; ClosedClaw can optimize for power users.
    - Test, document, promote to default
 
 2. **Add relationship memory**
+
    ```typescript
    // Track: Alice is Bob's sister, Bob works at Acme Corp
    graph.addEdge("Alice", "sister", "Bob");
    graph.addEdge("Bob", "works_at", "Acme Corp");
-   
+
    // Query: "Who works at Acme Corp?"
-   const employees = graph.query({relation: "works_at", object: "Acme Corp"});
+   const employees = graph.query({ relation: "works_at", object: "Acme Corp" });
    ```
 
 3. **Memory consolidation**
@@ -663,11 +687,11 @@ steps:
       action: fetch_pr_stats
       repo: closedclaw/closedclaw
       since: 7d
-  
+
   - name: summarize
     agent: main
     prompt: "Summarize these GitHub stats: {{steps.fetch-metrics.output}}"
-  
+
   - name: send-report
     tool: send_message
     params:
@@ -688,6 +712,7 @@ steps:
    - State persistence: resume after crash
 
 3. **CLI**
+
    ```bash
    closedclaw workflow run ./workflows/weekly-report.yaml
    closedclaw workflow list --active
@@ -717,6 +742,7 @@ steps:
 #### Tasks
 
 1. **Condition DSL** (simple expression language)
+
    ```javascript
    // Trigger format
    {
@@ -771,6 +797,7 @@ steps:
 **Concept**: Use ClosedClaw's existing [subagent system](/docs/tools/subagents.md) to create specialized agents that develop, audit, and maintain ClosedClaw itself.
 
 **Subagent Architecture**:
+
 - Subagents run in isolated sessions (`agent:<agentId>:subagent:<uuid>`)
 - Background execution, report results back when complete
 - Can use different models (e.g., Opus for analysis, Haiku for simple tasks)
@@ -787,6 +814,7 @@ Create `~/.closedclaw/agents/devops.md`:
 You are a specialized DevOps agent responsible for maintaining, auditing, and improving ClosedClaw itself.
 
 ## Core Responsibilities
+
 - **Security audits**: Scan for vulnerabilities, check sandbox configs, validate encryption
 - **Code quality**: Detect anti-patterns, duplicated code, magic strings, type safety issues
 - **Performance**: Identify bottlenecks, memory leaks, inefficient patterns
@@ -794,6 +822,7 @@ You are a specialized DevOps agent responsible for maintaining, auditing, and im
 - **Testing**: Check coverage, suggest missing test cases, identify untested code paths
 
 ## Tools Available
+
 - `read`: Inspect source code files
 - `exec`: Run linters, tests, build commands (sandboxed)
 - `grep_search`: Search codebase for patterns
@@ -802,6 +831,7 @@ You are a specialized DevOps agent responsible for maintaining, auditing, and im
 - Custom: `closedclaw security audit`, `closedclaw doctor`, `closedclaw test`
 
 ## Analysis Protocol
+
 1. Understand the task scope
 2. Search codebase for relevant context
 3. Analyze code with security/performance/maintainability lens
@@ -809,7 +839,9 @@ You are a specialized DevOps agent responsible for maintaining, auditing, and im
 5. Generate actionable recommendations
 
 ## Output Format
+
 Always structure findings as:
+
 - **Severity**: Critical | High | Medium | Low
 - **Category**: Security | Performance | Maintainability | Documentation | Testing
 - **Location**: File:Line or directory pattern
@@ -819,6 +851,7 @@ Always structure findings as:
 - **Priority**: Immediate | This Week | This Month | Backlog
 
 ## Coding Standards (ClosedClaw-specific)
+
 - ESM imports only
 - Strict TypeScript (no `any` unless justified)
 - ~500-700 lines per file guideline
@@ -830,6 +863,7 @@ Always structure findings as:
 #### Usage Examples
 
 **1. Security Audit**
+
 ```typescript
 // User: "Run a security audit of the encryption implementation"
 
@@ -843,16 +877,16 @@ sessions_spawn({
     - Documentation accuracy vs implementation
     - Test coverage for edge cases
     - Compliance with OWASP guidelines`,
-  model: "claude-opus-4.5",  // Premium model for code analysis
+  model: "claude-opus-4.5", // Premium model for code analysis
   runTimeoutSeconds: 300,
-  cleanup: "keep"  // Keep transcript for follow-up
-})
+  cleanup: "keep", // Keep transcript for follow-up
+});
 
 // DevOps agent runs independently, then announces:
 // "✅ Security Audit Complete (5m 12s, 15k tokens, $0.23)
-//  
+//
 //  Severity Breakdown: 0 critical, 2 high, 5 medium, 8 low
-//  
+//
 //  HIGH #1: src/security/passphrase.ts:189
 //  Category: Security
 //  Issue: Passphrase validation only runs client-side before encryption.
@@ -860,19 +894,20 @@ sessions_spawn({
 //  Recommendation: Add server-side validation in deriveKey() before Argon2id.
 //  Effort: Trivial (10 lines, add validatePassphrase() call)
 //  Priority: This Week
-//  
+//
 //  HIGH #2: src/security/encrypted-store.ts:78
-//  Category: Security  
+//  Category: Security
 //  Issue: atomicWrite() doesn't verify file permissions after creation.
 //         Race condition: file created 0o644, then chmod 0o600.
 //  Recommendation: Use fs.writeFile with mode option, then verify.
 //  Effort: Trivial (5 lines)
 //  Priority: This Week
-//  
+//
 //  [Full report: ~/.closedclaw/sessions/agent:devops:subagent:abc123.json]"
 ```
 
 **2. Code Quality Scan**
+
 ```bash
 User: "Find all TODO comments and create prioritized task list"
 
@@ -884,6 +919,7 @@ User: "Find all TODO comments and create prioritized task list"
 ```
 
 **3. Performance Profiling**
+
 ```bash
 User: "Profile the agent message handling pipeline and suggest optimizations"
 
@@ -895,6 +931,7 @@ User: "Profile the agent message handling pipeline and suggest optimizations"
 ```
 
 **4. Breaking Change Detection**
+
 ```bash
 User: "Compare current branch with v2026.2.1 and identify breaking API changes"
 
@@ -908,31 +945,32 @@ User: "Compare current branch with v2026.2.1 and identify breaking API changes"
 #### Continuous Background Monitoring
 
 **Config**: `~/.closedclaw/config.json5`
+
 ```json5
 {
   cron: {
     jobs: [
       {
         id: "daily-security-audit",
-        schedule: "0 2 * * *",  // 2am daily
+        schedule: "0 2 * * *", // 2am daily
         agentId: "devops",
         task: "Run security audit. Report only critical/high findings.",
-        announceTarget: { channel: "telegram", peer: "your-id" }
+        announceTarget: { channel: "telegram", peer: "your-id" },
       },
       {
         id: "weekly-code-quality",
-        schedule: "0 10 * * 1",  // 10am Mondays
+        schedule: "0 10 * * 1", // 10am Mondays
         agentId: "devops",
-        task: "Analyze code quality metrics: duplication, complexity, test coverage. Suggest top 5 refactoring candidates."
+        task: "Analyze code quality metrics: duplication, complexity, test coverage. Suggest top 5 refactoring candidates.",
       },
       {
         id: "monthly-dependency-audit",
-        schedule: "0 9 1 * *",  // 9am 1st of month
+        schedule: "0 9 1 * *", // 9am 1st of month
         agentId: "devops",
-        task: "Check for outdated npm dependencies with security vulnerabilities (npm audit). Prioritize patches."
-      }
-    ]
-  }
+        task: "Check for outdated npm dependencies with security vulnerabilities (npm audit). Prioritize patches.",
+      },
+    ],
+  },
 }
 ```
 
@@ -945,6 +983,7 @@ User: "Compare current branch with v2026.2.1 and identify breaking API changes"
 **Architecture**: Expand beyond single "main" agent to a **specialized agent team**.
 
 **Current System** (already exists):
+
 ```typescript
 // src/agents/
 agents: {
@@ -977,12 +1016,14 @@ Create role-specialized agents in `~/.closedclaw/agents/`:
 #### Example: Researcher Agent
 
 **Profile** (`~/.closedclaw/agents/researcher.md`):
+
 ```markdown
 # Researcher - Information Gathering Specialist
 
 You are a research-focused agent. Your primary goal is deep, accurate information gathering with proper citations.
 
 ## Core Capabilities
+
 - Web search with multi-source fact-checking
 - Academic paper lookup (Semantic Scholar, arXiv)
 - Citation formatting (APA, MLA, Chicago, IEEE)
@@ -990,6 +1031,7 @@ You are a research-focused agent. Your primary goal is deep, accurate informatio
 - Multi-perspective synthesis
 
 ## Research Protocol
+
 1. Break down question into sub-questions
 2. Search authoritative sources first (academic .edu, .gov, .org)
 3. Cross-reference claims across ≥3 independent sources
@@ -997,14 +1039,17 @@ You are a research-focused agent. Your primary goal is deep, accurate informatio
 5. Provide confidence scores: High (3+ sources) / Medium (2 sources) / Low (1 source)
 
 ## Tools Priority
+
 1. `web_search` (Brave Search API) - primary
 2. `web_fetch` - full page content with readability mode
 3. `read` - local knowledge base, saved papers
 4. `web_tools` - browser automation for paywalled content (when justified)
 
 ## Output Format
+
 Always include:
-- **Summary**: 2-3 sentence TL;DR  
+
+- **Summary**: 2-3 sentence TL;DR
 - **Key Findings**: Bullet points (5-10 max)
 - **Sources**: Numbered citations [1], [2], etc. with full URLs
 - **Confidence**: High | Medium | Low with justification
@@ -1012,6 +1057,7 @@ Always include:
 - **Follow-up**: Suggested deeper research paths
 
 ## Quality Checks
+
 - Verify publication dates (prefer recent unless historical)
 - Check author affiliations and potential biases
 - Distinguish between primary sources and secondary commentary
@@ -1019,6 +1065,7 @@ Always include:
 ```
 
 **Usage**:
+
 ```bash
 User: "What are the security implications of argon2id vs scrypt for password hashing?"
 
@@ -1043,12 +1090,14 @@ sessions_spawn({
 #### Example: Coder Agent
 
 **Profile** (`~/.closedclaw/agents/coder.md`):
+
 ```markdown
 # Coder - Software Development Specialist
 
 Focus: Clean, production-ready code with comprehensive testing.
 
 ## Expertise
+
 - TypeScript/JavaScript (ESM, strict mode)
 - Test-driven development (Vitest)
 - Performance optimization
@@ -1056,6 +1105,7 @@ Focus: Clean, production-ready code with comprehensive testing.
 - API design and documentation
 
 ## ClosedClaw Coding Standards
+
 - ESM imports only (`import` not `require`)
 - Strict TypeScript (no `any` without justification)
 - ~500-700 lines per file guideline (split when exceeding)
@@ -1064,6 +1114,7 @@ Focus: Clean, production-ready code with comprehensive testing.
 - Security: validate inputs, handle errors, fail securely
 
 ## Development Workflow
+
 1. **Understand**: Clarify requirements, ask questions
 2. **Research**: Search existing codebase for patterns (`semantic_search`, `list_code_usages`)
 3. **Design**: Plan architecture, identify integration points
@@ -1073,6 +1124,7 @@ Focus: Clean, production-ready code with comprehensive testing.
 7. **Document**: JSDoc for public APIs, README updates
 
 ## Tools
+
 - `read`, `write`, `edit`: File operations
 - `exec`: Run pnpm commands (build, test, lint)
 - `list_code_usages`: Check API usage before refactoring
@@ -1080,6 +1132,7 @@ Focus: Clean, production-ready code with comprehensive testing.
 - All operations sandboxed in Docker
 
 ## Error Handling
+
 - Always wrap risky operations in try-catch
 - Provide helpful error messages (what failed, why, how to fix)
 - Log errors with context (never swallow exceptions)
@@ -1087,6 +1140,7 @@ Focus: Clean, production-ready code with comprehensive testing.
 ```
 
 **Usage**:
+
 ```bash
 User: "Add rate limiting to the encryption CLI"
 
@@ -1131,7 +1185,7 @@ sessions_spawn({
 ## Phase 3: Implementation
 sessions_spawn({
   agentId: "coder",
-  task: "Implement Prometheus metrics using prom-client: 
+  task: "Implement Prometheus metrics using prom-client:
     - Counter: messages_received_total (by channel)
     - Histogram: response_time_seconds
     - Gauge: active_sessions_count
@@ -1163,16 +1217,19 @@ sessions_spawn({
 #### Self-Improvement Loop
 
 **Weekly Ritual**:
+
 ```bash
 closedclaw agent devops --message "Analyze last week's logs for improvement opportunities. Identify top 3 issues. Propose PRs."
 ```
 
 **Quarterly Audit**:
+
 ```bash
 closedclaw agent devops --message "Full codebase audit: security, performance, maintainability. Generate 90-day improvement roadmap."
 ```
 
 **Automated refactoring**:
+
 ```bash
 # DevOps finds code smell → spawns Coder to fix → generates PR
 # Human reviews and merges
@@ -1213,6 +1270,7 @@ closedclaw agent devops --message "Full codebase audit: security, performance, m
 **Result**: ClosedClaw doesn't just assist you — it builds, maintains, and improves itself with human oversight for critical decisions.
 
 **This is unprecedented** in open-source AI. No other assistant can:
+
 - Audit its own security
 - Refactor its own code
 - Write tests for itself
@@ -1238,6 +1296,7 @@ ClosedClaw is not just a personal AI assistant. **It's a self-aware, self-improv
    - Versioning: SOUL.v2.md, SOUL.v3.md (track persona evolution)
 
 2. **Persona templates**
+
    ```bash
    closedclaw persona create --template professional  # Formal, concise
    closedclaw persona create --template friendly      # Casual, emoji-rich
@@ -1259,6 +1318,7 @@ ClosedClaw is not just a personal AI assistant. **It's a self-aware, self-improv
 #### Tasks
 
 1. **User schema**
+
    ```json5
    users: [
      {id: "alice", channels: ["telegram:alice_tg", "whatsapp:+1234"]},
@@ -1290,12 +1350,13 @@ ClosedClaw is not just a personal AI assistant. **It's a self-aware, self-improv
 #### Tasks
 
 1. **Usage analytics** (`~/.closedclaw/analytics.json`)
+
    ```json5
    {
      tools: {
-       weather: {uses: 47, last_used: "2026-02-08", frequently_queried_location: "SF"},
-       calendar: {uses: 12, auto_declined: ["Spam Caller"]},
-     }
+       weather: { uses: 47, last_used: "2026-02-08", frequently_queried_location: "SF" },
+       calendar: { uses: 12, auto_declined: ["Spam Caller"] },
+     },
    }
    ```
 
@@ -1314,6 +1375,7 @@ ClosedClaw is not just a personal AI assistant. **It's a self-aware, self-improv
 #### Tasks
 
 1. **Config options**
+
    ```json5
    ui: {
      theme: "dark",
@@ -1347,8 +1409,8 @@ Agent has a special skill: `check-upstream-changes.md`
 
 You are ClosedClaw, a fork of OpenClaw.
 
-Your task: periodically check OpenClaw's GitHub repository for new releases and commits. 
-Identify security patches, bug fixes, and new features. 
+Your task: periodically check OpenClaw's GitHub repository for new releases and commits.
+Identify security patches, bug fixes, and new features.
 Present them to the user with recommendations:
 
 - 🔒 **Security patches**: Recommend immediate adoption
@@ -1372,6 +1434,7 @@ When user approves, generate a `git` command sequence or apply the patch program
    - Ignore: comments, whitespace, rename-only refactors
 
 3. **Patch application**
+
    ```bash
    closedclaw upstream apply-patch --commit abc123
    closedclaw upstream apply-patch --file security-fix.patch --preview
@@ -1383,24 +1446,25 @@ When user approves, generate a `git` command sequence or apply the patch program
      - Ask user: keep ClosedClaw version, take OpenClaw version, or manual merge
 
 5. **Automated agent workflow**
+
    ```yaml
    name: upstream-monitor
    trigger:
-     cron: "0 0 * * *"  # Daily at midnight
+     cron: "0 0 * * *" # Daily at midnight
    steps:
      - name: check-upstream
        skill: check-upstream-changes
        params:
          repo: openclaw/openclaw
          since: last_check
-     
+
      - name: notify-user
        if: steps.check-upstream.has_security_patches
        tool: send_message
        params:
          channel: telegram
          message: "🔒 OpenClaw released security patch: {{steps.check-upstream.summary}}"
-     
+
      - name: auto-apply-if-safe
        if: config.upstream.auto_apply_security
        tool: run_command
@@ -1416,32 +1480,32 @@ When user approves, generate a `git` command sequence or apply the patch program
 
 ### Merge Conflict Burden
 
-| Risk Level | Risk | Mitigations |
-|---|---|---|
-| **HIGH** | Upstream changes weekly; divergence → conflict debt | Keep changes modular (prefer extensions over core patches). Use plugin system for new features. Regular rebases (weekly). Automated conflict detection in CI. |
+| Risk Level | Risk                                                | Mitigations                                                                                                                                                   |
+| ---------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **HIGH**   | Upstream changes weekly; divergence → conflict debt | Keep changes modular (prefer extensions over core patches). Use plugin system for new features. Regular rebases (weekly). Automated conflict detection in CI. |
 
 ### Security Scope Creep
 
-| Risk Level | Risk | Mitigations |
-|---|---|---|
+| Risk Level | Risk                                             | Mitigations                                                                                                                  |
+| ---------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | **MEDIUM** | Perfect security impossible; diminishing returns | Prioritize high-impact defenses (sandbox, encryption, signing). Accept residual risk (e.g., sandbox escapes still possible). |
 
 ### Upstream License Drift
 
-| Risk Level | Risk | Mitigations |
-|---|---|---|
-| **LOW** | OpenClaw stays MIT, but could change | Monitor LICENSE file in upstream-monitor workflow. If license changes, fork becomes independent (no more sync). |
+| Risk Level | Risk                                 | Mitigations                                                                                                     |
+| ---------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| **LOW**    | OpenClaw stays MIT, but could change | Monitor LICENSE file in upstream-monitor workflow. If license changes, fork becomes independent (no more sync). |
 
 ---
 
 ## Success Metrics
 
-| Metric | Target | Measure |
-|---|---|---|
-| **Upstream sync latency** | Security patches applied <24h after OpenClaw release | `closedclaw upstream status --lag` |
-| **Sandbox escape attempts blocked** | 100% of malicious skills contained | Security audit logs |
-| **Credential exposure incidents** | 0 (with encryption) | Audit log analysis |
-| **User-perceived "personality"** | >80% users say "feels like my AI" | User survey |
+| Metric                              | Target                                               | Measure                            |
+| ----------------------------------- | ---------------------------------------------------- | ---------------------------------- |
+| **Upstream sync latency**           | Security patches applied <24h after OpenClaw release | `closedclaw upstream status --lag` |
+| **Sandbox escape attempts blocked** | 100% of malicious skills contained                   | Security audit logs                |
+| **Credential exposure incidents**   | 0 (with encryption)                                  | Audit log analysis                 |
+| **User-perceived "personality"**    | >80% users say "feels like my AI"                    | User survey                        |
 
 ---
 
@@ -1516,15 +1580,16 @@ When user approves, generate a `git` command sequence or apply the patch program
 ClosedClaw demonstrates a new paradigm: **AI that builds AI**.
 
 - **DevOps subagent** monitors code health, suggests refactorings, catches security issues
-- **Researcher subagent** investigates best practices, finds academic papers, synthesizes knowledge  
+- **Researcher subagent** investigates best practices, finds academic papers, synthesizes knowledge
 - **Coder subagent** implements features, writes tests, refactors technical debt
 - **Main agent** orchestrates the squad, makes high-level decisions
 - **User** provides strategic direction, approves changes
 
 This creates a **virtuous cycle**:
+
 ```
-User sets goal → Main agent plans → Subagents execute → 
-Code improves → Tests verify → Documentation updates → 
+User sets goal → Main agent plans → Subagents execute →
+Code improves → Tests verify → Documentation updates →
 User reviews → Merge → Repeat
 ```
 
@@ -1538,7 +1603,7 @@ User reviews → Merge → Repeat
 6. ✅ **Priority 12.5-12.6 In Progress**: Agent squad system — memory, spawner, IPC, task queue, coordinator (2026-02-09)
 7. **Next**: Network egress controls (Priority 5), Immutable audit logging (Priority 6)
 
-### Long-Term Vision  
+### Long-Term Vision
 
 **Year 1**: ClosedClaw becomes the most secure personal AI assistant (Priorities 1-7)
 

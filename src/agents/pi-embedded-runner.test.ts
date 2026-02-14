@@ -4,8 +4,8 @@ import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import "./test-helpers/fast-coding-tools.js";
 import type { ClosedClawConfig } from "../config/config.js";
-import { ensureClosedClawModelsJson } from "./models-config.js";
 import { TIMEOUT_TEST_LONG_MS, TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
+import { ensureClosedClawModelsJson } from "./models-config.js";
 
 vi.mock("@mariozechner/pi-ai", async () => {
   const actual = await vi.importActual<typeof import("@mariozechner/pi-ai")>("@mariozechner/pi-ai");

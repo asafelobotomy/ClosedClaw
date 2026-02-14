@@ -7,8 +7,8 @@ import os from "node:os";
 import type { EmbeddedRunAttemptParams, EmbeddedRunAttemptResult } from "./types.js";
 import { resolveHeartbeatPrompt } from "../../../auto-reply/heartbeat.js";
 import { resolveChannelCapabilities } from "../../../config/channel-capabilities.js";
-import { getMachineDisplayName } from "../../../infra/machine-name.js";
 import { MAX_IMAGE_BYTES } from "../../../config/constants/index.js";
+import { getMachineDisplayName } from "../../../infra/machine-name.js";
 import { getGlobalHookRunner } from "../../../plugins/hook-runner-global.js";
 import { isSubagentSessionKey } from "../../../routing/session-key.js";
 // Channel-specific reaction/button resolvers removed — channels archived.
@@ -18,7 +18,6 @@ import { normalizeMessageChannel } from "../../../utils/message-channel.js";
 import { isReasoningTagProvider } from "../../../utils/provider-utils.js";
 import { resolveClosedClawAgentDir } from "../../agent-paths.js";
 import { resolveAgentConfig, resolveSessionAgentIds } from "../../agent-scope.js";
-import { filterToolsByTier } from "../../tool-tiers.js";
 import { createAnthropicPayloadLogger } from "../../anthropic-payload-log.js";
 import { makeBootstrapWarn, resolveBootstrapContextForRun } from "../../bootstrap-files.js";
 import { createCacheTrace } from "../../cache-trace.js";
@@ -55,6 +54,7 @@ import {
 } from "../../skills.js";
 import { buildSystemPromptParams } from "../../system-prompt-params.js";
 import { buildSystemPromptReport } from "../../system-prompt-report.js";
+import { filterToolsByTier } from "../../tool-tiers.js";
 import { resolveTranscriptPolicy } from "../../transcript-policy.js";
 import { DEFAULT_BOOTSTRAP_FILENAME } from "../../workspace.js";
 import { isAbortError } from "../abort.js";
@@ -223,9 +223,7 @@ export async function runEmbeddedAttempt(
         _hookModelOverride = hookResult?.modelOverride;
         hookPrependContext = hookResult?.prependContext;
         if (hookResult?.toolAllowlist) {
-          log.debug(
-            `hooks: toolAllowlist set (${hookResult.toolAllowlist.length} tools)`,
-          );
+          log.debug(`hooks: toolAllowlist set (${hookResult.toolAllowlist.length} tools)`);
         }
       } catch (hookErr) {
         log.warn(`before_agent_start hook failed: ${String(hookErr)}`);
@@ -273,13 +271,16 @@ export async function runEmbeddedAttempt(
     if (hookToolAllowlist && hookToolAllowlist.length > 0) {
       const allowSet = new Set(hookToolAllowlist);
       tools = tools.filter((t) => allowSet.has(t.name));
-      log.debug(`hooks: filtered tools to ${tools.length} (allowlist: ${hookToolAllowlist.join(", ")})`);
+      log.debug(
+        `hooks: filtered tools to ${tools.length} (allowlist: ${hookToolAllowlist.join(", ")})`,
+      );
     }
     // Apply tool tier filter from agent config (lite/medium/full)
     const agentIdForTier = params.sessionKey?.split(":")[1];
-    const tierConfig = agentIdForTier && params.config
-      ? resolveAgentConfig(params.config, agentIdForTier)?.tools?.tier
-      : undefined;
+    const tierConfig =
+      agentIdForTier && params.config
+        ? resolveAgentConfig(params.config, agentIdForTier)?.tools?.tier
+        : undefined;
     if (tierConfig && tierConfig !== "full") {
       const beforeCount = tools.length;
       tools = filterToolsByTier(tools, tierConfig);
@@ -714,9 +715,7 @@ export async function runEmbeddedAttempt(
         let effectivePrompt = params.prompt;
         if (hookPrependContext) {
           effectivePrompt = `${hookPrependContext}\n\n${params.prompt}`;
-          log.debug(
-            `hooks: prepended context to prompt (${hookPrependContext.length} chars)`,
-          );
+          log.debug(`hooks: prepended context to prompt (${hookPrependContext.length} chars)`);
         }
 
         log.debug(`embedded run prompt start: runId=${params.runId} sessionId=${params.sessionId}`);

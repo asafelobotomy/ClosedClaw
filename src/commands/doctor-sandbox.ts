@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import { TIMEOUT_TEST_SUITE_SHORT_MS, minutesToMs } from "../config/constants/index.js";
 import path from "node:path";
 import type { ClosedClawConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
@@ -10,6 +9,7 @@ import {
   DEFAULT_SANDBOX_IMAGE,
   resolveSandboxScope,
 } from "../agents/sandbox.js";
+import { TIMEOUT_TEST_SUITE_SHORT_MS, minutesToMs } from "../config/constants/index.js";
 import { runCommandWithTimeout, runExec } from "../process/exec.js";
 import { note } from "../terminal/note.js";
 
@@ -76,7 +76,9 @@ async function isDockerAvailable(): Promise<boolean> {
 
 async function dockerImageExists(image: string): Promise<boolean> {
   try {
-    await runExec("docker", ["image", "inspect", image], { timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS });
+    await runExec("docker", ["image", "inspect", image], {
+      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
+    });
     return true;
   } catch (error) {
     const stderr =
@@ -149,6 +151,7 @@ async function handleMissingSandboxImage(
   params: SandboxImageCheck,
   runtime: RuntimeEnv,
   prompter: DoctorPrompter,
+  notifyChange: (message: string) => void,
 ) {
   const exists = await dockerImageExists(params.image);
   if (exists) {
@@ -172,6 +175,11 @@ async function handleMissingSandboxImage(
   }
 
   if (built) {
+    const nowExists = await dockerImageExists(params.image);
+    if (nowExists) {
+      params.updateConfig(params.image);
+      notifyChange(`Pinned ${params.kind} sandbox image → ${params.image}`);
+    }
     return;
   }
 }
@@ -214,6 +222,7 @@ export async function maybeRepairSandboxImages(
     },
     runtime,
     prompter,
+    (message) => changes.push(message),
   );
 
   if (sandbox.browser?.enabled) {
@@ -229,6 +238,7 @@ export async function maybeRepairSandboxImages(
       },
       runtime,
       prompter,
+      (message) => changes.push(message),
     );
   }
 

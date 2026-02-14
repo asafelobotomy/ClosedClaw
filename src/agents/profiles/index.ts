@@ -21,10 +21,7 @@ export type {
   ProfileLoadError,
 } from "./types.js";
 
-export {
-  DEVOPS_SCHEDULES,
-  SEVERITY_ORDER,
-} from "./types.js";
+export { DEVOPS_SCHEDULES, SEVERITY_ORDER } from "./types.js";
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
 

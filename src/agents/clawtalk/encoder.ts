@@ -49,7 +49,11 @@ const INTENT_PATTERNS: IntentPattern[] = [
     verb: "REQ",
     action: "web_search",
     extractors: [
-      { key: "since", pattern: /\b(?:last|past|recent)\s+(\d+\s*(?:days?|weeks?|months?|hours?))\b/i, group: 1 },
+      {
+        key: "since",
+        pattern: /\b(?:last|past|recent)\s+(\d+\s*(?:days?|weeks?|months?|hours?))\b/i,
+        group: 1,
+      },
       { key: "limit", pattern: /\b(?:top|first|limit)\s+(\d+)\b/i, group: 1, transform: Number },
     ],
   },
@@ -66,24 +70,17 @@ const INTENT_PATTERNS: IntentPattern[] = [
     confidence: 0.8,
     verb: "REQ",
     action: "summarize",
-    extractors: [
-      { key: "target", pattern: /(https?:\/\/\S+)/i, group: 1 },
-    ],
+    extractors: [{ key: "target", pattern: /(https?:\/\/\S+)/i, group: 1 }],
   },
 
   // Browse URL
   {
     intent: "browse",
-    patterns: [
-      /\b(?:open|visit|browse|go\s+to|check)\b.*\bhttps?:\/\//i,
-      /\bhttps?:\/\/\S+/i,
-    ],
+    patterns: [/\b(?:open|visit|browse|go\s+to|check)\b.*\bhttps?:\/\//i, /\bhttps?:\/\/\S+/i],
     confidence: 0.85,
     verb: "REQ",
     action: "browse",
-    extractors: [
-      { key: "url", pattern: /(https?:\/\/\S+)/i, group: 1 },
-    ],
+    extractors: [{ key: "url", pattern: /(https?:\/\/\S+)/i, group: 1 }],
   },
 
   // Read file
@@ -101,7 +98,11 @@ const INTENT_PATTERNS: IntentPattern[] = [
     verb: "REQ",
     action: "read_file",
     extractors: [
-      { key: "target", pattern: /(?:(?:file|read|cat|open|show)\s+)?([/~][\w\-./]+(?:\.\w+)?)/i, group: 1 },
+      {
+        key: "target",
+        pattern: /(?:(?:file|read|cat|open|show)\s+)?([/~][\w\-./]+(?:\.\w+)?)/i,
+        group: 1,
+      },
       { key: "target", pattern: /"([^"]+\.\w+)"/i, group: 1 },
     ],
   },
@@ -168,7 +169,12 @@ const INTENT_PATTERNS: IntentPattern[] = [
     verb: "TASK",
     action: "code_generate",
     extractors: [
-      { key: "lang", pattern: /\b(typescript|python|javascript|html|css|rust|go|java|c\+\+|ruby|php|swift|kotlin)\b/i, group: 1 },
+      {
+        key: "lang",
+        pattern:
+          /\b(typescript|python|javascript|html|css|rust|go|java|c\+\+|ruby|php|swift|kotlin)\b/i,
+        group: 1,
+      },
     ],
   },
 
@@ -370,8 +376,14 @@ export function encode(naturalLanguage: string): EncodedMessage {
  */
 function extractSearchQuery(text: string): string {
   let query = text
-    .replace(/^(?:please\s+)?(?:can you\s+)?(?:search|find|look up|google)\s+(?:for\s+)?(?:me\s+)?/i, "")
-    .replace(/^(?:what|who|when|where|how|why)\s+(?:is|are|was|were|did|does|do|will|would|can|could)\s+/i, "")
+    .replace(
+      /^(?:please\s+)?(?:can you\s+)?(?:search|find|look up|google)\s+(?:for\s+)?(?:me\s+)?/i,
+      "",
+    )
+    .replace(
+      /^(?:what|who|when|where|how|why)\s+(?:is|are|was|were|did|does|do|will|would|can|could)\s+/i,
+      "",
+    )
     .replace(/\s*\?+\s*$/, "")
     .trim();
 

@@ -666,7 +666,6 @@ async function collectChannelSecurityFindings(params: {
         });
       }
     }
-
   }
 
   return findings;

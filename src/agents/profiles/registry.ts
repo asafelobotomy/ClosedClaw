@@ -23,10 +23,7 @@ import type {
   ProfileSchedule,
   ProfileToolAccess,
 } from "./types.js";
-import {
-  AGENT_TEMPLATES,
-  type AgentTemplate,
-} from "../squad/templates.js";
+import { AGENT_TEMPLATES, type AgentTemplate } from "../squad/templates.js";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -89,15 +86,21 @@ export function parseSimpleYaml(text: string): Record<string, unknown> {
 
   for (const line of text.split("\n")) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) {continue;}
+    if (!trimmed || trimmed.startsWith("#")) {
+      continue;
+    }
 
     const colonIdx = trimmed.indexOf(":");
-    if (colonIdx === -1) {continue;}
+    if (colonIdx === -1) {
+      continue;
+    }
 
     const key = trimmed.slice(0, colonIdx).trim();
     const rawValue = trimmed.slice(colonIdx + 1).trim();
 
-    if (!key) {continue;}
+    if (!key) {
+      continue;
+    }
     result[key] = parseYamlValue(rawValue);
   }
 
@@ -109,16 +112,24 @@ export function parseSimpleYaml(text: string): Record<string, unknown> {
  */
 function parseYamlValue(raw: string): unknown {
   // Boolean
-  if (raw === "true") {return true;}
-  if (raw === "false") {return false;}
+  if (raw === "true") {
+    return true;
+  }
+  if (raw === "false") {
+    return false;
+  }
 
   // Number
-  if (/^-?\d+(\.\d+)?$/.test(raw)) {return Number(raw);}
+  if (/^-?\d+(\.\d+)?$/.test(raw)) {
+    return Number(raw);
+  }
 
   // Array: [a, b, c]
   if (raw.startsWith("[") && raw.endsWith("]")) {
     const inner = raw.slice(1, -1).trim();
-    if (!inner) {return [];}
+    if (!inner) {
+      return [];
+    }
     return inner.split(",").map((s) => {
       const trimmed = s.trim();
       // Strip quotes
@@ -133,10 +144,7 @@ function parseYamlValue(raw: string): unknown {
   }
 
   // Strip quotes from string values
-  if (
-    (raw.startsWith('"') && raw.endsWith('"')) ||
-    (raw.startsWith("'") && raw.endsWith("'"))
-  ) {
+  if ((raw.startsWith('"') && raw.endsWith('"')) || (raw.startsWith("'") && raw.endsWith("'"))) {
     return raw.slice(1, -1);
   }
 
@@ -179,11 +187,7 @@ export function builtinProfiles(): AgentProfile[] {
  * @param parsed - Parsed frontmatter + content
  * @param filePath - Source file path
  */
-export function fileToProfile(
-  id: string,
-  parsed: ParsedProfile,
-  filePath: string,
-): AgentProfile {
+export function fileToProfile(id: string, parsed: ParsedProfile, filePath: string): AgentProfile {
   const fm = parsed.frontmatter;
 
   // Extract name from frontmatter or first heading
@@ -207,9 +211,7 @@ export function fileToProfile(
 
   // Extract fallbacks
   const fallbacksRaw = fm.fallbacks ?? fm.fallbackModels;
-  const fallbackModels = Array.isArray(fallbacksRaw)
-    ? fallbacksRaw.map(String)
-    : undefined;
+  const fallbackModels = Array.isArray(fallbacksRaw) ? fallbacksRaw.map(String) : undefined;
 
   // Extract schedules
   const schedulesRaw = fm.schedules;
@@ -229,7 +231,8 @@ export function fileToProfile(
     tools,
     model: extractString(fm, "model"),
     fallbackModels,
-    tokenBudget: extractNumber(fm, "tokenBudget") ?? extractNumber(fm, "token_budget") ?? DEFAULT_TOKEN_BUDGET,
+    tokenBudget:
+      extractNumber(fm, "tokenBudget") ?? extractNumber(fm, "token_budget") ?? DEFAULT_TOKEN_BUDGET,
     capabilities,
     schedules,
     metadata: fm,
@@ -252,21 +255,21 @@ export function mergeWithTemplate(
     source: "composite",
     // Merge tools: file overrides, template fills gaps
     tools: {
-      allow: fileProfile.tools.allow.length > 0
-        ? fileProfile.tools.allow
-        : [...template.tools],
+      allow: fileProfile.tools.allow.length > 0 ? fileProfile.tools.allow : [...template.tools],
       deny: fileProfile.tools.deny,
     },
     // Merge capabilities
-    capabilities: fileProfile.capabilities.length > 1 || fileProfile.capabilities[0] !== fileProfile.id
-      ? fileProfile.capabilities
-      : [...template.capabilities],
+    capabilities:
+      fileProfile.capabilities.length > 1 || fileProfile.capabilities[0] !== fileProfile.id
+        ? fileProfile.capabilities
+        : [...template.capabilities],
     // Use file model or fall back to template
     model: fileProfile.model ?? template.suggestedModel,
     // Use file budget or template budget
-    tokenBudget: fileProfile.tokenBudget !== DEFAULT_TOKEN_BUDGET
-      ? fileProfile.tokenBudget
-      : template.defaultTokenBudget,
+    tokenBudget:
+      fileProfile.tokenBudget !== DEFAULT_TOKEN_BUDGET
+        ? fileProfile.tokenBudget
+        : template.defaultTokenBudget,
   };
 }
 
@@ -290,9 +293,7 @@ export async function loadProfileRegistry(
   const extensions = config.extensions ?? DEFAULT_EXTENSIONS;
 
   // Start with built-in templates
-  const templateProfiles = config.includeBuiltins !== false
-    ? builtinProfiles()
-    : [];
+  const templateProfiles = config.includeBuiltins !== false ? builtinProfiles() : [];
 
   const templateMap = new Map<string, AgentProfile>();
   for (const tp of templateProfiles) {
@@ -307,9 +308,7 @@ export async function loadProfileRegistry(
     // Directory might not exist — that's fine, just use templates
   }
 
-  const profileFiles = files.filter((f) =>
-    extensions.some((ext) => f.endsWith(ext)),
-  );
+  const profileFiles = files.filter((f) => extensions.some((ext) => f.endsWith(ext)));
 
   // Load each profile file
   for (const filename of profileFiles) {
@@ -367,9 +366,7 @@ export function findProfilesByCapability(
   snapshot: ProfileRegistrySnapshot,
   capabilities: string[],
 ): AgentProfile[] {
-  return snapshot.profiles.filter((p) =>
-    capabilities.some((cap) => p.capabilities.includes(cap)),
-  );
+  return snapshot.profiles.filter((p) => capabilities.some((cap) => p.capabilities.includes(cap)));
 }
 
 /**
@@ -378,9 +375,15 @@ export function findProfilesByCapability(
 export function validateProfile(profile: AgentProfile): string[] {
   const issues: string[] = [];
 
-  if (!profile.id) {issues.push("Missing profile ID");}
-  if (!profile.name) {issues.push("Missing profile name");}
-  if (!profile.systemPrompt) {issues.push("Missing system prompt");}
+  if (!profile.id) {
+    issues.push("Missing profile ID");
+  }
+  if (!profile.name) {
+    issues.push("Missing profile name");
+  }
+  if (!profile.systemPrompt) {
+    issues.push("Missing system prompt");
+  }
   if (profile.tools.allow.length === 0) {
     issues.push("No tools allowed — agent will be unable to perform actions");
   }
@@ -409,15 +412,18 @@ function extractHeading(content: string): string | undefined {
 }
 
 function parseSchedule(obj: Record<string, unknown>): ProfileSchedule | null {
-  const expression = typeof obj.expression === "string"
-    ? obj.expression
-    : typeof obj.cron === "string"
-      ? obj.cron
-      : null;
+  const expression =
+    typeof obj.expression === "string"
+      ? obj.expression
+      : typeof obj.cron === "string"
+        ? obj.cron
+        : null;
 
   const task = typeof obj.task === "string" ? obj.task : null;
 
-  if (!expression || !task) {return null;}
+  if (!expression || !task) {
+    return null;
+  }
 
   return {
     expression,

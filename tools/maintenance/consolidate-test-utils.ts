@@ -1,6 +1,6 @@
 /**
  * Repository Reorganization: Phase 2 - Consolidate Test Utilities
- * 
+ *
  * Consolidates fragmented test utilities from src/test-helpers/ and src/test-utils/
  * into unified test/helpers/ location.
  */
@@ -32,7 +32,11 @@ interface Migration {
 const FILE_MIGRATIONS: Migration[] = [
   { from: "src/test-helpers/workspace.ts", to: "test/helpers/workspace.ts", type: "file" },
   { from: "src/test-utils/ports.ts", to: "test/helpers/ports.ts", type: "file" },
-  { from: "src/test-utils/channel-plugins.ts", to: "test/helpers/channel-plugins.ts", type: "file" },
+  {
+    from: "src/test-utils/channel-plugins.ts",
+    to: "test/helpers/channel-plugins.ts",
+    type: "file",
+  },
 ];
 
 // Import path transformations based on file location
@@ -59,7 +63,7 @@ const IMPORT_TRANSFORMS: ImportTransform[] = [
     replacement: 'from "../../../test/helpers/$1.js"',
     filePattern: "src/**/**/*.ts",
   },
-  
+
   // From test/ → test/helpers/ (same directory)
   {
     pattern: /from ['"]\.\.\/src\/test-utils\/(channel-plugins|ports)(\.js)?['"]/g,
@@ -72,13 +76,13 @@ async function copyFile(from: string, to: string): Promise<void> {
   try {
     await fs.mkdir(path.dirname(to), { recursive: true });
     await fs.copyFile(from, to);
-    
+
     // Preserve executable permissions
     const stats = await fs.stat(from);
     if (stats.mode & 0o111) {
       await fs.chmod(to, stats.mode);
     }
-    
+
     console.log(`✓ Copied: ${from} → ${to}`);
   } catch (err) {
     console.error(`✗ Failed: ${from} → ${to}`, err);
@@ -88,19 +92,19 @@ async function copyFile(from: string, to: string): Promise<void> {
 
 async function updateImports(): Promise<number> {
   let totalUpdates = 0;
-  
+
   // Get all TypeScript files
   const files: string[] = [];
   for await (const file of walkDir(process.cwd())) {
     files.push(file);
   }
-  
+
   for (const file of files) {
     try {
       let content = await fs.readFile(file, "utf-8");
       let changed = false;
       let updatesInFile = 0;
-      
+
       // Apply all transformations
       for (const transform of IMPORT_TRANSFORMS) {
         const matches = content.match(transform.pattern);
@@ -110,7 +114,7 @@ async function updateImports(): Promise<number> {
           updatesInFile += matches.length;
         }
       }
-      
+
       if (changed) {
         await fs.writeFile(file, content, "utf-8");
         console.log(`✓ Updated ${updatesInFile} import(s) in: ${file}`);
@@ -120,13 +124,13 @@ async function updateImports(): Promise<number> {
       console.error(`✗ Failed to update imports in: ${file}`, err);
     }
   }
-  
+
   return totalUpdates;
 }
 
 async function removeOldDirectories(): Promise<void> {
   const dirsToRemove = ["src/test-helpers", "src/test-utils"];
-  
+
   for (const dir of dirsToRemove) {
     try {
       await fs.rm(dir, { recursive: true, force: true });
@@ -152,13 +156,13 @@ async function generateReport(updatesCount: number): Promise<void> {
 
 async function migrate(options: { dryRun?: boolean } = {}): Promise<void> {
   const { dryRun = false } = options;
-  
+
   if (dryRun) {
     console.log("🔍 DRY RUN MODE - No files will be modified\n");
   }
-  
+
   console.log("🚀 Starting Phase 2: Test Utilities Consolidation\n");
-  
+
   // Step 1: Copy files to new location
   console.log("📁 Migrating test utility files...\n");
   for (const migration of FILE_MIGRATIONS) {
@@ -168,7 +172,7 @@ async function migrate(options: { dryRun?: boolean } = {}): Promise<void> {
       console.log(`[DRY RUN] Would copy: ${migration.from} → ${migration.to}`);
     }
   }
-  
+
   // Step 2: Update imports
   console.log("\n📝 Updating import statements...\n");
   let updatesCount = 0;
@@ -177,7 +181,7 @@ async function migrate(options: { dryRun?: boolean } = {}): Promise<void> {
   } else {
     console.log("[DRY RUN] Would scan and update imports in all TypeScript files");
   }
-  
+
   // Step 3: Remove old directories
   console.log("\n🗑️  Removing old test utility directories...\n");
   if (!dryRun) {
@@ -186,10 +190,10 @@ async function migrate(options: { dryRun?: boolean } = {}): Promise<void> {
     console.log("[DRY RUN] Would remove: src/test-helpers/");
     console.log("[DRY RUN] Would remove: src/test-utils/");
   }
-  
+
   // Report
   await generateReport(updatesCount);
-  
+
   if (!dryRun) {
     console.log("\nNext steps:");
     console.log("  1. Run tests: pnpm test");

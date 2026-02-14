@@ -154,7 +154,7 @@ export async function resolveGatewayBindHost(
     }
     // MED-02: warn when falling back to 0.0.0.0 outside of explicit lan mode.
     console.warn(
-      '[gateway] WARNING: tailnet mode falling back to 0.0.0.0 — the gateway will be exposed on all network interfaces.',
+      "[gateway] WARNING: tailnet mode falling back to 0.0.0.0 — the gateway will be exposed on all network interfaces.",
     );
     return "0.0.0.0";
   }
@@ -168,7 +168,7 @@ export async function resolveGatewayBindHost(
     if (!host) {
       // MED-02: warn when falling back to 0.0.0.0 outside of explicit lan mode.
       console.warn(
-        '[gateway] WARNING: custom bind mode with empty host — falling back to 0.0.0.0 (all interfaces).',
+        "[gateway] WARNING: custom bind mode with empty host — falling back to 0.0.0.0 (all interfaces).",
       );
       return "0.0.0.0";
     } // invalid config → fall back to all
@@ -189,14 +189,12 @@ export async function resolveGatewayBindHost(
     }
     // MED-02: warn when falling back to 0.0.0.0 outside of explicit lan mode.
     console.warn(
-      '[gateway] WARNING: auto mode falling back to 0.0.0.0 — the gateway will be exposed on all network interfaces.',
+      "[gateway] WARNING: auto mode falling back to 0.0.0.0 — the gateway will be exposed on all network interfaces.",
     );
     return "0.0.0.0";
   }
 
-  console.warn(
-    '[gateway] WARNING: unknown bind mode — falling back to 0.0.0.0 (all interfaces).',
-  );
+  console.warn("[gateway] WARNING: unknown bind mode — falling back to 0.0.0.0 (all interfaces).");
   return "0.0.0.0";
 }
 

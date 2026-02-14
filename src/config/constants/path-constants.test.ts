@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import os from "node:os";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   STATE_DIRNAME,
   SUBDIRS,
@@ -202,7 +202,7 @@ describe("path-constants", () => {
 
     it("should respect state dir override in all builders", () => {
       process.env.ClosedClaw_STATE_DIR = "/custom";
-      
+
       const stateDir = getStateDir();
       const sandboxes = getSandboxesDir();
       const logs = getLogsDir();

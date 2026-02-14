@@ -1,8 +1,13 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { ENV_CLOSEDCLAW_GATEWAY_PORT, ENV_CLOSEDCLAW_GATEWAY_TOKEN, TIMEOUT_TEST_SUITE_LONG_MS, TIMEOUT_TEST_SUITE_SHORT_MS } from "@/config/constants";
-import { createClosedClawTools } from "../agents/openclaw-tools.js";
+import {
+  ENV_CLOSEDCLAW_GATEWAY_PORT,
+  ENV_CLOSEDCLAW_GATEWAY_TOKEN,
+  TIMEOUT_TEST_SUITE_LONG_MS,
+  TIMEOUT_TEST_SUITE_SHORT_MS,
+} from "@/config/constants";
+import { createClosedClawTools } from "../agents/closedclaw-tools.js";
 import { resolveSessionTranscriptPath } from "../config/sessions.js";
 import { emitAgentEvent } from "../infra/agent-events.js";
 import {
@@ -112,68 +117,72 @@ describe("sessions_send gateway loopback", () => {
 });
 
 describe("sessions_send label lookup", () => {
-  it("finds session by label and sends message", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
-    const spy = vi.mocked(agentCommand);
-    spy.mockImplementation(async (opts) => {
-      const params = opts as {
-        sessionId?: string;
-        runId?: string;
-        extraSystemPrompt?: string;
-      };
-      const sessionId = params.sessionId ?? "test-labeled";
-      const runId = params.runId ?? sessionId;
-      const sessionFile = resolveSessionTranscriptPath(sessionId);
-      await fs.mkdir(path.dirname(sessionFile), { recursive: true });
+  it(
+    "finds session by label and sends message",
+    { timeout: TIMEOUT_TEST_SUITE_LONG_MS },
+    async () => {
+      const spy = vi.mocked(agentCommand);
+      spy.mockImplementation(async (opts) => {
+        const params = opts as {
+          sessionId?: string;
+          runId?: string;
+          extraSystemPrompt?: string;
+        };
+        const sessionId = params.sessionId ?? "test-labeled";
+        const runId = params.runId ?? sessionId;
+        const sessionFile = resolveSessionTranscriptPath(sessionId);
+        await fs.mkdir(path.dirname(sessionFile), { recursive: true });
 
-      const startedAt = Date.now();
-      emitAgentEvent({
-        runId,
-        stream: "lifecycle",
-        data: { phase: "start", startedAt },
+        const startedAt = Date.now();
+        emitAgentEvent({
+          runId,
+          stream: "lifecycle",
+          data: { phase: "start", startedAt },
+        });
+
+        const text = "labeled response";
+        const message = {
+          role: "assistant",
+          content: [{ type: "text", text }],
+        };
+        await fs.appendFile(sessionFile, `${JSON.stringify({ message })}\n`, "utf8");
+
+        emitAgentEvent({
+          runId,
+          stream: "lifecycle",
+          data: { phase: "end", startedAt, endedAt: Date.now() },
+        });
       });
 
-      const text = "labeled response";
-      const message = {
-        role: "assistant",
-        content: [{ type: "text", text }],
-      };
-      await fs.appendFile(sessionFile, `${JSON.stringify({ message })}\n`, "utf8");
-
-      emitAgentEvent({
-        runId,
-        stream: "lifecycle",
-        data: { phase: "end", startedAt, endedAt: Date.now() },
+      // First, create a session with a label via sessions.patch
+      const { callGateway } = await import("./call.js");
+      await callGateway({
+        method: "sessions.patch",
+        params: { key: "test-labeled-session", label: "my-test-worker" },
+        timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
       });
-    });
 
-    // First, create a session with a label via sessions.patch
-    const { callGateway } = await import("./call.js");
-    await callGateway({
-      method: "sessions.patch",
-      params: { key: "test-labeled-session", label: "my-test-worker" },
-      timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS,
-    });
+      const tool = createClosedClawTools().find((candidate) => candidate.name === "sessions_send");
+      if (!tool) {
+        throw new Error("missing sessions_send tool");
+      }
 
-    const tool = createClosedClawTools().find((candidate) => candidate.name === "sessions_send");
-    if (!tool) {
-      throw new Error("missing sessions_send tool");
-    }
-
-    // Send using label instead of sessionKey
-    const result = await tool.execute("call-by-label", {
-      label: "my-test-worker",
-      message: "hello labeled session",
-      timeoutSeconds: 5,
-    });
-    const details = result.details as {
-      status?: string;
-      reply?: string;
-      sessionKey?: string;
-    };
-    expect(details.status).toBe("ok");
-    expect(details.reply).toBe("labeled response");
-    expect(details.sessionKey).toBe("agent:main:test-labeled-session");
-  });
+      // Send using label instead of sessionKey
+      const result = await tool.execute("call-by-label", {
+        label: "my-test-worker",
+        message: "hello labeled session",
+        timeoutSeconds: 5,
+      });
+      const details = result.details as {
+        status?: string;
+        reply?: string;
+        sessionKey?: string;
+      };
+      expect(details.status).toBe("ok");
+      expect(details.reply).toBe("labeled response");
+      expect(details.sessionKey).toBe("agent:main:test-labeled-session");
+    },
+  );
 
   it("returns error when label not found", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
     const tool = createClosedClawTools().find((candidate) => candidate.name === "sessions_send");
@@ -191,18 +200,22 @@ describe("sessions_send label lookup", () => {
     expect(details.error).toContain("No session found with label");
   });
 
-  it("returns error when neither sessionKey nor label provided", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
-    const tool = createClosedClawTools().find((candidate) => candidate.name === "sessions_send");
-    if (!tool) {
-      throw new Error("missing sessions_send tool");
-    }
+  it(
+    "returns error when neither sessionKey nor label provided",
+    { timeout: TIMEOUT_TEST_SUITE_LONG_MS },
+    async () => {
+      const tool = createClosedClawTools().find((candidate) => candidate.name === "sessions_send");
+      if (!tool) {
+        throw new Error("missing sessions_send tool");
+      }
 
-    const result = await tool.execute("call-no-key", {
-      message: "hello",
-      timeoutSeconds: 5,
-    });
-    const details = result.details as { status?: string; error?: string };
-    expect(details.status).toBe("error");
-    expect(details.error).toContain("Either sessionKey or label is required");
-  });
+      const result = await tool.execute("call-no-key", {
+        message: "hello",
+        timeoutSeconds: 5,
+      });
+      const details = result.details as { status?: string; error?: string };
+      expect(details.status).toBe("error");
+      expect(details.error).toContain("Either sessionKey or label is required");
+    },
+  );
 });

@@ -154,11 +154,7 @@ export async function findExtraGatewayServices(
       push(svc);
     }
     if (opts.deep) {
-      for (const dir of [
-        "/etc/systemd/system",
-        "/usr/lib/systemd/system",
-        "/lib/systemd/system",
-      ]) {
+      for (const dir of ["/etc/systemd/system", "/usr/lib/systemd/system", "/lib/systemd/system"]) {
         for (const svc of await scanSystemdDir({
           dir,
           scope: "system",

@@ -11,6 +11,7 @@ A **type-safe, centralized constants library** to replace scattered environment 
 ### Files Created (10 files)
 
 #### Core Implementation (5 files, ~760 lines)
+
 1. **`src/config/constants/env-constants.ts`** (~200 lines)
    - 50+ environment variable name constants
    - Platform detection utilities (isCI, isTest, isLiveTest, isWindows, isMacOS, isLinux)
@@ -31,6 +32,7 @@ A **type-safe, centralized constants library** to replace scattered environment 
    - Organized by category for discovery
 
 #### Tests (2 files, ~280 lines)
+
 4. **`src/config/constants/env-constants.test.ts`** (~120 lines)
    - 21 test cases covering all functions and constants
    - Platform detection validation
@@ -42,6 +44,7 @@ A **type-safe, centralized constants library** to replace scattered environment 
    - Type literal enforcement
 
 #### Documentation (3 files, ~1,300 lines)
+
 6. **`docs/development/using-constants.md`** (~600 lines)
    - Quick start guide
    - Environment variables section
@@ -67,6 +70,7 @@ A **type-safe, centralized constants library** to replace scattered environment 
    - Time savings estimation
 
 #### Updates (2 files)
+
 9. **`docs/completion/README.md`** (updated)
    - Added constants phase 1 to repository organization section
    - Updated impact estimate (+2-5 hours/dev/month)
@@ -79,6 +83,7 @@ A **type-safe, centralized constants library** to replace scattered environment 
 ## ✅ Test Results
 
 **All 51 tests passing** (100% coverage):
+
 - `env-constants.test.ts`: 21 tests ✅
 - `network-constants.test.ts`: 30 tests ✅
 
@@ -95,8 +100,9 @@ Test Files  2 passed (2)
 ## 🚀 Key Features
 
 ### 1. Environment Variables
+
 ```typescript
-import { ENV_CLOSEDCLAW_GATEWAY_PORT, isCI } from '@/config/constants';
+import { ENV_CLOSEDCLAW_GATEWAY_PORT, isCI } from "@/config/constants";
 
 // Type-safe env var access
 const port = process.env[ENV_CLOSEDCLAW_GATEWAY_PORT];
@@ -108,8 +114,9 @@ if (isCI()) {
 ```
 
 ### 2. Network Configuration
+
 ```typescript
-import { buildGatewayHttpUrl, DEFAULT_GATEWAY_PORT } from '@/config/constants';
+import { buildGatewayHttpUrl, DEFAULT_GATEWAY_PORT } from "@/config/constants";
 
 // Before: "http://127.0.0.1:18789" (repeated 30+ times)
 // After:
@@ -117,8 +124,9 @@ const url = buildGatewayHttpUrl();
 ```
 
 ### 3. Platform Detection
+
 ```typescript
-import { isWindows, getRunnerOS } from '@/config/constants';
+import { isWindows, getRunnerOS } from "@/config/constants";
 
 if (isWindows()) {
   // Windows-specific logic
@@ -130,24 +138,28 @@ const os = getRunnerOS(); // "macOS" | "Windows" | "Linux" | "unknown"
 ## 📊 Impact Analysis
 
 ### Before Constants Library
+
 - **50+ environment variable names** as string literals (prone to typos)
 - **30+ hardcoded URLs/ports** across test files (duplication)
 - **20+ path construction patterns** scattered throughout codebase
 - **Multiple platform detection variants** (inconsistent)
 
 ### After Constants Library
+
 - ✅ **Single source of truth** for all constants
 - ✅ **Type-safe access** with autocomplete (prevents typos)
 - ✅ **Consistent formatting** via URL builders
 - ✅ **Platform-aware helpers** (unified detection)
 
 ### Time Savings (Per Developer Per Month)
+
 - **5-10 min** saved looking up env var names
 - **10-15 min** saved debugging typos
 - **15-30 min** saved on port/URL changes
 - **Total: 30-55 minutes/developer/month**
 
 ### Example Scenario: Changing Gateway Port
+
 - **Before**: Search for "18789" across 30+ files, update each (~25 minutes)
 - **After**: Change `DEFAULT_GATEWAY_PORT` once (~30 seconds)
 - **Time saved: 24.5 minutes**
@@ -155,24 +167,28 @@ const os = getRunnerOS(); // "macOS" | "Windows" | "Linux" | "unknown"
 ## 🎁 Benefits
 
 ### Type Safety
+
 - Autocomplete for environment variable names
 - Compile-time error detection
 - Literal types enforce exact values
 - No runtime typos
 
 ### Developer Experience
+
 - Self-documenting code with named constants
 - Reduced cognitive load (no need to remember exact names)
 - Single import point (`@/config/constants`)
 - Comprehensive examples and documentation
 
 ### Code Quality
+
 - DRY principle enforced (single source of truth)
 - Easier refactoring (change once, apply everywhere)
 - Consistent formatting across codebase
 - Less magic numbers/strings
 
 ### Testing
+
 - Simplified test setup with URL builders
 - Environment-aware test configuration
 - Platform-specific CI handling
@@ -183,12 +199,14 @@ const os = getRunnerOS(); // "macOS" | "Windows" | "Linux" | "unknown"
 Phase 1 is **100% non-breaking** - all existing code continues to work.
 
 ### Recommended Adoption Strategy
+
 1. **Use in new code** (immediate adoption)
 2. **Update test files** (demonstrates patterns)
 3. **Migrate high-traffic files** (gateway, CLI, config)
 4. **Gradual rollout** (update opportunistically during feature work)
 
 ### No Deadline
+
 - Migration is **optional**
 - Can proceed over weeks/months
 - Old and new approaches coexist safely
@@ -196,14 +214,18 @@ Phase 1 is **100% non-breaking** - all existing code continues to work.
 ## 🔮 Next Steps (Optional)
 
 ### Phase 2: Path & Timing Constants
+
 Can be implemented independently or deferred:
+
 - Enhanced path constants (building on `src/config/paths.ts`)
 - Timing constants (timeouts, intervals, TTLs)
 - File size/limit constants consolidation
 - **Estimated time: 2-3 hours**
 
 ### Phase 3: Gradual Migration
+
 Optional migration of existing codebase:
+
 - Priority 1: Test files (demonstrate patterns)
 - Priority 2: Gateway files (high visibility)
 - Priority 3: CLI commands (user-facing)
@@ -220,6 +242,7 @@ This work extends the three-phase repository organization:
 - **Constants Enhancement Phase 1**: ✅ **Complete** ← You are here
 
 **Combined Impact**: Estimated **12-25 hours saved per developer per month** across:
+
 - Onboarding (contribution guide, templates)
 - Development (path aliases, barrel exports, constants)
 - Testing (test utilities, environment detection)
@@ -228,23 +251,27 @@ This work extends the three-phase repository organization:
 ## 📚 Resources
 
 ### Documentation
+
 - **Usage Guide**: `docs/development/using-constants.md`
 - **Examples**: `docs/development/constants-examples.ts`
 - **Completion Report**: `docs/completion/constants-phase-1-complete.md`
 - **Full Analysis**: `CONSTANTS-ENHANCEMENT-ANALYSIS.md` (root)
 
 ### Implementation
+
 - **Environment Variables**: `src/config/constants/env-constants.ts`
 - **Network Constants**: `src/config/constants/network-constants.ts`
 - **Barrel Export**: `src/config/constants/index.ts`
 
 ### Tests
+
 - **Env Tests**: `src/config/constants/env-constants.test.ts`
 - **Network Tests**: `src/config/constants/network-constants.test.ts`
 
 ## ✨ Ready for Production
 
 Phase 1 is **complete, tested, and ready for use**:
+
 - ✅ 51 tests passing
 - ✅ Zero breaking changes
 - ✅ Comprehensive documentation
@@ -258,6 +285,6 @@ Phase 1 is **complete, tested, and ready for use**:
 **Implementation Time**: ~1.5 hours  
 **Test Results**: 51/51 passing ✅  
 **ROI**: 2-4 hours saved per developer per month  
-**Payback Period**: ~1 month for 3+ developer team  
+**Payback Period**: ~1 month for 3+ developer team
 
 🎉 **Phase 1 Complete!**

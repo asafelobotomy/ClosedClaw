@@ -6,8 +6,8 @@ import { describe, expect, it } from "vitest";
 import { TIMEOUT_TEST_SUITE_LONG_MS } from "../src/config/constants/index.js";
 import { GatewayClient } from "../src/gateway/client.js";
 import { startGatewayServer } from "../src/gateway/server.js";
-import { getDeterministicFreePortBlock } from "./helpers/ports.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../src/utils/message-channel.js";
+import { getDeterministicFreePortBlock } from "./helpers/ports.js";
 
 type OpenAIResponseStreamEvent =
   | { type: "response.output_item.added"; item: Record<string, unknown> }

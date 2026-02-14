@@ -2,10 +2,14 @@ import type { MemoryIndexManager } from "../memory/manager.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { withProgress } from "../cli/progress.js";
 import { loadConfig } from "../config/config.js";
+import {
+  secondsToMs,
+  TIMEOUT_TEST_SUITE_SHORT_MS,
+  TIMEOUT_HTTP_SHORT_MS,
+} from "../config/constants/index.js";
 import { buildGatewayConnectionDetails, callGateway } from "../gateway/call.js";
 import { normalizeControlUiBasePath } from "../gateway/control-ui-shared.js";
 import { probeGateway } from "../gateway/probe.js";
-import { secondsToMs, TIMEOUT_TEST_SUITE_SHORT_MS, TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
 import { collectChannelStatusIssues } from "../infra/channels-status-issues.js";
 import { resolveOsSummary } from "../infra/os-summary.js";
 import { getTailnetHostname } from "../infra/tailscale.js";
@@ -118,7 +122,10 @@ export async function scanStatus(
         : await probeGateway({
             url: gatewayConnection.url,
             auth: resolveGatewayProbeAuth(cfg),
-            timeoutMs: Math.min(opts.all ? TIMEOUT_TEST_SUITE_SHORT_MS : secondsToMs(2.5), opts.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS),
+            timeoutMs: Math.min(
+              opts.all ? TIMEOUT_TEST_SUITE_SHORT_MS : secondsToMs(2.5),
+              opts.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS,
+            ),
           }).catch(() => null);
       const gatewayReachable = gatewayProbe?.ok === true;
       const gatewaySelf = gatewayProbe?.presence
@@ -134,7 +141,10 @@ export async function scanStatus(
               probe: false,
               timeoutMs: Math.min(secondsToMs(8), opts.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS),
             },
-            timeoutMs: Math.min(opts.all ? TIMEOUT_TEST_SUITE_SHORT_MS : secondsToMs(2.5), opts.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS),
+            timeoutMs: Math.min(
+              opts.all ? TIMEOUT_TEST_SUITE_SHORT_MS : secondsToMs(2.5),
+              opts.timeoutMs ?? TIMEOUT_HTTP_SHORT_MS,
+            ),
           }).catch(() => null)
         : null;
       const channelIssues = channelsStatus ? collectChannelStatusIssues(channelsStatus) : [];

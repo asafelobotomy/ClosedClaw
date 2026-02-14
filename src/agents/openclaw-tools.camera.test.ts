@@ -11,7 +11,7 @@ vi.mock("../media/image-ops.js", () => ({
 }));
 
 import "./test-helpers/fast-core-tools.js";
-import { createClosedClawTools } from "./openclaw-tools.js";
+import { createClosedClawTools } from "./closedclaw-tools.js";
 
 describe("nodes camera_snap", () => {
   beforeEach(() => {

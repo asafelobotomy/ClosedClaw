@@ -9,8 +9,8 @@
  */
 
 import type { AFSKParams, SignedTPCEnvelope } from "./types.js";
-import { DEFAULT_AFSK_PARAMS } from "./types.js";
 import { rsDecodePayload, ReedSolomonError } from "./reed-solomon.js";
+import { DEFAULT_AFSK_PARAMS } from "./types.js";
 
 const MAX_WAV_BYTES = 5 * 1024 * 1024; // Safety cap for inbound WAV payloads
 
@@ -137,8 +137,10 @@ function goertzelPower(
 
   for (let i = 0; i < length; i++) {
     const idx = start + i;
-    if (idx >= samples.length) break;
-    s0 = (samples[idx] / 0x7fff) + coeff * s1 - s2;
+    if (idx >= samples.length) {
+      break;
+    }
+    s0 = samples[idx] / 0x7fff + coeff * s1 - s2;
     s2 = s1;
     s1 = s0;
   }
@@ -298,14 +300,22 @@ export function decodeFromWav(
 // ---------------------------------------------------------------------------
 
 function isSignedTPCEnvelope(value: unknown): value is SignedTPCEnvelope {
-  if (typeof value !== "object" || value === null) return false;
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
   const obj = value as Record<string, unknown>;
 
-  if (typeof obj.signature !== "string") return false;
-  if (obj.scheme !== "ed25519" && obj.scheme !== "hmac") return false;
+  if (typeof obj.signature !== "string") {
+    return false;
+  }
+  if (obj.scheme !== "ed25519" && obj.scheme !== "hmac") {
+    return false;
+  }
 
   const env = obj.envelope;
-  if (typeof env !== "object" || env === null) return false;
+  if (typeof env !== "object" || env === null) {
+    return false;
+  }
   const envelope = env as Record<string, unknown>;
 
   return (

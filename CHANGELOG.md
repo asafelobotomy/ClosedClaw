@@ -283,7 +283,7 @@ Bulk fix of ~200 unit test failures caused by accumulated API refactors, bringin
   - **Utilities**: `resolveUserPath()`, `joinPaths()`, `getRelativePath()`, `normalizePath()`
   - Test suite: 27 tests
 
-- **Size Constants**  (`src/config/constants/size-constants.ts`): Media size limits and formatting utilities
+- **Size Constants** (`src/config/constants/size-constants.ts`): Media size limits and formatting utilities
   - **Media Size Limits**: `MAX_IMAGE_BYTES` (6MB), `MAX_AUDIO_BYTES` (16MB), `MAX_VIDEO_BYTES` (16MB), `MAX_DOCUMENT_BYTES` (100MB)
   - **Size Units**: `BYTES_PER_KB`, `BYTES_PER_MB`, `BYTES_PER_GB`
   - **Media Detection**: `mediaKindFromMime()`, `maxBytesForKind()`, `MediaKind` type
@@ -301,7 +301,6 @@ Bulk fix of ~200 unit test failures caused by accumulated API refactors, bringin
   - `server.roles-allowlist-update.e2e.test.ts`: Migrated to `getStateDir()`
   - `server.config-apply.e2e.test.ts`: Migrated to `getStateDir()`
   - `server.config-patch.e2e.test.ts`: Migrated to `getStateDir()`
-  
 - **CLI Command Files** (1 file migrated):
   - `commands/agents.test.ts`: Migrated to `getStateDir()`
 
@@ -318,6 +317,7 @@ Bulk fix of ~200 unit test failures caused by accumulated API refactors, bringin
 - **100% backward compatible** (existing code continues to work)
 
 ### Benefits
+
 - **Type Safety**: Autocomplete for all constant names, compile-time error detection, no typos
 - **Consistency**: Single source of truth for ports/URLs/paths/timeouts, uniform formatting
 - **Maintainability**: Change once, update everywhere; easy to add new constants
@@ -326,6 +326,7 @@ Bulk fix of ~200 unit test failures caused by accumulated API refactors, bringin
 - **Estimated ROI**: 3-5 hours saved per developer per month
 
 ### Documentation
+
 - **Usage Guide**: `docs/development/using-constants.md` (comprehensive patterns and examples)
 - **Practical Examples**: `docs/development/constants-examples.ts` (6 real-world scenarios)
 - **Phase 1 Report**: `docs/completion/constants-phase-1-complete.md`

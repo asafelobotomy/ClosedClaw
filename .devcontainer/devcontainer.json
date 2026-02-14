@@ -15,9 +15,7 @@
   "workspaceFolder": "/workspace",
 
   // Use a named volume for node_modules so installs don't write to the host
-  "mounts": [
-    "source=closedclaw-node-modules,target=/workspace/node_modules,type=volume"
-  ],
+  "mounts": ["source=closedclaw-node-modules,target=/workspace/node_modules,type=volume"],
 
   // Ports the gateway and bridge listen on
   "forwardPorts": [18789, 18790],
@@ -34,11 +32,7 @@
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash"
       },
-      "extensions": [
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "vitest.explorer"
-      ]
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "vitest.explorer"]
     }
   },
 

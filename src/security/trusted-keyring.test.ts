@@ -9,10 +9,11 @@
  * - Edge cases (corrupt files, missing keyring)
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { generateSigningKeyPair } from "./skill-signing.js";
 import {
   loadKeyring,
   saveKeyring,
@@ -27,7 +28,6 @@ import {
   type TrustedKey,
   type Keyring,
 } from "./trusted-keyring.js";
-import { generateSigningKeyPair } from "./skill-signing.js";
 
 // ─── Setup ───────────────────────────────────────────────────────────────────
 

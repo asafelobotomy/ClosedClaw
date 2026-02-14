@@ -9,17 +9,18 @@ Successfully consolidated fragmented test utilities from 3 scattered locations i
 
 ### 📊 Summary Statistics
 
-| Metric | Count |
-|--------|-------|
-| Directories consolidated | 3 → 1 |
-| Files moved | 3 |
-| Import statements updated | 37 |
-| Old directories removed | 2 |
-| Total test helpers | 9 files |
+| Metric                    | Count   |
+| ------------------------- | ------- |
+| Directories consolidated  | 3 → 1   |
+| Files moved               | 3       |
+| Import statements updated | 37      |
+| Old directories removed   | 2       |
+| Total test helpers        | 9 files |
 
 ## 🗂️ Before & After
 
 ### Before (Fragmented)
+
 ```
 src/
 ├── test-helpers/
@@ -41,6 +42,7 @@ test/
 **Problem**: Test utilities scattered across `src/test-helpers/`, `src/test-utils/`, and `test/helpers/` made them hard to find and maintain.
 
 ### After (Consolidated)
+
 ```
 test/
 └── helpers/                   # 9 files (all together)
@@ -60,6 +62,7 @@ test/
 ## 📋 Files Migrated
 
 ### 1. workspace.ts
+
 - **From**: `src/test-helpers/workspace.ts`
 - **To**: `test/helpers/workspace.ts`
 - **Purpose**: Temporary workspace creation for tests
@@ -67,6 +70,7 @@ test/
 - **Import updates**: 2 files
 
 ### 2. ports.ts
+
 - **From**: `src/test-utils/ports.ts`
 - **To**: `test/helpers/ports.ts`
 - **Purpose**: Free port allocation for test servers
@@ -74,8 +78,9 @@ test/
 - **Import updates**: 3 files
 
 ### 3. channel-plugins.ts
+
 - **From**: `src/test-utils/channel-plugins.ts`
-- **To**: `test/helpers/channel-plugins.ts`  
+- **To**: `test/helpers/channel-plugins.ts`
 - **Purpose**: Test plugin registry & mock channel plugins
 - **Functions**: `createTestRegistry()`, `createIMessageTestPlugin()`, `createOutboundTestPlugin()`
 - **Import updates**: 32 files
@@ -85,6 +90,7 @@ test/
 ### Import Path Changes
 
 **From src/ files**:
+
 ```typescript
 // Before
 from "../test-helpers/workspace.js"
@@ -98,6 +104,7 @@ from "../../test/helpers/ports.js"
 ```
 
 **From test/ files**:
+
 ```typescript
 // Before
 from "../src/test-utils/channel-plugins.js"
@@ -111,6 +118,7 @@ from "./helpers/ports.js"
 ### Files Updated (37 total)
 
 **Agent tests** (6 files):
+
 - `src/agents/bootstrap-files.test.ts`
 - `src/agents/channel-tools.test.ts`
 - `src/agents/pi-embedded-subscribe.tools.test.ts`
@@ -119,14 +127,17 @@ from "./helpers/ports.js"
 - `src/agents/workspace.test.ts`
 
 **Auto-reply tests** (3 files):
+
 - `src/auto-reply/command-control.test.ts`
 - `src/auto-reply/commands-registry.test.ts`
 - `src/auto-reply/reply/route-reply.test.ts`
 
 **Channel tests** (1 file):
+
 - `src/channels/plugins/index.test.ts`
 
 **Command tests** (7 files):
+
 - `src/commands/agent.test.ts`
 - `src/commands/channels.adds-non-default-telegram-account.test.ts`
 - `src/commands/channels.surfaces-signal-runtime-errors-channels-status-output.test.ts`
@@ -137,12 +148,15 @@ from "./helpers/ports.js"
 - `src/commands/onboard-non-interactive.gateway.test.ts`
 
 **Cron tests** (1 file):
+
 - `src/cron/isolated-agent.skips-delivery-without-whatsapp-recipient-besteffortdeliver-true.test.ts`
 
 **Docs tests** (1 file):
+
 - `src/docs/slash-commands-doc.test.ts`
 
 **Gateway tests** (6 files):
+
 - `src/gateway/config-reload.test.ts`
 - `src/gateway/hooks.test.ts`
 - `src/gateway/server.models-voicewake-misc.e2e.test.ts`
@@ -151,9 +165,11 @@ from "./helpers/ports.js"
 - `src/gateway/tools-invoke-http.test.ts`
 
 **Hooks tests** (1 file):
+
 - `src/hooks/soul-jester.test.ts`
 
 **Infrastructure tests** (9 files):
+
 - `src/infra/heartbeat-runner.respects-ackmaxchars-heartbeat-acks.test.ts`
 - `src/infra/heartbeat-runner.returns-default-unset.test.ts`
 - `src/infra/heartbeat-runner.sender-prefers-delivery-target.test.ts`
@@ -164,12 +180,14 @@ from "./helpers/ports.js"
 - `src/infra/outbound/targets.test.ts`
 
 **Test root** (2 files):
+
 - `test/provider-timeout.e2e.test.ts`
 - `test/setup.ts`
 
 ## ✅ Validation
 
 ### Type Checking
+
 ```bash
 # All migrated files pass type checking
 pnpm exec tsc --noEmit test/helpers/*.ts
@@ -177,11 +195,13 @@ pnpm exec tsc --noEmit test/helpers/*.ts
 ```
 
 ### Import Verification
+
 - ✅ All 37 import statements successfully updated
 - ✅ Internal imports within migrated files fixed
 - ✅ Relative paths adjusted for new location
 
 ### Build Verification
+
 - ✅ TypeScript compilation succeeds
 - ✅ No broken import references detected
 
@@ -198,6 +218,7 @@ pnpm exec tsc --noEmit test/helpers/*.ts
 Created automated migration script: `tools/maintenance/consolidate-test-utils.ts`
 
 **Features**:
+
 - Copies files to new location
 - Recursively updates all imports
 - Removes old directories
@@ -205,6 +226,7 @@ Created automated migration script: `tools/maintenance/consolidate-test-utils.ts
 - Detailed reporting
 
 **Usage**:
+
 ```bash
 # Preview changes
 pnpm exec tsx tools/maintenance/consolidate-test-utils.ts --dry-run
@@ -216,27 +238,32 @@ pnpm exec tsx tools/maintenance/consolidate-test-utils.ts
 ## 📝 Changes Summary
 
 ### Added
+
 - `test/helpers/workspace.ts` (from src/test-helpers/)
 - `test/helpers/ports.ts` (from src/test-utils/)
 - `test/helpers/channel-plugins.ts` (from src/test-utils/)
 - `tools/maintenance/consolidate-test-utils.ts` (migration script)
 
 ### Modified
+
 - 37 test files with updated import paths
 
 ### Removed
+
 - `src/test-helpers/` directory (empty, removed)
 - `src/test-utils/` directory (empty, removed)
 
 ## 🚀 Next Steps
 
 ### Completed ✅
+
 - [x] Consolidate test utilities
 - [x] Update all import references
 - [x] Remove old directories
 - [x] Verify builds & type checking
 
 ### Future Recommendations
+
 - [ ] Consider adding more test helpers as project grows
 - [ ] Document test helper usage in `test/helpers/README.md`
 - [ ] Add JSDoc comments to test helper functions

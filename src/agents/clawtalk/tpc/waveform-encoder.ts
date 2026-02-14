@@ -12,8 +12,8 @@
  */
 
 import type { AFSKParams, SignedTPCEnvelope } from "./types.js";
-import { DEFAULT_AFSK_PARAMS } from "./types.js";
 import { rsEncodePayload } from "./reed-solomon.js";
+import { DEFAULT_AFSK_PARAMS } from "./types.js";
 
 // ---------------------------------------------------------------------------
 // WAV header construction
@@ -37,22 +37,34 @@ function buildWavHeader(params: {
   let offset = 0;
 
   // RIFF header
-  header.write("RIFF", offset); offset += 4;
-  header.writeUInt32LE(fileSize, offset); offset += 4;
-  header.write("WAVE", offset); offset += 4;
+  header.write("RIFF", offset);
+  offset += 4;
+  header.writeUInt32LE(fileSize, offset);
+  offset += 4;
+  header.write("WAVE", offset);
+  offset += 4;
 
   // fmt sub-chunk
-  header.write("fmt ", offset); offset += 4;
-  header.writeUInt32LE(16, offset); offset += 4;          // sub-chunk size
-  header.writeUInt16LE(1, offset); offset += 2;           // PCM format
-  header.writeUInt16LE(channels, offset); offset += 2;
-  header.writeUInt32LE(sampleRate, offset); offset += 4;
-  header.writeUInt32LE(byteRate, offset); offset += 4;
-  header.writeUInt16LE(blockAlign, offset); offset += 2;
-  header.writeUInt16LE(bitsPerSample, offset); offset += 2;
+  header.write("fmt ", offset);
+  offset += 4;
+  header.writeUInt32LE(16, offset);
+  offset += 4; // sub-chunk size
+  header.writeUInt16LE(1, offset);
+  offset += 2; // PCM format
+  header.writeUInt16LE(channels, offset);
+  offset += 2;
+  header.writeUInt32LE(sampleRate, offset);
+  offset += 4;
+  header.writeUInt32LE(byteRate, offset);
+  offset += 4;
+  header.writeUInt16LE(blockAlign, offset);
+  offset += 2;
+  header.writeUInt16LE(bitsPerSample, offset);
+  offset += 2;
 
   // data sub-chunk
-  header.write("data", offset); offset += 4;
+  header.write("data", offset);
+  offset += 4;
   header.writeUInt32LE(dataSize, offset);
 
   return header;

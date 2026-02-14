@@ -7,7 +7,9 @@ import type { ClosedClawConfig } from "../config/config.js";
 import { resolveBrewExecutable } from "../infra/brew.js";
 import { fetchWithSsrFGuard } from "../infra/net/fetch-guard.js";
 import { runCommandWithTimeout } from "../process/exec.js";
+import { logSkillInstall } from "../security/audit-hooks.js";
 import { CONFIG_DIR, ensureDir, resolveUserPath } from "../utils.js";
+import { verifySkillSignatureForInstall } from "./skill-verification.js";
 import {
   hasBinary,
   loadWorkspaceSkillEntries,
@@ -17,8 +19,6 @@ import {
   type SkillsInstallPreferences,
 } from "./skills.js";
 import { resolveSkillKey } from "./skills/frontmatter.js";
-import { verifySkillSignatureForInstall } from "./skill-verification.js";
-import { logSkillInstall } from "../security/audit-hooks.js";
 
 export type SkillInstallRequest = {
   workspaceDir: string;
@@ -364,13 +364,14 @@ export async function installSkill(params: SkillInstallRequest): Promise<SkillIn
   // Handle verification failure
   if (!verification.allowed) {
     let errorMessage = `Skill installation blocked: ${verification.message}`;
-    
+
     if (verification.requiresConfirmation) {
-      errorMessage += "\n\nTo proceed without signature verification, update security config:\n" +
+      errorMessage +=
+        "\n\nTo proceed without signature verification, update security config:\n" +
         "  skills.security.promptOnUnsigned = false\n" +
         "Or add --force flag if supported by your installation method.";
     }
-    
+
     return {
       ok: false,
       message: errorMessage,
@@ -513,7 +514,7 @@ export async function installSkill(params: SkillInstallRequest): Promise<SkillIn
   })();
 
   const success = result.code === 0;
-  
+
   // Log installation event to audit log
   await logSkillInstall({
     skillId: resolveSkillKey(entry.skill),
@@ -525,7 +526,7 @@ export async function installSkill(params: SkillInstallRequest): Promise<SkillIn
     // Don't fail installation if audit logging fails
     console.warn(`Failed to log skill installation: ${(err as Error).message}`);
   });
-  
+
   return {
     ok: success,
     message: success ? "Installed" : formatInstallFailureMessage(result),

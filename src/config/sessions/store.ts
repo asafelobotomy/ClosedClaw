@@ -163,7 +163,16 @@ export function loadSessionStore(
     // Best-effort migration: GTK-only mode — rewrite non-GTK channel references
     // to "gtk-gui" so sessions route through the GTK channel by default.
     // Preserve common messaging channels that may be active.
-    const knownChannels = new Set(["gtk-gui", "webchat", "telegram", "whatsapp", "slack", "discord", "signal", "imessage"]);
+    const knownChannels = new Set([
+      "gtk-gui",
+      "webchat",
+      "telegram",
+      "whatsapp",
+      "slack",
+      "discord",
+      "signal",
+      "imessage",
+    ]);
     if (typeof rec.channel === "string" && !knownChannels.has(rec.channel)) {
       rec.channel = "gtk-gui";
     }
@@ -211,7 +220,6 @@ async function saveSessionStoreUnlocked(
 
   // Windows: avoid atomic rename swaps (can be flaky under concurrent access).
   // We serialize writers via the session-store lock instead.
-
 
   const tmp = `${storePath}.${process.pid}.${crypto.randomUUID()}.tmp`;
   try {

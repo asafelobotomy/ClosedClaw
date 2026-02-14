@@ -92,10 +92,6 @@ export function withNormalizedTimestamp<T extends Record<string, unknown>>(
 }
 
 function detectSystemTimeFormat(): boolean {
-
-
-
-
   try {
     const sample = new Date(2000, 0, 1, 13, 0);
     const formatted = new Intl.DateTimeFormat(undefined, { hour: "numeric" }).format(sample);

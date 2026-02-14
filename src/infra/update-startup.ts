@@ -5,7 +5,7 @@ import { formatCliCommand } from "../cli/command-format.js";
 import { secondsToMs } from "../config/constants/index.js";
 import { resolveStateDir } from "../config/paths.js";
 import { VERSION } from "../version.js";
-import { resolveClosedClawPackageRoot } from "./openclaw-root.js";
+import { resolveClosedClawPackageRoot } from "./closedclaw-root.js";
 import { normalizeUpdateChannel, DEFAULT_PACKAGE_CHANNEL } from "./update-channels.js";
 import { compareSemverStrings, resolveNpmChannelTag, checkUpdateStatus } from "./update-check.js";
 

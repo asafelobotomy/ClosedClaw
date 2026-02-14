@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { UpdateRunResult } from "../infra/update-runner.js";
+import { TIMEOUT_TEST_SUITE_STANDARD_MS } from "../config/constants/index.js";
 
 const confirm = vi.fn();
 const select = vi.fn();
@@ -22,7 +22,7 @@ vi.mock("../infra/update-runner.js", () => ({
   runGatewayUpdate: vi.fn(),
 }));
 
-vi.mock("../infra/openclaw-root.js", () => ({
+vi.mock("../infra/closedclaw-root.js", () => ({
   resolveClosedClawPackageRoot: vi.fn(),
 }));
 
@@ -88,7 +88,7 @@ describe("update-cli", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const { resolveClosedClawPackageRoot } = await import("../infra/openclaw-root.js");
+    const { resolveClosedClawPackageRoot } = await import("../infra/closedclaw-root.js");
     const { readConfigFileSnapshot } = await import("../config/config.js");
     const { checkUpdateStatus, fetchNpmTagVersion, resolveNpmChannelTag } =
       await import("../infra/update-check.js");
@@ -139,13 +139,17 @@ describe("update-cli", () => {
     setStdoutTty(false);
   });
 
-  it("exports updateCommand and registerUpdateCli", async () => {
-    const { updateCommand, registerUpdateCli, updateWizardCommand } =
-      await import("./update-cli.js");
-    expect(typeof updateCommand).toBe("function");
-    expect(typeof registerUpdateCli).toBe("function");
-    expect(typeof updateWizardCommand).toBe("function");
-  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
+  it(
+    "exports updateCommand and registerUpdateCli",
+    async () => {
+      const { updateCommand, registerUpdateCli, updateWizardCommand } =
+        await import("./update-cli.js");
+      expect(typeof updateCommand).toBe("function");
+      expect(typeof registerUpdateCli).toBe("function");
+      expect(typeof updateWizardCommand).toBe("function");
+    },
+    TIMEOUT_TEST_SUITE_STANDARD_MS,
+  );
 
   it("updateCommand runs update and outputs result", async () => {
     const { runGatewayUpdate } = await import("../infra/update-runner.js");
@@ -226,7 +230,7 @@ describe("update-cli", () => {
         "utf-8",
       );
 
-      const { resolveClosedClawPackageRoot } = await import("../infra/openclaw-root.js");
+      const { resolveClosedClawPackageRoot } = await import("../infra/closedclaw-root.js");
       const { runGatewayUpdate } = await import("../infra/update-runner.js");
       const { checkUpdateStatus } = await import("../infra/update-check.js");
       const { updateCommand } = await import("./update-cli.js");
@@ -291,7 +295,7 @@ describe("update-cli", () => {
         "utf-8",
       );
 
-      const { resolveClosedClawPackageRoot } = await import("../infra/openclaw-root.js");
+      const { resolveClosedClawPackageRoot } = await import("../infra/closedclaw-root.js");
       const { readConfigFileSnapshot } = await import("../config/config.js");
       const { resolveNpmChannelTag } = await import("../infra/update-check.js");
       const { runGatewayUpdate } = await import("../infra/update-runner.js");
@@ -344,7 +348,7 @@ describe("update-cli", () => {
         "utf-8",
       );
 
-      const { resolveClosedClawPackageRoot } = await import("../infra/openclaw-root.js");
+      const { resolveClosedClawPackageRoot } = await import("../infra/closedclaw-root.js");
       const { runGatewayUpdate } = await import("../infra/update-runner.js");
       const { updateCommand } = await import("./update-cli.js");
 
@@ -523,7 +527,7 @@ describe("update-cli", () => {
         "utf-8",
       );
 
-      const { resolveClosedClawPackageRoot } = await import("../infra/openclaw-root.js");
+      const { resolveClosedClawPackageRoot } = await import("../infra/closedclaw-root.js");
       const { resolveNpmChannelTag } = await import("../infra/update-check.js");
       const { runGatewayUpdate } = await import("../infra/update-runner.js");
       const { defaultRuntime } = await import("../runtime.js");
@@ -576,7 +580,7 @@ describe("update-cli", () => {
         "utf-8",
       );
 
-      const { resolveClosedClawPackageRoot } = await import("../infra/openclaw-root.js");
+      const { resolveClosedClawPackageRoot } = await import("../infra/closedclaw-root.js");
       const { resolveNpmChannelTag } = await import("../infra/update-check.js");
       const { runGatewayUpdate } = await import("../infra/update-runner.js");
       const { defaultRuntime } = await import("../runtime.js");

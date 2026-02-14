@@ -48,11 +48,7 @@ function detectAutoKind(input: string): ChannelResolveKind {
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
     return "user";
   }
-  if (
-    /^(user|matrix|zalo|zalouser):/i.test(
-      trimmed,
-    )
-  ) {
+  if (/^(user|matrix|zalo|zalouser):/i.test(trimmed)) {
     return "user";
   }
   return "group";

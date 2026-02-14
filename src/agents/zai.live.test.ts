@@ -9,25 +9,29 @@ const LIVE = isTruthyEnvValue(process.env.ZAI_LIVE_TEST) || isTruthyEnvValue(pro
 const describeLive = LIVE && ZAI_KEY ? describe : describe.skip;
 
 describeLive("zai live", () => {
-  it("returns assistant text", async () => {
-    const model = getModel("zai", "glm-4.7");
-    const res = await completeSimple(
-      model,
-      {
-        messages: [
-          {
-            role: "user",
-            content: "Reply with the word ok.",
-            timestamp: Date.now(),
-          },
-        ],
-      },
-      { apiKey: ZAI_KEY, maxTokens: 64 },
-    );
-    const text = res.content
-      .filter((block) => block.type === "text")
-      .map((block) => block.text.trim())
-      .join(" ");
-    expect(text.length).toBeGreaterThan(0);
-  }, TIMEOUT_TEST_SUITE_STANDARD_MS);
+  it(
+    "returns assistant text",
+    async () => {
+      const model = getModel("zai", "glm-4.7");
+      const res = await completeSimple(
+        model,
+        {
+          messages: [
+            {
+              role: "user",
+              content: "Reply with the word ok.",
+              timestamp: Date.now(),
+            },
+          ],
+        },
+        { apiKey: ZAI_KEY, maxTokens: 64 },
+      );
+      const text = res.content
+        .filter((block) => block.type === "text")
+        .map((block) => block.text.trim())
+        .join(" ");
+      expect(text.length).toBeGreaterThan(0);
+    },
+    TIMEOUT_TEST_SUITE_STANDARD_MS,
+  );
 });

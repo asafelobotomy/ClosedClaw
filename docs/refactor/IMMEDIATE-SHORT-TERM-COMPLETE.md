@@ -6,6 +6,7 @@
 ## ✅ Immediate Tasks Completed
 
 ### 1. Test Frequently Used Scripts
+
 - ✅ Verified `pnpm build` uses new paths (`tools/build/*`)
 - ✅ Verified `pnpm check` runs lint/format (migration script lint error fixed)
 - ✅ Confirmed `node tools/dev/run-node.mjs` functions correctly
@@ -14,6 +15,7 @@
 **Result**: All critical workflows functional with new `tools/` structure.
 
 ### 2. Review Migrated Structure
+
 - ✅ 9 top-level categories created
 - ✅ 25 total directories (including subdirectories)
 - ✅ 92 files in final structure
@@ -24,15 +26,16 @@
 ### 1. Update Documentation References
 
 **Files Updated**:
+
 - `docs/refactor/REPOSITORY-REORGANIZATION-PROPOSAL.md`
   - Marked Phase 1 as complete (✅)
   - Added resolution section with `tools/` structure
   - Linked to Phase 1 completion report
-  
 - `docs/.i18n/README.md`
   - Updated `scripts/docs-i18n` → `tools/docs/i18n`
 
 **Note on Other Doc References**:
+
 - Many docs reference non-existent scripts (`scripts/package-mac-app.sh`, `scripts/restart-mac.sh`, `scripts/clawlog.sh`)
 - These were already broken/outdated before migration
 - Left as-is to avoid scope creep; can be addressed separately
@@ -40,7 +43,9 @@
 ### 2. Update .github/labeler.yml
 
 **Changes**:
+
 - ✅ Added new `"tools"` label
+
   ```yaml
   "tools":
     - changed-files:
@@ -60,29 +65,32 @@
 ### 3. Fix Lint Errors
 
 **Fixed**:
+
 - `tools/maintenance/migrate-scripts.ts`
   - Removed unused `KEEP_AS_WRAPPERS` constant
   - Lint passes for migration script
 
 **Remaining**:
+
 - 51 pre-existing lint errors in `src/agents/squad/tools.test.ts`
 - Unrelated to reorganization (TypeScript ESLint issues)
 
 ## 📊 Final Statistics
 
-| Metric | Count |
-|--------|-------|
-| Items migrated | 63 (57 files + 6 dirs) |
-| Categories created | 9 |
-| Total directories | 25 |
-| Total files | 92 |
-| package.json updates | 38 script references |
-| Docs updated | 3 files |
-| Labeler patterns added | 4 new patterns |
+| Metric                 | Count                  |
+| ---------------------- | ---------------------- |
+| Items migrated         | 63 (57 files + 6 dirs) |
+| Categories created     | 9                      |
+| Total directories      | 25                     |
+| Total files            | 92                     |
+| package.json updates   | 38 script references   |
+| Docs updated           | 3 files                |
+| Labeler patterns added | 4 new patterns         |
 
 ## 🎯 Status Summary
 
 ### Completed ✅
+
 - [x] Phase 1 migration (scripts → tools)
 - [x] package.json updates
 - [x] Immediate testing
@@ -91,6 +99,7 @@
 - [x] Lint error fixes
 
 ### Deferred 📋
+
 - [ ] Update all doc references (many already broken)
 - [ ] Team communication about change
 - [ ] External documentation/wiki updates
@@ -99,11 +108,13 @@
 ## 🚀 Next Steps (Future)
 
 **Medium-term** (next release):
+
 - Monitor for any issues with new structure
 - Communicate change to team/contributors
 - Add migration note to CHANGELOG.md on next release
 
 **Long-term** (1-2 releases):
+
 - Remove old `scripts/` directory entirely
 - Consider Phase 2 (test utilities consolidation) if Phase 1 successful
 - Update developer onboarding docs

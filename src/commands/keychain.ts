@@ -11,7 +11,6 @@
  */
 
 import type { RuntimeEnv } from "../runtime.js";
-import { isRich, theme } from "../terminal/theme.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import {
   detectKeychainBackend,
@@ -19,6 +18,7 @@ import {
   listCredentials,
   type KeychainBackend,
 } from "../security/keychain.js";
+import { isRich, theme } from "../terminal/theme.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -141,16 +141,8 @@ export async function keychainStatusCommand(
   // Show migration hint if using encrypted-file
   if (info.backend === "encrypted-file") {
     lines.push("");
-    lines.push(
-      warn(
-        "⚠️  No OS keychain detected. Credentials are stored in encrypted files.",
-      ),
-    );
-    lines.push(
-      muted(
-        "Consider installing OS keychain tools for better security integration.",
-      ),
-    );
+    lines.push(warn("⚠️  No OS keychain detected. Credentials are stored in encrypted files."));
+    lines.push(muted("Consider installing OS keychain tools for better security integration."));
   }
 
   lines.push("");
@@ -158,9 +150,7 @@ export async function keychainStatusCommand(
   lines.push(
     muted(`Migrate credentials: ${formatCliCommand("closedclaw security keychain migrate")}`),
   );
-  lines.push(
-    muted(`List credentials: ${formatCliCommand("closedclaw security keychain list")}`),
-  );
+  lines.push(muted(`List credentials: ${formatCliCommand("closedclaw security keychain list")}`));
 
   runtime.log(lines.join("\n"));
 }
@@ -239,16 +229,8 @@ export async function keychainMigrateCommand(
   if (result.migrated === 0 && result.skipped === 0 && result.failed === 0) {
     lines.push(muted("No credentials found to migrate."));
     lines.push("");
-    lines.push(
-      muted(
-        "Credentials should be stored as JSON files in ~/.closedclaw/credentials/",
-      ),
-    );
-    lines.push(
-      muted(
-        "with fields: { namespace: string, identifier: string, secret: string }",
-      ),
-    );
+    lines.push(muted("Credentials should be stored as JSON files in ~/.closedclaw/credentials/"));
+    lines.push(muted("with fields: { namespace: string, identifier: string, secret: string }"));
   }
 
   if (result.errors.length > 0) {
@@ -262,22 +244,12 @@ export async function keychainMigrateCommand(
   if (result.migrated > 0 && !opts.dryRun) {
     lines.push("");
     lines.push(
-      success(
-        `Credentials successfully migrated to ${getBackendDescription(info.backend)}`,
-      ),
+      success(`Credentials successfully migrated to ${getBackendDescription(info.backend)}`),
     );
     lines.push("");
     lines.push(heading("Next Steps"));
-    lines.push(
-      muted(
-        "Original JSON files are still in ~/.closedclaw/credentials/",
-      ),
-    );
-    lines.push(
-      muted(
-        "Consider removing them once you've verified migration worked:",
-      ),
-    );
+    lines.push(muted("Original JSON files are still in ~/.closedclaw/credentials/"));
+    lines.push(muted("Consider removing them once you've verified migration worked:"));
     lines.push(muted(`  rm -rf ~/.closedclaw/credentials/*.json`));
   }
 
@@ -326,32 +298,14 @@ export async function keychainListCommand(
   lines.push("");
 
   if (info.backend !== "encrypted-file") {
-    lines.push(
-      muted(
-        "⚠️  Native keychains don't support enumeration.",
-      ),
-    );
-    lines.push(
-      muted(
-        "Credentials are stored securely but cannot be listed via CLI.",
-      ),
-    );
+    lines.push(muted("⚠️  Native keychains don't support enumeration."));
+    lines.push(muted("Credentials are stored securely but cannot be listed via CLI."));
     lines.push("");
     lines.push(
-      muted(
-        "To view credentials on macOS: open Keychain Access.app → search 'ClosedClaw'",
-      ),
+      muted("To view credentials on macOS: open Keychain Access.app → search 'ClosedClaw'"),
     );
-    lines.push(
-      muted(
-        "To view credentials on Linux: seahorse (GNOME) or kwalletmanager (KDE)",
-      ),
-    );
-    lines.push(
-      muted(
-        "To view credentials on Windows: Control Panel → Credential Manager",
-      ),
-    );
+    lines.push(muted("To view credentials on Linux: seahorse (GNOME) or kwalletmanager (KDE)"));
+    lines.push(muted("To view credentials on Windows: Control Panel → Credential Manager"));
     runtime.log(lines.join("\n"));
     return;
   }
@@ -362,9 +316,7 @@ export async function keychainListCommand(
     return;
   }
 
-  lines.push(
-    `Found ${accent(String(credentials.length))} credential(s):\n`,
-  );
+  lines.push(`Found ${accent(String(credentials.length))} credential(s):\n`);
 
   // Group by namespace
   const byNamespace = new Map<string, typeof credentials>();

@@ -52,6 +52,7 @@ closedclaw security log export --output audit-report.json --format json
 The audit log records these event types:
 
 ### Tool Execution (`tool_exec`)
+
 - **Bash/shell commands** - Every command executed via tools
 - **File operations** - Reads, writes, edits
 - **Network requests** - HTTP fetches, API calls
@@ -59,48 +60,57 @@ The audit log records these event types:
 - **Exit codes** - Success/failure status
 - **Execution duration** - Performance tracking
 
-###  Configuration Changes (`config_change`)
+### Configuration Changes (`config_change`)
+
 - **Config file writes** - Any modification to `~/.closedclaw/config.json5`
 - **Keys modified** - Which settings changed
-- **Actor** - Who made the change (CLI, Gateway, API)  
+- **Actor** - Who made the change (CLI, Gateway, API)
 
 ### Skill Installation (`skill_install`, `skill_uninstall`)
+
 - **Skill ID and path**
 - **Signature verification** - Whether skill was signed and verified
 - **Signer identity** - Publisher who signed the skill
 - **Trust level** - From trusted keyring
 
 ### Credential Access (`credential_access`)
+
 - **Read/write/delete operations**
 - **Service and account** - Which credentials accessed
 - **Actor** - Agent or user requesting access
 
 ### Channel Messages (`channel_send`)
+
 - **Outbound messages** - Destination channel and recipient
 - **Message type** - Text, image, etc.
 - **Session context** - Which agent sent the message
 
 ### Network Egress (`egress_blocked`, `egress_allowed`)
+
 - **Blocked requests** - URLs denied by egress policy
 - **Allowed requests** - (Optional) URLs permitted
 - **Reason** - Why request was blocked
 
 ### Authentication (`auth_event`)
+
 - **Login/logout** - OAuth flows
 - **Token refresh** - Credential updates
 - **Provider** - Anthropic, OpenAI, etc.
 
 ### Sessions (`session_event`)
+
 - **Session creation** - New agent conversations
 - **Session timeout** - Automatic cleanup
 - **Session keys** - Full routing context
 
 ### Security Alerts (`security_alert`)
+
 - **Sandbox escape attempts** - Path traversal, breakout attempts
 - **Policy violations** - DM policy, egress policy
 - **Integrity failures** - Config tampering, signature failures
 
 ### Gateway Events (`gateway_event`)
+
 - **Start/stop** - Gateway lifecycle
 - **Config reload** - SIGUSR1 hot-reload
 - **Crashes** - Unexpected terminations
@@ -108,11 +118,13 @@ The audit log records these event types:
 ## Audit Log Format
 
 ### File Location
+
 ```
 ~/.closedclaw/audit.log
 ```
 
 ### Format: JSONL (JSON Lines)
+
 One event per line for streaming reads and append-only writes:
 
 ```json
@@ -122,27 +134,29 @@ One event per line for streaming reads and append-only writes:
 
 ### Entry Schema
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `seq` | number | Monotonically increasing sequence number |
-| `ts` | string | ISO 8601 timestamp |
-| `type` | string | Event type (see above) |
-| `severity` | string | `info`, `warn`, `error`, or `critical` |
-| `summary` | string | Human-readable one-line description |
-| `details` | object | Type-specific structured data |
-| `actor` | string | Who triggered the event (optional) |
-| `session` | string | Session key (optional) |
-| `channel` | string | Channel name (optional) |
-| `prevHash` | string | SHA-256 hash of previous entry |
-| `hash` | string | SHA-256 hash of this entry |
+| Field      | Type   | Description                              |
+| ---------- | ------ | ---------------------------------------- |
+| `seq`      | number | Monotonically increasing sequence number |
+| `ts`       | string | ISO 8601 timestamp                       |
+| `type`     | string | Event type (see above)                   |
+| `severity` | string | `info`, `warn`, `error`, or `critical`   |
+| `summary`  | string | Human-readable one-line description      |
+| `details`  | object | Type-specific structured data            |
+| `actor`    | string | Who triggered the event (optional)       |
+| `session`  | string | Session key (optional)                   |
+| `channel`  | string | Channel name (optional)                  |
+| `prevHash` | string | SHA-256 hash of previous entry           |
+| `hash`     | string | SHA-256 hash of this entry               |
 
 ## Hash Chain Integrity
 
 Each log entry includes:
+
 - **`prevHash`**: SHA-256 of the previous entry
 - **`hash`**: SHA-256 of this entry (computed from all other fields)
 
 This creates a **tamper-evident blockchain-style chain**:
+
 ```
 Entry 1 (genesis) → Entry 2 → Entry 3 → Entry 4 → ...
    hash: a3f2        ↑         ↑          ↑
@@ -152,11 +166,13 @@ Entry 1 (genesis) → Entry 2 → Entry 3 → Entry 4 → ...
 **Detection**: If any entry is modified or deleted, the hash chain breaks and verification fails.
 
 **Verification**:
+
 ```bash
 closedclaw security log verify
 ```
 
 Output:
+
 ```
 ✓ Audit log integrity verified
 All hash chains are valid. No tampering detected.
@@ -189,6 +205,7 @@ closedclaw security log query --severity warn error critical
 ### Filter by Time Range
 
 **Relative time** (recommended for recent events):
+
 ```bash
 # Last hour
 closedclaw security log query --since 1h
@@ -204,6 +221,7 @@ closedclaw security log query --since 1h --until 30m
 ```
 
 **Absolute time** (ISO 8601):
+
 ```bash
 closedclaw security log query --since 2026-02-10T00:00:00Z
 closedclaw security log query --until 2026-02-11T00:00:00Z
@@ -272,6 +290,7 @@ closedclaw security log stats
 ```
 
 Output:
+
 ```
 Audit Log Statistics
 
@@ -308,16 +327,19 @@ Checks the entire hash chain for tampering. Exits with code 1 if verification fa
 ### Export for Analysis
 
 **CSV format** (Excel, Google Sheets):
+
 ```bash
 closedclaw security log export --output audit-report.csv --format csv
 ```
 
 **JSON format** (scripts, data analysis):
+
 ```bash
 closedclaw security log export --output audit-report.json --format json
 ```
 
 **Filtered exports**:
+
 ```bash
 # Export only critical events
 closedclaw security log export --output critical.csv --type security_alert --severity critical
@@ -331,6 +353,7 @@ closedclaw security log export --output tools-today.json --type tool_exec --sinc
 ### SIEM Integration
 
 Export to JSON and ingest into your SIEM:
+
 ```bash
 # Daily export cron job
 0 0 * * * closedclaw security log export --output /var/log/closedclaw/audit-$(date +\%Y-\%m-\%d).json --since 1d
@@ -339,6 +362,7 @@ Export to JSON and ingest into your SIEM:
 ### Compliance Reporting
 
 Generate compliance reports for auditors:
+
 ```bash
 # Last 30 days of security events
 closedclaw security log export --output compliance-report.csv --since 30d --type security_alert credential_access
@@ -347,6 +371,7 @@ closedclaw security log export --output compliance-report.csv --since 30d --type
 ### Monitoring and Alerts
 
 Check for critical events:
+
 ```bash
 #!/bin/bash
 # Alert on critical severity events in last 5 minutes
@@ -369,6 +394,7 @@ fi
 ### Log Tampering Detection
 
 If someone modifies the log file:
+
 1. Hash chain breaks at the modified entry
 2. `closedclaw security log verify` fails
 3. Alerts you to potential compromise
@@ -390,6 +416,7 @@ cp ~/.closedclaw/audit.log ~/.closedclaw/audit-$(date +%Y-%m-%d).log
 ### Access Control
 
 Protect audit logs with restrictive permissions:
+
 ```bash
 chmod 600 ~/.closedclaw/audit.log
 ```
@@ -411,6 +438,7 @@ Audit logs currently store plaintextin JSONL format. For sensitive environments:
 ### Regular Verification
 
 Add to your monitoring:
+
 ```bash
 # Cron: verify integrity daily
 0 2 * * * closedclaw security log verify || echo "ALERT: Audit log integrity failure"
@@ -419,6 +447,7 @@ Add to your monitoring:
 ### Retention Policy
 
 Define how long to keep audit logs:
+
 ```bash
 # Keep 90 days, rotate monthly
 0 0 1 * * find ~/.closedclaw/audit-*.log -mtime +90 -delete
@@ -429,16 +458,19 @@ Define how long to keep audit logs:
 When investigating incidents:
 
 1. **Identify time window**:
+
    ```bash
    closedclaw security log query --since "2026-02-10T15:00:00Z" --until "2026-02-10T16:00:00Z"
    ```
 
 2. **Filter by severity**:
+
    ```bash
    closedclaw security log query --severity critical error --since 1h
    ```
 
 3. **Trace session**:
+
    ```bash
    closedclaw security log query --session "agent:main:whatsapp:dm:+1234567890"
    ```
@@ -451,6 +483,7 @@ When investigating incidents:
 ### Performance Impact
 
 Audit logging is designed for minimal overhead:
+
 - **Async writes** - Non-blocking log appends
 - **Buffered I/O** - Batch writes to disk
 - **Sequential access** - No random seeks
@@ -466,7 +499,7 @@ Audit log not found: ~/.closedclaw/audit.log
 No audit events have been recorded yet.
 ```
 
-**Cause**: No events logged yet. 
+**Cause**: No events logged yet.
 **Solution**: Run some commands to generate events, or check that you're using the correct state directory.
 
 ### Integrity Verification Failed
@@ -477,11 +510,13 @@ Audit log integrity failure at entry #123: expected hash a3f2…, got b4e1…
 ```
 
 **Causes**:
+
 - Manual modification of audit log
 - Filesystem corruption
 - Incomplete writes
 
 **Investigation**:
+
 1. Check file permissions: `ls -l ~/.closedclaw/audit.log`
 2. Review system logs for disk errors
 3. If tampered, consider system compromise
@@ -489,6 +524,7 @@ Audit log integrity failure at entry #123: expected hash a3f2…, got b4e1…
 ### Performance Issues
 
 If audit logging slows down the system:
+
 1. Check disk I/O: `iostat -x 1`
 2. Verify file system not full: `df -h`
 3. Consider SSD for state directory
@@ -543,11 +579,13 @@ for entry in read_audit_log("~/.closedclaw/audit.log"):
 ## Configuration
 
 Audit logging is **always enabled** and requires no configuration. It automatically:
+
 - Creates `~/.closedclaw/audit.log` on first event
 - Initializes hash chain with genesis entry
 - Maintains integrity across restarts
 
-Future configuration options (*not yet implemented*):
+Future configuration options (_not yet implemented_):
+
 - `audit.retention.days` - Auto-delete old entries
 - `audit.rotation.sizeMb` - Rotate at file size
 - `audit.verbosity` - Control event types logged
@@ -555,7 +593,7 @@ Future configuration options (*not yet implemented*):
 ## See Also
 
 - [Security Overview](/gateway/security) - Broader security model
-- [Skill Signing](/security/skill-signing) - Cryptographic skill verification  
+- [Skill Signing](/security/skill-signing) - Cryptographic skill verification
 - [Trusted Keyring](/security/trusted-keyring) - Key management for signatures
 - [Security Audit](/cli/security) - Config/state security audit
 - [Doctor Command](/gateway/doctor) - System diagnostics
@@ -585,6 +623,7 @@ A: Not currently built-in. Use filesystem-level encryption (LUKS, encrypted home
 
 **Q: How do I share logs with auditors?**  
 A: Export to CSV for readability:
+
 ```bash
 closedclaw security log export --output audit-report.csv --since 30d
 ```

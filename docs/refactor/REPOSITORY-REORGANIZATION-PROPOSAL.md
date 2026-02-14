@@ -14,6 +14,7 @@
 ## Executive Summary
 
 This document proposes a comprehensive reorganization of the ClosedClaw repository to improve:
+
 - **Developer experience**: Clear, logical directory structure
 - **Maintainability**: Separation of concerns by purpose
 - **Discoverability**: Intuitive navigation
@@ -24,6 +25,7 @@ This document proposes a comprehensive reorganization of the ClosedClaw reposito
 ### 1. Scripts Directory Chaos ✅ **RESOLVED - Phase 1 Complete**
 
 **Previous Problem**: 49 scripts of different types mixed in single directory:
+
 - Build/compilation (6 scripts)
 - Development tools (8 scripts)
 - Platform-specific (12 scripts)
@@ -36,10 +38,11 @@ This document proposes a comprehensive reorganization of the ClosedClaw reposito
 **Previous Impact**: Hard to find the right script, no clear ownership, difficult onboarding
 
 **✅ Resolution**: **Phase 1 Complete** (February 9, 2026) - All 63 items (57 files + 6 directories) reorganized into `tools/` with 9 logical categories:
+
 - `tools/build/` - Compilation & bundling
 - `tools/ci/` - Git hooks & CI
 - `tools/deployment/` - Cloud & systemd
-- `tools/dev/` - Development utilities  
+- `tools/dev/` - Development utilities
 - `tools/docker/` - Container & sandbox
 - `tools/docs/` - Documentation generation
 - `tools/maintenance/` - Release & sync
@@ -51,12 +54,14 @@ See [Phase 1 Complete Report](./PHASE-1-COMPLETE.md) for details.
 ### 2. Channel Implementation Inconsistency ✅ **RESOLVED - Phase 3 Complete**
 
 **Previous Problem**: Some channels in `src/`, others in `extensions/`:
+
 - `src/discord/`, `src/telegram/`, `src/slack/`, `src/whatsapp/`, `src/imessage/`, `src/line/`, `src/signal/`
 - `extensions/discord/`, `extensions/telegram/`, etc. (different implementations)
 
 **Previous Impact**: Confusion about where channels should live, inconsistent patterns
 
 **✅ Resolution**: **Phase 3 Complete** (February 9, 2026) - Architecture documented, not duplication:
+
 - **`src/<channel>/`** = Core implementations (API clients, heavy logic, ~3000 lines each)
 - **`extensions/<channel>/`** = Plugin wrappers (registration, delegates to core, ~100 lines each)
 - This separation is **intentional architecture**, not a problem to fix
@@ -68,6 +73,7 @@ See [Channel Architecture Documentation](./CHANNEL-ARCHITECTURE.md) for comprehe
 ### 3. Test Utilities Fragmentation ✅ **RESOLVED - Phase 2 Complete**
 
 **Previous Problem**: Test code scattered across:
+
 - `test/` (root)
 - `src/test-helpers/`
 - `src/test-utils/`
@@ -75,6 +81,7 @@ See [Channel Architecture Documentation](./CHANNEL-ARCHITECTURE.md) for comprehe
 **Previous Impact**: Unclear where to add test utilities
 
 **✅ Resolution**: **Phase 2 Complete** (February 9, 2026) - All test utilities consolidated into `test/helpers/`:
+
 - Migrated 3 files from `src/test-helpers/` and `src/test-utils/`
 - Updated 37 import statements across project
 - Removed old directories
@@ -83,7 +90,9 @@ See [Channel Architecture Documentation](./CHANNEL-ARCHITECTURE.md) for comprehe
 See [Phase 2 Complete Report](./PHASE-2-COMPLETE.md) for details.
 
 ### 4. Monorepo Structure Ambiguity
+
 **Problem**: Multi-purpose folders without clear hierarchy:
+
 - `apps/` (Android, GTK GUI, shared)
 - `packages/` (clawdbot, moltbot)
 - `extensions/` (24+ plugins)
@@ -93,6 +102,7 @@ See [Phase 2 Complete Report](./PHASE-2-COMPLETE.md) for details.
 ## Research: Industry Best Practices
 
 Based on research from:
+
 - TypeScript monorepo patterns (2025)
 - Node.js/TS project structure recommendations
 - DevOps tooling organization standards
@@ -214,7 +224,7 @@ tools/dev/
   run-node.mjs
   watch-node.mjs
   check-ts-max-loc.ts
-  
+
 # Platform-specific
 tools/platform/macos/
   package-mac-app.sh
@@ -228,7 +238,7 @@ tools/platform/linux/
 
 tools/platform/ios/
   ios-team-id.sh
-  
+
 tools/platform/mobile/
   mobile-reauth.sh
 
@@ -236,7 +246,7 @@ tools/platform/mobile/
 tools/docker/
   [existing docker/ subfolder]
   sandbox-*.sh
-  
+
 # CI/CD
 tools/ci/
   committer
@@ -249,22 +259,22 @@ tools/testing/
   test-*.sh
   test-parallel.mjs
   e2e/
-  
+
 # Documentation
 tools/docs/
   build-docs-list.mjs
   docs-list.js
   docs-i18n/
   changelog-to-html.sh
-  
+
 # Deployment
 tools/deployment/systemd/
   [existing systemd/ subfolder]
-  
+
 tools/deployment/cloud/
   tailscale-*.sh
   setup-auth-system.sh
-  
+
 # Maintenance
 tools/maintenance/
   release-check.ts
@@ -272,19 +282,21 @@ tools/maintenance/
   protocol-gen*.ts
   firecrawl-compare.ts
   readability-basic-compare.ts
-  
+
 # Repro/debugging
 tools/repro/
   [existing repro/ subfolder]
 ```
 
 **Benefits**:
+
 - ✅ Clear categorization by purpose
 - ✅ Easy to find scripts
 - ✅ Natural ownership boundaries
 - ✅ Aligned with "tools" convention (common in TS projects)
 
 **Migration Impact**:
+
 - Update `package.json` script references (47 scripts)
 - Update documentation references
 - Update CI/CD workflows
@@ -300,7 +312,7 @@ tools/repro/
 # Before
 src/test-helpers/workspace.ts        # 1 file
 src/test-utils/ports.ts               # 2 files
-src/test-utils/channel-plugins.ts     
+src/test-utils/channel-plugins.ts
 test/helpers/                         # 6 files
 
 # After (9 files unified)
@@ -318,6 +330,7 @@ test/
 ```
 
 **Results**:
+
 - ✅ 3 files migrated to test/helpers/
 - ✅ 37 import statements updated across project
 - ✅ 2 old directories removed (src/test-helpers/, src/test-utils/)
@@ -362,6 +375,7 @@ extensions/
 ```
 
 **Why This Works**:
+
 - ✅ **Core** (`src/`): Tightly coupled to runtime, direct config/logging/routing access
 - ✅ **Extensions** (`extensions/`): Plugin interface, delegates to core via runtime bridge
 - ✅ **Clean separation**: Implementation vs interface
@@ -369,6 +383,7 @@ extensions/
 - ✅ **Runtime isolation**: Extensions import from plugin SDK, not `../../src/`
 
 **Data Flow Example** (Telegram):
+
 ```
 Agent sends message
   ↓
@@ -382,6 +397,7 @@ Telegram API
 **Decision**: **Option B** - Keep current structure, document the pattern
 
 **Benefits Realized**:
+
 - ✅ No breaking changes
 - ✅ Clear architectural documentation
 - ✅ Developer understanding improved
@@ -390,6 +406,7 @@ Telegram API
 **Documentation Created**: [CHANNEL-ARCHITECTURE.md](./CHANNEL-ARCHITECTURE.md)
 
 See [Channel Architecture Documentation](./CHANNEL-ARCHITECTURE.md) for:
+
 - Detailed architecture explanation
 - Core vs extension responsibilities
 - Data flow diagrams
@@ -423,6 +440,7 @@ ClosedClaw/
 ```
 
 **Results**:
+
 - ✅ 52 skills migrated to `.github/skills/`
 - ✅ 75 files moved with git history preserved
 - ✅ Root `skills/` directory removed
@@ -464,13 +482,13 @@ vitest.*.config.ts     → config/vitest.*.config.ts
 ```typescript
 // tools/maintenance/reorganize-repo.ts
 
-import fs from 'fs/promises';
-import path from 'path';
+import fs from "fs/promises";
+import path from "path";
 
 const MIGRATIONS = [
   // Build scripts
-  { from: 'scripts/bundle-a2ui.sh', to: 'tools/build/bundle-a2ui.sh' },
-  { from: 'scripts/canvas-a2ui-copy.ts', to: 'tools/build/canvas-a2ui-copy.ts' },
+  { from: "scripts/bundle-a2ui.sh", to: "tools/build/bundle-a2ui.sh" },
+  { from: "scripts/canvas-a2ui-copy.ts", to: "tools/build/canvas-a2ui-copy.ts" },
   // ... (full mapping)
 ];
 
@@ -480,9 +498,9 @@ async function migrate() {
     await fs.copyFile(from, to);
     console.log(`Copied: ${from} → ${to}`);
   }
-  
+
   // Update package.json
-  const pkg = JSON.parse(await fs.readFile('package.json', 'utf-8'));
+  const pkg = JSON.parse(await fs.readFile("package.json", "utf-8"));
   pkg.scripts = Object.fromEntries(
     Object.entries(pkg.scripts).map(([key, cmd]: [string, string]) => {
       let updated = cmd;
@@ -490,9 +508,9 @@ async function migrate() {
         updated = updated.replace(from, to);
       }
       return [key, updated];
-    })
+    }),
   );
-  await fs.writeFile('package.json', JSON.stringify(pkg, null, 2) + '\n');
+  await fs.writeFile("package.json", JSON.stringify(pkg, null, 2) + "\n");
 }
 
 migrate().catch(console.error);
@@ -519,7 +537,6 @@ migrate().catch(console.error);
   - Reorganized 63 items (57 files + 6 directories) from `scripts/` to `tools/` with 9 categories
   - Updated 38 package.json references
   - See: [PHASE-1-COMPLETE.md](./PHASE-1-COMPLETE.md)
-  
 - ✅ **Phase 2 (Tests)**: **COMPLETE** (February 9, 2026)
   - Consolidated test utilities from 3 locations to unified `test/helpers/`
   - Migrated 3 files, updated 37 imports
@@ -530,7 +547,6 @@ migrate().catch(console.error);
   - Documented intentional separation pattern
   - Decision: Keep current structure (no migration needed)
   - See: [CHANNEL-ARCHITECTURE.md](./CHANNEL-ARCHITECTURE.md)
-  
 - ✅ **Phase 4 (Skills)**: **COMPLETE** (February 9, 2026)
   - Relocated 52 skills from `skills/` to `.github/skills/`
   - Moved 75 files with git history preserved
@@ -549,14 +565,17 @@ migrate().catch(console.error);
 ## Alternatives Considered
 
 ### Alternative 1: Keep scripts/ as-is
+
 **Rejected**: Doesn't solve discoverability problem
 
 ### Alternative 2: Single "scripts" with prefixes
+
 Example: `scripts/build-bundle.sh`, `scripts/dev-auth.sh`
 
 **Rejected**: Doesn't scale, still cluttered
 
 ### Alternative 3: Complete monorepo restructure
+
 Move all `src/` into `packages/core`
 
 **Rejected**: Too disruptive, not necessary
@@ -570,10 +589,12 @@ Move all `src/` into `packages/core`
 ## Approval & Next Steps
 
 ### Approval Required From
+
 - [ ] @solon (repository owner)
 - [ ] Core maintainers
 
 ### Next Steps After Approval
+
 1. Create `tools/` directory structure
 2. Run migration script
 3. Update package.json
@@ -583,6 +604,7 @@ Move all `src/` into `packages/core`
 7. Remove old paths (after 2 releases)
 
 ### Discussion Points
+
 - Should we rename `scripts/` → `tools/` or keep both temporarily?
 - Timeline: Should this be done in main branch or feature branch?
 - Do we want automated checks to prevent scripts being added to wrong locations?

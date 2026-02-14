@@ -1,10 +1,10 @@
 /**
  * Custom Assertions for ClosedClaw Tests
- * 
+ *
  * Additional assertion helpers beyond Vitest's built-in matchers.
  */
 
-import { expect } from 'vitest';
+import { expect } from "vitest";
 
 /**
  * Assert that a value is a valid session key format
@@ -34,7 +34,7 @@ export function assertValidConfig(config: unknown) {
   const cfg = asRecord(config);
   expect(config).toBeDefined();
   expect(cfg.agents).toBeDefined();
-  expect(typeof cfg.agents).toBe('object');
+  expect(typeof cfg.agents).toBe("object");
 }
 
 /**
@@ -61,7 +61,7 @@ export function assertToolError(result: unknown, expectedMessage?: string) {
   const value = asRecord(result);
   expect(result).toBeDefined();
   expect(value.error).toBeDefined();
-  
+
   if (expectedMessage) {
     expect(asPrimitiveString(value.error)).toContain(expectedMessage);
   }
@@ -73,11 +73,11 @@ export function assertToolError(result: unknown, expectedMessage?: string) {
 export function assertValidAuditEntry(entry: unknown) {
   const value = asRecord(entry);
   expect(entry).toBeDefined();
-  expect(value.seq).toBeTypeOf('number');
-  expect(value.ts).toBeTypeOf('string');
-  expect(value.type).toBeTypeOf('string');
+  expect(value.seq).toBeTypeOf("number");
+  expect(value.ts).toBeTypeOf("string");
+  expect(value.type).toBeTypeOf("string");
   expect(asPrimitiveString(value.severity)).toMatch(/^(debug|info|warn|error|critical)$/);
-  expect(value.hash).toBeTypeOf('string');
+  expect(value.hash).toBeTypeOf("string");
 }
 
 /**
@@ -109,9 +109,9 @@ export function assertValidEncryptedFormat(encrypted: string) {
 export function assertValidKeychainEntry(entry: unknown) {
   const value = asRecord(entry);
   expect(entry).toBeDefined();
-  expect(value.namespace).toBeTypeOf('string');
-  expect(value.identifier).toBeTypeOf('string');
-  expect(value.secret).toBeTypeOf('string');
+  expect(value.namespace).toBeTypeOf("string");
+  expect(value.identifier).toBeTypeOf("string");
+  expect(value.secret).toBeTypeOf("string");
 }
 
 /**

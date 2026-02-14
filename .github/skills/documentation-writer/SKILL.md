@@ -81,6 +81,7 @@ docs/
 **CRITICAL**: Use root-relative paths without `.md` or `.mdx` extensions.
 
 ✅ **Correct**:
+
 ```markdown
 [Getting Started](/start/getting-started)
 [Configuration](/configuration)
@@ -89,6 +90,7 @@ docs/
 ```
 
 ❌ **Incorrect**:
+
 ```markdown
 [Getting Started](./start/getting-started.md)
 [Configuration](../configuration.md)
@@ -97,6 +99,7 @@ docs/
 ```
 
 **Why**: Root-relative links work consistently across:
+
 - GitHub Pages (where docs are served)
 - GitHub markdown preview
 - Local development servers
@@ -107,18 +110,26 @@ docs/
 **Avoid em dashes (—) and apostrophes (') in headings** for better URL compatibility:
 
 ✅ **Correct**:
+
 ```markdown
 ## Getting Started
+
 ## Channel Setup
+
 ## Using the CLI
+
 ## Agent Configuration
 ```
 
 ❌ **Incorrect**:
+
 ```markdown
 ## Getting Started — The Easy Way
+
 ## Channel's Setup
+
 ## Using the CLI—Advanced
+
 ## Agent's Configuration
 ```
 
@@ -129,6 +140,7 @@ docs/
 When linking to repository files (not docs), use **relative links** from repository root:
 
 ✅ **Correct in README.md**:
+
 ```markdown
 [Contributing](CONTRIBUTING.md)
 [License](LICENSE)
@@ -136,6 +148,7 @@ When linking to repository files (not docs), use **relative links** from reposit
 ```
 
 ✅ **Correct in docs/ (linking to repo files)**:
+
 ```markdown
 For release notes, see [CHANGELOG.md](https://github.com/ClosedClaw/ClosedClaw/blob/main/CHANGELOG.md)
 [macOS README](https://github.com/ClosedClaw/ClosedClaw/blob/main/apps/macos/README.md)
@@ -187,10 +200,10 @@ Step-by-step setup instructions:
 \`\`\`json5
 // ~/.ClosedClaw/config.json5
 {
-  feature: {
-    enabled: true,
-    option: "value",
-  },
+feature: {
+enabled: true,
+option: "value",
+},
 }
 \`\`\`
 
@@ -220,20 +233,23 @@ ClosedClaw command --advanced --flags
 
 Complete configuration reference:
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
+| Option    | Type      | Default | Description    |
+| --------- | --------- | ------- | -------------- |
 | `enabled` | `boolean` | `false` | Enable feature |
-| `timeout` | `number` | `30000` | Timeout in ms |
+| `timeout` | `number`  | `30000` | Timeout in ms  |
 
 ## Examples
 
 ### Example 1: Common Use Case
 
 \`\`\`bash
+
 # Command
+
 ClosedClaw example command
 
 # Expected output
+
 Success: Feature activated
 \`\`\`
 
@@ -242,9 +258,9 @@ Success: Feature activated
 \`\`\`json5
 // Configuration
 {
-  advanced: {
-    mode: "expert",
-  },
+advanced: {
+mode: "expert",
+},
 }
 \`\`\`
 
@@ -255,6 +271,7 @@ Success: Feature activated
 **Symptom**: Description of the problem
 
 **Solution**:
+
 1. Step to resolve
 2. Another step
 3. Verify fix
@@ -269,6 +286,7 @@ ClosedClaw diagnostic command
 \`\`\`
 
 **Solution**:
+
 - Fix step 1
 - Fix step 2
 
@@ -282,7 +300,7 @@ ClosedClaw diagnostic command
 
 - Related topic 1
 - Related topic 2
-\`\`\`
+  \`\`\`
 ```
 
 ### Channel Setup Guide Template
@@ -333,12 +351,12 @@ Select "[Channel]" from the channel list.
 \`\`\`json5
 // ~/.ClosedClaw/config.json5
 {
-  channels: {
-    [channel]: {
-      enabled: true,
-      token: "your-token-here",
-    },
-  },
+channels: {
+[channel]: {
+enabled: true,
+token: "your-token-here",
+},
+},
 }
 \`\`\`
 
@@ -352,26 +370,26 @@ ClosedClaw gateway
 
 ### Basic Configuration
 
-| Option | Type | Required | Description |
-|--------|------|----------|-------------|
-| `enabled` | `boolean` | No | Enable channel (default: false) |
-| `token` | `string` | Yes | Bot token or API key |
-| `allowFrom` | `string[]` | No | Allowlist (default: []) |
+| Option      | Type       | Required | Description                     |
+| ----------- | ---------- | -------- | ------------------------------- |
+| `enabled`   | `boolean`  | No       | Enable channel (default: false) |
+| `token`     | `string`   | Yes      | Bot token or API key            |
+| `allowFrom` | `string[]` | No       | Allowlist (default: [])         |
 
 ### Advanced Configuration
 
 \`\`\`json5
 {
-  channels: {
-    [channel]: {
-      enabled: true,
-      token: process.env.[CHANNEL]_TOKEN,
-      allowFrom: ["+1234567890"],
-      options: {
-        // Channel-specific options
-      },
-    },
-  },
+channels: {
+[channel]: {
+enabled: true,
+token: process.env.[CHANNEL]\_TOKEN,
+allowFrom: ["+1234567890"],
+options: {
+// Channel-specific options
+},
+},
+},
 }
 \`\`\`
 
@@ -401,11 +419,11 @@ Restrict access to specific users:
 
 \`\`\`json5
 {
-  channels: {
-    [channel]: {
-      allowFrom: ["user1", "user2"],
-    },
-  },
+channels: {
+[channel]: {
+allowFrom: ["user1", "user2"],
+},
+},
 }
 \`\`\`
 
@@ -415,11 +433,11 @@ Control how unknown users are handled:
 
 \`\`\`json5
 {
-  channels: {
-    [channel]: {
-      dmPolicy: "pairing", // "open" | "pairing" | "deny"
-    },
-  },
+channels: {
+[channel]: {
+dmPolicy: "pairing", // "open" | "pairing" | "deny"
+},
+},
 }
 \`\`\`
 
@@ -435,7 +453,7 @@ Control how unknown users are handled:
 
 1. Check allowlists
 2. Verify bot permissions
-3. Check logs: \`tail -f ~/.ClosedClaw/logs/gateway-*.log\`
+3. Check logs: \`tail -f ~/.ClosedClaw/logs/gateway-\*.log\`
 
 ## Limitations
 
@@ -447,7 +465,7 @@ Control how unknown users are handled:
 - [Channel API Docs](https://example.com)
 - [ClosedClaw Gateway](/gateway/api)
 - [Security](/security/allowlists)
-\`\`\`
+  \`\`\`
 ```
 
 ### Tool Documentation Template
@@ -472,28 +490,28 @@ Detailed explanation of the tool's purpose and when to use it.
 
 \`\`\`typescript
 {
-  name: "tool_name",
-  description: "What this tool does and when to use it",
-  parameters: {
-    param1: { type: "string", description: "Parameter 1", required: true },
-    param2: { type: "number", description: "Parameter 2", required: false },
-  },
+name: "tool_name",
+description: "What this tool does and when to use it",
+parameters: {
+param1: { type: "string", description: "Parameter 1", required: true },
+param2: { type: "number", description: "Parameter 2", required: false },
+},
 }
 \`\`\`
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `param1` | `string` | Yes | Description |
-| `param2` | `number` | No | Description (default: 0) |
+| Parameter | Type     | Required | Description              |
+| --------- | -------- | -------- | ------------------------ |
+| `param1`  | `string` | Yes      | Description              |
+| `param2`  | `number` | No       | Description (default: 0) |
 
 ## Return Value
 
 \`\`\`typescript
 {
-  result: "success",
-  data: { /* ... */ },
+result: "success",
+data: { /_ ... _/ },
 }
 \`\`\`
 
@@ -504,15 +522,15 @@ Detailed explanation of the tool's purpose and when to use it.
 **Input**:
 \`\`\`json
 {
-  "param1": "value",
+"param1": "value",
 }
 \`\`\`
 
 **Output**:
 \`\`\`json
 {
-  "result": "success",
-  "data": { "processed": "value" },
+"result": "success",
+"data": { "processed": "value" },
 }
 \`\`\`
 
@@ -521,16 +539,16 @@ Detailed explanation of the tool's purpose and when to use it.
 **Input**:
 \`\`\`json
 {
-  "param1": "value",
-  "param2": 42,
+"param1": "value",
+"param2": 42,
 }
 \`\`\`
 
 **Output**:
 \`\`\`json
 {
-  "result": "success",
-  "data": { "processed": "value", "count": 42 },
+"result": "success",
+"data": { "processed": "value", "count": 42 },
 }
 \`\`\`
 
@@ -556,18 +574,18 @@ Location: \`src/agents/tools/tool-name.ts\`
 import { type AnyAgentTool, jsonResult, readStringParam } from "./common.js";
 
 export function createToolName(options?: { config?: ClosedClawConfig }): AnyAgentTool {
-  return {
-    name: "tool_name",
-    description: "What this tool does and when to use it",
-    parameters: {
-      param1: { type: "string", description: "Parameter 1", required: true },
-    },
-    handler: async (params) => {
-      const value = readStringParam(params, "param1", { required: true });
-      // Implementation
-      return jsonResult({ result: "success" });
-    },
-  };
+return {
+name: "tool_name",
+description: "What this tool does and when to use it",
+parameters: {
+param1: { type: "string", description: "Parameter 1", required: true },
+},
+handler: async (params) => {
+const value = readStringParam(params, "param1", { required: true });
+// Implementation
+return jsonResult({ result: "success" });
+},
+};
 }
 \`\`\`
 
@@ -576,7 +594,7 @@ export function createToolName(options?: { config?: ClosedClawConfig }): AnyAgen
 - [Tool Creation Guide](/agents/tools)
 - [OpenClaw Tools](/tools/openclaw-tools)
 - [Bash Tools](/tools/bash-tools)
-\`\`\`
+  \`\`\`
 ```
 
 ## Formatting Guidelines
@@ -606,7 +624,7 @@ Use consistent alignment:
 
 ```markdown
 | Column 1 | Column 2 | Column 3 |
-|----------|----------|----------|
+| -------- | -------- | -------- |
 | Value 1  | Value 2  | Value 3  |
 | Value A  | Value B  | Value C  |
 ```
@@ -674,6 +692,7 @@ title: "Page Title"
 ### Examples
 
 ✅ **Good**:
+
 ```markdown
 Configure your token in the config file:
 
@@ -683,6 +702,7 @@ Configure your token in the config file:
 ```
 
 ❌ **Bad**:
+
 ```markdown
 You might want to consider configuring your token, which you can do by editing
 the configuration file and adding a token field with your actual token value.
@@ -721,17 +741,17 @@ Edit `~/.ClosedClaw/config.json5`:
 
 \`\`\`json5
 {
-  feature: {
-    enabled: true,
-    option: "value",
-  },
+feature: {
+enabled: true,
+option: "value",
+},
 }
 \`\`\`
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
+| Option    | Type      | Default | Description    |
+| --------- | --------- | ------- | -------------- |
 | `enabled` | `boolean` | `false` | Enable feature |
 ```
 
@@ -750,6 +770,7 @@ ClosedClaw diagnostic command
 \`\`\`
 
 **Solution**:
+
 1. Step to fix
 2. Another step
 3. Verify solution worked
@@ -765,10 +786,13 @@ ClosedClaw diagnostic command
 Description of the example.
 
 \`\`\`bash
+
 # Command
+
 ClosedClaw example
 
 # Expected output
+
 Success!
 \`\`\`
 
@@ -777,7 +801,7 @@ Success!
 \`\`\`json5
 // Complex configuration
 {
-  advanced: { /* ... */ },
+advanced: { /_ ... _/ },
 }
 \`\`\`
 ```
@@ -803,6 +827,7 @@ Success!
 ### Local Preview
 
 If using a docs server:
+
 ```bash
 # Start docs server (if available)
 npm run docs:dev
@@ -814,6 +839,7 @@ open http://localhost:3000
 ### Link Validation
 
 Check that all links work:
+
 ```bash
 # Find broken internal links
 grep -r '\[.*\](.*\.md)' docs/
@@ -838,6 +864,7 @@ npx markdownlint docs/**/*.md
 ```
 
 ✅ **Fix**: Use root-relative without extension
+
 ```markdown
 [Guide](/start/getting-started)
 ```
@@ -849,6 +876,7 @@ npx markdownlint docs/**/*.md
 ```
 
 ✅ **Fix**: Use simple headings
+
 ```markdown
 ## Installation (Easy Method)
 ```
@@ -860,6 +888,7 @@ Configure at `C:\Users\You\.ClosedClaw\config.json5`
 ```
 
 ✅ **Fix**: Use cross-platform notation
+
 ```markdown
 Configure at `~/.ClosedClaw/config.json5`
 ```

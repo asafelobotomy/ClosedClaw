@@ -14,6 +14,7 @@ title: "Trusted Keyring"
 **Location**: `~/.ClosedClaw/security/trusted-keyring.json`
 
 Related:
+
 - [Skill Signing](/security/skill-signing) - Signing guide
 - [Security CLI](/cli/security) - Command reference
 - [Gateway Security](/gateway/security) - Overall security guide
@@ -27,17 +28,20 @@ The **trusted keyring** is a local database of public keys that ClosedClaw uses 
 ### Trust Model
 
 **Trust Levels**:
+
 - **full**: Fully trusted publisher (official skills, verified organizations)
 - **marginal**: Partially trusted publisher (community contributors, individuals)
 
 **None** (not in keyring): Untrusted, signatures will be rejected.
 
 **Trust Hierarchy**:
+
 ```
 full > marginal > (not in keyring)
 ```
 
 **Configuration Controls**:
+
 - `skills.security.minTrustLevel`: "full" or "marginal" (default)
 - Install blocked if signer's trust < minimum
 
@@ -48,11 +52,13 @@ full > marginal > (not in keyring)
 ### Common Tasks
 
 **List all trusted keys**:
+
 ```bash
 ClosedClaw security keys list
 ```
 
 **Add a key from file**:
+
 ```bash
 ClosedClaw security keys add \
   --key-id <key-id> \
@@ -62,16 +68,19 @@ ClosedClaw security keys add \
 ```
 
 **Change trust level**:
+
 ```bash
 ClosedClaw security keys trust <key-id> --trust full
 ```
 
 **Remove a key**:
+
 ```bash
 ClosedClaw security keys remove <key-id>
 ```
 
 **Find a specific key**:
+
 ```bash
 ClosedClaw security keys list --key-id <key-id>
 ```
@@ -87,6 +96,7 @@ ClosedClaw security keys list
 ```
 
 **Output** (table format):
+
 ```
 Key ID              Signer               Trust     Added
 ──────────────────  ───────────────────  ────────  ──────────────────────
@@ -95,12 +105,14 @@ YW5vdGhlci1rZXk=    Alice Williams       marginal  2026-02-09T08:15:30Z
 ```
 
 **Options**:
+
 - `--trust <level>`: Filter by trust level (full/marginal)
 - `--signer <name>`: Filter by signer name
 - `--key-id <id>`: Filter by key ID
 - `--json`: JSON output for scripting
 
 **Examples**:
+
 ```bash
 # List only full-trust keys
 ClosedClaw security keys list --trust full
@@ -125,6 +137,7 @@ ClosedClaw security keys add \
 ```
 
 **Options**:
+
 - `--key-id <id>` (required): Key identifier (from publisher)
 - `--public-key <path>`: Path to public key file (PEM format)
 - `--public-key <pem>`: Or inline PEM string
@@ -134,6 +147,7 @@ ClosedClaw security keys add \
 - `--json`: JSON output
 
 **From file**:
+
 ```bash
 ClosedClaw security keys add \
   --key-id dGVzdC1rZXktaWQ= \
@@ -144,6 +158,7 @@ ClosedClaw security keys add \
 ```
 
 **Inline PEM**:
+
 ```bash
 ClosedClaw security keys add \
   --key-id dGVzdC1rZXktaWQ= \
@@ -155,12 +170,14 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...
 ```
 
 **Validation**:
+
 - Key ID format checked
 - PEM format validated
 - Duplicate key IDs rejected
 - Key must be valid Ed25519 public key
 
 **Error Handling**:
+
 ```bash
 # Duplicate key
 Error: Key dGVzdC... already exists in keyring
@@ -181,10 +198,12 @@ ClosedClaw security keys remove <key-id>
 ```
 
 **Options**:
+
 - `--force`: Don't fail if key doesn't exist
 - `--json`: JSON output
 
 **Examples**:
+
 ```bash
 # Remove by key ID
 ClosedClaw security keys remove dGVzdC1rZXktaWQ=
@@ -194,11 +213,13 @@ ClosedClaw security keys remove dGVzdC1rZXktaWQ= --force
 ```
 
 **Safety**:
+
 - Removing a key doesn't uninstall skills signed by that key
 - Skills signed by removed keys will fail verification on next install/update
 - You can re-add the same key later
 
 **Confirmation**:
+
 ```
 ✓ Removed key: dGVzdC1rZXktaWQ=
   Signer: Alice Williams
@@ -213,10 +234,12 @@ ClosedClaw security keys trust <key-id> --trust <level>
 ```
 
 **Options**:
+
 - `--trust <level>` (required): New trust level (full/marginal)
 - `--json`: JSON output
 
 **Examples**:
+
 ```bash
 # Upgrade to full trust
 ClosedClaw security keys trust dGVzdC1rZXktaWQ= --trust full
@@ -226,11 +249,13 @@ ClosedClaw security keys trust dGVzdC1rZXktaWQ= --trust marginal
 ```
 
 **Use Cases**:
+
 - Publisher proves trustworthiness → upgrade to `full`
 - Concerns about publisher → downgrade to `marginal`
 - Temporary trust adjustment for testing
 
 **Output**:
+
 ```
 ✓ Updated trust level for key: dGVzdC1rZXktaWQ=
   Signer: Alice Williams
@@ -245,6 +270,7 @@ ClosedClaw security keys trust dGVzdC1rZXktaWQ= --trust marginal
 **Location**: `~/.ClosedClaw/security/trusted-keyring.json`
 
 **Format** (JSON):
+
 ```json
 {
   "version": 1,
@@ -269,6 +295,7 @@ ClosedClaw security keys trust dGVzdC1rZXktaWQ= --trust marginal
 ```
 
 **Fields**:
+
 - `version`: Schema version (currently 1)
 - `keys[]`: Array of trusted keys
   - `keyId`: Base64-encoded key identifier
@@ -279,12 +306,14 @@ ClosedClaw security keys trust dGVzdC1rZXktaWQ= --trust marginal
   - `comment` (optional): User note
 
 **Permissions**:
+
 ```bash
 # Should be user-only read/write
 chmod 600 ~/.ClosedClaw/security/trusted-keyring.json
 ```
 
 **Manual Editing**:
+
 - ⚠️ Not recommended (use CLI commands instead)
 - If needed, validate JSON after editing
 - Restart gateway to reload: `ClosedClaw gateway --reset`
@@ -296,80 +325,92 @@ chmod 600 ~/.ClosedClaw/security/trusted-keyring.json
 ### When to Use "full" Trust
 
 **Full Trust** means:
+
 - You completely trust this publisher
 - Skills from this publisher can have elevated privileges
 - You'd run their code with minimal review
 
 **Grant "full" trust to**:
+
 - Official ClosedClaw project skills
 - Verified organizations (with public audit trail)
 - Well-known open-source projects
 - Publishers you personally know and trust
 
 **Example Policy**:
+
 ```json5
 {
-  "skills": {
-    "security": {
-      "minTrustLevel": "full"  // Only full-trust publishers allowed
-    }
-  }
+  skills: {
+    security: {
+      minTrustLevel: "full", // Only full-trust publishers allowed
+    },
+  },
 }
 ```
 
 ### When to Use "marginal" Trust
 
 **Marginal Trust** means:
+
 - You cautiously trust this publisher
 - Skills should be reviewed before installation
 - You trust them for specific use cases
 
 **Grant "marginal" trust to**:
+
 - Community contributors
 - Individual developers
 - New or unverified publishers
 - Skills you want to test
 
 **Example Policy**:
+
 ```json5
 {
-  "skills": {
-    "security": {
-      "minTrustLevel": "marginal"  // Accept marginal or full (default)
-    }
-  }
+  skills: {
+    security: {
+      minTrustLevel: "marginal", // Accept marginal or full (default)
+    },
+  },
 }
 ```
 
 ### Trust Level Transitions
 
 **Upgrade** (marginal → full):
+
 ```bash
 ClosedClaw security keys trust <key-id> --trust full
 ```
 
 **Reasons to upgrade**:
+
 - Publisher demonstrates reliability over time
 - Skills pass security audits
 - Publisher gains community reputation
 - Organization becomes verified
 
 **Downgrade** (full → marginal):
+
 ```bash
 ClosedClaw security keys trust <key-id> --trust marginal
 ```
 
 **Reasons to downgrade**:
+
 - Security concerns arise
 - Publisher behavior changes
 - Temporary caution during investigation
 
 **Remove** (any → none):
+
 ```bash
 ClosedClaw security keys remove <key-id>
 ```
 
 **Reasons to remove**:
+
 - Key compromised
 - Publisher no longer trusted
 - Cleaning up unused keys
@@ -393,6 +434,7 @@ ClosedClaw security keys remove <key-id>
 5. Add to keyring if match
 
 **Verification Channels** (in order of preference):
+
 1. In-person exchange (strongest)
 2. Video call with screen share
 3. Publisher's verified website (HTTPS + known domain)
@@ -403,17 +445,20 @@ ClosedClaw security keys remove <key-id>
 ### Regular Audits
 
 **Monthly Review**:
+
 ```bash
 ClosedClaw security keys list
 ```
 
 **Questions to ask**:
+
 - Do I still trust these publishers?
 - Are there unused keys to remove?
 - Should any trust levels change?
 - Are there new publishers to add?
 
 **Automation**:
+
 ```bash
 # List keys older than 1 year
 ClosedClaw security keys list --json | \
@@ -427,16 +472,19 @@ ClosedClaw security keys list --json | \
 **Principle**: Only trust what you need.
 
 **Good**:
+
 - 5-10 keys (official + essential community)
 - All keys actively used
 - Clear trust level rationale
 
 **Bad**:
+
 - 50+ keys "just in case"
 - Blindly adding keys without verification
 - Full trust for everyone
 
 **Cleanup**:
+
 ```bash
 # Find unused keys (no skills from this signer)
 for key in $(ClosedClaw security keys list --json | jq -r '.keys[].keyId'); do
@@ -451,12 +499,14 @@ done
 ### Backup and Restore
 
 **Backup keyring**:
+
 ```bash
 cp ~/.ClosedClaw/security/trusted-keyring.json \
    ~/backups/keyring-$(date +%Y%m%d).json
 ```
 
 **Restore keyring**:
+
 ```bash
 cp ~/backups/keyring-20260210.json \
    ~/.ClosedClaw/security/trusted-keyring.json
@@ -464,6 +514,7 @@ ClosedClaw gateway --reset  # Reload
 ```
 
 **Sync across devices**:
+
 ```bash
 # Device 1 -> Device 2
 scp user@device1:~/.ClosedClaw/security/trusted-keyring.json \
@@ -471,6 +522,7 @@ scp user@device1:~/.ClosedClaw/security/trusted-keyring.json \
 ```
 
 **Version Control** (for teams):
+
 ```bash
 # Create team keyring repo
 git init team-keyring
@@ -494,6 +546,7 @@ cp team-keyring/trusted-keyring.json ~/.ClosedClaw/security/
 **Cause**: Trying to add a key ID that's already present.
 
 **Fix**:
+
 ```bash
 # Check existing key
 ClosedClaw security keys list --key-id <key-id>
@@ -511,6 +564,7 @@ ClosedClaw security keys trust <key-id> --trust full
 **Cause**: Public key file is not valid PEM format.
 
 **Fix**:
+
 ```bash
 # Verify PEM format
 cat publisher.pub
@@ -528,6 +582,7 @@ openssl pkey -in private.key -pubout -out public.pub
 **Cause**: Signature references a key ID that's not in your keyring.
 
 **Fix**:
+
 ```bash
 # Extract key ID from signature
 cat skill/SKILL.md.sig | grep keyId
@@ -546,6 +601,7 @@ ClosedClaw security keys add \
 **Cause**: First time using signatures, or keyring deleted.
 
 **Fix**:
+
 ```bash
 # Create security directory
 mkdir -p ~/.ClosedClaw/security
@@ -559,6 +615,7 @@ ClosedClaw security keys add ...
 **Cause**: File permissions too open.
 
 **Fix**:
+
 ```bash
 chmod 600 ~/.ClosedClaw/security/trusted-keyring.json
 chmod 700 ~/.ClosedClaw/security
@@ -571,11 +628,13 @@ chmod 700 ~/.ClosedClaw/security
 ### Programmatic Access
 
 **Read keyring** (JSON):
+
 ```bash
 ClosedClaw security keys list --json
 ```
 
 **Output Schema**:
+
 ```json
 {
   "keys": [
@@ -591,6 +650,7 @@ ClosedClaw security keys list --json
 ```
 
 **Example** (find all full-trust keys):
+
 ```bash
 ClosedClaw security keys list --json | \
   jq '.keys[] | select(.trustLevel == "full") | .keyId'
@@ -608,7 +668,7 @@ If you have keys in a different format:
 for pubkey in ~/.ClosedClaw/keys/trusted/*.pub; do
   keyid=$(basename "$pubkey" .pub)
   signer=$(cat "$pubkey.info" 2>/dev/null || echo "Unknown")
-  
+
   ClosedClaw security keys add \
     --key-id "$keyid" \
     --public-key "$pubkey" \
@@ -622,6 +682,7 @@ done
 For teams sharing a keyring:
 
 **Setup** (team admin):
+
 ```bash
 # Create team keyring
 mkdir team-keyring
@@ -642,6 +703,7 @@ git push -u origin main
 ```
 
 **Usage** (team members):
+
 ```bash
 # Clone team keyring
 git clone git@github.com:team/keyring.git ~/team-keyring
@@ -669,6 +731,7 @@ A: Installed skills still work, but you can't verify signatures for future insta
 
 **Q: Can I export individual keys?**  
 A: Use `--json` and `jq`:
+
 ```bash
 ClosedClaw security keys list --key-id <id> --json | \
   jq '.keys[0]'

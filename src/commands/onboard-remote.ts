@@ -1,9 +1,9 @@
 import type { ClosedClawConfig } from "../config/config.js";
 import type { GatewayBonjourBeacon } from "../infra/bonjour-discovery.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
+import { secondsToMs } from "../config/constants/index.js";
 import { discoverGatewayBeacons } from "../infra/bonjour-discovery.js";
 import { resolveWideAreaDiscoveryDomain } from "../infra/widearea-dns.js";
-import { secondsToMs } from "../config/constants/index.js";
 import { detectBinary } from "./onboard-helpers.js";
 
 const DEFAULT_GATEWAY_URL = "ws://127.0.0.1:18789";

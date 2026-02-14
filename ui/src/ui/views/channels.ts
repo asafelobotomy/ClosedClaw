@@ -1,9 +1,5 @@
 import { html, nothing } from "lit";
-import type {
-  ChannelAccountSnapshot,
-  ChannelUiMetaEntry,
-  ChannelsStatusSnapshot,
-} from "../types";
+import type { ChannelAccountSnapshot, ChannelUiMetaEntry, ChannelsStatusSnapshot } from "../types";
 import type { ChannelKey, ChannelsChannelData, ChannelsProps } from "./channels.types";
 import { formatAgo } from "../format";
 import { renderChannelConfigSection } from "./channels.config";

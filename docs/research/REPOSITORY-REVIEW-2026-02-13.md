@@ -5,6 +5,7 @@
 This targeted review focuses on core ClosedClaw functionality: **GTK GUI channel**, **security posture**, **subagent spawning/orchestration**, **efficiency**, **performance**, and **multi-agent LLM usage**. The review was conducted with user-specified requirements to default to the most efficient and secure methods, use dynamic best-average defaults, and ensure comprehensive security coverage with no unsecured paths.
 
 **Quick Stats**:
+
 - **Focus Areas**: 6 core capabilities reviewed
 - **Critical Findings**: 5 security/efficiency gaps identified
 - **User Requirements**: 3 directives answered
@@ -19,11 +20,13 @@ This targeted review focuses on core ClosedClaw functionality: **GTK GUI channel
 **Status**: ✅ Partially Met — identified gaps requiring remediation
 
 **Current State**:
+
 - GTK IPC defaults to file-based mode with no authentication
 - Subagent spawning allows unbounded timeouts and persistent cleanup
 - Hook tokens enforce header-only auth (query params rejected) ✅
 
 **Required Changes**:
+
 - Default GTK IPC to Unix socket with token auth
 - Enforce file-based IPC opt-in with 0600 permissions
 - Add dynamic timeout caps for subagent runs
@@ -36,11 +39,13 @@ This targeted review focuses on core ClosedClaw functionality: **GTK GUI channel
 **Status**: ⚠️ Needs Implementation
 
 **Current State**:
+
 - Static defaults across all request types
 - No per-channel timeout tuning
 - No payload size adaptation
 
 **Required Changes**:
+
 - Compute subagent timeout from agent config + task complexity
 - Adaptive payload limits based on channel capabilities
 - Dynamic lite-mode iteration caps based on model/task
@@ -52,11 +57,13 @@ This targeted review focuses on core ClosedClaw functionality: **GTK GUI channel
 **Status**: ❌ Critical Gaps Identified
 
 **Security Gaps**:
+
 - GTK file-based IPC: no auth, no permission checks
 - GTK channel DM policy: `open` with `allowFrom: ["*"]`
 - Subagent steering: no requester identity validation
 
 **Performance Gaps**:
+
 - GTK lite-mode: no fetch timeouts or backoff
 - IPC broadcast: no per-client backpressure
 - Subagent cleanup: default `keep` accumulates state
@@ -70,12 +77,14 @@ This targeted review focuses on core ClosedClaw functionality: **GTK GUI channel
 **Location**: `extensions/gtk-gui/` (plugin), `apps/gtk-gui/` (Python client)
 
 **Architecture**:
+
 - **IPC Bridge**: Unix socket (token auth) OR file-based (inbox/outbox JSONL)
 - **Channel Plugin**: Registers as `gtk-gui` with `order: 1` (primary interface)
 - **Lite Mode**: Direct Ollama calls for small models (1B–3B) with tool support
 - **ClawTalk Integration**: Risk scoring and orchestration tags for elevated commands
 
 **Files Reviewed**:
+
 - [`extensions/gtk-gui/index.ts`](extensions/gtk-gui/index.ts) — Plugin entry point
 - [`extensions/gtk-gui/src/channel.ts`](extensions/gtk-gui/src/channel.ts#L1-L341) — Channel implementation
 - [`extensions/gtk-gui/src/ipc.ts`](extensions/gtk-gui/src/ipc.ts#L1-L325) — IPC bridge (socket + file)
@@ -90,7 +99,7 @@ This targeted review focuses on core ClosedClaw functionality: **GTK GUI channel
 - **Location**: [`extensions/gtk-gui/src/ipc.ts`](extensions/gtk-gui/src/ipc.ts#L100-L120)
 - **Problem**: File-based IPC mode (inbox/outbox paths) has no authentication or permission enforcement. Any local process that can write to the inbox file can inject messages. The socket mode generates and enforces tokens, but file mode doesn't.
 - **Impact**: Local privilege escalation; untrusted process can send arbitrary commands to the AI agent
-- **Fix**: 
+- **Fix**:
   1. Disable file-based IPC by default; require explicit `allowFileIpc: true` config flag
   2. Enforce 0600 permissions on inbox/outbox files
   3. Add optional token validation for file mode (write token to separate file, validate in monitor)
@@ -120,7 +129,7 @@ This targeted review focuses on core ClosedClaw functionality: **GTK GUI channel
 
 #### **MEDIUM: GTK-04 — Lite-mode lacks timeouts and backoff**
 
-- **Severity**: Medium  
+- **Severity**: Medium
 - **Location**: [`extensions/gtk-gui/src/monitor.ts`](extensions/gtk-gui/src/monitor.ts#L36-L170)
 - **Problem**: Lite-mode ReAct loop calls Ollama without request timeouts or rate/backoff controls. A slow or hung local model will block the loop and the UI path indefinitely. The `LITE_MODE_MAX_ITERATIONS = 8` cap prevents infinite loops but doesn't prevent long stalls.
 - **Impact**: UI freezes; poor user experience; resource exhaustion on stuck requests
@@ -151,6 +160,7 @@ This targeted review focuses on core ClosedClaw functionality: **GTK GUI channel
 **Location**: `src/agents/` (core), `src/agents/tools/sessions-spawn-tool.ts` (tool)
 
 **Architecture**:
+
 - **Spawn Tool**: `sessions_spawn` creates isolated child sessions via gateway RPC
 - **Announce Flow**: Child completion triggers announce-back to requester session
 - **Session Model**: Child sessions use `agent:<agentId>:subagent:<uuid>` keys
@@ -158,6 +168,7 @@ This targeted review focuses on core ClosedClaw functionality: **GTK GUI channel
 - **Timeouts**: Configurable `runTimeoutSeconds` per spawn
 
 **Files Reviewed**:
+
 - [`src/agents/tools/sessions-spawn-tool.ts`](src/agents/tools/sessions-spawn-tool.ts#L1-L285) — Spawn tool implementation
 - [`src/agents/subagent-announce.ts`](src/agents/subagent-announce.ts#L1-L522) — Announce-back flow
 - [`src/agents/subagent-registry.ts`](src/agents/subagent-registry.ts) — Subagent tracking
@@ -212,12 +223,14 @@ This targeted review focuses on core ClosedClaw functionality: **GTK GUI channel
 **Location**: Multi-agent orchestration spans gateway, routing, and agent runtime
 
 **Architecture**:
+
 - **Squad System**: Coordinator + worker agents for parallel task decomposition (legacy/experimental)
 - **Subagent System**: Primary multi-agent pattern via `sessions_spawn` tool
 - **Model Selection**: Per-subagent model override via `model` parameter
 - **Thinking Override**: Per-subagent thinking level control
 
 **Files Reviewed**:
+
 - [`src/agents/squad/spawner.ts`](src/agents/squad/spawner.ts) — Squad spawning (legacy)
 - [`src/agents/squad/coordinator.ts`](src/agents/squad/coordinator.ts) — Squad coordination
 - [`src/agents/subagent-announce.ts`](src/agents/subagent-announce.ts#L290-L340) — Subagent system prompt builder
@@ -232,17 +245,20 @@ The `buildSubagentSystemPrompt` function generates clear role boundaries:
 You are a **subagent** spawned by the main agent for a specific task.
 
 ## Your Role
+
 - You were created to handle: <task>
 - Complete this task. That's your entire purpose.
 - You are NOT the main agent. Don't try to be.
 
 ## Rules
+
 1. **Stay focused** - Do your assigned task, nothing else
 2. **Complete the task** - Your final message will be automatically reported
 3. **Don't initiate** - No heartbeats, no proactive actions, no side quests
 4. **Be ephemeral** - You may be terminated after task completion. That's fine.
 
 ## What You DON'T Do
+
 - NO user conversations (that's main agent's job)
 - NO external messages (email, tweets, etc.) unless explicitly tasked
 - NO cron jobs or persistent state
@@ -276,18 +292,21 @@ You are a **subagent** spawned by the main agent for a specific task.
 **Overall Assessment**: ★★★☆☆ (3/5) — Strong foundation with critical gaps in GTK channel
 
 **Strengths**:
+
 - ✅ Hook tokens enforce header-only auth (query params rejected)
 - ✅ Subagent isolation prevents direct user messaging
 - ✅ Token-based authentication in socket mode
 - ✅ Clear security boundaries in system prompts
 
 **Critical Gaps**:
+
 - ❌ GTK file-based IPC has no authentication
 - ❌ GTK channel DM policy is wide open (`allowFrom: ["*"]`)
 - ❌ No backpressure or payload limits in IPC bridge
 - ⚠️ Subagent steering lacks requester validation
 
 **Completed Fixes** (this session):
+
 - ✅ **MED-03**: Hook query tokens removed — only `Authorization: Bearer` or `X-ClosedClaw-Token` headers accepted
 
 **Required Fixes** (prioritized):
@@ -304,23 +323,27 @@ You are a **subagent** spawned by the main agent for a specific task.
 ### 5. Efficiency & Performance
 
 **GTK IPC Performance**:
+
 - **Socket Mode**: Efficient binary framing, low overhead, sub-millisecond latency
 - **File Mode**: Append-only JSONL, polling overhead, higher latency (10–50 ms)
 - **Recommendation**: Default to socket mode; deprecate file mode
 
 **Lite Mode Performance**:
+
 - **ReAct Loop**: Efficient for tool-use models (qwen3, llama3.1+)
 - **Iteration Cap**: 8 iterations prevents infinite loops but doesn't bound time
 - **Fetch Overhead**: No timeout → potential indefinite stall
 - **Recommendation**: Add 30s per-fetch timeout, 5-minute global budget
 
 **Subagent Performance**:
+
 - **Spawn Overhead**: ~100–200ms for RPC + session creation
 - **Parallel Efficiency**: Multiple subagents can run concurrently
 - **Cleanup Overhead**: `delete` mode requires additional RPC call
 - **Recommendation**: Default `cleanup: "delete"` to prevent state accumulation
 
 **Memory Footprint**:
+
 - **GTK Session History**: ~10 exchanges × ~500 bytes = ~5 KB per active session
 - **Subagent Registry**: In-memory map; grows with concurrent subagents
 - **IPC Buffer**: No per-client limit → potential unbounded growth
@@ -334,6 +357,7 @@ You are a **subagent** spawned by the main agent for a specific task.
 
 **Status**: Fixed  
 **Files Changed**:
+
 - [`src/gateway/hooks.ts`](src/gateway/hooks.ts#L46-L70) — Removed query token extraction
 - [`src/gateway/server-http.ts`](src/gateway/server-http.ts#L83-L105) — Reject query tokens with warning
 - [`src/gateway/hooks.test.ts`](src/gateway/hooks.test.ts#L42-L64) — Updated tests
@@ -344,6 +368,7 @@ You are a **subagent** spawned by the main agent for a specific task.
 - [`docs/internal/ClosedClawRepositoryAudit.md`](docs/internal/ClosedClawRepositoryAudit.md#L124-L130) — Marked resolved
 
 **Changes**:
+
 1. Removed `fromQuery` flag from `HookTokenResult` type
 2. Removed query token extraction logic from `extractHookToken`
 3. Added rejection logic: if query token present, log warning and return 401

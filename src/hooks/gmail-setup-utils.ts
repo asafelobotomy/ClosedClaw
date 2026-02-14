@@ -1,7 +1,7 @@
 import fs from "node:fs";
-import { TIMEOUT_HTTP_DEFAULT_MS, secondsToMs, minutesToMs } from "../config/constants/index.js";
 import path from "node:path";
 import { hasBinary } from "../agents/skills.js";
+import { TIMEOUT_HTTP_DEFAULT_MS, secondsToMs, minutesToMs } from "../config/constants/index.js";
 import { runCommandWithTimeout, type SpawnResult } from "../process/exec.js";
 import { resolveUserPath } from "../utils.js";
 import { normalizeServePath } from "./gmail.js";

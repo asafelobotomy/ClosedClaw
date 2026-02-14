@@ -6,8 +6,8 @@
  * while preserving all agent, tool, cron, and hook functionality.
  */
 
-import type { ClosedClawConfig } from "./types.js";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
+import type { ClosedClawConfig } from "./types.js";
 
 const GTK_CHANNEL_ID = "gtk-gui";
 
@@ -15,10 +15,7 @@ const GTK_CHANNEL_ID = "gtk-gui";
  * Checks whether a channel has at least one enabled account in the config.
  * A channel is "configured" if it has accounts with `enabled !== false`.
  */
-function hasEnabledAccounts(
-  cfg: ClosedClawConfig,
-  channelId: string,
-): boolean {
+function hasEnabledAccounts(cfg: ClosedClawConfig, channelId: string): boolean {
   const channels = cfg.channels as Record<string, unknown> | undefined;
   if (!channels) {
     return false;

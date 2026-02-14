@@ -16,15 +16,15 @@ Unlike static security audit checks (which ClosedClaw already has), internal con
 
 ## Existing Infrastructure
 
-| Component | Status | Location |
-|---|---|---|
-| Security audit engine | Built | `src/security/audit.ts`, `src/security/audit-extra.ts` — ~40 check categories |
-| Subagent spawn system | Built | `src/agents/tools/sessions-spawn-tool.ts` |
-| Cron scheduling | Built | `src/agents/tools/cron-tool.ts` |
-| DevOps agent template | Built | `src/agents/squad/templates.ts` — devops profile |
-| DevOps usage guide | Documented | `docs/agents/devops-subagent.md` |
-| Hook observation | Built | Plugin hooks: `before_tool_call`, `after_tool_call`, `agent_end` |
-| Memory persistence | Built | `extensions/memory-core/`, `extensions/memory-lancedb/` |
+| Component             | Status     | Location                                                                      |
+| --------------------- | ---------- | ----------------------------------------------------------------------------- |
+| Security audit engine | Built      | `src/security/audit.ts`, `src/security/audit-extra.ts` — ~40 check categories |
+| Subagent spawn system | Built      | `src/agents/tools/sessions-spawn-tool.ts`                                     |
+| Cron scheduling       | Built      | `src/agents/tools/cron-tool.ts`                                               |
+| DevOps agent template | Built      | `src/agents/squad/templates.ts` — devops profile                              |
+| DevOps usage guide    | Documented | `docs/agents/devops-subagent.md`                                              |
+| Hook observation      | Built      | Plugin hooks: `before_tool_call`, `after_tool_call`, `agent_end`              |
+| Memory persistence    | Built      | `extensions/memory-core/`, `extensions/memory-lancedb/`                       |
 
 ## Architecture
 
@@ -99,18 +99,18 @@ Unlike static security audit checks (which ClosedClaw already has), internal con
 {
   agents: {
     list: {
-      "security": {
+      security: {
         model: { primary: "anthropic/claude-opus-4", fallbacks: ["openai/gpt-5"] },
         systemPrompt: "You are a security analyst for this ClosedClaw deployment...",
         tools: {
           profile: "full",
           allow: ["exec", "web_search", "web_fetch", "memory_search", "memory_write"],
-          deny: ["message", "sessions_spawn"]  // no outbound messages, no recursive spawning
+          deny: ["message", "sessions_spawn"], // no outbound messages, no recursive spawning
         },
-        sandbox: { mode: "all", workspaceAccess: "ro" }  // read-only access to source
-      }
-    }
-  }
+        sandbox: { mode: "all", workspaceAccess: "ro" }, // read-only access to source
+      },
+    },
+  },
 }
 ```
 
@@ -160,20 +160,20 @@ Produce a structured report:
     cron: {
       // Daily quick scan (cheaper model, focused checks)
       "security-daily": {
-        schedule: "0 3 * * *",  // 3 AM daily
+        schedule: "0 3 * * *", // 3 AM daily
         task: "Run a quick security scan: closedclaw security audit --json. Report only critical and new findings.",
         agentId: "security",
-        model: "anthropic/claude-sonnet-4"  // cheaper for routine scans
+        model: "anthropic/claude-sonnet-4", // cheaper for routine scans
       },
       // Weekly deep audit (premium model, full analysis)
       "security-weekly": {
-        schedule: "0 4 * * 0",  // 4 AM Sunday
+        schedule: "0 4 * * 0", // 4 AM Sunday
         task: "Full security audit with research. Check CVEs, review upstream patches, analyze trends, propose fixes.",
         agentId: "security",
-        model: "anthropic/claude-opus-4"
-      }
-    }
-  }
+        model: "anthropic/claude-opus-4",
+      },
+    },
+  },
 }
 ```
 
@@ -205,11 +205,11 @@ Produce a structured report:
 
 ## Cost Estimates
 
-| Schedule | Model | Est. tokens/run | Est. cost/run | Monthly cost |
-|---|---|---|---|---|
-| Daily quick scan | claude-sonnet-4 | ~10k | ~$0.03 | ~$0.90 |
-| Weekly deep audit | claude-opus-4 | ~50k | ~$0.75 | ~$3.00 |
-| **Total** | | | | **~$4/month** |
+| Schedule          | Model           | Est. tokens/run | Est. cost/run | Monthly cost  |
+| ----------------- | --------------- | --------------- | ------------- | ------------- |
+| Daily quick scan  | claude-sonnet-4 | ~10k            | ~$0.03        | ~$0.90        |
+| Weekly deep audit | claude-opus-4   | ~50k            | ~$0.75        | ~$3.00        |
+| **Total**         |                 |                 |               | **~$4/month** |
 
 ## Synergies
 

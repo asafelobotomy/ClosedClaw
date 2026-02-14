@@ -6,11 +6,11 @@
  * with pattern-based fallback for models that don't.
  */
 
-import { readFile, readdir, stat, appendFile, mkdir, writeFile } from "node:fs/promises";
 import { exec, spawn } from "node:child_process";
-import { promisify } from "node:util";
+import { readFile, readdir, stat, appendFile, mkdir, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join, dirname } from "node:path";
+import { promisify } from "node:util";
 import {
   getDatabase as getFtsDatabase,
   insertFact as ftsInsertFact,
@@ -18,11 +18,7 @@ import {
   getStats as ftsGetStats,
   importFromIndex as ftsImportFromIndex,
 } from "./memory-fts.js";
-import {
-  assessRisk,
-  recordExecution,
-  formatRiskReport,
-} from "./risk-scoring.js";
+import { assessRisk, recordExecution, formatRiskReport } from "./risk-scoring.js";
 
 const execAsync = promisify(exec);
 
@@ -180,10 +176,14 @@ let _ftsSeeded = false;
 
 /** Ensure FTS5 database is seeded from JSON index (one-time migration). */
 async function ensureFtsSeeded(): Promise<void> {
-  if (_ftsSeeded) {return;}
+  if (_ftsSeeded) {
+    return;
+  }
   _ftsSeeded = true;
   const db = getFtsDatabase();
-  if (!db) {return;}
+  if (!db) {
+    return;
+  }
   try {
     const index = await loadMemoryIndex();
     if (index.facts.length > 0) {
@@ -204,7 +204,9 @@ function ftsInsertBestEffort(fact: {
 }): void {
   try {
     const db = getFtsDatabase();
-    if (db) {ftsInsertFact(db, fact);}
+    if (db) {
+      ftsInsertFact(db, fact);
+    }
   } catch {
     // Non-fatal
   }
@@ -395,7 +397,15 @@ const SAVE_NOTE: LiteTool = {
 
       // 2. Update JSON index
       const index = await loadMemoryIndex();
-      const fact: MemoryFact = { id, type, content: factContent, entities, confidence, timestamp, source };
+      const fact: MemoryFact = {
+        id,
+        type,
+        content: factContent,
+        entities,
+        confidence,
+        timestamp,
+        source,
+      };
       index.facts.push(fact);
       await saveMemoryIndex(index);
 
@@ -408,8 +418,12 @@ const SAVE_NOTE: LiteTool = {
 
       const typeLabel = FACT_TYPE_LABELS[type];
       const parts = [`${typeLabel} fact saved`];
-      if (entities.length > 0) {parts.push(`entities: ${entities.map((e) => `@${e}`).join(", ")}`);}
-      if (confidence != null) {parts.push(`confidence: ${confidence}`);}
+      if (entities.length > 0) {
+        parts.push(`entities: ${entities.map((e) => `@${e}`).join(", ")}`);
+      }
+      if (confidence != null) {
+        parts.push(`confidence: ${confidence}`);
+      }
       return parts.join(" — ") + ".";
     } catch (err) {
       return `Error saving note: ${(err as Error).message}`;
@@ -429,8 +443,7 @@ const RECALL_NOTES: LiteTool = {
     properties: {
       query: {
         type: "string",
-        description:
-          "Keyword to search for in saved facts. Leave empty to browse recent facts.",
+        description: "Keyword to search for in saved facts. Leave empty to browse recent facts.",
       },
       entity: {
         type: "string",
@@ -439,13 +452,11 @@ const RECALL_NOTES: LiteTool = {
       },
       type: {
         type: "string",
-        description:
-          "Filter by fact type: W (world), B (experience), O (opinion), S (summary).",
+        description: "Filter by fact type: W (world), B (experience), O (opinion), S (summary).",
       },
       since: {
         type: "string",
-        description:
-          "Time filter: number+d for days (e.g. '7d'), or ISO date (e.g. '2026-02-01').",
+        description: "Time filter: number+d for days (e.g. '7d'), or ISO date (e.g. '2026-02-01').",
       },
     },
     required: [],
@@ -484,16 +495,26 @@ const RECALL_NOTES: LiteTool = {
             return "No facts stored yet. Use save_note to remember things.";
           }
           const filters: string[] = [];
-          if (queryText) {filters.push(`query="${queryText}"`);}
-          if (entityText) {filters.push(`entity=@${entityText}`);}
-          if (typeText) {filters.push(`type=${typeText}`);}
-          if (sinceText) {filters.push(`since=${sinceText}`);}
+          if (queryText) {
+            filters.push(`query="${queryText}"`);
+          }
+          if (entityText) {
+            filters.push(`entity=@${entityText}`);
+          }
+          if (typeText) {
+            filters.push(`type=${typeText}`);
+          }
+          if (sinceText) {
+            filters.push(`since=${sinceText}`);
+          }
           return `No facts matching ${filters.join(", ")}. Total facts stored: ${stats.total}. (FTS5)`;
         }
 
         const lines = ftsResults.map(({ fact: f }) => {
-          const prefix = f.type === "O" && f.confidence != null ? `${f.type}(c=${f.confidence})` : f.type;
-          const ents = f.entities.length > 0 ? ` ${f.entities.map((e: string) => `@${e}`).join(" ")}` : "";
+          const prefix =
+            f.type === "O" && f.confidence != null ? `${f.type}(c=${f.confidence})` : f.type;
+          const ents =
+            f.entities.length > 0 ? ` ${f.entities.map((e: string) => `@${e}`).join(" ")}` : "";
           const date = f.timestamp.slice(0, 10);
           return `[${date}] ${prefix}${ents}: ${f.content}`;
         });
@@ -558,17 +579,26 @@ const RECALL_NOTES: LiteTool = {
 
       if (results.length === 0) {
         const filters: string[] = [];
-        if (queryText) {filters.push(`query="${queryText}"`);}
-        if (entityText) {filters.push(`entity=@${entityText}`);}
-        if (typeText) {filters.push(`type=${typeText}`);}
-        if (sinceText) {filters.push(`since=${sinceText}`);}
+        if (queryText) {
+          filters.push(`query="${queryText}"`);
+        }
+        if (entityText) {
+          filters.push(`entity=@${entityText}`);
+        }
+        if (typeText) {
+          filters.push(`type=${typeText}`);
+        }
+        if (sinceText) {
+          filters.push(`since=${sinceText}`);
+        }
         return `No facts matching ${filters.join(", ")}. Total facts stored: ${index.facts.length}.`;
       }
 
       // Format results
       const limited = results.slice(-25);
       const lines = limited.map((f) => {
-        const prefix = f.type === "O" && f.confidence != null ? `${f.type}(c=${f.confidence})` : f.type;
+        const prefix =
+          f.type === "O" && f.confidence != null ? `${f.type}(c=${f.confidence})` : f.type;
         const ents = f.entities.length > 0 ? ` ${f.entities.map((e) => `@${e}`).join(" ")}` : "";
         const date = f.timestamp.slice(0, 10);
         return `[${date}] ${prefix}${ents}: ${f.content}`;
@@ -600,21 +630,23 @@ const REFLECT_MEMORY: LiteTool = {
     properties: {
       entity: {
         type: "string",
-        description:
-          "Entity name (without @) to reflect on. E.g. 'Alice', 'Castle', 'Rust'.",
+        description: "Entity name (without @) to reflect on. E.g. 'Alice', 'Castle', 'Rust'.",
       },
     },
     required: ["entity"],
   },
   async execute({ entity }) {
     const entityName = String(entity).trim();
-    if (!entityName) {return "Provide an entity name to reflect on.";}
+    if (!entityName) {
+      return "Provide an entity name to reflect on.";
+    }
     try {
       const index = await loadMemoryIndex();
       const entityLower = entityName.toLowerCase();
-      const facts = index.facts.filter((f) =>
-        f.entities.some((e) => e.toLowerCase() === entityLower) ||
-        f.content.toLowerCase().includes(entityLower),
+      const facts = index.facts.filter(
+        (f) =>
+          f.entities.some((e) => e.toLowerCase() === entityLower) ||
+          f.content.toLowerCase().includes(entityLower),
       );
 
       if (facts.length === 0) {
@@ -623,7 +655,9 @@ const REFLECT_MEMORY: LiteTool = {
 
       // Group by type
       const grouped: Record<FactType, MemoryFact[]> = { W: [], B: [], O: [], S: [] };
-      for (const f of facts) {grouped[f.type].push(f);}
+      for (const f of facts) {
+        grouped[f.type].push(f);
+      }
 
       const sections: string[] = [`# What I know about @${entityName}\n`];
       sections.push(`**Total facts:** ${facts.length}`);
@@ -632,12 +666,16 @@ const REFLECT_MEMORY: LiteTool = {
 
       if (grouped.W.length > 0) {
         sections.push("## World Facts");
-        for (const f of grouped.W) {sections.push(`- ${f.content} *(${f.timestamp.slice(0, 10)})*`);}
+        for (const f of grouped.W) {
+          sections.push(`- ${f.content} *(${f.timestamp.slice(0, 10)})*`);
+        }
         sections.push("");
       }
       if (grouped.B.length > 0) {
         sections.push("## Experiences");
-        for (const f of grouped.B) {sections.push(`- ${f.content} *(${f.timestamp.slice(0, 10)})*`);}
+        for (const f of grouped.B) {
+          sections.push(`- ${f.content} *(${f.timestamp.slice(0, 10)})*`);
+        }
         sections.push("");
       }
       if (grouped.O.length > 0) {
@@ -650,7 +688,9 @@ const REFLECT_MEMORY: LiteTool = {
       }
       if (grouped.S.length > 0) {
         sections.push("## Summaries");
-        for (const f of grouped.S) {sections.push(`- ${f.content} *(${f.timestamp.slice(0, 10)})*`);}
+        for (const f of grouped.S) {
+          sections.push(`- ${f.content} *(${f.timestamp.slice(0, 10)})*`);
+        }
         sections.push("");
       }
 
@@ -658,7 +698,9 @@ const REFLECT_MEMORY: LiteTool = {
       const relatedEntities = new Set<string>();
       for (const f of facts) {
         for (const e of f.entities) {
-          if (e.toLowerCase() !== entityLower) {relatedEntities.add(e);}
+          if (e.toLowerCase() !== entityLower) {
+            relatedEntities.add(e);
+          }
         }
       }
       if (relatedEntities.size > 0) {
@@ -669,7 +711,10 @@ const REFLECT_MEMORY: LiteTool = {
       // Optionally persist entity summary to bank
       try {
         await mkdir(MEMORY_ENTITIES_DIR, { recursive: true });
-        const entityFile = join(MEMORY_ENTITIES_DIR, `${entityName.replace(/[^a-zA-Z0-9_-]/g, "_")}.md`);
+        const entityFile = join(
+          MEMORY_ENTITIES_DIR,
+          `${entityName.replace(/[^a-zA-Z0-9_-]/g, "_")}.md`,
+        );
         await writeFile(entityFile, sections.join("\n") + "\n", "utf-8");
       } catch {
         // Non-critical — summary display still works
@@ -707,7 +752,8 @@ const CURRENT_TIME: LiteTool = {
 
 const WRITE_FILE: LiteTool = {
   name: "write_file",
-  description: "Write content to a file. Creates the file if it doesn't exist, or overwrites if it does.",
+  description:
+    "Write content to a file. Creates the file if it doesn't exist, or overwrites if it does.",
   parameters: {
     type: "object",
     properties: {
@@ -781,7 +827,8 @@ const WEB_SEARCH: LiteTool = {
 
       const response = await fetch(url, {
         headers: {
-          "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+          "User-Agent":
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
           Accept: "text/html",
         },
         signal: controller.signal,
@@ -810,7 +857,7 @@ const WEB_SEARCH: LiteTool = {
         let rawUrl = match[1];
         // Clean HTML tags from title
         const title = match[2].replace(/<[^>]*>/g, "").trim();
-        
+
         // Extract actual URL from DDG redirect (uddg param)
         let url = rawUrl;
         const uddgMatch = rawUrl.match(/uddg=([^&]+)/);
@@ -821,7 +868,7 @@ const WEB_SEARCH: LiteTool = {
             url = uddgMatch[1];
           }
         }
-        
+
         if (title && url) {
           titles.push({ url, title });
         }
@@ -1026,7 +1073,9 @@ const CLIPBOARD_WRITE: LiteTool = {
       return new Promise((resolve, reject) => {
         const proc = spawn(cmd, args, { stdio: ["pipe", "ignore", "ignore"], timeout: 5000 });
         proc.on("error", reject);
-        proc.on("close", (code) => (code === 0 ? resolve() : reject(new Error(`${cmd} exited with ${code}`))));
+        proc.on("close", (code) =>
+          code === 0 ? resolve() : reject(new Error(`${cmd} exited with ${code}`)),
+        );
         proc.stdin.end(content);
       });
     }
@@ -1099,7 +1148,9 @@ function safeEvaluateMath(input: string): number {
   }
 
   function skipWhitespace(): void {
-    while (pos < src.length && src[pos] === " ") {pos++;}
+    while (pos < src.length && src[pos] === " ") {
+      pos++;
+    }
   }
 
   function consume(expected: string): void {
@@ -1114,16 +1165,24 @@ function safeEvaluateMath(input: string): number {
     skipWhitespace();
     const start = pos;
     if (src[pos] === "." || (src[pos] >= "0" && src[pos] <= "9")) {
-      while (pos < src.length && src[pos] >= "0" && src[pos] <= "9") {pos++;}
+      while (pos < src.length && src[pos] >= "0" && src[pos] <= "9") {
+        pos++;
+      }
       if (pos < src.length && src[pos] === ".") {
         pos++;
-        while (pos < src.length && src[pos] >= "0" && src[pos] <= "9") {pos++;}
+        while (pos < src.length && src[pos] >= "0" && src[pos] <= "9") {
+          pos++;
+        }
       }
       // Scientific notation: 1e5, 2.3e-4
       if (pos < src.length && (src[pos] === "e" || src[pos] === "E")) {
         pos++;
-        if (pos < src.length && (src[pos] === "+" || src[pos] === "-")) {pos++;}
-        while (pos < src.length && src[pos] >= "0" && src[pos] <= "9") {pos++;}
+        if (pos < src.length && (src[pos] === "+" || src[pos] === "-")) {
+          pos++;
+        }
+        while (pos < src.length && src[pos] >= "0" && src[pos] <= "9") {
+          pos++;
+        }
       }
       return Number(src.slice(start, pos));
     }
@@ -1133,7 +1192,9 @@ function safeEvaluateMath(input: string): number {
   function parseIdentifier(): string {
     skipWhitespace();
     const start = pos;
-    while (pos < src.length && /[a-zA-Z0-9_]/.test(src[pos])) {pos++;}
+    while (pos < src.length && /[a-zA-Z0-9_]/.test(src[pos])) {
+      pos++;
+    }
     return src.slice(start, pos).toLowerCase();
   }
 
@@ -1161,7 +1222,9 @@ function safeEvaluateMath(input: string): number {
       // Check for function call
       if (peek() === "(") {
         const fn = MATH_FUNCTIONS[name];
-        if (!fn) {throw new Error(`Unknown function: ${name}`);}
+        if (!fn) {
+          throw new Error(`Unknown function: ${name}`);
+        }
         consume("(");
         const args: number[] = [parseExpr()];
         while (peek() === ",") {
@@ -1174,7 +1237,9 @@ function safeEvaluateMath(input: string): number {
 
       // Constant
       const constant = MATH_CONSTANTS[name];
-      if (constant !== undefined) {return constant;}
+      if (constant !== undefined) {
+        return constant;
+      }
 
       throw new Error(`Unknown identifier: ${name}`);
     }
@@ -1254,13 +1319,15 @@ function safeEvaluateMath(input: string): number {
 
 const CALCULATOR: LiteTool = {
   name: "calculator",
-  description: "Evaluate a mathematical expression. Supports basic arithmetic, Math functions (sin, cos, sqrt, pow, etc.), and constants (PI, E).",
+  description:
+    "Evaluate a mathematical expression. Supports basic arithmetic, Math functions (sin, cos, sqrt, pow, etc.), and constants (PI, E).",
   parameters: {
     type: "object",
     properties: {
       expression: {
         type: "string",
-        description: "The mathematical expression to evaluate (e.g., '2 + 2', 'sqrt(16)', 'sin(PI/2)')",
+        description:
+          "The mathematical expression to evaluate (e.g., '2 + 2', 'sqrt(16)', 'sin(PI/2)')",
       },
     },
     required: ["expression"],
@@ -1272,7 +1339,9 @@ const CALCULATOR: LiteTool = {
       if (typeof result !== "number" || !Number.isFinite(result)) {
         return `Error: Result is not a valid number (got ${result})`;
       }
-      const formatted = Number.isInteger(result) ? result.toString() : result.toPrecision(10).replace(/\.?0+$/, "");
+      const formatted = Number.isInteger(result)
+        ? result.toString()
+        : result.toPrecision(10).replace(/\.?0+$/, "");
       return `${expr} = ${formatted}`;
     } catch (err) {
       return `Error evaluating expression: ${(err as Error).message}`;
@@ -1343,13 +1412,15 @@ const OCR_TIMEOUT_MS = 30_000;
 
 const SCREENSHOT: LiteTool = {
   name: "screenshot",
-  description: "Take a screenshot of the entire screen and save it. Returns the path to the saved image.",
+  description:
+    "Take a screenshot of the entire screen and save it. Returns the path to the saved image.",
   parameters: {
     type: "object",
     properties: {
       filename: {
         type: "string",
-        description: "Optional filename for the screenshot (without extension). Defaults to timestamp.",
+        description:
+          "Optional filename for the screenshot (without extension). Defaults to timestamp.",
       },
     },
     required: [],
@@ -1359,7 +1430,9 @@ const SCREENSHOT: LiteTool = {
       await mkdir(SCREENSHOTS_DIR, { recursive: true });
 
       const safeFilename = toSafeString(filename);
-      const name = safeFilename ? safeFilename.replace(/[^a-zA-Z0-9_-]/g, "_") : `screenshot_${Date.now()}`;
+      const name = safeFilename
+        ? safeFilename.replace(/[^a-zA-Z0-9_-]/g, "_")
+        : `screenshot_${Date.now()}`;
       const filepath = join(SCREENSHOTS_DIR, `${name}.png`);
 
       // Use grim for Wayland screenshot (full screen)
@@ -1385,13 +1458,15 @@ const SCREENSHOT: LiteTool = {
 
 const SCREENSHOT_REGION: LiteTool = {
   name: "screenshot_region",
-  description: "Take a screenshot of a user-selected screen region. The user will be prompted to select an area.",
+  description:
+    "Take a screenshot of a user-selected screen region. The user will be prompted to select an area.",
   parameters: {
     type: "object",
     properties: {
       filename: {
         type: "string",
-        description: "Optional filename for the screenshot (without extension). Defaults to timestamp.",
+        description:
+          "Optional filename for the screenshot (without extension). Defaults to timestamp.",
       },
     },
     required: [],
@@ -1401,7 +1476,9 @@ const SCREENSHOT_REGION: LiteTool = {
       await mkdir(SCREENSHOTS_DIR, { recursive: true });
 
       const safeFilename = toSafeString(filename);
-      const name = safeFilename ? safeFilename.replace(/[^a-zA-Z0-9_-]/g, "_") : `region_${Date.now()}`;
+      const name = safeFilename
+        ? safeFilename.replace(/[^a-zA-Z0-9_-]/g, "_")
+        : `region_${Date.now()}`;
       const filepath = join(SCREENSHOTS_DIR, `${name}.png`);
 
       // Use slurp to select region, then grim to capture
@@ -1459,7 +1536,7 @@ const OCR_IMAGE: LiteTool = {
         {
           timeout: OCR_TIMEOUT_MS,
           maxBuffer: MAX_OUTPUT_SIZE * 2,
-        }
+        },
       );
 
       const text = stdout.trim();
@@ -1488,7 +1565,8 @@ const OCR_IMAGE: LiteTool = {
 
 const SCREENSHOT_OCR: LiteTool = {
   name: "screenshot_ocr",
-  description: "Take a screenshot and immediately extract text from it using OCR. Useful for reading text from the screen.",
+  description:
+    "Take a screenshot and immediately extract text from it using OCR. Useful for reading text from the screen.",
   parameters: {
     type: "object",
     properties: {
@@ -1507,7 +1585,7 @@ const SCREENSHOT_OCR: LiteTool = {
       const selectRegion = region === true;
 
       // Take screenshot
-      const screenshotCmd = selectRegion 
+      const screenshotCmd = selectRegion
         ? `grim -g "$(slurp)" "${filepath}"`
         : `grim "${filepath}"`;
 
@@ -1516,13 +1594,10 @@ const SCREENSHOT_OCR: LiteTool = {
       });
 
       // Run OCR on the screenshot
-      const { stdout } = await execAsync(
-        `tesseract "${filepath}" stdout -l eng 2>/dev/null`,
-        {
-          timeout: OCR_TIMEOUT_MS,
-          maxBuffer: MAX_OUTPUT_SIZE * 2,
-        }
-      );
+      const { stdout } = await execAsync(`tesseract "${filepath}" stdout -l eng 2>/dev/null`, {
+        timeout: OCR_TIMEOUT_MS,
+        maxBuffer: MAX_OUTPUT_SIZE * 2,
+      });
 
       // Clean up temp file
       await execAsync(`rm -f "${filepath}"`).catch(() => {});
@@ -1593,10 +1668,7 @@ export function getOllamaTools(): OllamaTool[] {
 /**
  * Execute a tool by name with given parameters
  */
-export async function executeTool(
-  name: string,
-  params: Record<string, unknown>,
-): Promise<string> {
+export async function executeTool(name: string, params: Record<string, unknown>): Promise<string> {
   const tool = LITE_TOOLS.find((t) => t.name === name);
   if (!tool) {
     return `Error: Unknown tool "${name}"`;
@@ -1714,11 +1786,15 @@ export async function executePatterns(text: string): Promise<string> {
 export function hasPatterns(text: string): boolean {
   // Check WRITE pattern
   WRITE_PATTERN.lastIndex = 0;
-  if (WRITE_PATTERN.test(text)) {return true;}
+  if (WRITE_PATTERN.test(text)) {
+    return true;
+  }
 
   // Check REMIND pattern
   REMIND_PATTERN.lastIndex = 0;
-  if (REMIND_PATTERN.test(text)) {return true;}
+  if (REMIND_PATTERN.test(text)) {
+    return true;
+  }
 
   return PATTERNS.some(({ regex }) => {
     regex.lastIndex = 0;

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
-import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import { WebSocket } from "ws";
+import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import { buildDeviceAuthPayload } from "./device-auth.js";
 import { PROTOCOL_VERSION } from "./protocol/index.js";
@@ -50,23 +50,27 @@ describe("gateway server auth/connect", () => {
       await server.close();
     });
 
-    test("closes silent handshakes after timeout", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
-      vi.useRealTimers();
-      const prevHandshakeTimeout = process.env.ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS;
-      process.env.ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS = "50";
-      try {
-        const ws = await openWs(port);
-        const handshakeTimeoutMs = getHandshakeTimeoutMs();
-        const closed = await waitForWsClose(ws, handshakeTimeoutMs + 250);
-        expect(closed).toBe(true);
-      } finally {
-        if (prevHandshakeTimeout === undefined) {
-          delete process.env.ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS;
-        } else {
-          process.env.ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS = prevHandshakeTimeout;
+    test(
+      "closes silent handshakes after timeout",
+      { timeout: TIMEOUT_TEST_SUITE_LONG_MS },
+      async () => {
+        vi.useRealTimers();
+        const prevHandshakeTimeout = process.env.ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS;
+        process.env.ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS = "50";
+        try {
+          const ws = await openWs(port);
+          const handshakeTimeoutMs = getHandshakeTimeoutMs();
+          const closed = await waitForWsClose(ws, handshakeTimeoutMs + 250);
+          expect(closed).toBe(true);
+        } finally {
+          if (prevHandshakeTimeout === undefined) {
+            delete process.env.ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS;
+          } else {
+            process.env.ClosedClaw_TEST_HANDSHAKE_TIMEOUT_MS = prevHandshakeTimeout;
+          }
         }
-      }
-    });
+      },
+    );
 
     test("connect (req) handshake returns hello-ok payload", async () => {
       const { CONFIG_PATH, STATE_DIR } = await import("../config/config.js");

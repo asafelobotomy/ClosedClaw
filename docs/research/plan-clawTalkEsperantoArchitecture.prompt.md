@@ -4,13 +4,13 @@
 
 You're describing a **brain + body** architecture:
 
-| Component | Role | Analogy |
-|---|---|---|
-| **ClosedClaw Frontend LLM** | Personality, memory, routing, user communication | Brain |
-| **Translation Device** | Nervous system — carries signals between brain and limbs | Spinal cord |
-| **ClawDense / .claws** | Universal signal format all organs understand | Nervous impulse encoding |
-| **Subagents** | Specialists that perform tasks | Organs / limbs |
-| **CT/1 Protocol** | Routing metadata — which organ, what priority, what capability | Hormonal / addressing system |
+| Component                   | Role                                                           | Analogy                      |
+| --------------------------- | -------------------------------------------------------------- | ---------------------------- |
+| **ClosedClaw Frontend LLM** | Personality, memory, routing, user communication               | Brain                        |
+| **Translation Device**      | Nervous system — carries signals between brain and limbs       | Spinal cord                  |
+| **ClawDense / .claws**      | Universal signal format all organs understand                  | Nervous impulse encoding     |
+| **Subagents**               | Specialists that perform tasks                                 | Organs / limbs               |
+| **CT/1 Protocol**           | Routing metadata — which organ, what priority, what capability | Hormonal / addressing system |
 
 The Esperanto analogy is apt but needs refinement. Here's why and how:
 
@@ -29,6 +29,7 @@ Qwen3 -> "Please search the web for the latest Node.js CVEs and return
 ```
 
 This is **83 tokens**. It contains:
+
 - Politeness tokens ("Please") — waste
 - Redundant structure ("and return", "with") — waste
 - Ambiguity ("latest" — last week? last year? "structured" — JSON? markdown? bullets?)
@@ -57,9 +58,10 @@ This (ClawDense as a compiled task specification):
 
 **27 tokens** for the JSON vs 83 for the English. Zero ambiguity. Every model that understands JSON (all of them) interprets this identically.
 
-But here's the key: **the subagent LLM doesn't receive this JSON directly**. The Translation Device receives it, then compiles it into the optimal prompt format for *that specific model*:
+But here's the key: **the subagent LLM doesn't receive this JSON directly**. The Translation Device receives it, then compiles it into the optimal prompt format for _that specific model_:
 
 For **Qwen3** subagent:
+
 ```
 Search the web for Node.js CVEs from the past 90 days. Return only critical
 and high severity. For each: CVE ID, severity, affected versions, mitigation.
@@ -67,6 +69,7 @@ Maximum 10 sources. Output as a structured list.
 ```
 
 For **Claude** subagent:
+
 ```xml
 <task>Search for Node.js CVEs from the past 90 days.</task>
 <constraints>
@@ -159,18 +162,22 @@ For **GPT-4** subagent: a function call with typed parameters.
 ## Pain Points Eliminated
 
 ### Pain Point 1: Garbled Output (Current Bug)
+
 **Root cause**: ClawTalk metadata injected into LLM prompt.
 **Fix**: LLMs never see ClawDense. The TD is a code boundary. The `before_agent_start` hook produces only clean NL system prompts. The `message_sending` hook strips any residual artifacts. **Two-layer guarantee.**
 
 ### Pain Point 2: LLMs Can't Speak Custom Languages
+
 **Root cause**: Trying to make LLMs generate/parse ClawDense.
 **Fix**: ClawDense is an **IR**, not a language. It's machine-readable structured data processed by the TD (code). LLMs speak their native format (NL + function calling). The `.claws` compiler handles the translation at compile time, not inference time.
 
 ### Pain Point 3: Token Waste on Translation
+
 **Root cause**: Having LLMs translate between formats.
 **Fix**: All translation is deterministic code. Zero LLM tokens spent on encoding/decoding. The only tokens are the task itself.
 
 ### Pain Point 4: Cross-Model Confusion
+
 **Root cause**: Different models interpret the same English differently.
 **Fix**: The TD compiles the same ClawDense IR into **model-optimized prompts**. A `.claws` skill can have `@dialect` annotations per model family:
 
@@ -192,8 +199,10 @@ For **GPT-4** subagent: a function call with typed parameters.
 The compiler selects the right dialect for the target subagent's model. Same skill, optimal prompt per model.
 
 ### Pain Point 5: Manual Subagent Configuration
+
 **Root cause**: Hand-writing system prompts and tool lists per subagent.
 **Fix**: `.claws` skill files are the single source of truth. The compiler generates:
+
 - System prompt (from Vibe block)
 - Tool schemas (from IDL block)
 - Execution plan (from Engine block)
@@ -203,6 +212,7 @@ The compiler selects the right dialect for the target subagent's model. Same ski
 Drop a `.claws` file -> subagent exists. Delete it -> subagent gone.
 
 ### Pain Point 6: Frontend LLM Doing Everything
+
 **Root cause**: Single monolithic agent with a massive system prompt.
 **Fix**: Frontend LLM has a lean system prompt focused on personality + routing. It has **one meta-tool**: `delegate_task`. Everything else flows through subagents.
 
@@ -238,8 +248,7 @@ specialist. Do NOT attempt to perform these tasks yourself -- delegate them.`,
       },
       domain_hint: {
         type: "string",
-        description:
-          "Optional hint: 'research', 'code', 'science', 'history', 'cooking', etc.",
+        description: "Optional hint: 'research', 'code', 'science', 'history', 'cooking', etc.",
         required: false,
       },
       urgency: {
@@ -304,6 +313,7 @@ to the user.
 ## The Esperanto Question: Answered
 
 ClawDense is **not** an Esperanto that LLMs speak to each other. That would require:
+
 - Teaching every model a new language (system prompt overhead or fine-tuning)
 - Hoping they generate valid syntax (unreliable)
 - Debugging cross-model dialect differences
@@ -340,26 +350,28 @@ The "Esperanto" is the IR layer — it's universal, but **only the Translation D
 
 ## What Changes from the Previous Plan
 
-| Previous Plan | Refined Plan | Why |
-|---|---|---|
-| TD intercepts via `before_agent_start` hook, modifying system prompts | TD sits behind `delegate_task` tool — Frontend LLM explicitly delegates | Cleaner separation. Frontend LLM makes conscious routing decisions. No hidden prompt manipulation |
-| Subagent routing via intent classification in the hook | Subagent routing via `domain_hint` parameter + skill matching in TD | The Frontend LLM is the best intent classifier — it's an LLM. Let it classify, then delegate |
-| ClawDense injected into subagent prompts | ClawDense never touches any LLM. `.claws` compiles to NL | Eliminates entire class of garbled-output bugs |
-| `prependContext` carries routing metadata | `prependContext` is eliminated for ClawTalk purposes; skill-compiled prompts set as subagent system prompts | Clean separation between frontend personality and subagent task prompts |
-| `message_sending` hook strips artifacts | `message_sending` hook still strips as defense-in-depth, but artifacts shouldn't exist | Belt-and-suspenders approach |
-| Frontend LLM has all tools | Frontend LLM has only `delegate_task` + conversational tools (memory, etc.) | Massive system prompt reduction. Frontend focuses on being personable |
-| Complex intent router in code | Frontend LLM does intent routing naturally (it's what LLMs are best at) | Simpler code, better accuracy. LLMs understand nuance that regex can't |
+| Previous Plan                                                         | Refined Plan                                                                                                | Why                                                                                               |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| TD intercepts via `before_agent_start` hook, modifying system prompts | TD sits behind `delegate_task` tool — Frontend LLM explicitly delegates                                     | Cleaner separation. Frontend LLM makes conscious routing decisions. No hidden prompt manipulation |
+| Subagent routing via intent classification in the hook                | Subagent routing via `domain_hint` parameter + skill matching in TD                                         | The Frontend LLM is the best intent classifier — it's an LLM. Let it classify, then delegate      |
+| ClawDense injected into subagent prompts                              | ClawDense never touches any LLM. `.claws` compiles to NL                                                    | Eliminates entire class of garbled-output bugs                                                    |
+| `prependContext` carries routing metadata                             | `prependContext` is eliminated for ClawTalk purposes; skill-compiled prompts set as subagent system prompts | Clean separation between frontend personality and subagent task prompts                           |
+| `message_sending` hook strips artifacts                               | `message_sending` hook still strips as defense-in-depth, but artifacts shouldn't exist                      | Belt-and-suspenders approach                                                                      |
+| Frontend LLM has all tools                                            | Frontend LLM has only `delegate_task` + conversational tools (memory, etc.)                                 | Massive system prompt reduction. Frontend focuses on being personable                             |
+| Complex intent router in code                                         | Frontend LLM does intent routing naturally (it's what LLMs are best at)                                     | Simpler code, better accuracy. LLMs understand nuance that regex can't                            |
 
 ---
 
 ## Updated Implementation Steps
 
 ### Phase 1: Fix Garbled Output (Immediate)
+
 1. Remove `prependContext` ClawTalk metadata injection from `clawtalk-hook.ts`
 2. Strip `message_sending` as defense-in-depth (wire the existing hook)
 3. **Test**: "Tell me about yourself" returns clean NL
 
 ### Phase 2: Build `delegate_task` Tool
+
 4. Create `src/agents/tools/delegate-task-tool.ts`
 5. Create `src/agents/clawtalk/translation-device.ts` with `dispatch()` method
 6. Wire `delegate_task` into the Frontend LLM's tool list
@@ -367,30 +379,35 @@ The "Esperanto" is the IR layer — it's universal, but **only the Translation D
 8. **Test**: "Search for Node.js vulnerabilities" -> Frontend calls `delegate_task` -> TD dispatches -> clean result
 
 ### Phase 3: Skill Compiler
+
 9. Create `src/agents/clawtalk/skill-compiler.ts`
 10. Add `@dialect` support for model-specific prompt generation
 11. Implement skill hot-loading from `~/.closedclaw/skills/`
 12. **Test**: Load `web-research.claws` -> compiles to valid NL prompt for Qwen3, Claude, GPT-4
 
 ### Phase 4: ClawDense as IR
+
 13. Refine ClawDense schema as a typed JSON-like IR (not a terse opcode language)
 14. Implement `encode()` (NL task -> IR) and `compile()` (IR + skill -> model prompt) in TD
 15. Implement ClawDense compression for wire transport between TD instances (multi-node)
 16. **Test**: Roundtrip encode -> compress -> decompress -> compile produces valid prompts
 
 ### Phase 5: Multi-Model Subagent Dispatch
+
 17. TD selects optimal model per subagent based on skill `@dialect` + task complexity + urgency
 18. Spawn real subagent sessions via existing `sessions_spawn` mechanism
 19. Collect results via existing announce system
 20. **Test**: Research task -> Claude subagent. Code task -> Claude Sonnet subagent. Simple lookup -> GPT-4o-mini subagent
 
 ### Phase 6: Multi-Subagent Composition
+
 21. Frontend LLM can call `delegate_task` multiple times (sequential or described in one call)
 22. TD supports `MULTI` dispatch — parallel subagent fan-out
 23. Results merged and returned to Frontend LLM for synthesis
 24. **Test**: "Research quantum computing and write Python simulation code" -> two subagents -> merged result
 
 ### Phase 7: Security Hardening
+
 25. Schema validation on all TD boundaries
 26. Content sandboxing for subagent responses
 27. Provenance tracking per inter-agent message
@@ -401,17 +418,17 @@ The "Esperanto" is the IR layer — it's universal, but **only the Translation D
 
 ## Advantages Over OpenClaw Baseline (Updated)
 
-| Dimension | OpenClaw | ClosedClaw Brain+Body | Improvement |
-|---|---|---|---|
-| **Frontend system prompt** | ~2000+ tokens (monolithic, covers everything) | ~100 tokens (personality + delegate) | **95% smaller frontend prompt. Every request saves ~1900 tokens** |
-| **Task execution quality** | One model does everything (jack of all trades) | Best model per task domain | **Specialist models outperform generalists by 15-30% on domain tasks** |
-| **Token efficiency (simple chat)** | Baseline | Same — no delegation needed | Neutral |
-| **Token efficiency (complex task)** | Full NL everywhere | ClawDense IR on wire + lean prompts | **40-65% savings on multi-hop** |
-| **Security** | Flat trust model | Privilege separation + sandboxing + provenance | **Structural defense-in-depth** |
-| **Model flexibility** | Switch model = rewrite all prompts | Switch model = TD selects right dialect | **True multi-model without prompt engineering** |
-| **Adding capabilities** | Edit monolithic system prompt + add tools | Drop a `.claws` file | **Hot-pluggable skills** |
-| **Debugging** | Read one conversation log | Structured traces per subagent + TD routing decisions | **Better observability for complex flows** |
-| **Personality consistency** | Model's personality varies with task complexity (overloaded prompt) | Frontend is always the personality; subagents are invisible | **Consistent user experience** |
+| Dimension                           | OpenClaw                                                            | ClosedClaw Brain+Body                                       | Improvement                                                            |
+| ----------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Frontend system prompt**          | ~2000+ tokens (monolithic, covers everything)                       | ~100 tokens (personality + delegate)                        | **95% smaller frontend prompt. Every request saves ~1900 tokens**      |
+| **Task execution quality**          | One model does everything (jack of all trades)                      | Best model per task domain                                  | **Specialist models outperform generalists by 15-30% on domain tasks** |
+| **Token efficiency (simple chat)**  | Baseline                                                            | Same — no delegation needed                                 | Neutral                                                                |
+| **Token efficiency (complex task)** | Full NL everywhere                                                  | ClawDense IR on wire + lean prompts                         | **40-65% savings on multi-hop**                                        |
+| **Security**                        | Flat trust model                                                    | Privilege separation + sandboxing + provenance              | **Structural defense-in-depth**                                        |
+| **Model flexibility**               | Switch model = rewrite all prompts                                  | Switch model = TD selects right dialect                     | **True multi-model without prompt engineering**                        |
+| **Adding capabilities**             | Edit monolithic system prompt + add tools                           | Drop a `.claws` file                                        | **Hot-pluggable skills**                                               |
+| **Debugging**                       | Read one conversation log                                           | Structured traces per subagent + TD routing decisions       | **Better observability for complex flows**                             |
+| **Personality consistency**         | Model's personality varies with task complexity (overloaded prompt) | Frontend is always the personality; subagents are invisible | **Consistent user experience**                                         |
 
 ---
 

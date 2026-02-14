@@ -10,6 +10,21 @@ import type {
   PluginDiagnostic,
   PluginLogger,
 } from "./types.js";
+import {
+  scanSkillsDirectory,
+  validatePermissions,
+  loadClawsFile,
+} from "../agents/clawtalk/claws-parser.js";
+import {
+  clawtalkBeforeAgentStartHandler,
+  clawtalkMessageSendingHandler,
+  updateClawTalkHookConfig,
+} from "../agents/clawtalk/clawtalk-hook.js";
+import {
+  kernelShieldBeforeToolCallHandler,
+  registerSkillForShield,
+  updateKernelShieldConfig,
+} from "../agents/clawtalk/kernel-shield-hook.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { resolveUserPath } from "../utils.js";
 import { clearPluginCommands } from "./commands.js";
@@ -26,21 +41,6 @@ import { createPluginRegistry, type PluginRecord, type PluginRegistry } from "./
 import { setActivePluginRegistry } from "./runtime.js";
 import { createPluginRuntime } from "./runtime/index.js";
 import { validateJsonSchemaValue } from "./schema-validator.js";
-import {
-  clawtalkBeforeAgentStartHandler,
-  clawtalkMessageSendingHandler,
-  updateClawTalkHookConfig,
-} from "../agents/clawtalk/clawtalk-hook.js";
-import {
-  scanSkillsDirectory,
-  validatePermissions,
-  loadClawsFile,
-} from "../agents/clawtalk/claws-parser.js";
-import {
-  kernelShieldBeforeToolCallHandler,
-  registerSkillForShield,
-  updateKernelShieldConfig,
-} from "../agents/clawtalk/kernel-shield-hook.js";
 
 export type PluginLoadResult = PluginRegistry;
 
@@ -485,7 +485,11 @@ function registerClawTalkHookIfEnabled(
 ): void {
   // Check if any agent has clawtalk.enabled, or if there's a defaults-level setting.
   const agents = cfg.agents?.list ?? [];
-  const anyEnabled = agents.some((a) => (a as Record<string, unknown>).clawtalk && ((a as Record<string, unknown>).clawtalk as Record<string, unknown>).enabled === true);
+  const anyEnabled = agents.some(
+    (a) =>
+      (a as Record<string, unknown>).clawtalk &&
+      ((a as Record<string, unknown>).clawtalk as Record<string, unknown>).enabled === true,
+  );
 
   if (!anyEnabled) {
     return;
@@ -499,15 +503,18 @@ function registerClawTalkHookIfEnabled(
   if (firstClawtalk) {
     updateClawTalkHookConfig({
       enabled: true,
-      escalationThreshold: typeof firstClawtalk.escalationThreshold === "number"
-        ? firstClawtalk.escalationThreshold
-        : undefined,
-      escalationModel: typeof firstClawtalk.escalationModel === "string"
-        ? firstClawtalk.escalationModel
-        : undefined,
-      compressionLevel: typeof firstClawtalk.compression === "string"
-        ? (firstClawtalk.compression as "off" | "transport")
-        : undefined,
+      escalationThreshold:
+        typeof firstClawtalk.escalationThreshold === "number"
+          ? firstClawtalk.escalationThreshold
+          : undefined,
+      escalationModel:
+        typeof firstClawtalk.escalationModel === "string"
+          ? firstClawtalk.escalationModel
+          : undefined,
+      compressionLevel:
+        typeof firstClawtalk.compression === "string"
+          ? (firstClawtalk.compression as "off" | "transport")
+          : undefined,
     } as Partial<import("../agents/clawtalk/types.js").ClawTalkConfig>);
   }
 
@@ -565,9 +572,7 @@ function registerKernelShieldHookIfEnabled(
     typeof enforcement === "boolean"
       ? String(enforcement)
       : "permissive";
-  logger.info?.(
-    `[kernel-shield] Hook registered (enforcement=${enforcementLabel})`,
-  );
+  logger.info?.(`[kernel-shield] Hook registered (enforcement=${enforcementLabel})`);
 }
 
 /**
@@ -576,9 +581,7 @@ function registerKernelShieldHookIfEnabled(
  * Runs asynchronously after registry setup — skill file loading does not block
  * gateway startup. Warnings are logged but do not prevent operation.
  */
-async function loadClawTalkSkillFiles(
-  _cfg: Partial<ClosedClawConfig>,
-): Promise<void> {
+async function loadClawTalkSkillFiles(_cfg: Partial<ClosedClawConfig>): Promise<void> {
   const logger = defaultLogger();
   try {
     const summaries = await scanSkillsDirectory();

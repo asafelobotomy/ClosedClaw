@@ -176,121 +176,125 @@ describeLive("memory plugin live tests", () => {
     }
   });
 
-  test("memory tools work end-to-end", async () => {
-    const { default: memoryPlugin } = await import("./index.js");
-    const liveApiKey = process.env.OPENAI_API_KEY ?? "";
+  test(
+    "memory tools work end-to-end",
+    async () => {
+      const { default: memoryPlugin } = await import("./index.js");
+      const liveApiKey = process.env.OPENAI_API_KEY ?? "";
 
-    // Mock plugin API
-    // oxlint-disable-next-line typescript/no-explicit-any
-    const registeredTools: any[] = [];
-    // oxlint-disable-next-line typescript/no-explicit-any
-    const registeredClis: any[] = [];
-    // oxlint-disable-next-line typescript/no-explicit-any
-    const registeredServices: any[] = [];
-    // oxlint-disable-next-line typescript/no-explicit-any
-    const registeredHooks: Record<string, any[]> = {};
-    const logs: string[] = [];
+      // Mock plugin API
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const registeredTools: any[] = [];
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const registeredClis: any[] = [];
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const registeredServices: any[] = [];
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const registeredHooks: Record<string, any[]> = {};
+      const logs: string[] = [];
 
-    const mockApi = {
-      id: "memory-lancedb",
-      name: "Memory (LanceDB)",
-      source: "test",
-      config: {},
-      pluginConfig: {
-        embedding: {
-          apiKey: liveApiKey,
-          model: "text-embedding-3-small",
+      const mockApi = {
+        id: "memory-lancedb",
+        name: "Memory (LanceDB)",
+        source: "test",
+        config: {},
+        pluginConfig: {
+          embedding: {
+            apiKey: liveApiKey,
+            model: "text-embedding-3-small",
+          },
+          dbPath,
+          autoCapture: false,
+          autoRecall: false,
         },
-        dbPath,
-        autoCapture: false,
-        autoRecall: false,
-      },
-      runtime: {},
-      logger: {
-        info: (msg: string) => logs.push(`[info] ${msg}`),
-        warn: (msg: string) => logs.push(`[warn] ${msg}`),
-        error: (msg: string) => logs.push(`[error] ${msg}`),
-        debug: (msg: string) => logs.push(`[debug] ${msg}`),
-      },
+        runtime: {},
+        logger: {
+          info: (msg: string) => logs.push(`[info] ${msg}`),
+          warn: (msg: string) => logs.push(`[warn] ${msg}`),
+          error: (msg: string) => logs.push(`[error] ${msg}`),
+          debug: (msg: string) => logs.push(`[debug] ${msg}`),
+        },
+        // oxlint-disable-next-line typescript/no-explicit-any
+        registerTool: (tool: any, opts: any) => {
+          registeredTools.push({ tool, opts });
+        },
+        // oxlint-disable-next-line typescript/no-explicit-any
+        registerCli: (registrar: any, opts: any) => {
+          registeredClis.push({ registrar, opts });
+        },
+        // oxlint-disable-next-line typescript/no-explicit-any
+        registerService: (service: any) => {
+          registeredServices.push(service);
+        },
+        // oxlint-disable-next-line typescript/no-explicit-any
+        on: (hookName: string, handler: any) => {
+          if (!registeredHooks[hookName]) {
+            registeredHooks[hookName] = [];
+          }
+          registeredHooks[hookName].push(handler);
+        },
+        resolvePath: (p: string) => p,
+      };
+
+      // Register plugin
       // oxlint-disable-next-line typescript/no-explicit-any
-      registerTool: (tool: any, opts: any) => {
-        registeredTools.push({ tool, opts });
-      },
-      // oxlint-disable-next-line typescript/no-explicit-any
-      registerCli: (registrar: any, opts: any) => {
-        registeredClis.push({ registrar, opts });
-      },
-      // oxlint-disable-next-line typescript/no-explicit-any
-      registerService: (service: any) => {
-        registeredServices.push(service);
-      },
-      // oxlint-disable-next-line typescript/no-explicit-any
-      on: (hookName: string, handler: any) => {
-        if (!registeredHooks[hookName]) {
-          registeredHooks[hookName] = [];
-        }
-        registeredHooks[hookName].push(handler);
-      },
-      resolvePath: (p: string) => p,
-    };
+      memoryPlugin.register(mockApi as any);
 
-    // Register plugin
-    // oxlint-disable-next-line typescript/no-explicit-any
-    memoryPlugin.register(mockApi as any);
+      // Check registration
+      expect(registeredTools.length).toBe(3);
+      expect(registeredTools.map((t) => t.opts?.name)).toContain("memory_recall");
+      expect(registeredTools.map((t) => t.opts?.name)).toContain("memory_store");
+      expect(registeredTools.map((t) => t.opts?.name)).toContain("memory_forget");
+      expect(registeredClis.length).toBe(1);
+      expect(registeredServices.length).toBe(1);
 
-    // Check registration
-    expect(registeredTools.length).toBe(3);
-    expect(registeredTools.map((t) => t.opts?.name)).toContain("memory_recall");
-    expect(registeredTools.map((t) => t.opts?.name)).toContain("memory_store");
-    expect(registeredTools.map((t) => t.opts?.name)).toContain("memory_forget");
-    expect(registeredClis.length).toBe(1);
-    expect(registeredServices.length).toBe(1);
+      // Get tool functions
+      const storeTool = registeredTools.find((t) => t.opts?.name === "memory_store")?.tool;
+      const recallTool = registeredTools.find((t) => t.opts?.name === "memory_recall")?.tool;
+      const forgetTool = registeredTools.find((t) => t.opts?.name === "memory_forget")?.tool;
 
-    // Get tool functions
-    const storeTool = registeredTools.find((t) => t.opts?.name === "memory_store")?.tool;
-    const recallTool = registeredTools.find((t) => t.opts?.name === "memory_recall")?.tool;
-    const forgetTool = registeredTools.find((t) => t.opts?.name === "memory_forget")?.tool;
+      // Test store
+      const storeResult = await storeTool.execute("test-call-1", {
+        text: "The user prefers dark mode for all applications",
+        importance: 0.8,
+        category: "preference",
+      });
 
-    // Test store
-    const storeResult = await storeTool.execute("test-call-1", {
-      text: "The user prefers dark mode for all applications",
-      importance: 0.8,
-      category: "preference",
-    });
+      expect(storeResult.details?.action).toBe("created");
+      expect(storeResult.details?.id).toBeDefined();
+      const storedId = storeResult.details?.id;
 
-    expect(storeResult.details?.action).toBe("created");
-    expect(storeResult.details?.id).toBeDefined();
-    const storedId = storeResult.details?.id;
+      // Test recall
+      const recallResult = await recallTool.execute("test-call-2", {
+        query: "dark mode preference",
+        limit: 5,
+      });
 
-    // Test recall
-    const recallResult = await recallTool.execute("test-call-2", {
-      query: "dark mode preference",
-      limit: 5,
-    });
+      expect(recallResult.details?.count).toBeGreaterThan(0);
+      expect(recallResult.details?.memories?.[0]?.text).toContain("dark mode");
 
-    expect(recallResult.details?.count).toBeGreaterThan(0);
-    expect(recallResult.details?.memories?.[0]?.text).toContain("dark mode");
+      // Test duplicate detection
+      const duplicateResult = await storeTool.execute("test-call-3", {
+        text: "The user prefers dark mode for all applications",
+      });
 
-    // Test duplicate detection
-    const duplicateResult = await storeTool.execute("test-call-3", {
-      text: "The user prefers dark mode for all applications",
-    });
+      expect(duplicateResult.details?.action).toBe("duplicate");
 
-    expect(duplicateResult.details?.action).toBe("duplicate");
+      // Test forget
+      const forgetResult = await forgetTool.execute("test-call-4", {
+        memoryId: storedId,
+      });
 
-    // Test forget
-    const forgetResult = await forgetTool.execute("test-call-4", {
-      memoryId: storedId,
-    });
+      expect(forgetResult.details?.action).toBe("deleted");
 
-    expect(forgetResult.details?.action).toBe("deleted");
+      // Verify it's gone
+      const recallAfterForget = await recallTool.execute("test-call-5", {
+        query: "dark mode preference",
+        limit: 5,
+      });
 
-    // Verify it's gone
-    const recallAfterForget = await recallTool.execute("test-call-5", {
-      query: "dark mode preference",
-      limit: 5,
-    });
-
-    expect(recallAfterForget.details?.count).toBe(0);
-  }, TIMEOUT_TEST_SUITE_LONG_MS); // 60s timeout for live API calls
+      expect(recallAfterForget.details?.count).toBe(0);
+    },
+    TIMEOUT_TEST_SUITE_LONG_MS,
+  ); // 60s timeout for live API calls
 });

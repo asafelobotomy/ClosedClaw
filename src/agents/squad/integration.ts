@@ -15,12 +15,12 @@
  * @module agents/squad/integration
  */
 
-import type { AgentSpawnConfig } from "./spawner.js";
-import type { SquadConfig, CoordinationStrategy, ComplexTask } from "./coordinator.js";
-import type { TaskInput, TaskPriority } from "./task-queue.js";
 import type { AgentProfile, ProfileRegistrySnapshot } from "../profiles/types.js";
-import { AGENT_TEMPLATES } from "./templates.js";
+import type { SquadConfig, CoordinationStrategy, ComplexTask } from "./coordinator.js";
+import type { AgentSpawnConfig } from "./spawner.js";
+import type { TaskInput, TaskPriority } from "./task-queue.js";
 import { AGENTS } from "../../constants/agents.js";
+import { AGENT_TEMPLATES } from "./templates.js";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -142,20 +142,40 @@ const STRATEGY_RULES: Array<{
   weight: number;
 }> = [
   // Pipeline: sequential workflows (research → code → test → review)
-  { pattern: /research.*(?:then|and then|followed by).*(?:code|implement)/i, strategy: "pipeline", weight: 3 },
-  { pattern: /(?:implement|code).*(?:then|and).*(?:test|review)/i, strategy: "pipeline", weight: 3 },
+  {
+    pattern: /research.*(?:then|and then|followed by).*(?:code|implement)/i,
+    strategy: "pipeline",
+    weight: 3,
+  },
+  {
+    pattern: /(?:implement|code).*(?:then|and).*(?:test|review)/i,
+    strategy: "pipeline",
+    weight: 3,
+  },
   { pattern: /step\s*by\s*step|sequential|in order/i, strategy: "pipeline", weight: 2 },
 
   // Map-Reduce: split-and-merge patterns
-  { pattern: /(?:analyze|scan|audit).*(?:all|every|each).*(?:file|module|component)/i, strategy: "map-reduce", weight: 3 },
+  {
+    pattern: /(?:analyze|scan|audit).*(?:all|every|each).*(?:file|module|component)/i,
+    strategy: "map-reduce",
+    weight: 3,
+  },
   { pattern: /summarize.*multiple|combine.*results/i, strategy: "map-reduce", weight: 2 },
 
   // Consensus: decision-making, evaluation
-  { pattern: /(?:decide|choose|evaluate|compare).*(?:option|approach|solution)/i, strategy: "consensus", weight: 3 },
+  {
+    pattern: /(?:decide|choose|evaluate|compare).*(?:option|approach|solution)/i,
+    strategy: "consensus",
+    weight: 3,
+  },
   { pattern: /(?:vote|agree|consensus)/i, strategy: "consensus", weight: 3 },
 
   // Parallel: independent tasks
-  { pattern: /(?:simultaneously|in parallel|at the same time|concurrently)/i, strategy: "parallel", weight: 3 },
+  {
+    pattern: /(?:simultaneously|in parallel|at the same time|concurrently)/i,
+    strategy: "parallel",
+    weight: 3,
+  },
   { pattern: /(?:both|all of|multiple).*(?:at once|together)/i, strategy: "parallel", weight: 2 },
 ];
 
@@ -193,13 +213,13 @@ export function analyzeTaskForSquad(
   }
 
   // Sort by score, take top profiles (min 2 for a squad)
-  const sorted = [...matchedProfiles.entries()]
-    .toSorted((a, b) => b[1] - a[1]);
+  const sorted = [...matchedProfiles.entries()].toSorted((a, b) => b[1] - a[1]);
 
-  const recommendedProfiles = sorted.length >= 2
-    ? sorted.map(([id]) => id)
-    : // If fewer than 2 matches, include researcher + best match as fallback
-      sorted.length === 1
+  const recommendedProfiles =
+    sorted.length >= 2
+      ? sorted.map(([id]) => id)
+      : // If fewer than 2 matches, include researcher + best match as fallback
+        sorted.length === 1
         ? [sorted[0][0], sorted[0][0] === "researcher" ? "coder" : "researcher"]
         : ["researcher", "coder"];
 
@@ -228,15 +248,20 @@ export function analyzeTaskForSquad(
     .filter(([, score]) => score > 0)
     .map(([cap]) => cap);
 
-  const complexity = Math.min(1, (taskTypes.length * 0.15) + (words.length * 0.005) + (recommendedProfiles.length * 0.1));
+  const complexity = Math.min(
+    1,
+    taskTypes.length * 0.15 + words.length * 0.005 + recommendedProfiles.length * 0.1,
+  );
 
   // Build reasoning
   const reasoning = [
     `Detected task types: ${taskTypes.join(", ") || "general"}`,
     `Recommended ${recommendedProfiles.length} agents with "${bestStrategy}" strategy`,
-    complexity > 0.6 ? "High complexity — multiple specialized agents recommended" :
-      complexity > 0.3 ? "Moderate complexity — targeted agent selection" :
-        "Low complexity — minimal squad sufficient",
+    complexity > 0.6
+      ? "High complexity — multiple specialized agents recommended"
+      : complexity > 0.3
+        ? "Moderate complexity — targeted agent selection"
+        : "Low complexity — minimal squad sufficient",
   ].join(". ");
 
   return {
@@ -271,21 +296,23 @@ export function buildSquadFromProfiles(
       // Try falling back to a built-in template
       const template = AGENT_TEMPLATES[profileId];
       if (template) {
-        agents.push(profileToSpawnConfig(
-          {
-            id: template.id,
-            name: template.name,
-            description: template.description,
-            source: "template",
-            systemPrompt: template.systemPrompt,
-            tools: { allow: [...template.tools] },
-            model: template.suggestedModel,
-            tokenBudget: template.defaultTokenBudget,
-            capabilities: [...template.capabilities],
-            loadedAt: Date.now(),
-          },
-          request,
-        ));
+        agents.push(
+          profileToSpawnConfig(
+            {
+              id: template.id,
+              name: template.name,
+              description: template.description,
+              source: "template",
+              systemPrompt: template.systemPrompt,
+              tools: { allow: [...template.tools] },
+              model: template.suggestedModel,
+              tokenBudget: template.defaultTokenBudget,
+              capabilities: [...template.capabilities],
+              loadedAt: Date.now(),
+            },
+            request,
+          ),
+        );
         resolvedProfiles.push(profileId);
         warnings.push(`Profile "${profileId}" resolved from template (no user profile found)`);
       } else {
@@ -329,9 +356,7 @@ function profileToSpawnConfig(
 
   // Apply deny list
   const denySet = profile.tools.deny ? new Set(profile.tools.deny) : undefined;
-  const filteredTools = denySet
-    ? tools.filter((t) => !denySet.has(t))
-    : tools;
+  const filteredTools = denySet ? tools.filter((t) => !denySet.has(t)) : tools;
 
   return {
     role: profile.id,
@@ -391,16 +416,11 @@ export function formSquadForTask(
 /**
  * Build a ComplexTask object from a user message for squad execution.
  */
-export function buildComplexTask(
-  description: string,
-  analysis: TaskAnalysis,
-): ComplexTask {
+export function buildComplexTask(description: string, analysis: TaskAnalysis): ComplexTask {
   // Generate subtasks based on recommended profiles
   const subtasks: TaskInput[] = analysis.recommendedProfiles.map((profileId) => {
     const taskType = analysis.taskTypes.find((t) =>
-      TASK_CAPABILITY_MAP[t]?.some((cap) =>
-        AGENT_TEMPLATES[profileId]?.capabilities.includes(cap),
-      ),
+      TASK_CAPABILITY_MAP[t]?.some((cap) => AGENT_TEMPLATES[profileId]?.capabilities.includes(cap)),
     );
 
     return {

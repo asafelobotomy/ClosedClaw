@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { TIMEOUT_TEST_LONG_MS } from "../config/constants/index.js";
 import { HISTORY_CONTEXT_MARKER } from "../auto-reply/reply/history.js";
 import { CURRENT_MESSAGE_MARKER } from "../auto-reply/reply/mentions.js";
+import { TIMEOUT_TEST_LONG_MS } from "../config/constants/index.js";
 import { emitAgentEvent } from "../infra/agent-events.js";
 import { agentCommand, getFreePort, installGatewayTestHooks } from "./test-helpers.js";
 

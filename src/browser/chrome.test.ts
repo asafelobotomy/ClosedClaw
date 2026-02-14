@@ -178,9 +178,7 @@ describe("browser chrome helpers", () => {
 
   it("uses executablePath from config when set", () => {
     const customPath = "/opt/google/chrome/chrome";
-    const spy = vi
-      .spyOn(fs, "existsSync")
-      .mockImplementation((p) => String(p) === customPath);
+    const spy = vi.spyOn(fs, "existsSync").mockImplementation((p) => String(p) === customPath);
     const exe = resolveBrowserExecutableForPlatform(
       { executablePath: customPath } as Parameters<typeof resolveBrowserExecutableForPlatform>[0],
       "win32",

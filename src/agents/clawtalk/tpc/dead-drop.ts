@@ -11,10 +11,10 @@
  *     archive/           → Processed messages (auto-cleaned by TTL)
  */
 
-import fs from "node:fs";
-import path from "node:path";
 import crypto from "node:crypto";
 import { EventEmitter } from "node:events";
+import fs from "node:fs";
+import path from "node:path";
 
 const MAX_WAV_BYTES = 5 * 1024 * 1024; // 5MB safety cap
 const VALID_ID_REGEX = /^[A-Za-z0-9._-]+$/;
@@ -76,7 +76,9 @@ export class DeadDropManager extends EventEmitter<DeadDropEvents> {
    * Initialize the dead-drop directory structure and start watching.
    */
   async start(): Promise<void> {
-    if (this.started) return;
+    if (this.started) {
+      return;
+    }
 
     // Create directory structure
     this.ensureDirectories();
@@ -102,7 +104,9 @@ export class DeadDropManager extends EventEmitter<DeadDropEvents> {
    * Stop watching and clean up timers.
    */
   async stop(): Promise<void> {
-    if (!this.started) return;
+    if (!this.started) {
+      return;
+    }
 
     if (this.watcher) {
       await this.watcher.close();
@@ -184,7 +188,9 @@ export class DeadDropManager extends EventEmitter<DeadDropEvents> {
   listMessages(agentId: string): DeadDropMessage[] {
     this.assertSafeAgentId(agentId);
     const inboxDir = this.agentInboxPath(agentId);
-    if (!fs.existsSync(inboxDir)) return [];
+    if (!fs.existsSync(inboxDir)) {
+      return [];
+    }
 
     const files = fs.readdirSync(inboxDir);
     return files
@@ -195,7 +201,7 @@ export class DeadDropManager extends EventEmitter<DeadDropEvents> {
         targetAgent: agentId,
         createdAt: fs.statSync(path.join(inboxDir, f)).mtimeMs,
       }))
-      .sort((a, b) => a.createdAt - b.createdAt);
+      .toSorted((a, b) => a.createdAt - b.createdAt);
   }
 
   /**
@@ -234,7 +240,9 @@ export class DeadDropManager extends EventEmitter<DeadDropEvents> {
    */
   watchAgent(agentId: string): void {
     this.assertSafeAgentId(agentId);
-    if (this.pollTimers.has(agentId)) return;
+    if (this.pollTimers.has(agentId)) {
+      return;
+    }
 
     const seen = new Set<string>();
 
@@ -325,11 +333,15 @@ export class DeadDropManager extends EventEmitter<DeadDropEvents> {
 
     watcher.on("add", (filePath: string) => {
       // Skip temp files
-      if (filePath.includes(".tmp")) return;
+      if (filePath.includes(".tmp")) {
+        return;
+      }
 
       const parts = filePath.split(path.sep);
       const inboxIdx = parts.indexOf("inbox");
-      if (inboxIdx === -1 || inboxIdx + 1 >= parts.length) return;
+      if (inboxIdx === -1 || inboxIdx + 1 >= parts.length) {
+        return;
+      }
 
       const targetAgent = parts[inboxIdx + 1];
       const fileName = parts[parts.length - 1];
@@ -356,7 +368,9 @@ export class DeadDropManager extends EventEmitter<DeadDropEvents> {
     const pollRoot = (): void => {
       try {
         const inboxRoot = path.join(this.resolvedBase, "inbox");
-        if (!fs.existsSync(inboxRoot)) return;
+        if (!fs.existsSync(inboxRoot)) {
+          return;
+        }
 
         const agents = fs.readdirSync(inboxRoot);
         for (const agentId of agents) {
@@ -378,7 +392,9 @@ export class DeadDropManager extends EventEmitter<DeadDropEvents> {
 
   private async cleanupArchive(): Promise<void> {
     const archiveDir = this.archivePath();
-    if (!fs.existsSync(archiveDir)) return;
+    if (!fs.existsSync(archiveDir)) {
+      return;
+    }
 
     const now = Date.now();
     const files = fs.readdirSync(archiveDir);
@@ -427,9 +443,7 @@ export class DeadDropManager extends EventEmitter<DeadDropEvents> {
       throw new Error("WAV data is empty");
     }
     if (size > MAX_WAV_BYTES) {
-      throw new Error(
-        `WAV data exceeds maximum allowed size of ${MAX_WAV_BYTES} bytes`,
-      );
+      throw new Error(`WAV data exceeds maximum allowed size of ${MAX_WAV_BYTES} bytes`);
     }
   }
 
@@ -440,8 +454,12 @@ export class DeadDropManager extends EventEmitter<DeadDropEvents> {
   }
 
   private isValidMessageFile(fileName: string): boolean {
-    if (!fileName.endsWith(".wav")) return false;
-    if (fileName.endsWith(".tmp")) return false;
+    if (!fileName.endsWith(".wav")) {
+      return false;
+    }
+    if (fileName.endsWith(".tmp")) {
+      return false;
+    }
     const base = fileName.replace(/\.wav$/, "");
     return this.isValidMessageId(base);
   }

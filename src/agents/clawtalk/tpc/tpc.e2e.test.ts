@@ -14,16 +14,15 @@
  *   - Circuit breaker, rate limiter, and audit logger integration
  */
 
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "node:fs";
-import path from "node:path";
 import os from "node:os";
-
-import { TPCRuntime } from "./index.js";
-import { CircuitBreaker } from "./circuit-breaker.js";
-import { RateLimiter } from "./rate-limiter.js";
+import path from "node:path";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { AuditLogger } from "./audit-logger.js";
+import { CircuitBreaker } from "./circuit-breaker.js";
+import { TPCRuntime } from "./index.js";
 import { KeyRotationManager } from "./key-rotation.js";
+import { RateLimiter } from "./rate-limiter.js";
 
 // ---------------------------------------------------------------------------
 // Helpers

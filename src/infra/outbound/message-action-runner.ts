@@ -17,6 +17,7 @@ import {
 } from "../../agents/tools/common.js";
 import { parseReplyDirectives } from "../../auto-reply/reply/reply-directives.js";
 import { dispatchChannelMessageAction } from "../../channels/plugins/message-actions.js";
+import { loadWebMedia } from "../../media/load-web-media.js";
 import { extensionForMime } from "../../media/mime.js";
 import {
   isDeliverableMessageChannel,
@@ -24,7 +25,6 @@ import {
   type GatewayClientMode,
   type GatewayClientName,
 } from "../../utils/message-channel.js";
-import { loadWebMedia } from "../../media/load-web-media.js";
 import {
   listConfiguredMessageChannels,
   resolveMessageChannelSelection,
@@ -681,10 +681,16 @@ async function handleSendAction(ctx: ResolvedActionContext): Promise<MessageActi
   const threadId = readStringParam(params, "threadId");
   const autoThreadId: string | undefined = (() => {
     const ctx = input.toolContext;
-    if (!ctx?.currentThreadTs) {return undefined;}
-    if (ctx.replyToMode === "off") {return undefined;}
+    if (!ctx?.currentThreadTs) {
+      return undefined;
+    }
+    if (ctx.replyToMode === "off") {
+      return undefined;
+    }
     const currentId = (ctx.currentChannelId ?? "").trim().toLowerCase();
-    if (!currentId) {return undefined;}
+    if (!currentId) {
+      return undefined;
+    }
     const targetNorm = to
       .trim()
       .toLowerCase()

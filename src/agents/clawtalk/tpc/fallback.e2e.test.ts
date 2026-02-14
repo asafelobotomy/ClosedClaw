@@ -8,14 +8,13 @@
  *   - The system explicitly chooses text, not silently degrades
  */
 
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "node:fs";
-import path from "node:path";
 import os from "node:os";
-
-import { TPCRuntime } from "./index.js";
-import { CircuitBreaker } from "./circuit-breaker.js";
+import path from "node:path";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { AuditLogger } from "./audit-logger.js";
+import { CircuitBreaker } from "./circuit-breaker.js";
+import { TPCRuntime } from "./index.js";
 
 // ---------------------------------------------------------------------------
 // Helpers

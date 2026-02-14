@@ -129,7 +129,7 @@ export interface FallbackResult<T> {
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-const DEFAULT_COOLDOWN_MS = 60_000;         // 1 minute
+const DEFAULT_COOLDOWN_MS = 60_000; // 1 minute
 const DEFAULT_CIRCUIT_BREAKER_THRESHOLD = 3; // 3 consecutive failures → circuit break
 const DEFAULT_CIRCUIT_BREAKER_RESET_MS = 300_000; // 5 minutes
 
@@ -137,8 +137,8 @@ const DEFAULT_CIRCUIT_BREAKER_RESET_MS = 300_000; // 5 minutes
  * Reasons that should trigger an immediate fallback (don't retry same model).
  */
 const IMMEDIATE_FALLBACK_REASONS: Set<FailoverReason> = new Set([
-  "auth",       // Bad key — won't fix itself
-  "billing",    // Account issue
+  "auth", // Bad key — won't fix itself
+  "billing", // Account issue
   "rate_limit", // 429 — back off
 ]);
 
@@ -146,8 +146,8 @@ const IMMEDIATE_FALLBACK_REASONS: Set<FailoverReason> = new Set([
  * Reasons that might be transient (could retry after brief delay).
  */
 const TRANSIENT_REASONS: Set<FailoverReason> = new Set([
-  "timeout",    // Network blip
-  "unknown",    // Unclear, might recover
+  "timeout", // Network blip
+  "unknown", // Unclear, might recover
 ]);
 
 // ─── Fallback Chain ─────────────────────────────────────────────────────────
@@ -313,7 +313,13 @@ export class FallbackChain {
         }
 
         // Determine next model
-        const nextIndex = findNextAvailable(this.config.chain, this.states, i + 1, now, this.config);
+        const nextIndex = findNextAvailable(
+          this.config.chain,
+          this.states,
+          i + 1,
+          now,
+          this.config,
+        );
         const nextModelId = nextIndex !== -1 ? this.config.chain[nextIndex] : undefined;
 
         const fallbackEvent: FallbackEvent = {
@@ -381,7 +387,9 @@ export class FallbackChain {
    */
   resetModel(modelId: string): boolean {
     const state = this.states.get(modelId);
-    if (!state) {return false;}
+    if (!state) {
+      return false;
+    }
 
     Object.assign(state, createInitialState(modelId));
     return true;
@@ -414,8 +422,12 @@ export class FallbackChain {
     let totalFailures = 0;
 
     for (const state of this.states.values()) {
-      if (state.available && !state.circuitBroken) {available++;}
-      if (state.circuitBroken) {circuitBroken.push(state.modelId);}
+      if (state.available && !state.circuitBroken) {
+        available++;
+      }
+      if (state.circuitBroken) {
+        circuitBroken.push(state.modelId);
+      }
       totalSuccesses += state.totalSuccesses;
       totalFailures += state.totalFailures;
     }
@@ -455,7 +467,9 @@ function findNextAvailable(
 ): number {
   for (let i = startIndex; i < chain.length; i++) {
     const state = states.get(chain[i]);
-    if (!state) {continue;}
+    if (!state) {
+      continue;
+    }
 
     // Skip circuit-broken (unless reset time elapsed)
     if (state.circuitBroken && now - state.circuitBrokenAt < config.circuitBreakerResetMs) {
@@ -481,13 +495,28 @@ function classifyErrorDefault(error: Error): FailoverReason {
   if (msg.includes("rate limit") || msg.includes("429") || msg.includes("too many requests")) {
     return "rate_limit";
   }
-  if (msg.includes("auth") || msg.includes("401") || msg.includes("unauthorized") || msg.includes("forbidden")) {
+  if (
+    msg.includes("auth") ||
+    msg.includes("401") ||
+    msg.includes("unauthorized") ||
+    msg.includes("forbidden")
+  ) {
     return "auth";
   }
-  if (msg.includes("billing") || msg.includes("402") || msg.includes("payment") || msg.includes("quota")) {
+  if (
+    msg.includes("billing") ||
+    msg.includes("402") ||
+    msg.includes("payment") ||
+    msg.includes("quota")
+  ) {
     return "billing";
   }
-  if (msg.includes("timeout") || msg.includes("timed out") || msg.includes("etimedout") || msg.includes("abort")) {
+  if (
+    msg.includes("timeout") ||
+    msg.includes("timed out") ||
+    msg.includes("etimedout") ||
+    msg.includes("abort")
+  ) {
     return "timeout";
   }
 

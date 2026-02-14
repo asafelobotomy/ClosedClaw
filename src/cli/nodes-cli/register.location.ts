@@ -1,6 +1,6 @@
 import type { Command } from "commander";
-import { TIMEOUT_HTTP_DEFAULT_MS } from "../../config/constants/index.js";
 import type { NodesRpcOpts } from "./types.js";
+import { TIMEOUT_HTTP_DEFAULT_MS } from "../../config/constants/index.js";
 import { randomIdempotencyKey } from "../../gateway/call.js";
 import { defaultRuntime } from "../../runtime.js";
 import { runNodesCommand } from "./cli-utils.js";

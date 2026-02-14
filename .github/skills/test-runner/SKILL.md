@@ -112,6 +112,7 @@ pnpm test:docker:cleanup          # Cleanup
 ## Test Parallelization
 
 `pnpm test` runs `scripts/test-parallel.mjs`:
+
 - **Parallel runs**: Unit + Extensions (on Linux/macOS)
 - **Serial runs**: Gateway (to avoid WebSocket flakes on Windows)
 - **Adaptive workers**: Allocates workers based on CPU count
@@ -161,17 +162,20 @@ pnpm test:live -- path/to/test.live.test.ts
 ### Common Issues
 
 **Port conflicts**: Gateway tests bind to ports, ensure no other instance running
+
 ```bash
 lsof -i :18789  # Check if port in use
 pkill -f closedclaw  # Kill stray processes
 ```
 
 **Stale lock files**: Clean up gateway lock files
+
 ```bash
 rm ~/.closedclaw/gateway.lock
 ```
 
 **Timeout issues**: Increase timeout for slow operations
+
 ```typescript
 it("slow operation", { timeout: 30000 }, async () => {
   // ... test
@@ -179,6 +183,7 @@ it("slow operation", { timeout: 30000 }, async () => {
 ```
 
 **Flaky tests**: Run multiple times to verify
+
 ```bash
 pnpm test -- path/to/flaky.test.ts --repeat=10
 ```
@@ -186,6 +191,7 @@ pnpm test -- path/to/flaky.test.ts --repeat=10
 ## Coverage Requirements
 
 Coverage enforced at **70%** for:
+
 - Lines
 - Branches
 - Functions
@@ -213,12 +219,20 @@ it("handles errors", async () => {
 });
 
 // Cover branches
-it("handles true case", () => { /* ... */ });
-it("handles false case", () => { /* ... */ });
+it("handles true case", () => {
+  /* ... */
+});
+it("handles false case", () => {
+  /* ... */
+});
 
 // Cover optional parameters
-it("works without options", () => { /* ... */ });
-it("works with options", () => { /* ... */ });
+it("works without options", () => {
+  /* ... */
+});
+it("works with options", () => {
+  /* ... */
+});
 ```
 
 ## Live Tests
@@ -329,6 +343,7 @@ await gateway.stop();
 ### GitHub Actions
 
 Tests run on:
+
 - **Linux**: Full parallel execution
 - **macOS**: Reduced workers (avoid OOM)
 - **Windows**: Sharded + serial gateway tests

@@ -26,93 +26,109 @@ ClawDense uses a prefix-based syntax to minimize token consumption while maintai
 
 ### Prefix Reference
 
-| Prefix | Category | Example | Description |
-|--------|----------|---------|-------------|
-| `!` | Auth/Perms | `!chk($U, "S_RW")` | Check user $U for System Read/Write permissions |
-| `@` | SysCall | `@fs:r("/path")` | Direct file system read request |
-| `?` | Query | `?fs:diff("/etc", $BASELINE)` | Query file system differences |
-| `>>` | Flow Control | `>>$sub(coder)` | Handoff task to specialized subagent |
-| `$` | Variable | `$UID` | Reference system or environment variable |
-| `::` | State | `::flush($SID)` | Flush session state |
-| `#` | Comment | `# audit check` | Internal notes (not executed) |
+| Prefix | Category     | Example                       | Description                                     |
+| ------ | ------------ | ----------------------------- | ----------------------------------------------- |
+| `!`    | Auth/Perms   | `!chk($U, "S_RW")`            | Check user $U for System Read/Write permissions |
+| `@`    | SysCall      | `@fs:r("/path")`              | Direct file system read request                 |
+| `?`    | Query        | `?fs:diff("/etc", $BASELINE)` | Query file system differences                   |
+| `>>`   | Flow Control | `>>$sub(coder)`               | Handoff task to specialized subagent            |
+| `$`    | Variable     | `$UID`                        | Reference system or environment variable        |
+| `::`   | State        | `::flush($SID)`               | Flush session state                             |
+| `#`    | Comment      | `# audit check`               | Internal notes (not executed)                   |
 
 ### Extended Operations
 
-| Operation | Format | Description |
-|-----------|--------|-------------|
-| **File System** | `@fs:s(path, query)` | Search files |
-| | `@fs:r(path)` | Read file |
-| | `@fs:w(path, data)` | Write file |
-| | `@fs:diff(path, baseline)` | Compute differences |
-| **Auth** | `!auth:chk(user, scope)` | Check authorization |
-| | `!grant(user, perm)` | Grant permission |
-| | `!revoke(user, perm)` | Revoke permission |
-| **Vault** | `@vault:r(key)` | Read from secure vault |
-| | `@vault:w(key, payload)` | Write to secure vault (encrypted) |
-| **Subagents** | `>>$sub(name) [state_id]` | Transfer control to subagent with state |
-| | `<<$return(result)` | Return from subagent |
-| **State** | `::hyd(checkpoint_id)` | Hydrate (restore) from checkpoint |
-| | `::save(checkpoint_id)` | Save current state |
-| | `::flush(session_id)` | Clear session state |
-| **Triggers** | `!trigger:refactor(id, reason)` | Trigger self-healing refactor |
-| | `!trigger:backup()` | Initiate backup sequence |
+| Operation       | Format                          | Description                             |
+| --------------- | ------------------------------- | --------------------------------------- |
+| **File System** | `@fs:s(path, query)`            | Search files                            |
+|                 | `@fs:r(path)`                   | Read file                               |
+|                 | `@fs:w(path, data)`             | Write file                              |
+|                 | `@fs:diff(path, baseline)`      | Compute differences                     |
+| **Auth**        | `!auth:chk(user, scope)`        | Check authorization                     |
+|                 | `!grant(user, perm)`            | Grant permission                        |
+|                 | `!revoke(user, perm)`           | Revoke permission                       |
+| **Vault**       | `@vault:r(key)`                 | Read from secure vault                  |
+|                 | `@vault:w(key, payload)`        | Write to secure vault (encrypted)       |
+| **Subagents**   | `>>$sub(name) [state_id]`       | Transfer control to subagent with state |
+|                 | `<<$return(result)`             | Return from subagent                    |
+| **State**       | `::hyd(checkpoint_id)`          | Hydrate (restore) from checkpoint       |
+|                 | `::save(checkpoint_id)`         | Save current state                      |
+|                 | `::flush(session_id)`           | Clear session state                     |
+| **Triggers**    | `!trigger:refactor(id, reason)` | Trigger self-healing refactor           |
+|                 | `!trigger:backup()`             | Initiate backup sequence                |
 
 ## Comparison: Markdown vs ClawDense
 
 ### Searching for a File
 
 **OpenClaw (Markdown):**
+
 ```markdown
 Search for the string 'invoice' in the /docs directory
 ```
+
 (12 tokens)
 
 **ClosedClaw (ClawDense):**
+
 ```
 @fs:s("/docs", "invoice")
 ```
+
 (6 tokens → 50% reduction)
 
 ### Authorization Check
 
 **OpenClaw (Markdown):**
+
 ```markdown
 Check if the current user is authorized to perform database migration operations
 ```
+
 (15 tokens)
 
 **ClosedClaw (ClawDense):**
+
 ```
 !auth:chk($UID, "DB_MIG")
 ```
+
 (5 tokens → 67% reduction)
 
 ### Subagent Handoff
 
 **OpenClaw (Markdown):**
+
 ```markdown
 Transferring this task to the research subagent, preserving current context state
 ```
+
 (13 tokens)
 
 **ClosedClaw (ClawDense):**
+
 ```
 >>$sub(research) [$CTX_ID]
 ```
+
 (4 tokens → 69% reduction)
 
 ### Encrypted Write
 
 **OpenClaw (Markdown):**
+
 ```markdown
 Write the sensitive data to secure storage with encryption enabled
 ```
+
 (12 tokens)
 
 **ClosedClaw (ClawDense):**
+
 ```
 @vault:w("key", $payload)
 ```
+
 (4 tokens → 67% reduction)
 
 ## Example Workflows
@@ -130,6 +146,7 @@ A subagent performing background security audit using ClawDense:
 ```
 
 **Equivalent Markdown (42 tokens):**
+
 ```markdown
 Check if root user has audit permissions across all systems.
 Query the file system to compute differences between /etc and the baseline hash.
@@ -167,6 +184,7 @@ User request: "Migrate encrypted SQLite ledger to vector store, anonymize client
 **Phase 3: Error Recovery**
 
 If power loss occurs:
+
 ```
 ::hyd(chk_1m)  # Resume from 1M checkpoint
 # Continue from last saved state
@@ -214,29 +232,35 @@ Before executing a `.claws` tool, Shield calculates:
 ## Grammar Rules
 
 ### 1. Prefix Consistency
+
 - Operations MUST start with defined prefixes (`!`, `@`, `?`, `>>`, etc.)
 - No mixing of conventions within single operation
 
 ### 2. Variable Naming
+
 - System variables: `$UPPERCASE_SNAKE`
 - User variables: `$camelCase` or `$snake_case`
 - Environment vars: `$ENV_VAR_NAME`
 
 ### 3. Whitespace
+
 - Minimal spacing: `@fs:r("/path")` not `@ fs : r ( "/path" )`
 - Comments on separate lines with `#` prefix
 
 ### 4. Chaining
+
 - Use newlines for sequential operations
 - Use `->` for result passing: `!auth:chk($U, "RW") -> $RESULT`
 
 ### 5. State References
+
 - Wrap in brackets: `[$state_id]`
 - Max 32 chars: `[chk_20260209_142000]`
 
 ## Security Considerations
 
 ### 1. Audit Trail
+
 Every ClawDense operation is logged with full expansion:
 
 ```
@@ -247,6 +271,7 @@ Every ClawDense operation is logged with full expansion:
 ```
 
 ### 2. Permission Boundary
+
 ClawDense operations CANNOT bypass Manifest permissions:
 
 ```
@@ -257,6 +282,7 @@ ClawDense operations CANNOT bypass Manifest permissions:
 ```
 
 ### 3. Rate Limiting
+
 Prevent denial-of-service via rapid ClawDense calls:
 
 ```
@@ -268,16 +294,19 @@ Prevent denial-of-service via rapid ClawDense calls:
 ## Implementation Status
 
 ### ✅ Implemented in ClosedClaw
+
 - Basic prefix parser (`!`, `@`, `$`)
 - File system operations (`@fs:*`)
 - Variable resolution (`$VAR`)
 
 ### 🚧 In Progress
+
 - Subagent handoff protocol (`>>`, `<<`)
 - State management (`::hyd`, `::save`, `::flush`)
 - Kernel Shield integration
 
 ### 📋 Planned
+
 - Vault operations (`@vault:*`)
 - Extended auth (`!grant`, `!revoke`)
 - Tool refactor triggers (`!trigger:*`)
@@ -322,19 +351,21 @@ Stenographic mappings are stored in **Block 8: The Lexicon** of `.claws` files, 
 **Use Case:** Internal system paths and high-frequency variable names
 
 **Algorithm:**
+
 1. Preserve the first letter
 2. Strip all vowels (unless word starts/ends with one)
 3. Collapse duplicate consonants
 
 **Examples:**
 
-| Full Path | A-Script | Savings |
-|-----------|----------|---------|
-| `/usr/local/bin/python` | `/u/l/b/py` | 78% |
-| `/var/log/syslog` | `/v/lg/syslg` | 53% |
-| `/home/user/documents` | `/h/u/dcmnts` | 61% |
+| Full Path               | A-Script      | Savings |
+| ----------------------- | ------------- | ------- |
+| `/usr/local/bin/python` | `/u/l/b/py`   | 78%     |
+| `/var/log/syslog`       | `/v/lg/syslg` | 53%     |
+| `/home/user/documents`  | `/h/u/dcmnts` | 61%     |
 
 **ClawDense Usage:**
+
 ```
 @fs:r(/v/lg/syslg)
 # Kernel expands to: @fs:r(/var/log/syslog)
@@ -353,15 +384,16 @@ Stenographic mappings are stored in **Block 8: The Lexicon** of `.claws` files, 
 
 **Examples:**
 
-| Full Command | Teeline | Meaning |
-|--------------|---------|---------|
-| `verify_signature` | `vfy_sgn` | Signature verification |
-| `request_permission` | `rq_prm` | Permission request |
-| `execute_payload` | `ex_pld` | Payload execution |
-| `sanitize_output` | `snt_out` | Output sanitization |
-| `validate_credentials` | `vld_crd` | Credential validation |
+| Full Command           | Teeline   | Meaning                |
+| ---------------------- | --------- | ---------------------- |
+| `verify_signature`     | `vfy_sgn` | Signature verification |
+| `request_permission`   | `rq_prm`  | Permission request     |
+| `execute_payload`      | `ex_pld`  | Payload execution      |
+| `sanitize_output`      | `snt_out` | Output sanitization    |
+| `validate_credentials` | `vld_crd` | Credential validation  |
 
 **ClawDense Usage:**
+
 ```
 >>$sub(vfy_sgn)
 # Kernel expands to: >>$sub(verify_signature)
@@ -380,6 +412,7 @@ Stenographic mappings are stored in **Block 8: The Lexicon** of `.claws` files, 
 
 **Tier 1: Low Risk (V_r < 0.3)**
 Full A-Script compression:
+
 ```
 !chk($U, "r")
 # Check user read access
@@ -387,6 +420,7 @@ Full A-Script compression:
 
 **Tier 2: Medium Risk (0.3 < V_r < 0.7)**
 Teeline Truncation for clarity:
+
 ```
 !chk_prm($U, "read_vlt")
 # Check permission for vault read
@@ -394,6 +428,7 @@ Teeline Truncation for clarity:
 
 **Tier 3: High Risk (V_r > 0.7)**
 Full Orthographic (English):
+
 ```
 !AUTHORIZE_ACCESS(USER=$U, SCOPE="ENCRYPTED_VAULT_WRITE")
 # Explicit, auditable, no ambiguity
@@ -411,24 +446,28 @@ Full Orthographic (English):
 **Concept:** Since we can't use "line thickness" in text, we use **casing** and **Unicode modification** to represent priority and security requirements.
 
 **Light Stroke (lowercase):** Non-blocking background process
+
 ```
 !!sync_mem
 # Asynchronous memory sync
 ```
 
 **Heavy Stroke (UPPERCASE):** Blocking, high-priority process
+
 ```
 !!CRITICAL_FLUSH
 # Synchronous, blocks until complete
 ```
 
 **Positioned (U̲nderline):** Requires Biometric Anchor (Hardware HITL)
+
 ```
 !!U̲RT_VLT_W
 # Underline triggers TouchID/FaceID requirement
 ```
 
 **Implementation:**
+
 - Lowercase: `priority=background, blocking=false`
 - Uppercase: `priority=critical, blocking=true`
 - Underlined: `require_biometric=true`
@@ -459,7 +498,7 @@ The Kernel Shield acts as the "Stenographer's Key," decoding shorthand in real-t
    If verified, invoke WASM component
 ```
 
-**Security:** Stenographic expansion happens *before* proof verification, ensuring compressed commands still pass formal checks.
+**Security:** Stenographic expansion happens _before_ proof verification, ensuring compressed commands still pass formal checks.
 
 ---
 
@@ -467,11 +506,11 @@ The Kernel Shield acts as the "Stenographer's Key," decoding shorthand in real-t
 
 Based on 1000-operation test suite with stenographic compression:
 
-| Method | Original Tokens | With ClawDense | With Stenography | Total Reduction |
-|--------|----------------|----------------|------------------|-----------------|
-| **Path Navigation** | 12 tokens | 6 tokens | 4 tokens | 67% |
-| **Auth Planning** | 24 tokens | 9 tokens | 6 tokens | 75% |
-| **Complex Workflow** | 1,000 tokens | 380 tokens | 240 tokens | 76% |
+| Method               | Original Tokens | With ClawDense | With Stenography | Total Reduction |
+| -------------------- | --------------- | -------------- | ---------------- | --------------- |
+| **Path Navigation**  | 12 tokens       | 6 tokens       | 4 tokens         | 67%             |
+| **Auth Planning**    | 24 tokens       | 9 tokens       | 6 tokens         | 75%             |
+| **Complex Workflow** | 1,000 tokens    | 380 tokens     | 240 tokens       | 76%             |
 
 **Key Insight:** Stenographic compression adds an additional ~40% reduction on top of base ClawDense savings.
 
@@ -516,6 +555,7 @@ TouchID: AUTHORIZED ✓
 ```
 
 **Token Analysis:**
+
 - **Without ClawDense:** ~1,850 tokens
 - **With base ClawDense:** ~740 tokens (60% reduction)
 - **With stenographic:** ~450 tokens (76% total reduction)
@@ -527,6 +567,7 @@ TouchID: AUTHORIZED ✓
 ### Security Considerations
 
 #### Audit Trail
+
 Every stenographic operation is logged with full expansion:
 
 ```
@@ -536,6 +577,7 @@ Every stenographic operation is logged with full expansion:
 ```
 
 #### Permission Boundaries
+
 Stenographic commands CANNOT bypass manifest permissions:
 
 ```
@@ -546,7 +588,9 @@ Stenographic commands CANNOT bypass manifest permissions:
 ```
 
 #### Rate Limiting
+
 Prevent DoS via rapid shorthand abuse:
+
 - Max 1000 ops/second per session
 - Max 100 vault operations/minute
 - Max 10 concurrent subagent handoffs
@@ -556,18 +600,21 @@ Prevent DoS via rapid shorthand abuse:
 ### Implementation Roadmap
 
 #### Phase 1: Basic Stenography (v3.0-alpha)
+
 - [x] A-Script path compression
 - [x] Block 8 Lexicon parser
 - [ ] Kernel Shield integration
 - [ ] Audit logging with expansion
 
 #### Phase 2: Advanced Features (v3.0-beta)
+
 - [ ] Teeline command truncation
 - [ ] Orthic tier-based expansion
 - [ ] Pitman weighted prioritization
 - [ ] Performance benchmarking
 
 #### Phase 3: Security Hardening (v3.0-rc)
+
 - [ ] Neural Fingerprinting integration
 - [ ] Hardware HITL for underlined commands
 - [ ] Rate limiting and abuse prevention
@@ -578,22 +625,25 @@ Prevent DoS via rapid shorthand abuse:
 ### When to Use Stenography
 
 **Recommended For:**
+
 - ✅ High-frequency internal commands
 - ✅ Kernel-to-subagent communication
 - ✅ Background automation tasks
 - ✅ Token-constrained environments
 
 **Not Recommended For:**
+
 - ❌ User-facing messages (readability matters)
 - ❌ External API calls (require standard format)
 - ❌ Security audit logs (need full expansion)
 - ❌ Cross-system communication (no shared lexicon)
 
-**Best Practice:** Use stenography for *internal orchestration*, keep natural language for *external communication*.
+**Best Practice:** Use stenography for _internal orchestration_, keep natural language for _external communication_.
 
 ---
 
 **See Also:**
+
 - [Agent Security Research](../research/agent-security.md) - Neural Fingerprinting and Kernel Shield details
 - [.claws File Format](claws-file-format.md) - Block 8 (Lexicon) and Block 9 (Neural Fingerprint) specifications
 
@@ -601,12 +651,12 @@ Prevent DoS via rapid shorthand abuse:
 
 Based on 1000-iteration test suite:
 
-| Metric | Markdown | ClawDense | Improvement |
-|--------|----------|-----------|-------------|
-| **Avg Tokens/Op** | 12.4 | 4.8 | 61% reduction |
-| **Parse Time** | 2.3ms | 0.8ms | 65% faster |
-| **Context Window Usage** | 48K tokens | 19K tokens | 60% less |
-| **Operations per 100K Context** | 8,064 | 20,833 | 2.58× more |
+| Metric                          | Markdown   | ClawDense  | Improvement   |
+| ------------------------------- | ---------- | ---------- | ------------- |
+| **Avg Tokens/Op**               | 12.4       | 4.8        | 61% reduction |
+| **Parse Time**                  | 2.3ms      | 0.8ms      | 65% faster    |
+| **Context Window Usage**        | 48K tokens | 19K tokens | 60% less      |
+| **Operations per 100K Context** | 8,064      | 20,833     | 2.58× more    |
 
 ## Migration Guide
 
@@ -616,12 +666,15 @@ When creating `.claws` files, use ClawDense in internal planning blocks but keep
 
 ```markdown
 # THE VIBE (Natural language)
+
 > Use when user mentions billing or invoices
 
 # INTERNAL PLANNING (ClawDense)
+
 !auth:chk($UID, "BILLING_READ")
 @fs:r("~/.closedclaw/billing.db")
->>$sub(stripe_api) [invoice_params]
+
+> > $sub(stripe_api) [invoice_params]
 ```
 
 ### For Agent Prompts

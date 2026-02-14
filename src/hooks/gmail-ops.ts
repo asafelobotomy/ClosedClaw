@@ -1,5 +1,4 @@
 import { spawn } from "node:child_process";
-import { minutesToMs, secondsToMs } from "../config/constants/index.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import {
   type ClosedClawConfig,
@@ -10,6 +9,7 @@ import {
   validateConfigObjectWithPlugins,
   writeConfigFile,
 } from "../config/config.js";
+import { minutesToMs, secondsToMs } from "../config/constants/index.js";
 import { runCommandWithTimeout } from "../process/exec.js";
 import { defaultRuntime } from "../runtime.js";
 import { displayPath } from "../utils.js";

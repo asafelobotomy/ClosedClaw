@@ -280,7 +280,13 @@ export class TokenBudgetTracker {
   /**
    * Get usage summary for all agents.
    */
-  getSummary(): Array<{ agentId: string; used: number; limit: number; percent: number; exceeded: boolean }> {
+  getSummary(): Array<{
+    agentId: string;
+    used: number;
+    limit: number;
+    percent: number;
+    exceeded: boolean;
+  }> {
     return [...this.budgets.entries()].map(([agentId, budget]) => ({
       agentId,
       used: budget.used,
@@ -377,7 +383,9 @@ export class RateLimiter {
     return new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => {
         const idx = this.state.queue.findIndex((q) => q.resolve === resolve);
-        if (idx >= 0) {this.state.queue.splice(idx, 1);}
+        if (idx >= 0) {
+          this.state.queue.splice(idx, 1);
+        }
         reject(new Error(`Rate limiter timeout after ${timeoutMs}ms`));
       }, timeoutMs);
 

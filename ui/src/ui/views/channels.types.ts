@@ -1,8 +1,4 @@
-import type {
-  ChannelAccountSnapshot,
-  ChannelsStatusSnapshot,
-  ConfigUiHints,
-} from "../types";
+import type { ChannelAccountSnapshot, ChannelsStatusSnapshot, ConfigUiHints } from "../types";
 
 export type ChannelKey = string;
 

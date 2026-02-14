@@ -12,6 +12,7 @@ ClosedClaw channels exist in **both** `src/` and `extensions/` directories. This
 - **`extensions/<channel>/`** = Plugin wrapper (registration, runtime bridge)
 
 This separation enables:
+
 - ✅ **Clean plugin interface** while keeping core tightly coupled
 - ✅ **Runtime isolation** between core and extensions
 - ✅ **Plugin SDK exports** without circular dependencies
@@ -25,7 +26,7 @@ This separation enables:
 ```
 src/
 ├── discord/          # Discord Bot API implementation
-├── telegram/         # Telegram Bot API implementation  
+├── telegram/         # Telegram Bot API implementation
 ├── slack/            # Slack Socket Mode implementation
 ├── signal/           # Signal (signal-cli) implementation
 ├── imessage/         # iMessage (imsg CLI) implementation
@@ -35,6 +36,7 @@ src/
 ```
 
 **Responsibilities**:
+
 - API client creation and management (Bot instances, HTTP clients)
 - Message sending/receiving logic
 - Authentication and session management
@@ -45,12 +47,14 @@ src/
 - Message action handlers (send, react, edit, delete)
 
 **Key Characteristics**:
+
 - Heavy, stateful implementations
 - Direct dependencies on core modules (`config`, `routing`, `logging`, `infra`)
 - Exported via `src/plugin-sdk/index.ts` for extension use
 - Tightly coupled to `PluginRuntime`
 
 **Example**: `src/telegram/bot.ts`
+
 ```typescript
 import { Bot } from "grammy";
 import type { ClosedClawConfig } from "../config/config.js";
@@ -81,6 +85,7 @@ extensions/
 ```
 
 **Responsibilities**:
+
 - Plugin registration via `ClosedClawPluginApi`
 - Runtime bridge setup (`setXYZRuntime()`)
 - Channel plugin interface implementation
@@ -88,12 +93,14 @@ extensions/
 - Delegating to core implementation
 
 **Key Characteristics**:
+
 - Thin, stateless wrappers (~100-200 lines)
 - Single dependency: `closedclaw/plugin-sdk`
 - Runtime isolation: imports from SDK, not from `../../src/`
 - Plugin lifecycle: `register(api) { ... }`
 
 **Example**: `extensions/telegram/index.ts`
+
 ```typescript
 import type { ClosedClawPluginApi } from "closedclaw/plugin-sdk";
 import { telegramPlugin } from "./src/channel.js";
@@ -104,8 +111,8 @@ const plugin = {
   name: "Telegram",
   description: "Telegram channel plugin",
   register(api: ClosedClawPluginApi) {
-    setTelegramRuntime(api.runtime);  // Bridge runtime
-    api.registerChannel({ plugin: telegramPlugin });  // Register plugin
+    setTelegramRuntime(api.runtime); // Bridge runtime
+    api.registerChannel({ plugin: telegramPlugin }); // Register plugin
   },
 };
 
@@ -113,6 +120,7 @@ export default plugin;
 ```
 
 **Example**: `extensions/telegram/src/channel.ts`
+
 ```typescript
 import { getChatChannelMeta, type ChannelPlugin } from "closedclaw/plugin-sdk";
 import { getTelegramRuntime } from "./runtime.js";
@@ -120,20 +128,20 @@ import { getTelegramRuntime } from "./runtime.js";
 export const telegramPlugin: ChannelPlugin = {
   id: "telegram",
   meta: getChatChannelMeta("telegram"),
-  
+
   // Delegate to core implementation via runtime
   actions: {
-    listActions: (ctx) => 
-      getTelegramRuntime().channel.telegram.messageActions.listActions(ctx),
+    listActions: (ctx) => getTelegramRuntime().channel.telegram.messageActions.listActions(ctx),
     handleAction: async (ctx) =>
       await getTelegramRuntime().channel.telegram.messageActions.handleAction(ctx),
   },
-  
+
   // More delegation to core...
 };
 ```
 
 **Example**: `extensions/telegram/src/runtime.ts`
+
 ```typescript
 import type { PluginRuntime } from "closedclaw/plugin-sdk";
 
@@ -220,6 +228,7 @@ export { collectTelegramStatusIssues } from "../channels/plugins/status-issues/t
 ```
 
 Extensions import via:
+
 ```typescript
 import {
   resolveTelegramAccount,
@@ -260,6 +269,7 @@ import {
 ### ❌ Alternative Rejected: Move All Channels to Extensions
 
 **Why Not?**
+
 - Breaking change: would require massive refactoring of `src/`
 - Core modules deeply depend on channel implementations
 - Loss of tight coupling benefits (direct config/logging access)
@@ -267,10 +277,12 @@ import {
 - Runtime would need to import from extensions (circular)
 
 **From Proposal**:
+
 > **Option B**: Keep as-is with clear documentation
+>
 > - Document that core channel implementations stay in `src/`
 > - Extensions in `extensions/` are plugin wrappers
-> 
+>
 > **Recommendation**: **Option B** - Document the pattern, avoid breaking changes
 
 ## File Organization Patterns
@@ -278,6 +290,7 @@ import {
 ### Core Channel Module (`src/<channel>/`)
 
 **Typical structure**:
+
 ```
 src/telegram/
 ├── accounts.ts           # Account resolution
@@ -302,6 +315,7 @@ src/telegram/
 ### Extension Plugin (`extensions/<channel>/`)
 
 **Typical structure**:
+
 ```
 extensions/telegram/
 ├── package.json          # Plugin metadata
@@ -316,12 +330,14 @@ extensions/telegram/
 ## Adding a New Channel
 
 **1. Create Core Implementation** (`src/<channel>/`)
+
 ```bash
 mkdir -p src/newchannel
 # Implement: accounts.ts, bot.ts, send.ts, monitor.ts
 ```
 
 **2. Export from Plugin SDK** (`src/plugin-sdk/index.ts`)
+
 ```typescript
 // Channel: NewChannel
 export {
@@ -332,17 +348,20 @@ export {
 ```
 
 **3. Create Extension Plugin** (`extensions/newchannel/`)
+
 ```bash
 mkdir -p extensions/newchannel/src
 # Create: index.ts, src/channel.ts, src/runtime.ts, package.json
 ```
 
 **4. Register in Core**
+
 - Add to `src/channels/registry.ts` (CHAT_CHANNEL_ORDER, CHAT_CHANNEL_META)
 - Add to `src/channels/dock.ts` (DOCKS)
 - Add to `src/plugins/runtime/index.ts` (channel runtime methods)
 
 **5. Update Configuration**
+
 - Add to `src/config/types.channels.ts` (ChannelsConfig)
 - Add Zod schema to `src/config/zod-schema.ts`
 - Add to plugin auto-enable logic
@@ -353,35 +372,35 @@ See: [Channel Plugin Creator Skill](/.github/skills/channel-plugin-creator/SKILL
 
 ### Channels with Core + Extension (7)
 
-| Channel | Core (`src/`) | Extension (`extensions/`) | Status |
-|---------|---------------|---------------------------|--------|
-| Discord | `src/discord/` | `extensions/discord/` | ✅ Active |
-| Telegram | `src/telegram/` | `extensions/telegram/` | ✅ Active |
-| Slack | `src/slack/` | `extensions/slack/` | ✅ Active |
-| Signal | `src/signal/` | `extensions/signal/` | ✅ Active |
-| iMessage | `src/imessage/` | `extensions/imessage/` | ✅ Active |
-| WhatsApp | `src/web/` | `extensions/whatsapp/` | ✅ Active |
-| LINE | `src/line/` | `extensions/line/` | ✅ Active |
+| Channel  | Core (`src/`)   | Extension (`extensions/`) | Status    |
+| -------- | --------------- | ------------------------- | --------- |
+| Discord  | `src/discord/`  | `extensions/discord/`     | ✅ Active |
+| Telegram | `src/telegram/` | `extensions/telegram/`    | ✅ Active |
+| Slack    | `src/slack/`    | `extensions/slack/`       | ✅ Active |
+| Signal   | `src/signal/`   | `extensions/signal/`      | ✅ Active |
+| iMessage | `src/imessage/` | `extensions/imessage/`    | ✅ Active |
+| WhatsApp | `src/web/`      | `extensions/whatsapp/`    | ✅ Active |
+| LINE     | `src/line/`     | `extensions/line/`        | ✅ Active |
 
 ### Extension-Only Channels (13)
 
 These channels are implemented purely as plugins without core implementations:
 
-| Channel | Location | Type |
-|---------|----------|------|
-| BlueBubbles | `extensions/bluebubbles/` | iMessage proxy |
-| Google Chat | `extensions/googlechat/` | Google Workspace |
-| Matrix | `extensions/matrix/` | Federated chat |
-| Mattermost | `extensions/mattermost/` | Open-source team chat |
-| MS Teams | `extensions/msteams/` | Microsoft Teams |
-| Nextcloud Talk | `extensions/nextcloud-talk/` | Nextcloud messaging |
-| Nostr | `extensions/nostr/` | Decentralized protocol |
-| Tlon | `extensions/tlon/` | Urbit messaging |
-| Twitch | `extensions/twitch/` | Live streaming chat |
-| Voice Call | `extensions/voice-call/` | Voice assistant |
-| Web UI | `extensions/web/` | Browser interface |
-| Zalo | `extensions/zalo/` | Vietnamese messenger |
-| ZaloUser | `extensions/zalouser/` | Zalo user mode |
+| Channel        | Location                     | Type                   |
+| -------------- | ---------------------------- | ---------------------- |
+| BlueBubbles    | `extensions/bluebubbles/`    | iMessage proxy         |
+| Google Chat    | `extensions/googlechat/`     | Google Workspace       |
+| Matrix         | `extensions/matrix/`         | Federated chat         |
+| Mattermost     | `extensions/mattermost/`     | Open-source team chat  |
+| MS Teams       | `extensions/msteams/`        | Microsoft Teams        |
+| Nextcloud Talk | `extensions/nextcloud-talk/` | Nextcloud messaging    |
+| Nostr          | `extensions/nostr/`          | Decentralized protocol |
+| Tlon           | `extensions/tlon/`           | Urbit messaging        |
+| Twitch         | `extensions/twitch/`         | Live streaming chat    |
+| Voice Call     | `extensions/voice-call/`     | Voice assistant        |
+| Web UI         | `extensions/web/`            | Browser interface      |
+| Zalo           | `extensions/zalo/`           | Vietnamese messenger   |
+| ZaloUser       | `extensions/zalouser/`       | Zalo user mode         |
 
 ## Maintenance Guidelines
 

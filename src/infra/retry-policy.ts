@@ -1,4 +1,3 @@
-import { RateLimitError } from "@buape/carbon";
 import { formatErrorMessage } from "./errors.js";
 import { type RetryConfig, resolveRetryConfig, retryAsync } from "./retry.js";
 
@@ -19,6 +18,14 @@ export const TELEGRAM_RETRY_DEFAULTS = {
 };
 
 const TELEGRAM_RETRY_RE = /429|timeout|connect|reset|closed|unavailable|temporarily/i;
+
+function isRateLimitError(err: unknown): err is { retryAfter: number } {
+  if (!err || typeof err !== "object") {
+    return false;
+  }
+  const retryAfter = (err as { retryAfter?: unknown }).retryAfter;
+  return typeof retryAfter === "number" && Number.isFinite(retryAfter);
+}
 
 function getTelegramRetryAfterMs(err: unknown): number | undefined {
   if (!err || typeof err !== "object") {
@@ -55,8 +62,8 @@ export function createDiscordRetryRunner(params: {
     retryAsync(fn, {
       ...retryConfig,
       label,
-      shouldRetry: (err) => err instanceof RateLimitError,
-      retryAfterMs: (err) => (err instanceof RateLimitError ? err.retryAfter * 1000 : undefined),
+      shouldRetry: (err) => isRateLimitError(err),
+      retryAfterMs: (err) => (isRateLimitError(err) ? err.retryAfter * 1000 : undefined),
       onRetry: params.verbose
         ? (info) => {
             const labelText = info.label ?? "request";

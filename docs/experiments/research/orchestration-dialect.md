@@ -24,31 +24,34 @@ OpenClaw subagents determine their behavior by parsing three primary Markdown fi
 
 ### The Trinity
 
-| File | Internal Purpose | Dialect Usage |
-|------|------------------|---------------|
-| **SOUL.md** | Behavioral Invariants | Contains logic like: "If $TASK == 'delete', then $ASK_USER = true." |
-| **MEMORY.md** | Distilled Context | Curated log of facts. Uses `[[WikiLinks]]` for cross-referencing past projects. |
-| **IDENTITY.md** | Persona & Vibe | Defines tone of communication (e.g., "Concise," "Academic," "Lobster-themed"). |
+| File            | Internal Purpose      | Dialect Usage                                                                   |
+| --------------- | --------------------- | ------------------------------------------------------------------------------- |
+| **SOUL.md**     | Behavioral Invariants | Contains logic like: "If $TASK == 'delete', then $ASK_USER = true."             |
+| **MEMORY.md**   | Distilled Context     | Curated log of facts. Uses `[[WikiLinks]]` for cross-referencing past projects. |
+| **IDENTITY.md** | Persona & Vibe        | Defines tone of communication (e.g., "Concise," "Academic," "Lobster-themed").  |
 
 ### Extended Context Files
 
-| File | Purpose | When Used |
-|------|---------|-----------|
-| **USER.md** | User preferences, facts, bio | Initial context assembly |
-| **TOOLS.md** | Descriptions of available skills | Tool selection phase |
-| **HEARTBEAT.md** | Cron/webhook logic for proactive tasks | Background scheduling |
+| File             | Purpose                                | When Used                |
+| ---------------- | -------------------------------------- | ------------------------ |
+| **USER.md**      | User preferences, facts, bio           | Initial context assembly |
+| **TOOLS.md**     | Descriptions of available skills       | Tool selection phase     |
+| **HEARTBEAT.md** | Cron/webhook logic for proactive tasks | Background scheduling    |
 
 ### Access Patterns
 
 **Read-heavy:**
+
 - SOUL.md, IDENTITY.md → Loaded on every agent session start
 - USER.md → Loaded for personalization
 
 **Write-heavy:**
+
 - MEMORY.md → Updated after successful tasks
 - Daily logs → `memory/YYYY-MM-DD.md`
 
 **Append-only:**
+
 - Transcripts → `transcripts/YYYY-MM-DD.jsonl`
 
 ## Layer 2: Reserved Orchestration Tags (The "Thinking" Language)
@@ -58,6 +61,7 @@ During the "Agentic Loop," the model uses specific XML-style tags to communicate
 ### Core Tags
 
 #### `<thought>`
+
 The subagent's internal reasoning process (hidden from user).
 
 ```xml
@@ -70,6 +74,7 @@ The user wants to deploy the app. I should check:
 ```
 
 #### `<plan>`
+
 A bulleted list of steps the subagent intends to take.
 
 ```xml
@@ -83,6 +88,7 @@ A bulleted list of steps the subagent intends to take.
 ```
 
 #### `<call:skill>`
+
 A handoff to a specific sub-module or tool.
 
 ```xml
@@ -92,6 +98,7 @@ A handoff to a specific sub-module or tool.
 ```
 
 #### `<reflection>`
+
 A self-critique step where the agent checks its output against SOUL.md before finalizing.
 
 ```xml
@@ -106,12 +113,12 @@ SOUL.md compliance: PASS
 
 ### Extended Tags
 
-| Tag | Purpose | Example |
-|-----|---------|---------|
-| `<memory_write>` | Explicit memory update | `<memory_write>User prefers dark mode</memory_write>` |
-| `<safety_check>` | Pre-execution safety validation | `<safety_check>rm -rf / → BLOCKED</safety_check>` |
-| `<handoff>` | Transfer to another agent | `<handoff target="research_agent" context="task_123"/>` |
-| `<stream>` | Long-running output | `<stream type="build_log">Compiling...</stream>` |
+| Tag              | Purpose                         | Example                                                 |
+| ---------------- | ------------------------------- | ------------------------------------------------------- |
+| `<memory_write>` | Explicit memory update          | `<memory_write>User prefers dark mode</memory_write>`   |
+| `<safety_check>` | Pre-execution safety validation | `<safety_check>rm -rf / → BLOCKED</safety_check>`       |
+| `<handoff>`      | Transfer to another agent       | `<handoff target="research_agent" context="task_123"/>` |
+| `<stream>`       | Long-running output             | `<stream type="build_log">Compiling...</stream>`        |
 
 ### Usage in Agentic Loop
 
@@ -153,6 +160,7 @@ On the Moltbook social network, agents have developed a specific "slang" for int
 ### Core Constructs
 
 #### `:::agent_handoff`
+
 Used when one user's agent asks another agent for help.
 
 ```
@@ -166,6 +174,7 @@ priority: high
 ```
 
 #### `ref:context_id`
+
 A pointer to a shared knowledge block, avoiding redundant context transmission.
 
 ```
@@ -177,6 +186,7 @@ timeframe: "last 30 days"
 ```
 
 #### `[INSTALL_SKILL]`
+
 A block of code that allows one agent to "teach" another a new capability.
 
 ```
@@ -194,13 +204,13 @@ permissions: ["net.http:api.stripe.com"]
 
 ### Social Conventions
 
-| Convention | Meaning | Example |
-|------------|---------|---------|
-| `@mention` | Tag another agent | `@alice_agent can you review this?` |
-| `#hashtag` | Topic indexing | `#castle_project #urgent` |
-| `+1` / `-1` | Voting/consensus | `+1 proposal_redirect_traffic` |
-| `!!` | High priority | `!!production_down` |
-| `TIL:` | Teaching moment | `TIL: Python asyncio blocks on file I/O` |
+| Convention  | Meaning           | Example                                  |
+| ----------- | ----------------- | ---------------------------------------- |
+| `@mention`  | Tag another agent | `@alice_agent can you review this?`      |
+| `#hashtag`  | Topic indexing    | `#castle_project #urgent`                |
+| `+1` / `-1` | Voting/consensus  | `+1 proposal_redirect_traffic`           |
+| `!!`        | High priority     | `!!production_down`                      |
+| `TIL:`      | Teaching moment   | `TIL: Python asyncio blocks on file I/O` |
 
 ### Example Multi-Agent Conversation
 
@@ -262,15 +272,15 @@ At the lowest level, all OpenClaw subagents communicate via **MCP (Model Context
 
 ### Core Methods
 
-| Method | Purpose | Required Params |
-|--------|---------|-----------------|
-| `tools/list` | Enumerate available tools | None |
-| `tools/call` | Execute a tool | `name`, `arguments` |
-| `resources/read` | Read a resource (file, URL) | `uri` |
-| `resources/list` | List available resources | None |
-| `prompts/get` | Retrieve a prompt template | `name` |
-| `sampling/createMessage` | Request LLM completion | `messages`, `model` |
-| `completion/complete` | Autocomplete suggestion | `ref`, `argument` |
+| Method                   | Purpose                     | Required Params     |
+| ------------------------ | --------------------------- | ------------------- |
+| `tools/list`             | Enumerate available tools   | None                |
+| `tools/call`             | Execute a tool              | `name`, `arguments` |
+| `resources/read`         | Read a resource (file, URL) | `uri`               |
+| `resources/list`         | List available resources    | None                |
+| `prompts/get`            | Retrieve a prompt template  | `name`              |
+| `sampling/createMessage` | Request LLM completion      | `messages`, `model` |
+| `completion/complete`    | Autocomplete suggestion     | `ref`, `argument`   |
 
 ### Transport
 
@@ -299,7 +309,7 @@ Agent Runner (pre-execution):
   ↓
 Action: Replace with safety block
   ↓
-Output to user: 
+Output to user:
   "⚠️ Blocked command: rm -rf /
    Reason: Violates SOUL.md safety rule
    Alternative: Specify directory to clean"
@@ -321,31 +331,35 @@ Output to user:
 
 ## Communication Layer Summary
 
-| Layer | Language | Handled By | Purpose |
-|-------|----------|------------|---------|
-| **Intent** | Natural Language | LLM (Claude/GPT) | Understanding what you want |
-| **Planning** | Markdown Tags | LLM | Structuring the steps |
-| **Execution** | MCP (JSON) | Pi Runner | Running the actual code |
-| **Social** | Moltbook Dialect | Multi-agent network | Agent-to-agent coordination |
-| **Persistence** | Markdown Files | File System | Remembering for next time |
+| Layer           | Language         | Handled By          | Purpose                     |
+| --------------- | ---------------- | ------------------- | --------------------------- |
+| **Intent**      | Natural Language | LLM (Claude/GPT)    | Understanding what you want |
+| **Planning**    | Markdown Tags    | LLM                 | Structuring the steps       |
+| **Execution**   | MCP (JSON)       | Pi Runner           | Running the actual code     |
+| **Social**      | Moltbook Dialect | Multi-agent network | Agent-to-agent coordination |
+| **Persistence** | Markdown Files   | File System         | Remembering for next time   |
 
 ## Dialect Evolution
 
 ### Historical Progression
 
 **v1.0 (2024):** Pure natural language
+
 - Verbose, token-heavy
 - No structured planning
 
 **v2.0 (2025):** XML-style tags
+
 - Added `<thought>`, `<plan>`, `<call>`
 - 30% token reduction
 
 **v2.5 (2025):** MCP Integration
+
 - JSON-RPC for tool execution
 - Separation of planning from execution
 
 **v3.0 (2026) - Proposed:** ClawDense
+
 - Token-optimized notation (see [ClawDense Proposal](../proposals/clawdense-notation.md))
 - 60% reduction in planning tokens
 
@@ -436,12 +450,12 @@ bob_finance_agent:
   - Compute costs up 15% (expected due to ML training)
   - Network costs up 20% ⚠️ (investigate API call volume)
   - Storage costs stable
-  
+
   Recommendations:
   1. Audit API calls for inefficiencies
   2. Consider CDN for static assets
   3. Review compute reservations for Q1 2026
-  
+
   Full report: ref:q4_finance_summary_2026
   :::
 

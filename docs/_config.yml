@@ -1,5 +1,5 @@
 title: "ClosedClaw Docs"
-description: "A TypeScript/Node gateway + macOS/iOS/Android companions for WhatsApp (web) and Telegram (bot)."
+description: "AI assistant gateway that connects multiple messaging channels to the Pi agent runtime."
 markdown: kramdown
 highlighter: rouge
 
@@ -26,26 +26,18 @@ nav:
     url: "/start/ClosedClaw/"
   - title: "Gateway"
     url: "/gateway/"
-  - title: "Remote"
-    url: "/gateway/remote/"
-  - title: "Discovery"
-    url: "/gateway/discovery/"
   - title: "Configuration"
     url: "/gateway/configuration/"
-  - title: "WebChat"
-    url: "/web/webchat/"
-  - title: "macOS App"
-    url: "/platforms/macos/"
-  - title: "iOS App"
-    url: "/platforms/ios/"
-  - title: "Android App"
-    url: "/platforms/android/"
-  - title: "Telegram"
-    url: "/channels/telegram/"
+  - title: "Tools"
+    url: "/tools/"
+  - title: "Agents"
+    url: "/agents/"
   - title: "Security"
-    url: "/gateway/security/"
+    url: "/security/"
   - title: "Troubleshooting"
     url: "/gateway/troubleshooting/"
+  - title: "Development"
+    url: "/development/"
 
 kramdown:
   input: GFM

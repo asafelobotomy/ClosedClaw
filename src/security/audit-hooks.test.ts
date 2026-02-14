@@ -2,10 +2,10 @@
  * Tests for audit hooks integration.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs/promises";
-import path from "node:path";
 import os from "node:os";
+import path from "node:path";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   logToolExecution,
   logConfigChange,
@@ -392,7 +392,9 @@ describe("audit hooks", () => {
       expect(entries).toHaveLength(3);
 
       // First entry should link to genesis
-      expect(entries[0].prevHash).toBe("0000000000000000000000000000000000000000000000000000000000000000");
+      expect(entries[0].prevHash).toBe(
+        "0000000000000000000000000000000000000000000000000000000000000000",
+      );
 
       // Second entry should link to first
       expect(entries[1].prevHash).toBe(entries[0].hash);

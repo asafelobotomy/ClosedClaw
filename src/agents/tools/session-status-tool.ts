@@ -1,5 +1,4 @@
 import { Type } from "@sinclair/typebox";
-import { secondsToMs } from "../../config/constants/index.js";
 import type { ClosedClawConfig } from "../../config/config.js";
 import type { AnyAgentTool } from "./common.js";
 import { resolveAgentDir } from "../../agents/agent-scope.js";
@@ -22,6 +21,7 @@ import { normalizeGroupActivation } from "../../auto-reply/group-activation.js";
 import { getFollowupQueueDepth, resolveQueueSettings } from "../../auto-reply/reply/queue.js";
 import { buildStatusMessage } from "../../auto-reply/status.js";
 import { loadConfig } from "../../config/config.js";
+import { secondsToMs } from "../../config/constants/index.js";
 import {
   loadSessionStore,
   resolveStorePath,

@@ -1,5 +1,5 @@
 import type { GatewayRequestHandlers } from "./types.js";
-import { resolveClosedClawPackageRoot } from "../../infra/openclaw-root.js";
+import { resolveClosedClawPackageRoot } from "../../infra/closedclaw-root.js";
 import {
   formatDoctorNonInteractiveHint,
   type RestartSentinelPayload,

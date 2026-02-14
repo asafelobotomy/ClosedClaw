@@ -220,10 +220,16 @@ describe("security fix", () => {
     });
 
     const hasNotDir = res.actions.some(
-      (action) => action.kind === "chmod" && action.path === fakeStateDir && action.skipped === "not-a-directory",
+      (action) =>
+        action.kind === "chmod" &&
+        action.path === fakeStateDir &&
+        action.skipped === "not-a-directory",
     );
     const hasNotFile = res.actions.some(
-      (action) => action.kind === "chmod" && action.path === fakeConfigPath && action.skipped === "not-a-file",
+      (action) =>
+        action.kind === "chmod" &&
+        action.path === fakeConfigPath &&
+        action.skipped === "not-a-file",
     );
 
     expect(hasNotDir).toBe(true);
@@ -231,7 +237,8 @@ describe("security fix", () => {
 
     const includeRes = await fixSecurityFootguns({ env, stateDir: tmp, configPath: realConfig });
     const hasSymlinkSkip = includeRes.actions.some(
-      (action) => action.kind === "chmod" && action.path === includeLink && action.skipped === "symlink",
+      (action) =>
+        action.kind === "chmod" && action.path === includeLink && action.skipped === "symlink",
     );
     expect(hasSymlinkSkip).toBe(true);
   });

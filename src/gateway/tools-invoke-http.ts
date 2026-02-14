@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { createClosedClawTools } from "../agents/openclaw-tools.js";
+import { createClosedClawTools } from "../agents/closedclaw-tools.js";
 import {
   filterToolsByPolicy,
   resolveEffectiveToolPolicy,

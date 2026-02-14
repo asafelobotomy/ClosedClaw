@@ -36,21 +36,22 @@ tools/
 
 ## Category Breakdown
 
-| Category      | Files | Purpose                          |
-|---------------|-------|----------------------------------|
-| build         | 5     | Compilation, bundling, build info |
-| ci            | 3     | Git hooks, formatting, CI setup  |
-| deployment    | 7     | Cloud services, systemd          |
-| dev           | 10    | Development tools & utilities    |
-| docker        | 4     | Containers & sandbox setup       |
-| docs          | 3     | Documentation generation         |
-| maintenance   | 11    | Release checks, syncing, codegen |
-| platform      | 6     | OS-specific scripts              |
-| testing       | 8     | Test runners, docker tests       |
+| Category    | Files | Purpose                           |
+| ----------- | ----- | --------------------------------- |
+| build       | 5     | Compilation, bundling, build info |
+| ci          | 3     | Git hooks, formatting, CI setup   |
+| deployment  | 7     | Cloud services, systemd           |
+| dev         | 10    | Development tools & utilities     |
+| docker      | 4     | Containers & sandbox setup        |
+| docs        | 3     | Documentation generation          |
+| maintenance | 11    | Release checks, syncing, codegen  |
+| platform    | 6     | OS-specific scripts               |
+| testing     | 8     | Test runners, docker tests        |
 
 ## Files Migrated
 
 ### Build (5 files)
+
 - `bundle-a2ui.sh` → `tools/build/`
 - `canvas-a2ui-copy.ts` → `tools/build/`
 - `copy-hook-metadata.ts` → `tools/build/`
@@ -58,11 +59,13 @@ tools/
 - `build_icon.sh` → `tools/build/`
 
 ### CI/CD (3 files)
+
 - `committer` → `tools/ci/`
 - `format-staged.js` → `tools/ci/`
 - `setup-git-hooks.js` → `tools/ci/`
 
 ### Deployment (7 files)
+
 - `tailscale-enforce.sh` → `tools/deployment/cloud/`
 - `tailscale-mullvad.sh` → `tools/deployment/cloud/`
 - `tailscale-preflight.sh` → `tools/deployment/cloud/`
@@ -72,6 +75,7 @@ tools/
 - `termux-sync-widget.sh` → `tools/deployment/cloud/`
 
 ### Development (10 files)
+
 - `auth-monitor.sh` → `tools/dev/`
 - `bench-model.ts` → `tools/dev/`
 - `debug-claude-usage.ts` → `tools/dev/`
@@ -84,17 +88,20 @@ tools/
 - `ui.js` → `tools/dev/`
 
 ### Docker (4 files)
+
 - `sandbox-browser-entrypoint.sh` → `tools/docker/`
 - `sandbox-browser-setup.sh` → `tools/docker/`
 - `sandbox-common-setup.sh` → `tools/docker/`
 - `sandbox-setup.sh` → `tools/docker/`
 
 ### Documentation (3 files)
+
 - `build-docs-list.mjs` → `tools/docs/`
 - `docs-list.js` → `tools/docs/`
 - `changelog-to-html.sh` → `tools/docs/`
 
 ### Maintenance (11 files)
+
 - `release-check.ts` → `tools/maintenance/`
 - `sync-labels.ts` → `tools/maintenance/`
 - `sync-moonshot-docs.ts` → `tools/maintenance/`
@@ -108,6 +115,7 @@ tools/
 - `update-clawtributors.types.ts` → `tools/maintenance/`
 
 ### Platform-Specific (6 files)
+
 - `package-mac-dist.sh` → `tools/platform/macos/`
 - `notarize-mac-artifact.sh` → `tools/platform/macos/`
 - `make_appcast.sh` → `tools/platform/macos/`
@@ -116,6 +124,7 @@ tools/
 - `mobile-reauth.sh` → `tools/platform/mobile/`
 
 ### Testing (8 files)
+
 - `test-parallel.mjs` → `tools/testing/`
 - `test-cleanup-docker.sh` → `tools/testing/`
 - `test-install-sh-docker.sh` → `tools/testing/`
@@ -126,6 +135,7 @@ tools/
 - `zai-fallback-repro.ts` → `tools/testing/repro/`
 
 ### Directories (6 subdirectories)
+
 - `scripts/docker/` → `tools/docker/legacy/`
 - `scripts/docs-i18n/` → `tools/docs/i18n/`
 - `scripts/e2e/` → `tools/testing/e2e/`
@@ -136,6 +146,7 @@ tools/
 ## Validation
 
 ✅ **Build scripts verified**
+
 ```bash
 # package.json now references:
 tools/build/canvas-a2ui-copy.ts
@@ -145,6 +156,7 @@ tools/build/bundle-a2ui.sh
 ```
 
 ✅ **Dev scripts verified**
+
 ```bash
 # All dev commands use new paths:
 pnpm dev → node tools/dev/run-node.mjs
@@ -152,6 +164,7 @@ pnpm gateway:watch → node tools/dev/watch-node.mjs
 ```
 
 ✅ **File integrity verified**
+
 - All files copied successfully
 - Executable permissions preserved
 - Original files remain in scripts/ for backwards compatibility
@@ -161,6 +174,7 @@ pnpm gateway:watch → node tools/dev/watch-node.mjs
 **Status**: Old `scripts/` directory remains intact alongside new `tools/` structure.
 
 **Rationale**:
+
 - Zero-risk migration (no files deleted)
 - External scripts referencing old paths still work
 - Can remove `scripts/` directory in future release after transition period
@@ -176,22 +190,26 @@ pnpm gateway:watch → node tools/dev/watch-node.mjs
 ## Next Steps
 
 ### Immediate
+
 - ✅ Migration complete
 - ✅ package.json updated
 - ✅ Build validated
 
 ### Short-term (1-2 weeks)
+
 - [ ] Update documentation references (README, docs/)
 - [ ] Update CI/CD configs if needed
 - [ ] Add `tools/` to .github/labeler.yml
 - [ ] Communicate change to team
 
 ### Medium-term (next release)
+
 - [ ] Monitor for any scripts still referencing old paths
 - [ ] Update external documentation/wikis
 - [ ] Add deprecation notice in old scripts/
 
 ### Long-term (1-2 releases later)
+
 - [ ] Remove old `scripts/` directory
 - [ ] Update archive docs referencing old structure
 
@@ -200,6 +218,7 @@ pnpm gateway:watch → node tools/dev/watch-node.mjs
 Automated migration script created at: `tools/maintenance/migrate-scripts.ts`
 
 **Usage**:
+
 ```bash
 # Dry run (preview only)
 pnpm exec tsx tools/maintenance/migrate-scripts.ts --dry-run
@@ -214,11 +233,13 @@ pnpm exec tsx tools/maintenance/migrate-scripts.ts --no-symlinks
 ## Impact
 
 **Risk Level**: ✅ **LOW**
+
 - Non-breaking change (old paths still work)
 - Package manager automatically uses updated package.json
 - Build validated, no runtime changes
 
 **Developer Experience**: ⬆️ **HIGH POSITIVE IMPACT**
+
 - Clear categorization
 - Easier navigation
 - Professional structure

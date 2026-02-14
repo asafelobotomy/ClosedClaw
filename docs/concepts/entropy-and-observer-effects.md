@@ -83,15 +83,15 @@ Inject controlled randomness into agent decision-making at specific points:
   agents: {
     defaults: {
       entropy: {
-        enabled: false,              // opt-in
-        temperatureVariance: 0.1,    // ± this amount from base temp
-        promptRotation: false,       // rotate system prompt suffixes
-        toolOrderShuffle: false,     // randomize tool presentation order
-        explorationRate: 0.0,        // epsilon for exploration (0.0 = off, 0.1 = 10% explore)
-        seed: null                   // null = true random, string = deterministic seed
-      }
-    }
-  }
+        enabled: false, // opt-in
+        temperatureVariance: 0.1, // ± this amount from base temp
+        promptRotation: false, // rotate system prompt suffixes
+        toolOrderShuffle: false, // randomize tool presentation order
+        explorationRate: 0.0, // epsilon for exploration (0.0 = off, 0.1 = 10% explore)
+        seed: null, // null = true random, string = deterministic seed
+      },
+    },
+  },
 }
 ```
 
@@ -118,7 +118,7 @@ api.on("before_agent_start", {
     }
 
     return next();
-  }
+  },
 });
 ```
 
@@ -127,6 +127,7 @@ api.on("before_agent_start", {
 ### The Principle
 
 In software, observation genuinely changes behavior:
+
 - Adding logging changes timing (I/O overhead)
 - Profiling changes memory allocation patterns
 - Monitoring dashboards change operator behavior which changes system config
@@ -140,30 +141,31 @@ Rather than fighting the observer effect, embrace it. The agent should know when
 {
   agents: {
     list: {
-      "main": {
+      main: {
         observability: {
-          mode: "aware",          // "unaware" | "aware" | "transparent"
+          mode: "aware", // "unaware" | "aware" | "transparent"
           // "unaware": agent doesn't know it's being monitored
           // "aware": agent knows monitoring exists but not specifics
           // "transparent": agent can read its own mirror observations
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 }
 ```
 
 **Trade-off analysis:**
 
-| Mode | Benefit | Risk |
-|---|---|---|
-| **unaware** | Most natural behavior, best for diagnostics | Agent may make errors it would avoid if watched |
-| **aware** | Agent self-corrects knowing observations happen | May perform differently (Hawthorne effect) — but this could be desirable |
-| **transparent** | Agent can learn from mirror feedback | Feedback loop risk; agent may game the mirror's metrics |
+| Mode            | Benefit                                         | Risk                                                                     |
+| --------------- | ----------------------------------------------- | ------------------------------------------------------------------------ |
+| **unaware**     | Most natural behavior, best for diagnostics     | Agent may make errors it would avoid if watched                          |
+| **aware**       | Agent self-corrects knowing observations happen | May perform differently (Hawthorne effect) — but this could be desirable |
+| **transparent** | Agent can learn from mirror feedback            | Feedback loop risk; agent may game the mirror's metrics                  |
 
 ### Measuring the Observer Effect
 
 The self_mirror can run controlled experiments:
+
 1. Observe agent with monitoring hooks active for 1 week
 2. Observe agent with hooks disabled for 1 week (mirror only sees session logs post-hoc)
 3. Compare: response quality, tool efficiency, error rates, cost
@@ -200,20 +202,20 @@ When the self_mirror detects a quality trend:
 
 ```typescript
 interface CorrectionState {
-  metric: string;           // "verbosity" | "tool_efficiency" | "error_rate"
-  targetValue: number;      // desired score
-  currentValue: number;     // latest measured score
+  metric: string; // "verbosity" | "tool_efficiency" | "error_rate"
+  targetValue: number; // desired score
+  currentValue: number; // latest measured score
   correctionStrength: number; // starts at 1.0, halves each cycle
-  dampingFactor: number;    // 0.5 default
-  cycleCount: number;       // how many corrections applied
-  maxCycles: number;        // stop after N corrections (prevent infinite loop)
+  dampingFactor: number; // 0.5 default
+  cycleCount: number; // how many corrections applied
+  maxCycles: number; // stop after N corrections (prevent infinite loop)
 }
 
 function computeCorrection(state: CorrectionState): string | null {
   const delta = state.currentValue - state.targetValue;
-  if (Math.abs(delta) < EPSILON) return null;  // converged
+  if (Math.abs(delta) < EPSILON) return null; // converged
 
-  if (state.cycleCount >= state.maxCycles) return null;  // give up
+  if (state.cycleCount >= state.maxCycles) return null; // give up
 
   const strength = state.correctionStrength * Math.pow(state.dampingFactor, state.cycleCount);
 
@@ -248,11 +250,11 @@ $$H(X) = -\sum_{i=1}^{n} p(x_i) \log_2 p(x_i)$$
 
 Where $X$ is the distribution of tool choices over a window of $N$ actions.
 
-| Metric | Low entropy (< 1.0) | High entropy (> 3.0) |
-|---|---|---|
-| **Tool distribution** | Agent stuck on 1-2 tools | Agent using diverse toolkit |
-| **Response length** | Uniform response sizes | Varied (appropriate to context) |
-| **Decision time** | Constant deliberation | Variable (simple = fast, complex = slow) |
+| Metric                | Low entropy (< 1.0)      | High entropy (> 3.0)                     |
+| --------------------- | ------------------------ | ---------------------------------------- |
+| **Tool distribution** | Agent stuck on 1-2 tools | Agent using diverse toolkit              |
+| **Response length**   | Uniform response sizes   | Varied (appropriate to context)          |
+| **Decision time**     | Constant deliberation    | Variable (simple = fast, complex = slow) |
 
 The mirror agent computes these periodically and flags when entropy drops below a threshold (behavioral rut) or spikes above (erratic behavior).
 
@@ -266,7 +268,7 @@ High mutual information = agents are tightly coupled (good for pipeline, bad for
 
 ## Implementation Checklist
 
-- [ ] Define entropy config schema (agents.defaults.entropy.*)
+- [ ] Define entropy config schema (agents.defaults.entropy.\*)
 - [ ] Implement entropy pool (crypto-based randomness source)
 - [ ] Build temperature variance injection (before_agent_start hook)
 - [ ] Build tool order shuffling middleware

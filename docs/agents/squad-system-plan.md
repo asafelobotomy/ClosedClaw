@@ -7,6 +7,7 @@
 ## Vision
 
 Enable multiple AI agents to collaborate on complex tasks through:
+
 - Specialized role-based agents (researcher, coder, reviewer, tester)
 - Shared memory and context across agent boundaries
 - Coordination protocols for parallel work
@@ -46,16 +47,19 @@ Enable multiple AI agents to collaborate on complex tasks through:
 Goal: Establish foundation for multi-agent collaboration with brain-inspired memory
 
 **Phase 1: Memory + Agent Lifecycle (3-4 days)**
+
 - Brain-inspired memory system (working, short-term, long-term)
 - Agent spawning and lifecycle management
 - Inter-agent communication (message passing)
 
 **Phase 2: Coordination Basics (2-3 days)**
+
 - Task queue with priority support
 - Basic coordinator (pipeline strategy only)
 - Simple CLI commands
 
 **MVP Success Criteria**:
+
 - [ ] Spawn 2+ agents in a squad
 - [ ] Agents share state via short-term memory
 - [ ] Memory automatically consolidates to long-term
@@ -68,18 +72,21 @@ Goal: Establish foundation for multi-agent collaboration with brain-inspired mem
 ### Full System: Advanced Features (Phases 3-5, 5-6 days)
 
 **Phase 3: Integration (2-3 days)**
+
 - Semantic and procedural memory stores
 - Squad-aware tools
 - Advanced retrieval (spreading activation, context-dependent)
 - Routing integration
 
 **Phase 4: Advanced Strategies (2-3 days)**
+
 - Parallel strategy
 - Map-reduce strategy
 - Consensus strategy
 - Agent templates (researcher, coder, reviewer, tester)
 
 **Phase 5: Polish & Monitoring (1-2 days)**
+
 - Web UI dashboard
 - Resource management (budgets, rate limits)
 - E2E tests
@@ -92,24 +99,27 @@ Goal: Establish foundation for multi-agent collaboration with brain-inspired mem
 **Goal**: Build foundational components for multi-agent coordination
 
 #### 1.1 Brain-Inspired Memory System (Day 1-2)
+
 **Research**: Human cognitive memory architecture (working, short-term, long-term)
 **See**: [`docs/agents/memory-architecture-research.md`](memory-architecture-research.md)
 
 **Files**: `src/agents/squad/memory/`
 
 ##### Working Memory (Active Context)
+
 **File**: `src/agents/squad/memory/working-memory.ts`
 
 Immediate task context, limited capacity (7±2 items):
+
 ```typescript
 class WorkingMemory {
   private items: Map<string, any> = new Map();
-  private readonly maxSize: number = 10;  // Miller's Law
-  
+  private readonly maxSize: number = 10; // Miller's Law
+
   set(key: string, value: any): void;
   get(key: string): any | undefined;
   clear(): void;
-  
+
   // LRU eviction when full
   private evictLeastRecentlyUsed(): void;
 }
@@ -118,9 +128,11 @@ class WorkingMemory {
 **MVP**: Simple in-memory map per agent, cleared on task completion
 
 ##### Short-Term Memory (Recent Cache)
+
 **File**: `src/agents/squad/memory/short-term-memory.ts`
 
 TTL-based cache for recent data (5 min default):
+
 ```typescript
 interface ShortTermEntry {
   value: any;
@@ -133,14 +145,14 @@ interface ShortTermEntry {
 
 class ShortTermMemory {
   private cache: Map<string, ShortTermEntry> = new Map();
-  
-  get(key: string): any | undefined;           // Auto-extends TTL on access
+
+  get(key: string): any | undefined; // Auto-extends TTL on access
   set(key: string, value: any, ttl?: number): void;
   delete(key: string): void;
-  
+
   // Consolidation
-  getHotEntries(): Array<[string, ShortTermEntry]>;  // Access count >= 5
-  
+  getHotEntries(): Array<[string, ShortTermEntry]>; // Access count >= 5
+
   // Cleanup
   evictExpired(): void;
 }
@@ -149,15 +161,17 @@ class ShortTermMemory {
 **MVP**: In-memory with automatic TTL expiration, access count tracking
 
 ##### Long-Term Memory (Persistent Store)
+
 **File**: `src/agents/squad/memory/long-term-memory.ts`
 
 Encrypted persistent storage:
+
 ```typescript
 class LongTermMemory {
-  episodic: EpisodicStore;    // Task history (MVP focus)
-  semantic: SemanticStore;    // Facts (Phase 3)
+  episodic: EpisodicStore; // Task history (MVP focus)
+  semantic: SemanticStore; // Facts (Phase 3)
   procedural: ProceduralStore; // Strategies (Phase 3)
-  
+
   constructor(storePath: string, passphrase: string);
 }
 
@@ -184,25 +198,27 @@ interface Episode {
 **MVP**: File-based episodic store using EncryptedStore, simple search
 
 ##### Memory Consolidation (Background Process)
+
 **File**: `src/agents/squad/memory/consolidation.ts`
 
 Promotes hot short-term data to long-term:
+
 ```typescript
 async function consolidateMemory(squad: Squad): Promise<ConsolidationResult> {
   const shortTerm = squad.shortTermMemory;
   const longTerm = squad.longTermMemory;
-  
-  const hotEntries = shortTerm.getHotEntries();  // Access count >= 5
-  
+
+  const hotEntries = shortTerm.getHotEntries(); // Access count >= 5
+
   for (const [key, entry] of hotEntries) {
     // Classify and store
     const episode = convertToEpisode(entry);
     await longTerm.episodic.store(episode);
-    
+
     // Remove from short-term
     shortTerm.delete(key);
   }
-  
+
   return { consolidated: hotEntries.length };
 }
 ```
@@ -212,6 +228,7 @@ async function consolidateMemory(squad: Squad): Promise<ConsolidationResult> {
 **Tests**: 25 tests covering all memory tiers, consolidation, retrieval
 
 #### 1.2 Agent Spawning Mechanism (Day 1-2)
+
 **File**: `src/agents/squad/spawner.ts`
 
 - **AgentSpawner class**: Creates and manages agent instances
@@ -219,7 +236,6 @@ async function consolidateMemory(squad: Squad): Promise<ConsolidationResult> {
   - Agent templates (researcher.md, coder.md, reviewer.md, tester.md)
   - Resource limits (max agents, memory per agent, token budgets)
   - Graceful shutdown and cleanup
-  
 - **Agent Lifecycle**:
   - INITIALIZING → READY → WORKING → IDLE → TERMINATING → TERMINATED
   - Heartbeat monitoring (detect hung/crashed agents)
@@ -227,6 +243,7 @@ async function consolidateMemory(squad: Squad): Promise<ConsolidationResult> {
   - Orphan cleanup (agents whose squad terminated)
 
 - **API Design**:
+
 ```typescript
 interface AgentSpawner {
   spawn(config: AgentSpawnConfig): Promise<AgentHandle>;
@@ -236,12 +253,12 @@ interface AgentSpawner {
 }
 
 interface AgentSpawnConfig {
-  role: string;             // "researcher" | "coder" | "reviewer" | "tester"
-  profile: string;          // Path to agent profile markdown
-  model?: string;           // Override default model
-  tools?: string[];         // Subset of available tools
-  maxTokens?: number;       // Budget per task
-  environment?: Record<string, string>;  // Agent-specific env vars
+  role: string; // "researcher" | "coder" | "reviewer" | "tester"
+  profile: string; // Path to agent profile markdown
+  model?: string; // Override default model
+  tools?: string[]; // Subset of available tools
+  maxTokens?: number; // Budget per task
+  environment?: Record<string, string>; // Agent-specific env vars
 }
 
 interface AgentHandle {
@@ -256,6 +273,7 @@ interface AgentHandle {
 **Tests**: 12 tests covering spawn, lifecycle, resource limits, failure recovery
 
 #### 1.3 Inter-Agent Communication (Day 2)
+
 **File**: `src/agents/squad/ipc.ts`
 
 - **Message Passing**: Typed messages between agents
@@ -271,6 +289,7 @@ interface AgentHandle {
   - **Request-Reply**: Agent A asks, Agent B responds
 
 - **API Design**:
+
 ```typescript
 interface AgentIPC {
   send(toAgentId: string, message: AgentMessage): Promise<void>;
@@ -286,7 +305,7 @@ interface AgentMessage {
   type: "task" | "result" | "notification" | "question";
   payload: any;
   timestamp: string;
-  replyTo?: string;  // For request-response
+  replyTo?: string; // For request-response
 }
 ```
 
@@ -297,6 +316,7 @@ interface AgentMessage {
 **Goal**: Enable squads to work together on complex tasks
 
 #### 2.1 Task Queue & Distribution (Day 3)
+
 **File**: `src/agents/squad/task-queue.ts`
 
 - **Task Queue**: FIFO queue with priority support
@@ -313,6 +333,7 @@ interface AgentMessage {
   - Capability matching (only assign if agent has required tools)
 
 - **API Design**:
+
 ```typescript
 interface TaskQueue {
   enqueue(task: Task): Promise<string>;
@@ -324,20 +345,21 @@ interface TaskQueue {
 
 interface Task {
   id: string;
-  type: string;              // "research" | "code" | "review" | "test"
+  type: string; // "research" | "code" | "review" | "test"
   description: string;
   input: any;
   priority: "high" | "normal" | "low";
-  requiredCapabilities?: string[];  // ["coding", "web_search"]
-  dependsOn?: string[];      // Wait for these task IDs
-  timeout?: number;          // Max execution time (ms)
-  retries?: number;          // Max retry attempts
+  requiredCapabilities?: string[]; // ["coding", "web_search"]
+  dependsOn?: string[]; // Wait for these task IDs
+  timeout?: number; // Max execution time (ms)
+  retries?: number; // Max retry attempts
 }
 ```
 
 **Tests**: 18 tests covering enqueue, claim, dependencies, retries, priority
 
 #### 2.2 Squad Coordinator (Day 3-4)
+
 **File**: `src/agents/squad/coordinator.ts`
 
 - **SquadCoordinator class**: Orchestrates multi-agent workflows
@@ -354,6 +376,7 @@ interface Task {
   - **Consensus**: Multiple agents vote on best solution
 
 - **API Design**:
+
 ```typescript
 interface SquadCoordinator {
   createSquad(config: SquadConfig): Promise<Squad>;
@@ -367,13 +390,13 @@ interface SquadConfig {
   strategy: "pipeline" | "parallel" | "map-reduce" | "consensus";
   agents: AgentSpawnConfig[];
   sharedMemory?: SquadMemoryConfig;
-  maxDuration?: number;      // Squad lifetime (ms)
+  maxDuration?: number; // Squad lifetime (ms)
 }
 
 interface ComplexTask {
   description: string;
-  decomposition?: Task[];    // Pre-decomposed subtasks
-  successCriteria?: string;  // How to evaluate completion
+  decomposition?: Task[]; // Pre-decomposed subtasks
+  successCriteria?: string; // How to evaluate completion
 }
 
 interface SquadResult {
@@ -391,6 +414,7 @@ interface SquadResult {
 **Tests**: 20 tests covering strategies, decomposition, aggregation, error handling
 
 #### 2.3 Coordination Primitives (Day 4)
+
 **File**: `src/agents/squad/primitives.ts`
 
 - **Locks**: Prevent concurrent access to shared resources
@@ -417,6 +441,7 @@ interface SquadResult {
 ### Phase 3: Integration & Features (2-3 days)
 
 #### 3.1 Tool Integration (Day 5)
+
 **File**: `src/agents/squad/tools.ts`
 
 - **Squad-Aware Tools**: New tools for agent coordination
@@ -435,6 +460,7 @@ interface SquadResult {
 **Tests**: 12 tests covering tool registration, access control, execution
 
 #### 3.2 Routing Integration (Day 5-6)
+
 **File**: `src/routing/squad-routing.ts`
 
 - **Squad Bindings**: Route messages to squads instead of single agents
@@ -450,9 +476,11 @@ interface SquadResult {
 **Tests**: 10 tests covering squad routing, triggers, reply aggregation
 
 #### 3.3 CLI Commands (Day 6)
+
 **File**: `src/cli/squad-cli.ts`
 
 New commands:
+
 - `closedclaw squad create --name research-team --agents researcher,coder`
 - `closedclaw squad list`: Show active squads
 - `closedclaw squad status <squad-id>`: Show squad progress
@@ -463,6 +491,7 @@ New commands:
 **Tests**: 8 tests covering all CLI commands
 
 #### 3.4 Web UI Monitoring (Day 7)
+
 **Files**: `ui/src/ui/views/squads.ts`, `src/web/routes/squads.ts`
 
 - **Squad Dashboard**: Real-time view of active squads
@@ -482,9 +511,11 @@ New commands:
 ### Phase 4: Advanced Features (2-3 days)
 
 #### 4.1 Agent Templates (Day 8)
+
 **Files**: `~/.closedclaw/agents/squad-templates/`
 
 Pre-built agent profiles:
+
 - **researcher.md**: Web search expert, fact verification, source analysis
 - **coder.md**: Code generation, refactoring, debugging
 - **reviewer.md**: Code review, security audit, best practices
@@ -493,6 +524,7 @@ Pre-built agent profiles:
 - **devops.md**: Infrastructure, deployment, monitoring (from Priority 12.5)
 
 Each template includes:
+
 - System prompt (role, capabilities, constraints)
 - Tool allowlist (only relevant tools)
 - Model recommendation (fast for simple agents, powerful for complex)
@@ -501,6 +533,7 @@ Each template includes:
 **Tests**: 5 tests per template (25 total)
 
 #### 4.2 Squad Strategies (Day 8-9)
+
 **File**: `src/agents/squad/strategies/`
 
 Implement coordination strategies:
@@ -509,17 +542,20 @@ Implement coordination strategies:
   ```
   User request → Researcher (gather info) → Coder (implement) → Reviewer (check) → User
   ```
-  
 - **Parallel Strategy** (`parallel.ts`):
+
   ```
   User request → [Agent A, Agent B, Agent C] → Merge results → User
   ```
+
   Use case: Generate 3 alternative solutions, user picks best
 
 - **Map-Reduce Strategy** (`map-reduce.ts`):
+
   ```
   Large task → Split into subtasks → Distribute to agents → Merge outputs → User
   ```
+
   Use case: Analyze 100 files in parallel
 
 - **Consensus Strategy** (`consensus.ts`):
@@ -531,6 +567,7 @@ Implement coordination strategies:
 **Tests**: 10 tests per strategy (40 total)
 
 #### 4.3 Resource Management (Day 9)
+
 **File**: `src/agents/squad/resources.ts`
 
 - **Token Budget Tracking**: Prevent overspending
@@ -555,9 +592,11 @@ Implement coordination strategies:
 ### Phase 5: Testing & Documentation (1-2 days)
 
 #### 5.1 Integration Tests (Day 10)
+
 **File**: `src/agents/squad/squad.e2e.test.ts`
 
 End-to-end scenarios:
+
 - **Research Squad**: User asks complex question → Researcher gathers info → Coder writes analysis script → Tester verifies → User gets answer
 - **Code Review Squad**: User commits code → Reviewer finds issues → Coder fixes → Tester runs tests → User gets PR
 - **Parallel Analysis**: User uploads 10 files → Map-reduce distributes → Agents analyze → Results merged → User gets report
@@ -565,6 +604,7 @@ End-to-end scenarios:
 **Tests**: 5 e2e tests (slow, comprehensive)
 
 #### 5.2 Documentation (Day 10-11)
+
 **Files**: `docs/agents/squad-system.md`, `docs/agents/squad-strategies.md`, `docs/agents/squad-examples.md`
 
 - **User Guide**: How to create and use squads
@@ -575,9 +615,11 @@ End-to-end scenarios:
 - **Troubleshooting**: Debug squad issues
 
 #### 5.3 Example Configurations (Day 11)
+
 **Files**: `examples/squads/`
 
 Pre-built squad configs:
+
 - `research-squad.json5`: Researcher + coder for data analysis
 - `code-review-squad.json5`: Reviewer + tester for PR gating
 - `documentation-squad.json5`: Documenter + reviewer for doc generation
@@ -587,19 +629,20 @@ Pre-built squad configs:
 
 Total: **11 days** (can compress to 8-9 with aggressive focus)
 
-| Phase | Duration | Tasks |
-|-------|----------|-------|
-| Phase 1: Core Infrastructure | 3-4 days | Shared memory, spawning, IPC |
-| Phase 2: Coordination | 3-4 days | Task queue, coordinator, primitives |
-| Phase 3: Integration | 2-3 days | Tools, routing, CLI, web UI |
-| Phase 4: Advanced Features | 2-3 days | Templates, strategies, resources |
-| Phase 5: Testing & Docs | 1-2 days | E2E tests, docs, examples |
+| Phase                        | Duration | Tasks                               |
+| ---------------------------- | -------- | ----------------------------------- |
+| Phase 1: Core Infrastructure | 3-4 days | Shared memory, spawning, IPC        |
+| Phase 2: Coordination        | 3-4 days | Task queue, coordinator, primitives |
+| Phase 3: Integration         | 2-3 days | Tools, routing, CLI, web UI         |
+| Phase 4: Advanced Features   | 2-3 days | Templates, strategies, resources    |
+| Phase 5: Testing & Docs      | 1-2 days | E2E tests, docs, examples           |
 
 ## Dependencies
 
 **External**: None (uses existing crypto, config, routing infrastructure)
 
 **Internal**:
+
 - Shared memory layer → Agent spawning, IPC
 - Agent spawning + IPC → Task queue, coordination
 - Coordination → Tool integration, routing

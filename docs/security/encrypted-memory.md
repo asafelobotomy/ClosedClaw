@@ -37,6 +37,7 @@ closedclaw security encrypt --status
 ```
 
 Output example:
+
 ```
 Encryption Status
 
@@ -72,6 +73,7 @@ This encrypts all plaintext stores in place. **Backup your data first!**
 ### ⚠️ CRITICAL: Passphrase Loss = Data Loss
 
 If you lose your passphrase, **your encrypted data cannot be recovered**. There is no backdoor or recovery mechanism. Keep your passphrase:
+
 - **Secure**: Store in a password manager (1Password, Bitwarden, etc.)
 - **Backed up**: Write down and store in a safe place
 - **Never committed**: Do not commit passphrases to git repositories
@@ -79,11 +81,13 @@ If you lose your passphrase, **your encrypted data cannot be recovered**. There 
 ### Threat Model
 
 **Protects Against**:
+
 - Physical disk theft
 - Unauthorized local file access
 - Backup compromise (if backups are encrypted)
 
 **Does NOT Protect Against**:
+
 - Active memory dumps while Gateway is running (passphrase is in RAM)
 - Root/admin access on a running system
 - Keyloggers or malware that capture the passphrase when set
@@ -91,6 +95,7 @@ If you lose your passphrase, **your encrypted data cannot be recovered**. There 
 ### Defense in Depth
 
 Encryption at rest is **one layer** of security. Combine with:
+
 - **Mandatory sandboxing** (Priority 2) - Isolates tool execution
 - **Filesystem permissions** - 0o600 on all state/config files
 - **DM pairing** - Requires pairing codes for unknown senders
@@ -134,9 +139,11 @@ Encryption at rest is **one layer** of security. Combine with:
 Check encryption status of all stores.
 
 **Options**:
+
 - `--json`: Output as JSON
 
 **Example**:
+
 ```bash
 closedclaw security encrypt --status --json
 ```
@@ -146,10 +153,12 @@ closedclaw security encrypt --status --json
 Migrate plaintext stores to encrypted storage.
 
 **Requirements**:
+
 - Passphrase must be configured (via env var or file)
 - Passphrase must meet strength requirements
 
 **Example**:
+
 ```bash
 export ClosedClaw_PASSPHRASE="MySecurePassphrase123!"
 closedclaw security encrypt --migrate
@@ -160,11 +169,13 @@ closedclaw security encrypt --migrate
 Show encryption setup instructions (no flags).
 
 **Example**:
+
 ```bash
 closedclaw security encrypt
 ```
 
 Output:
+
 ```
 Encryption Setup
 
@@ -188,35 +199,35 @@ Migrate data: closedclaw security encrypt --migrate
 ### Key Rotation
 
 **Automatic Key Metadata Tracking**: Every encrypted payload now includes:
+
 - `keyId`: Unique identifier (format: `key_<timestamp36>_<random8>`)
 - `keyCreatedAt`: ISO 8601 timestamp for rotation policy enforcement
 
 **Check Key Age**:
-```typescript
-import { needsKeyRotation } from './crypto.js';
 
-const payload = await encryptedStore.readLatest('my-file.enc');
+```typescript
+import { needsKeyRotation } from "./crypto.js";
+
+const payload = await encryptedStore.readLatest("my-file.enc");
 if (needsKeyRotation(payload, 90)) {
-  console.log('Key rotation recommended (>90 days old)');
+  console.log("Key rotation recommended (>90 days old)");
 }
 ```
 
 **Rotate Keys**:
+
 ```typescript
-import { rekeyEncryptedPayload } from './crypto.js';
+import { rekeyEncryptedPayload } from "./crypto.js";
 
 // Re-encrypt with new passphrase
 const oldPassphrase = process.env.ClosedClaw_OLD_PASSPHRASE;
 const newPassphrase = process.env.ClosedClaw_PASSPHRASE;
 
-const rekeyed = await rekeyEncryptedPayload(
-  encryptedPayload,
-  oldPassphrase,
-  newPassphrase
-);
+const rekeyed = await rekeyEncryptedPayload(encryptedPayload, oldPassphrase, newPassphrase);
 ```
 
 **Best Practices**:
+
 - Rotate keys every **90 days** (default policy)
 - Use unique passphrases for each rotation
 - Keep old passphrases for 30 days to decrypt backups
@@ -226,12 +237,14 @@ const rekeyed = await rekeyEncryptedPayload(
 **Automatic Protection**: Config backups (`.bak`, `.bak.1`, etc.) are **automatically encrypted** on every write to prevent plaintext API key leakage.
 
 **Manual Encryption**:
+
 ```bash
 # Encrypt all existing unencrypted backups
 closedclaw security encrypt --backups
 ```
 
 **Diagnostics**:
+
 ```bash
 # Check backup encryption status
 closedclaw doctor
@@ -242,6 +255,7 @@ closedclaw doctor
 ```
 
 **Implementation Details**:
+
 - Backups encrypted with same passphrase as main config
 - Best-effort encryption: logs errors but doesn't fail writes
 - Already-encrypted backups are skipped
@@ -274,6 +288,7 @@ pnpm test
 ```
 
 Test coverage:
+
 - **crypto.test.ts** (61 tests): Core encryption/decryption, key derivation, validation
 - **crypto-hardening.test.ts** (10 tests): Key rotation, re-keying, backup encryption, legacy compatibility
 
@@ -283,6 +298,7 @@ Test coverage:
 - **[@noble/hashes](https://github.com/paulmillr/noble-hashes)** v1.5.0: Audited hashing library (Argon2id)
 
 Both libraries are:
+
 - Actively maintained by [@paulmillr](https://github.com/paulmillr)
 - Audited by security researchers
 - Used in production by major projects
@@ -297,6 +313,7 @@ Error: Failed to resolve passphrase
 ```
 
 **Solution**: Ensure `ClosedClaw_PASSPHRASE` is set:
+
 ```bash
 export ClosedClaw_PASSPHRASE="your-passphrase"
 closedclaw security encrypt --migrate
@@ -310,6 +327,7 @@ Passphrase is too weak:
 ```
 
 **Solution**: Use a stronger passphrase:
+
 ```bash
 export ClosedClaw_PASSPHRASE="MyM0re$ecurePa55phrase!"
 ```
@@ -321,6 +339,7 @@ Decryption failed: incorrect passphrase or corrupted data
 ```
 
 **Solution**:
+
 1. Verify passphrase is correct
 2. Check backup files (`*.bak`) in same directory
 3. Restore from backup if available

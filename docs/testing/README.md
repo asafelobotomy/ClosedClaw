@@ -5,9 +5,11 @@ This directory contains testing-related documentation, guides, and reports.
 ## Structure
 
 ### Guides (`*.md` files)
+
 - **TEST-FIXES-GUIDE.md** — Comprehensive guide to test fixes and patterns used in the codebase
 
 ### Reports (`reports/` directory)
+
 - **TEST-FIXES-2026-02-11.md** — Detailed documentation of all test failures fixed on 2026-02-11, including root causes and patterns
 
 ## Quick Links
@@ -30,4 +32,3 @@ See TEST-FIXES-2026-02-11.md for detailed patterns:
 3. **Module-Level Capture** — Hoisted vi.mock + dynamic import for module state
 4. **RuntimeEnv** — CLI command API (void return, `runtime.log()` output)
 5. **Plugin Adapters** — Unified `deliverOutboundPayloads` API for outbound delivery
-

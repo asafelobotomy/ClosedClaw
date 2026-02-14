@@ -2,9 +2,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { RuntimeEnv } from "../runtime.js";
 import type { DoctorPrompter } from "./doctor-prompter.js";
-import { resolveClosedClawPackageRoot } from "../infra/openclaw-root.js";
-import { runCommandWithTimeout } from "../process/exec.js";
 import { TIMEOUT_TEST_SUITE_SHORT_MS, minutesToMs } from "../config/constants/index.js";
+import { resolveClosedClawPackageRoot } from "../infra/closedclaw-root.js";
+import { runCommandWithTimeout } from "../process/exec.js";
 import { note } from "../terminal/note.js";
 
 export async function maybeRepairUiProtocolFreshness(
@@ -90,52 +90,63 @@ export async function maybeRepairUiProtocolFreshness(
         { timeoutMs: TIMEOUT_TEST_SUITE_SHORT_MS },
       ).catch(() => null);
 
+      const staleMessage = "UI assets are older than the protocol schema.";
+
       if (gitLog && gitLog.code === 0 && gitLog.stdout.trim()) {
         note(
-          `UI assets are older than the protocol schema.\nFunctional changes since last build:\n${gitLog.stdout
+          `${staleMessage}\nFunctional changes since last build:\n${gitLog.stdout
             .trim()
             .split("\n")
             .map((l) => `- ${l}`)
             .join("\n")}`,
           "UI Freshness",
         );
+      } else {
+        note(
+          [
+            staleMessage,
+            "Could not inspect git history (git missing or repo unavailable).",
+            "Rebuild UI to ensure protocol compatibility.",
+          ].join("\n"),
+          "UI Freshness",
+        );
+      }
 
-        const shouldRepair = await prompter.confirmAggressive({
-          message: "Rebuild UI now? (Detected protocol mismatch requiring update)",
-          initialValue: true,
-        });
+      const shouldRepair = await prompter.confirmAggressive({
+        message: "Rebuild UI now? (Detected protocol mismatch requiring update)",
+        initialValue: true,
+      });
 
-        if (shouldRepair) {
-          const uiSourcesPath = path.join(root, "ui/package.json");
-          const uiSourcesExist = await fs.stat(uiSourcesPath).catch(() => null);
-          if (!uiSourcesExist) {
-            note("Skipping UI rebuild: ui/ sources not present.", "UI");
-            return;
-          }
+      if (shouldRepair) {
+        const uiSourcesPath = path.join(root, "ui/package.json");
+        const uiSourcesExist = await fs.stat(uiSourcesPath).catch(() => null);
+        if (!uiSourcesExist) {
+          note("Skipping UI rebuild: ui/ sources not present.", "UI");
+          return;
+        }
 
-          note("Rebuilding stale UI assets... (this may take a moment)", "UI");
-          // Use scripts/ui.js to build, assuming node is available as we are running in it.
-          // We use the same node executable to run the script.
-          const uiScriptPath = path.join(root, "scripts/ui.js");
-          const buildResult = await runCommandWithTimeout(
-            [process.execPath, uiScriptPath, "build"],
-            {
-              cwd: root,
-              timeoutMs: minutesToMs(2),
-              env: { ...process.env, FORCE_COLOR: "1" },
-            },
-          );
-          if (buildResult.code === 0) {
-            note("UI rebuild complete.", "UI");
-          } else {
-            const details = [
-              `UI rebuild failed (exit ${buildResult.code ?? "unknown"}).`,
-              buildResult.stderr.trim() ? buildResult.stderr.trim() : null,
-            ]
-              .filter(Boolean)
-              .join("\n");
-            note(details, "UI");
-          }
+        note("Rebuilding stale UI assets... (this may take a moment)", "UI");
+        // Use scripts/ui.js to build, assuming node is available as we are running in it.
+        // We use the same node executable to run the script.
+        const uiScriptPath = path.join(root, "scripts/ui.js");
+        const buildResult = await runCommandWithTimeout(
+          [process.execPath, uiScriptPath, "build"],
+          {
+            cwd: root,
+            timeoutMs: minutesToMs(2),
+            env: { ...process.env, FORCE_COLOR: "1" },
+          },
+        );
+        if (buildResult.code === 0) {
+          note("UI rebuild complete.", "UI");
+        } else {
+          const details = [
+            `UI rebuild failed (exit ${buildResult.code ?? "unknown"}).`,
+            buildResult.stderr.trim() ? buildResult.stderr.trim() : null,
+          ]
+            .filter(Boolean)
+            .join("\n");
+          note(details, "UI");
         }
       }
     }

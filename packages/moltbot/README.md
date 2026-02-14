@@ -13,11 +13,13 @@ When users who previously installed `moltbot` run `npm install moltbot` or `pnpm
 ## Migration
 
 Replace:
+
 ```bash
 npm install -g moltbot
 ```
 
 With:
+
 ```bash
 npm install -g closedclaw
 ```

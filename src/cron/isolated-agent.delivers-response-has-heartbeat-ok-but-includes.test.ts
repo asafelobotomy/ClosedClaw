@@ -91,7 +91,9 @@ describe("runCronIsolatedAgentTurn", () => {
   beforeEach(() => {
     vi.mocked(runEmbeddedPiAgent).mockReset();
     vi.mocked(loadModelCatalog).mockResolvedValue([]);
-    vi.mocked(deliverOutboundPayloads).mockReset().mockResolvedValue([{ messageId: "mock-1" }]);
+    vi.mocked(deliverOutboundPayloads)
+      .mockReset()
+      .mockResolvedValue([{ messageId: "mock-1" }]);
   });
 
   it("delivers when response has HEARTBEAT_OK but includes media", async () => {

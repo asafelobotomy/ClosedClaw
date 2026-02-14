@@ -1,10 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-
 export function getShellConfig(): { shell: string; args: string[] } {
-
-
   const envShell = process.env.SHELL?.trim();
   const shellName = envShell ? path.basename(envShell) : "";
   // Fish rejects common bashisms used by tools, so prefer bash when detected.
@@ -64,8 +61,6 @@ export function sanitizeBinaryOutput(text: string): string {
 }
 
 export function killProcessTree(pid: number): void {
-
-
   try {
     process.kill(-pid, "SIGKILL");
   } catch {

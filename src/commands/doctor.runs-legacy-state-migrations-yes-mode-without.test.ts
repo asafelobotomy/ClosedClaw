@@ -216,7 +216,7 @@ vi.mock("../process/exec.js", () => ({
   runCommandWithTimeout,
 }));
 
-vi.mock("../infra/openclaw-root.js", () => ({
+vi.mock("../infra/closedclaw-root.js", () => ({
   resolveClosedClawPackageRoot,
 }));
 
@@ -327,64 +327,68 @@ vi.mock("./doctor-state-migrations.js", () => ({
 }));
 
 describe("doctor command", () => {
-  it("runs legacy state migrations in yes mode without prompting", async () => {
-    readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/ClosedClaw.json",
-      exists: true,
-      raw: "{}",
-      parsed: {},
-      valid: true,
-      config: {},
-      issues: [],
-      legacyIssues: [],
-    });
+  it(
+    "runs legacy state migrations in yes mode without prompting",
+    async () => {
+      readConfigFileSnapshot.mockResolvedValue({
+        path: "/tmp/ClosedClaw.json",
+        exists: true,
+        raw: "{}",
+        parsed: {},
+        valid: true,
+        config: {},
+        issues: [],
+        legacyIssues: [],
+      });
 
-    const { doctorCommand } = await import("./doctor.js");
-    const runtime = {
-      log: vi.fn(),
-      error: vi.fn(),
-      exit: vi.fn(),
-    };
+      const { doctorCommand } = await import("./doctor.js");
+      const runtime = {
+        log: vi.fn(),
+        error: vi.fn(),
+        exit: vi.fn(),
+      };
 
-    const { detectLegacyStateMigrations, runLegacyStateMigrations } =
-      await import("./doctor-state-migrations.js");
-    detectLegacyStateMigrations.mockResolvedValueOnce({
-      targetAgentId: "main",
-      targetMainKey: "main",
-      stateDir: "/tmp/state",
-      oauthDir: "/tmp/oauth",
-      sessions: {
-        legacyDir: "/tmp/state/sessions",
-        legacyStorePath: "/tmp/state/sessions/sessions.json",
-        targetDir: "/tmp/state/agents/main/sessions",
-        targetStorePath: "/tmp/state/agents/main/sessions/sessions.json",
-        hasLegacy: true,
-      },
-      agentDir: {
-        legacyDir: "/tmp/state/agent",
-        targetDir: "/tmp/state/agents/main/agent",
-        hasLegacy: false,
-      },
-      whatsappAuth: {
-        legacyDir: "/tmp/oauth",
-        targetDir: "/tmp/oauth/whatsapp/default",
-        hasLegacy: false,
-      },
-      preview: ["- Legacy sessions detected"],
-    });
-    runLegacyStateMigrations.mockResolvedValueOnce({
-      changes: ["migrated"],
-      warnings: [],
-    });
+      const { detectLegacyStateMigrations, runLegacyStateMigrations } =
+        await import("./doctor-state-migrations.js");
+      detectLegacyStateMigrations.mockResolvedValueOnce({
+        targetAgentId: "main",
+        targetMainKey: "main",
+        stateDir: "/tmp/state",
+        oauthDir: "/tmp/oauth",
+        sessions: {
+          legacyDir: "/tmp/state/sessions",
+          legacyStorePath: "/tmp/state/sessions/sessions.json",
+          targetDir: "/tmp/state/agents/main/sessions",
+          targetStorePath: "/tmp/state/agents/main/sessions/sessions.json",
+          hasLegacy: true,
+        },
+        agentDir: {
+          legacyDir: "/tmp/state/agent",
+          targetDir: "/tmp/state/agents/main/agent",
+          hasLegacy: false,
+        },
+        whatsappAuth: {
+          legacyDir: "/tmp/oauth",
+          targetDir: "/tmp/oauth/whatsapp/default",
+          hasLegacy: false,
+        },
+        preview: ["- Legacy sessions detected"],
+      });
+      runLegacyStateMigrations.mockResolvedValueOnce({
+        changes: ["migrated"],
+        warnings: [],
+      });
 
-    runLegacyStateMigrations.mockClear();
-    confirm.mockClear();
+      runLegacyStateMigrations.mockClear();
+      confirm.mockClear();
 
-    await doctorCommand(runtime, { yes: true });
+      await doctorCommand(runtime, { yes: true });
 
-    expect(runLegacyStateMigrations).toHaveBeenCalledTimes(1);
-    expect(confirm).not.toHaveBeenCalled();
-  }, TIMEOUT_HTTP_DEFAULT_MS);
+      expect(runLegacyStateMigrations).toHaveBeenCalledTimes(1);
+      expect(confirm).not.toHaveBeenCalled();
+    },
+    TIMEOUT_HTTP_DEFAULT_MS,
+  );
 
   it("skips gateway restarts in non-interactive mode", async () => {
     readConfigFileSnapshot.mockResolvedValue({
@@ -418,44 +422,48 @@ describe("doctor command", () => {
     expect(confirm).not.toHaveBeenCalled();
   });
 
-  it("migrates anthropic oauth config profile id when only email profile exists", async () => {
-    readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/ClosedClaw.json",
-      exists: true,
-      raw: "{}",
-      parsed: {},
-      valid: true,
-      config: {
-        auth: {
-          profiles: {
-            "anthropic:default": { provider: "anthropic", mode: "oauth" },
+  it(
+    "migrates anthropic oauth config profile id when only email profile exists",
+    async () => {
+      readConfigFileSnapshot.mockResolvedValue({
+        path: "/tmp/ClosedClaw.json",
+        exists: true,
+        raw: "{}",
+        parsed: {},
+        valid: true,
+        config: {
+          auth: {
+            profiles: {
+              "anthropic:default": { provider: "anthropic", mode: "oauth" },
+            },
           },
         },
-      },
-      issues: [],
-      legacyIssues: [],
-    });
+        issues: [],
+        legacyIssues: [],
+      });
 
-    ensureAuthProfileStore.mockReturnValueOnce({
-      version: 1,
-      profiles: {
-        "anthropic:me@example.com": {
-          type: "oauth",
-          provider: "anthropic",
-          access: "access",
-          refresh: "refresh",
-          expires: Date.now() + TIMEOUT_TEST_SUITE_LONG_MS,
-          email: "me@example.com",
+      ensureAuthProfileStore.mockReturnValueOnce({
+        version: 1,
+        profiles: {
+          "anthropic:me@example.com": {
+            type: "oauth",
+            provider: "anthropic",
+            access: "access",
+            refresh: "refresh",
+            expires: Date.now() + TIMEOUT_TEST_SUITE_LONG_MS,
+            email: "me@example.com",
+          },
         },
-      },
-    });
+      });
 
-    const { doctorCommand } = await import("./doctor.js");
-    await doctorCommand({ log: vi.fn(), error: vi.fn(), exit: vi.fn() }, { yes: true });
+      const { doctorCommand } = await import("./doctor.js");
+      await doctorCommand({ log: vi.fn(), error: vi.fn(), exit: vi.fn() }, { yes: true });
 
-    const written = writeConfigFile.mock.calls.at(-1)?.[0] as Record<string, unknown>;
-    const profiles = (written.auth as { profiles: Record<string, unknown> }).profiles;
-    expect(profiles["anthropic:me@example.com"]).toBeTruthy();
-    expect(profiles["anthropic:default"]).toBeUndefined();
-  }, TIMEOUT_HTTP_DEFAULT_MS);
+      const written = writeConfigFile.mock.calls.at(-1)?.[0] as Record<string, unknown>;
+      const profiles = (written.auth as { profiles: Record<string, unknown> }).profiles;
+      expect(profiles["anthropic:me@example.com"]).toBeTruthy();
+      expect(profiles["anthropic:default"]).toBeUndefined();
+    },
+    TIMEOUT_HTTP_DEFAULT_MS,
+  );
 });

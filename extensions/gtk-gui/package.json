@@ -2,23 +2,23 @@
   "name": "@ClosedClaw/gtk-gui",
   "version": "2026.2.1",
   "description": "Custom GTK GUI channel plugin for ClosedClaw - Linux desktop integration",
+  "keywords": [
+    "channel",
+    "closedclaw",
+    "desktop",
+    "gtk",
+    "linux"
+  ],
+  "license": "MIT",
   "type": "module",
   "main": "index.ts",
   "exports": {
     ".": "./index.ts"
   },
-  "keywords": [
-    "closedclaw",
-    "gtk",
-    "linux",
-    "desktop",
-    "channel"
-  ],
-  "license": "MIT",
-  "peerDependencies": {
-    "ClosedClaw": ">=2026.1.0"
-  },
   "devDependencies": {
     "ClosedClaw": "workspace:*"
+  },
+  "peerDependencies": {
+    "ClosedClaw": ">=2026.1.0"
   }
 }

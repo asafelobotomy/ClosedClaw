@@ -12,9 +12,9 @@ import { fileURLToPath } from "node:url";
 import type { ClosedClawConfig } from "../../../config/config.js";
 import type { HookHandler } from "../../hooks.js";
 import { resolveAgentWorkspaceDir } from "../../../agents/agent-scope.js";
+import { getWorkspaceDir } from "../../../config/constants/index.js";
 import { resolveAgentIdFromSessionKey } from "../../../routing/session-key.js";
 import { resolveHookConfig } from "../../config.js";
-import { getWorkspaceDir } from "../../../config/constants/index.js";
 
 /**
  * Read recent messages from session file for slug generation
@@ -75,9 +75,7 @@ const saveSessionToMemory: HookHandler = async (event) => {
     const context = event.context || {};
     const cfg = context.cfg as ClosedClawConfig | undefined;
     const agentId = resolveAgentIdFromSessionKey(event.sessionKey);
-    const workspaceDir = cfg
-      ? resolveAgentWorkspaceDir(cfg, agentId)
-      : getWorkspaceDir();
+    const workspaceDir = cfg ? resolveAgentWorkspaceDir(cfg, agentId) : getWorkspaceDir();
     const memoryDir = path.join(workspaceDir, "memory");
     await fs.mkdir(memoryDir, { recursive: true });
 

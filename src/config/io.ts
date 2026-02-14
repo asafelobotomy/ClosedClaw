@@ -625,7 +625,7 @@ export async function writeConfigFile(cfg: ClosedClawConfig): Promise<void> {
   const configPath = resolveConfigPath();
   clearConfigCache();
   await createConfigIO().writeConfigFile(cfg);
-  
+
   // Log config change to audit log
   const { logConfigChange } = await import("../security/audit-hooks.js");
   await logConfigChange({

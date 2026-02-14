@@ -241,9 +241,7 @@ export class CostTracker {
   /**
    * Register rates from a model definitions map.
    */
-  registerModelRatesBatch(
-    models: Record<string, { cost: ModelCostRates }>,
-  ): void {
+  registerModelRatesBatch(models: Record<string, { cost: ModelCostRates }>): void {
     for (const [id, def] of Object.entries(models)) {
       this.modelRates.set(id, def.cost);
     }
@@ -312,9 +310,15 @@ export class CostTracker {
     const until = opts?.until ?? Date.now();
 
     const filtered = this.records.filter((r) => {
-      if (r.timestamp < since || r.timestamp > until) {return false;}
-      if (opts?.modelId && r.modelId !== opts.modelId) {return false;}
-      if (opts?.agentId && r.agentId !== opts.agentId) {return false;}
+      if (r.timestamp < since || r.timestamp > until) {
+        return false;
+      }
+      if (opts?.modelId && r.modelId !== opts.modelId) {
+        return false;
+      }
+      if (opts?.agentId && r.agentId !== opts.agentId) {
+        return false;
+      }
       return true;
     });
 
@@ -540,9 +544,7 @@ export function formatUsageSummary(summary: UsageSummary): string {
   );
 
   if (summary.fallbackCalls > 0) {
-    lines.push(
-      `Fallback calls: ${summary.fallbackCalls} ($${summary.fallbackCostUsd.toFixed(4)})`,
-    );
+    lines.push(`Fallback calls: ${summary.fallbackCalls} ($${summary.fallbackCostUsd.toFixed(4)})`);
   }
 
   // By model
@@ -565,9 +567,7 @@ export function formatUsageSummary(summary: UsageSummary): string {
     for (const [, agent] of [...summary.byAgent.entries()].toSorted(
       (a, b) => b[1].costUsd - a[1].costUsd,
     )) {
-      lines.push(
-        `  ${agent.agentId}: ${agent.calls} calls, $${agent.costUsd.toFixed(4)}`,
-      );
+      lines.push(`  ${agent.agentId}: ${agent.calls} calls, $${agent.costUsd.toFixed(4)}`);
     }
   }
 
@@ -575,16 +575,28 @@ export function formatUsageSummary(summary: UsageSummary): string {
 }
 
 function formatTimeRange(since: number, until: number): string {
-  if (since === 0) {return "all time";}
+  if (since === 0) {
+    return "all time";
+  }
   const duration = until - since;
-  if (duration <= MS_PER_DAY) {return "last 24h";}
-  if (duration <= MS_PER_WEEK) {return "last 7d";}
-  if (duration <= MS_PER_MONTH) {return "last 30d";}
+  if (duration <= MS_PER_DAY) {
+    return "last 24h";
+  }
+  if (duration <= MS_PER_WEEK) {
+    return "last 7d";
+  }
+  if (duration <= MS_PER_MONTH) {
+    return "last 30d";
+  }
   return `${Math.round(duration / MS_PER_DAY)}d`;
 }
 
 function formatNumber(n: number): string {
-  if (n >= 1_000_000) {return `${(n / 1_000_000).toFixed(1)}M`;}
-  if (n >= 1_000) {return `${(n / 1_000).toFixed(1)}K`;}
+  if (n >= 1_000_000) {
+    return `${(n / 1_000_000).toFixed(1)}M`;
+  }
+  if (n >= 1_000) {
+    return `${(n / 1_000).toFixed(1)}K`;
+  }
   return Math.round(n).toString();
 }

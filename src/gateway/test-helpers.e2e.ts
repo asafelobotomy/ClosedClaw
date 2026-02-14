@@ -1,11 +1,12 @@
 import { WebSocket } from "ws";
+import { TIMEOUT_GATEWAY_CONNECT_MS } from "@/config/constants";
+import { getDeterministicFreePortBlock } from "../../test/helpers/ports.js";
 import {
   loadOrCreateDeviceIdentity,
   publicKeyRawBase64UrlFromPem,
   signDevicePayload,
 } from "../infra/device-identity.js";
 import { rawDataToString } from "../infra/ws.js";
-import { getDeterministicFreePortBlock } from "../../test/helpers/ports.js";
 import {
   GATEWAY_CLIENT_MODES,
   GATEWAY_CLIENT_NAMES,
@@ -15,7 +16,6 @@ import {
 import { GatewayClient } from "./client.js";
 import { buildDeviceAuthPayload } from "./device-auth.js";
 import { PROTOCOL_VERSION } from "./protocol/index.js";
-import { TIMEOUT_GATEWAY_CONNECT_MS } from "@/config/constants";
 
 export async function getFreeGatewayPort(): Promise<number> {
   return await getDeterministicFreePortBlock({ offsets: [0, 1, 2, 3, 4] });
@@ -55,7 +55,10 @@ export async function connectGatewayClient(params: {
       onClose: (code, reason) =>
         stop(new Error(`gateway closed during connect (${code}): ${reason}`)),
     });
-    const timer = setTimeout(() => stop(new Error("gateway connect timeout")), TIMEOUT_GATEWAY_CONNECT_MS);
+    const timer = setTimeout(
+      () => stop(new Error("gateway connect timeout")),
+      TIMEOUT_GATEWAY_CONNECT_MS,
+    );
     timer.unref();
     client.start();
   });

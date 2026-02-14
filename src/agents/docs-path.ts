@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { resolveClosedClawPackageRoot } from "../infra/openclaw-root.js";
+import { resolveClosedClawPackageRoot } from "../infra/closedclaw-root.js";
 
 export async function resolveClosedClawDocsPath(params: {
   workspaceDir?: string;

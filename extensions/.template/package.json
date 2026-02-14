@@ -2,38 +2,38 @@
   "name": "@closedclaw/extension-template",
   "version": "0.1.0",
   "description": "Description of your ClosedClaw extension",
-  "type": "module",
-  "main": "src/index.ts",
   "keywords": [
     "closedclaw",
-    "plugin",
-    "extension"
+    "extension",
+    "plugin"
   ],
-  "author": "Your Name <your.email@example.com>",
   "license": "MIT",
+  "author": "Your Name <your.email@example.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/ClosedClaw/ClosedClaw.git",
     "directory": "extensions/extension-template"
   },
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
   "devDependencies": {
-    "closedclaw": "workspace:*",
     "@types/node": "^25.2.0",
+    "closedclaw": "workspace:*",
     "vitest": "^4.0.18"
   },
   "peerDependencies": {
     "closedclaw": "^2026.2.0"
   },
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "closedclaw": {
     "extensions": [
       "./src/index.ts"
     ]
-  },
-  "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "engines": {
-    "node": ">=22.12.0"
   }
 }

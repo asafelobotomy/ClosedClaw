@@ -16,7 +16,7 @@ Implemented the `closedclaw upstream` command suite that enables ClosedClaw to b
    - Outputs JSON for automation
 
 2. **`closedclaw upstream diff`**
-   - Shows commit-by-commit differences  
+   - Shows commit-by-commit differences
    - Filter by security-only changes
    - Custom commit ranges
    - File pattern filtering
@@ -40,7 +40,7 @@ Running `closedclaw upstream status` on this fork:
 ```
 Fork point:     v2026.2.1
 Current branch: main
-Upstream:       v2026.2.6-3 (openclaw/main)  
+Upstream:       v2026.2.6-3 (openclaw/main)
 Last sync:      2/8/2026
 
 Divergence:
@@ -75,6 +75,7 @@ src/
 ### State Management
 
 **Tracking State** (`~/.closedclaw/upstream-tracking.json5`):
+
 - Fork point
 - Last sync timestamp
 - Latest upstream version
@@ -83,6 +84,7 @@ src/
 - Available features
 
 **Configuration** (`~/.closedclaw/upstream-config.json5`):
+
 - Auto-apply security patches
 - Check interval
 - Remote URL
@@ -118,7 +120,7 @@ Create scheduled task to check upstream daily:
 # Cron job or systemd timer
 name: upstream-monitor
 trigger:
-  cron: "0 0 * * *"  # Daily at midnight
+  cron: "0 0 * * *" # Daily at midnight
 steps:
   - command: closedclaw upstream status --json
   - if: has_security_patches
@@ -130,6 +132,7 @@ steps:
 ### Week 3 - Selective Feature Adoption
 
 Review the 69 available features:
+
 1. `closedclaw upstream diff --commits HEAD..openclaw/main`
 2. Identify features aligned with ClosedClaw goals
 3. Cherry-pick with `closedclaw upstream sync --commit <sha>`
@@ -150,6 +153,7 @@ The upstream commands are designed to be invoked by an AI agent:
 
 ```markdown
 # Agent workflow
+
 You are ClosedClaw. Check for OpenClaw updates daily.
 
 1. Run: closedclaw upstream status --json
@@ -174,7 +178,7 @@ You are ClosedClaw. Check for OpenClaw updates daily.
 ### Improvements Needed
 
 1. **Semantic Diff** (not yet implemented): Would enable smarter conflict detection
-2. **Interactive Mode** (not yet implemented): Need full terminal UI for selecting commits  
+2. **Interactive Mode** (not yet implemented): Need full terminal UI for selecting commits
 3. **Conflict Resolution**: Current sync aborts on conflicts; needs guided merge workflow
 4. **Test Coverage**: Add unit tests for GitService, classification logic
 
@@ -194,12 +198,12 @@ You are ClosedClaw. Check for OpenClaw updates daily.
 
 ## Success Metrics
 
-| Metric | Target | Current |
-|---|---|---|
-| Command load time | <100ms | ✅ ~50ms (lazy load) |
-| Upstream check accuracy | 100% commits classified | ✅ Heuristic (good enough) |
-| User adoption | 1 sync/week | 🔄 To be measured |
-| Security lag | <24h for critical patches | 🔄 Manual (will automate) |
+| Metric                  | Target                    | Current                    |
+| ----------------------- | ------------------------- | -------------------------- |
+| Command load time       | <100ms                    | ✅ ~50ms (lazy load)       |
+| Upstream check accuracy | 100% commits classified   | ✅ Heuristic (good enough) |
+| User adoption           | 1 sync/week               | 🔄 To be measured          |
+| Security lag            | <24h for critical patches | 🔄 Manual (will automate)  |
 
 ## Conclusion
 

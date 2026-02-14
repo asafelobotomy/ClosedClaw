@@ -5,17 +5,17 @@
  * Uses mock probe results — no actual audio hardware required.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs";
-import path from "node:path";
 import os from "node:os";
+import path from "node:path";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import type { HardwareProfile } from "./types.js";
 import {
   getAFSKParamsForMode,
   ULTRASONIC_AFSK_PARAMS,
   AUDIBLE_AFSK_PARAMS,
 } from "./profile-selector.js";
 import { DEFAULT_AFSK_PARAMS, ULTRASONIC_AFSK_PARAMS as ULTRASONIC_TYPES_PARAMS } from "./types.js";
-import type { HardwareProfile } from "./types.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -138,7 +138,7 @@ describe("profile-selector", () => {
       };
       const cached = {
         profile: staleProfile,
-        timestamp: Date.now() - (25 * 60 * 60 * 1000), // 25 hours ago
+        timestamp: Date.now() - 25 * 60 * 60 * 1000, // 25 hours ago
       };
       fs.writeFileSync(cacheFile, JSON.stringify(cached));
 
@@ -228,15 +228,18 @@ describe("profile-selector", () => {
     it("forceReprobe skips cache", async () => {
       // Write a fresh cache with ultrasonic mode
       const cacheFile = path.join(tmpDir, "hardware-profile.json");
-      fs.writeFileSync(cacheFile, JSON.stringify({
-        profile: {
-          ultrasonicSupported: true,
-          selectedMode: "ultrasonic",
-          snrDb: 30,
-          packetErrorRate: 0.01,
-        },
-        timestamp: Date.now(),
-      }));
+      fs.writeFileSync(
+        cacheFile,
+        JSON.stringify({
+          profile: {
+            ultrasonicSupported: true,
+            selectedMode: "ultrasonic",
+            snrDb: 30,
+            packetErrorRate: 0.01,
+          },
+          timestamp: Date.now(),
+        }),
+      );
 
       const { selectProfile } = await import("./profile-selector.js");
       // Force reprobe — cache is ignored, and without Python, falls back to file

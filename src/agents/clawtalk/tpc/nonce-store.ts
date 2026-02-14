@@ -184,7 +184,9 @@ export class NonceStore {
   }
 
   private scheduleSave(): void {
-    if (this.saveTimer) return;
+    if (this.saveTimer) {
+      return;
+    }
     // Debounce saves: write at most once per second
     this.saveTimer = setTimeout(() => {
       this.saveTimer = null;

@@ -1,10 +1,10 @@
 import type { BrowserActionPathResult, BrowserActionTargetOk } from "./client-actions-types.js";
-import { TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import type {
   BrowserConsoleMessage,
   BrowserNetworkRequest,
   BrowserPageError,
 } from "./pw-session.js";
+import { TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import { fetchBrowserJson } from "./client-fetch.js";
 
 function buildProfileQuery(profile?: string): string {

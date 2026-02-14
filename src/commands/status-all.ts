@@ -4,6 +4,11 @@ import { buildWorkspaceSkillStatus } from "../agents/skills-status.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { withProgress } from "../cli/progress.js";
 import { loadConfig, readConfigFileSnapshot, resolveGatewayPort } from "../config/config.js";
+import {
+  secondsToMs,
+  TIMEOUT_HTTP_SHORT_MS,
+  TIMEOUT_TEST_SUITE_SHORT_MS,
+} from "../config/constants/index.js";
 import { readLastGatewayErrorLine } from "../daemon/diagnostics.js";
 import { resolveNodeService } from "../daemon/node-service.js";
 import { resolveGatewayService } from "../daemon/service.js";
@@ -11,7 +16,7 @@ import { buildGatewayConnectionDetails, callGateway } from "../gateway/call.js";
 import { normalizeControlUiBasePath } from "../gateway/control-ui-shared.js";
 import { probeGateway } from "../gateway/probe.js";
 import { collectChannelStatusIssues } from "../infra/channels-status-issues.js";
-import { resolveClosedClawPackageRoot } from "../infra/openclaw-root.js";
+import { resolveClosedClawPackageRoot } from "../infra/closedclaw-root.js";
 import { resolveOsSummary } from "../infra/os-summary.js";
 import { inspectPortUsage } from "../infra/ports.js";
 import { readRestartSentinel } from "../infra/restart-sentinel.js";
@@ -24,7 +29,6 @@ import {
 } from "../infra/update-channels.js";
 import { checkUpdateStatus, compareSemverStrings } from "../infra/update-check.js";
 import { runExec } from "../process/exec.js";
-import { secondsToMs, TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SUITE_SHORT_MS } from "../config/constants/index.js";
 import { VERSION } from "../version.js";
 import { resolveControlUiLinks } from "./onboard-helpers.js";
 import { getAgentLocalStatuses } from "./status-all/agents.js";

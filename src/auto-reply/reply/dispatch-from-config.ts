@@ -546,9 +546,7 @@ export async function dispatchReplyFromConfig(params: {
                     provider: currentSurface,
                     sessionKey: ctx.SessionKey,
                     messageThreadId: ctx.MessageThreadId,
-                    hasMedia: Boolean(
-                      ttsOnlyPayload.mediaUrl || ttsOnlyPayload.mediaUrls?.length,
-                    ),
+                    hasMedia: Boolean(ttsOnlyPayload.mediaUrl || ttsOnlyPayload.mediaUrls?.length),
                   },
                 },
                 {

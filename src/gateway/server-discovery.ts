@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
+import { TIMEOUT_TEST_SHORT_MS } from "../config/constants/index.js";
 import { getTailnetHostname } from "../infra/tailscale.js";
 import { runExec } from "../process/exec.js";
-import { TIMEOUT_TEST_SHORT_MS } from "../config/constants/index.js";
 
 export type ResolveBonjourCliPathOptions = {
   env?: NodeJS.ProcessEnv;
@@ -82,7 +82,8 @@ export async function resolveTailnetDnsHint(opts?: {
 
   const exec =
     opts?.exec ??
-    ((command, args) => runExec(command, args, { timeoutMs: TIMEOUT_TEST_SHORT_MS, maxBuffer: 200_000 }));
+    ((command, args) =>
+      runExec(command, args, { timeoutMs: TIMEOUT_TEST_SHORT_MS, maxBuffer: 200_000 }));
   try {
     return await getTailnetHostname(exec);
   } catch {

@@ -134,6 +134,7 @@ export async function noteStateIntegrity(
   cfg: ClosedClawConfig,
   prompter: DoctorPrompterLike,
   configPath?: string,
+  options?: { skipCrossHomeScan?: boolean },
 ) {
   const warnings: string[] = [];
   const changes: string[] = [];
@@ -302,14 +303,17 @@ export async function noteStateIntegrity(
     }
   }
 
+  const skipCrossHomeScan = options?.skipCrossHomeScan === true;
   const extraStateDirs = new Set<string>();
-  if (path.resolve(stateDir) !== path.resolve(defaultStateDir)) {
-    if (existsDir(defaultStateDir)) {
-      extraStateDirs.add(defaultStateDir);
+  if (!skipCrossHomeScan) {
+    if (path.resolve(stateDir) !== path.resolve(defaultStateDir)) {
+      if (existsDir(defaultStateDir)) {
+        extraStateDirs.add(defaultStateDir);
+      }
     }
-  }
-  for (const other of findOtherStateDirs(stateDir)) {
-    extraStateDirs.add(other);
+    for (const other of findOtherStateDirs(stateDir)) {
+      extraStateDirs.add(other);
+    }
   }
   if (extraStateDirs.size > 0) {
     warnings.push(

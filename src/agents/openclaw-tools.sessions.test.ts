@@ -22,7 +22,7 @@ vi.mock("../config/config.js", async (importOriginal) => {
 
 import "./test-helpers/fast-core-tools.js";
 import { sleep } from "../utils.js";
-import { createClosedClawTools } from "./openclaw-tools.js";
+import { createClosedClawTools } from "./closedclaw-tools.js";
 
 const waitForCalls = async (getCount: () => number, count: number, timeoutMs = 2000) => {
   const start = Date.now();

@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChannelOutboundAdapter } from "../../channels/plugins/types.js";
-import { createOutboundTestPlugin, createTestRegistry } from "../../../test/helpers/channel-plugins.js";
+import {
+  createOutboundTestPlugin,
+  createTestRegistry,
+} from "../../../test/helpers/channel-plugins.js";
 
 const loadMessage = async () => await import("./message.js");
 

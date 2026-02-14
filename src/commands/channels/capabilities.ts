@@ -3,7 +3,9 @@ import type { ClosedClawConfig } from "../../config/config.js";
 import { resolveChannelDefaultAccountId } from "../../channels/plugins/helpers.js";
 import { getChannelPlugin, listChannelPlugins } from "../../channels/plugins/index.js";
 // Discord/Slack-specific imports removed \u2014 channels archived.
-import { danger } from "../../globals.js";import { defaultRuntime, type RuntimeEnv } from "../../runtime.js";import { theme } from "../../terminal/theme.js";
+import { danger } from "../../globals.js";
+import { defaultRuntime, type RuntimeEnv } from "../../runtime.js";
+import { theme } from "../../terminal/theme.js";
 import { formatChannelAccountLabel, requireValidConfig } from "./shared.js";
 
 export type ChannelsCapabilitiesOptions = {
@@ -33,7 +35,13 @@ type DiscordPermissionsReport = {
 };
 
 // Stub types for archived channels
-type SlackScopesResult = { scopes?: string[]; missing?: string[]; ok?: boolean; error?: string; source?: string };
+type SlackScopesResult = {
+  scopes?: string[];
+  missing?: string[];
+  ok?: boolean;
+  error?: string;
+  source?: string;
+};
 
 type ChannelCapabilitiesReport = {
   channel: string;

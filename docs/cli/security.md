@@ -45,6 +45,7 @@ closedclaw security log query --type tool_exec --failed-only
 ```
 
 **Options**:
+
 - `--type <types...>`: Filter by event type(s) (tool_exec, config_change, skill_install, etc.)
 - `--severity <lvls...>`: Filter by severity (info, warn, error, critical)
 - `--since <time>`: Start time (ISO or relative: 1h, 30m, 2d)
@@ -65,6 +66,7 @@ closedclaw security log stats --verify
 ```
 
 **Options**:
+
 - `--verify`: Verify hash chain integrity
 - `--json`: JSON output
 
@@ -76,6 +78,7 @@ closedclaw security log export --output audit.json --format json
 ```
 
 **Options**:
+
 - `--output <path>` (required): Output file path
 - `--format <format>`: csv or json (default: csv)
 - `--type <types...>`: Filter by event type(s)
@@ -91,6 +94,7 @@ closedclaw security log verify
 Verifies the SHA-256 hash chain for tampering. Exits with code 1 if verification fails.
 
 **Options**:
+
 - `--json`: JSON output
 
 ---
@@ -109,9 +113,11 @@ closedclaw security keychain status --json
 Check which keychain backend is active (macOS Keychain, Linux Secret Service, Windows Credential Manager, or encrypted-file fallback).
 
 **Options**:
+
 - `--json`: JSON output
 
 **Example Output**:
+
 ```
 Backend: macOS Keychain (via `security` CLI)
 Available: yes
@@ -133,10 +139,12 @@ closedclaw security keychain migrate --dry-run
 Migrate credentials from JSON files in `~/.closedclaw/credentials/` to OS keychain.
 
 **Options**:
+
 - `--dry-run`: Show what would be migrated without making changes
 - `--json`: JSON output
 
 **Example Output**:
+
 ```
 Migration Results
 
@@ -157,9 +165,11 @@ closedclaw security keychain list --json
 List stored credentials. Only works with encrypted-file backend; native keychains don't support enumeration.
 
 **Options**:
+
 - `--json`: JSON output
 
 **Example Output (File Backend)**:
+
 ```
 Found 3 credential(s):
 
@@ -172,6 +182,7 @@ openai:
 ```
 
 **Example Output (Native Keychain)**:
+
 ```
 ⚠️  Native keychains don't support enumeration.
 Credentials are stored securely but cannot be listed via CLI.
@@ -192,6 +203,7 @@ ClosedClaw security skill keygen --signer "Your Name"
 ```
 
 **Options**:
+
 - `--signer <name>` (required): Your name or organization
 - `--output <dir>`: Save keys to directory (prints to stdout if omitted)
 - `--add-to-keyring`: Automatically add public key to your keyring
@@ -199,10 +211,12 @@ ClosedClaw security skill keygen --signer "Your Name"
 - `--json`: JSON output for scripting
 
 **Output** (with `--output`):
+
 - `<dir>/skill-signing.key`: Private key (keep secret!)
 - `<dir>/skill-signing.pub`: Public key (distribute this)
 
 **Example**:
+
 ```bash
 ClosedClaw security skill keygen \
   --signer "Alice Williams" \
@@ -222,6 +236,7 @@ ClosedClaw security skill sign \
 ```
 
 **Options**:
+
 - `--skill <path>` (required): Path to SKILL.md file
 - `--key <path>` (required): Path to private key file
 - `--key-id <id>` (required): Key ID from keygen
@@ -230,9 +245,11 @@ ClosedClaw security skill sign \
 - `--json`: JSON output for scripting
 
 **Output**:
+
 - Creates `<skill>.sig` alongside skill file
 
 **Example**:
+
 ```bash
 ClosedClaw security skill sign \
   --skill ~/.ClosedClaw/skills/weather/SKILL.md \
@@ -246,16 +263,19 @@ ClosedClaw security skill sign \
 Signatures are automatically verified during `ClosedClaw skills install`.
 
 **Success** (signed + trusted):
+
 ```
 ✓ Signature verified for 'my-skill': Signed by Publisher Name (trust: full)
 ```
 
 **Warning** (unsigned):
+
 ```
 ⚠ Installing unsigned skill 'my-skill' (signatures not enforced)
 ```
 
 **Blocked** (untrusted or invalid):
+
 ```
 ✗ Skill installation blocked: Signing key not found in trusted keyring
 ```
@@ -275,12 +295,14 @@ ClosedClaw security keys list
 ```
 
 **Options**:
+
 - `--trust <level>`: Filter by trust level (full/marginal)
 - `--signer <name>`: Filter by signer name
 - `--key-id <id>`: Filter by key ID
 - `--json`: JSON output for scripting
 
 **Example Output**:
+
 ```
 Key ID              Signer               Trust     Added
 ──────────────────  ───────────────────  ────────  ──────────────────────
@@ -299,6 +321,7 @@ ClosedClaw security keys add \
 ```
 
 **Options**:
+
 - `--key-id <id>` (required): Key identifier from publisher
 - `--public-key <path>`: Path to public key file (PEM format)
 - `--signer <name>` (required): Publisher name
@@ -307,6 +330,7 @@ ClosedClaw security keys add \
 - `--json`: JSON output
 
 **Example**:
+
 ```bash
 ClosedClaw security keys add \
   --key-id dGVzdC1rZXktaWQ= \
@@ -328,6 +352,7 @@ ClosedClaw security keys trust <key-id> --trust <level>
 ```
 
 **Examples**:
+
 ```bash
 # Upgrade to full trust
 ClosedClaw security keys trust dGVzdC1rZXktaWQ= --trust full

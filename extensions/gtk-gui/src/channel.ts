@@ -1,6 +1,6 @@
 /**
  * GTK GUI Channel Plugin
- * 
+ *
  * Provides ClosedClaw channel integration for a custom GTK GUI application.
  * Supports Unix socket or file-based IPC for message exchange.
  */
@@ -11,11 +11,10 @@ import type {
   ChannelMeta,
   ClosedClawConfig,
 } from "ClosedClaw/plugin-sdk";
-import { GtkIpcBridge, generateMessageId, type GtkMessage, type GtkIpcConfig } from "./ipc.js";
-import { processGtkMessage } from "./monitor.js";
-
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { GtkIpcBridge, generateMessageId, type GtkMessage, type GtkIpcConfig } from "./ipc.js";
+import { processGtkMessage } from "./monitor.js";
 
 const CLOSEDCLAW_STATE_DIR = join(homedir(), ".ClosedClaw");
 const DEFAULT_SOCKET_PATH = join(CLOSEDCLAW_STATE_DIR, "gtk.sock");
@@ -28,7 +27,9 @@ const CHANNEL_ID = "gtk-gui";
 let ipcBridge: GtkIpcBridge | null = null;
 
 function resolveGtkConfig(cfg: ClosedClawConfig): GtkIpcConfig {
-  const pluginConfig = (cfg as Record<string, unknown>).plugins as Record<string, unknown> | undefined;
+  const pluginConfig = (cfg as Record<string, unknown>).plugins as
+    | Record<string, unknown>
+    | undefined;
   const entries = pluginConfig?.entries as Record<string, unknown> | undefined;
   const gtkEntry = entries?.["gtk-gui"] as Record<string, unknown> | undefined;
   const config = gtkEntry?.config as GtkIpcConfig | undefined;
@@ -82,14 +83,14 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
   id: CHANNEL_ID,
   meta: gtkChannelMeta,
   capabilities: gtkCapabilities,
-  
-  reload: { 
-    configPrefixes: ["plugins.entries.gtk-gui"] 
+
+  reload: {
+    configPrefixes: ["plugins.entries.gtk-gui"],
   },
 
   config: {
     listAccountIds: () => ["default"],
-    
+
     resolveAccount: (cfg, accountId) => {
       const config = resolveGtkConfig(cfg);
       return {
@@ -99,32 +100,34 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
         config,
       };
     },
-    
+
     defaultAccountId: () => "default",
-    
+
     setAccountEnabled: () => {
       // Single account, always enabled
       return {};
     },
-    
+
     deleteAccount: () => {
       // Cannot delete the single account
       return {};
     },
-    
+
     isConfigured: (_account) => {
-      return Boolean(_account.config.socketPath || (_account.config.inboxPath && _account.config.outboxPath));
+      return Boolean(
+        _account.config.socketPath || (_account.config.inboxPath && _account.config.outboxPath),
+      );
     },
-    
+
     describeAccount: (_account) => ({
       accountId: _account.accountId,
       name: "GTK GUI",
       enabled: _account.enabled,
       configured: true,
     }),
-    
+
     resolveAllowFrom: () => ["*"], // Allow all local GTK messages
-    
+
     formatAllowFrom: ({ allowFrom }) => allowFrom,
   },
 
@@ -137,7 +140,7 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
       approveHint: "GTK GUI messages are from local application",
       normalizeEntry: (raw) => raw,
     }),
-    
+
     resolveGroupPolicy: () => ({
       policy: "disabled",
       allowlist: [],
@@ -154,7 +157,12 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
       return { ok: true as const, to };
     },
 
-    sendText: async (ctx: { cfg: ClosedClawConfig; to: string; text: string; accountId?: string | null }) => {
+    sendText: async (ctx: {
+      cfg: ClosedClawConfig;
+      to: string;
+      text: string;
+      accountId?: string | null;
+    }) => {
       const bridge = getIpcBridge(ctx.cfg);
       const config = resolveGtkConfig(ctx.cfg);
       const target = ctx.to?.trim() || config.userId || DEFAULT_USER_ID;
@@ -176,7 +184,13 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
       };
     },
 
-    sendMedia: async (ctx: { cfg: ClosedClawConfig; to: string; text: string; mediaUrl?: string; accountId?: string | null }) => {
+    sendMedia: async (ctx: {
+      cfg: ClosedClawConfig;
+      to: string;
+      text: string;
+      mediaUrl?: string;
+      accountId?: string | null;
+    }) => {
       const bridge = getIpcBridge(ctx.cfg);
       const config = resolveGtkConfig(ctx.cfg);
       const target = ctx.to?.trim() || config.userId || DEFAULT_USER_ID;
@@ -209,14 +223,16 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
 
       return {
         connected: bridge.isConnected,
-        accounts: [{
-          accountId: "default",
-          status: bridge.isConnected ? "connected" : "disconnected",
-          details: {
-            socketPath: config.socketPath,
-            clientCount: bridge.clientCount,
+        accounts: [
+          {
+            accountId: "default",
+            status: bridge.isConnected ? "connected" : "disconnected",
+            details: {
+              socketPath: config.socketPath,
+              clientCount: bridge.clientCount,
+            },
           },
-        }],
+        ],
       };
     },
 
@@ -246,7 +262,7 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
       try {
         await bridge.start(async (message) => {
           log?.debug?.(`Received GTK message: ${message.id}`);
-          
+
           // Process the message through the AI agent
           const result = await processGtkMessage(message, {
             cfg,
@@ -255,7 +271,7 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
             setStatus,
             userId: config.userId ?? DEFAULT_USER_ID,
           });
-          
+
           // Send response back to GTK client
           if (result.text) {
             const response: GtkMessage = {
@@ -314,7 +330,7 @@ export const gtkGuiPlugin: ChannelPlugin<ResolvedGtkAccount> = {
 
   streaming: {
     supportsBlockStreaming: () => true,
-    
+
     async streamBlock(ctx) {
       const { cfg, to, text } = ctx;
       const bridge = getIpcBridge(cfg);

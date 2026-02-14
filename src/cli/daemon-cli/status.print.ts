@@ -1,7 +1,5 @@
 import { resolveControlUiLinks } from "../../commands/onboard-helpers.js";
-import {
-  resolveGatewaySystemdServiceName,
-} from "../../daemon/constants.js";
+import { resolveGatewaySystemdServiceName } from "../../daemon/constants.js";
 import { renderGatewayServiceCleanupHints } from "../../daemon/inspect.js";
 import {
   isSystemdUnavailableDetail,
@@ -270,9 +268,7 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
     }
     const env = (service.command?.environment ?? process.env) as NodeJS.ProcessEnv;
     const unit = resolveGatewaySystemdServiceName(env.ClosedClaw_PROFILE);
-    defaultRuntime.error(
-      errorText(`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`),
-    );
+    defaultRuntime.error(errorText(`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`));
     spacer();
   }
 

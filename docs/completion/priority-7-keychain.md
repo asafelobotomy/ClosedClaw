@@ -27,6 +27,7 @@ Three comprehensive CLI commands for keychain management:
 - **List**: `closedclaw security keychain list` - List stored credentials (file backend only)
 
 **Features**:
+
 - Backend auto-detection (macOS/Linux/Windows/fallback)
 - Platform-specific recommendations
 - Dry-run migration support
@@ -41,11 +42,13 @@ Three comprehensive CLI commands for keychain management:
 Comprehensive test coverage for all CLI commands:
 
 **Test Suites**:
+
 - `keychainStatusCommand` (5 tests) - Backend display, recommendations, warnings, JSON output
 - `keychainMigrateCommand` (7 tests) - Migration results, dry-run, errors, next steps
 - `keychainListCommand` (8 tests) - Credential listing, grouping, timestamps, platform instructions
 
 **Coverage**:
+
 - All backend types (macos, linux, windows, encrypted-file)
 - Human-readable and JSON output modes
 - Error handling and edge cases
@@ -56,6 +59,7 @@ Comprehensive test coverage for all CLI commands:
 **Modified File**: `src/cli/security-cli.ts` (+60 lines)
 
 Added keychain subcommand to security CLI:
+
 - Imported keychain command functions
 - Created `keychain` subcommand with examples
 - Registered three commands: status, migrate, list
@@ -64,10 +68,12 @@ Added keychain subcommand to security CLI:
 ### 4. Comprehensive Documentation (885 lines)
 
 **Files**:
+
 - `docs/security/keychain.md` (800 lines) - Complete user guide
 - `docs/cli/security.md` (+85 lines) - CLI reference update
 
 **Documentation Sections**:
+
 - Quick start guide
 - Platform support matrix (macOS, Linux, Windows, fallback)
 - Command reference (status, migrate, list)
@@ -88,6 +94,7 @@ Added keychain subcommand to security CLI:
 **File**: `src/security/keychain.ts` (670 lines)
 
 The foundational keychain integration was already implemented:
+
 - Backend detection for all platforms
 - Native CLI tool wrappers (security, secret-tool, cmdkey)
 - Store/retrieve/delete operations
@@ -99,6 +106,7 @@ The foundational keychain integration was already implemented:
 **File**: `src/security/keychain.test.ts` (439 lines)
 
 Infrastructure tests already existed:
+
 - Backend detection tests (all platforms)
 - Store/retrieve/delete lifecycle tests
 - Migration tests
@@ -114,21 +122,25 @@ Infrastructure tests already existed:
 ### Supported Backends
 
 **macOS Keychain**:
+
 - **Tool**: `/usr/bin/security` (built-in)
 - **Features**: Protected by login password, locks with screen lock, Touch ID integration
 - **Access**: Keychain Access.app (GUI)
 
 **Linux Secret Service**:
+
 - **Tool**: `secret-tool` (from `libsecret-tools` package)
 - **Features**: GNOME Keyring or KWallet, keyring password protection
 - **Access**: `seahorse` (GNOME) or `kwalletmanager` (KDE)
 
 **Windows Credential Manager**:
+
 - **Tool**: `cmdkey` (built-in)
 - **Features**: User account protection, domain integration, BitLocker enhancement
 - **Access**: Control Panel → Credential Manager
 
 **Encrypted File Fallback**:
+
 - **Location**: `~/.closedclaw/credentials/`
 - **Encryption**: AES-256-GCM (Priority 3)
 - **When Used**: Headless servers, Docker, CI/CD, missing dependencies
@@ -136,6 +148,7 @@ Infrastructure tests already existed:
 ### Service/Account Format
 
 All ClosedClaw credentials use standardized naming:
+
 - **Service**: `ClosedClaw:<namespace>` (e.g., `ClosedClaw:anthropic`)
 - **Account**: `<identifier>` (e.g., `api-key`)
 
@@ -144,6 +157,7 @@ This makes credentials easy to find in native keychain GUIs (search "ClosedClaw"
 ### Design Choices
 
 **CLI Tools Instead of Native Bindings**:
+
 - ✅ No native compilation (no node-gyp, no Rust)
 - ✅ Simpler installation
 - ✅ Stable OS APIs
@@ -320,6 +334,7 @@ if (result.errors.length > 0) {
 ### `secret-tool` not found (Linux)
 
 **Solution**:
+
 ```bash
 # Debian/Ubuntu
 sudo apt install libsecret-tools
@@ -334,6 +349,7 @@ sudo pacman -S libsecret
 ### macOS keychain prompts repeatedly
 
 **Solution**:
+
 1. Open Keychain Access.app
 2. Find "ClosedClaw" entries
 3. Double-click → Access Control tab
@@ -345,6 +361,7 @@ sudo pacman -S libsecret
 **Cause**: JSON files missing required fields
 
 **Solution**: Ensure files have this structure:
+
 ```json
 {
   "namespace": "anthropic",
@@ -358,6 +375,7 @@ sudo pacman -S libsecret
 **Expected**: Native keychains don't support CLI enumeration (security feature)
 
 **Solution**: Use native GUI tools:
+
 - **macOS**: Keychain Access.app → search "ClosedClaw"
 - **Linux**: `seahorse` or `kwalletmanager`
 - **Windows**: Control Panel → Credential Manager
@@ -379,24 +397,28 @@ sudo pacman -S libsecret
 ## Platform-Specific Notes
 
 ### macOS
+
 - Built-in keychain always available
 - Touch ID integration possible (System Settings)
 - Automatically backed up by Time Machine
 - Login keychain is default storage location
 
 ### Linux
+
 - Desktop environment dependent (GNOME/KDE/Other)
 - Requires `libsecret-tools` package
 - Auto-unlock can be configured
 - SSH sessions may need D-Bus session
 
 ### Windows
+
 - Built-in cmdkey always available
 - Roaming profiles sync credentials (enterprise)
 - BitLocker enhances protection
 - UAC prompts on first use
 
 ### Headless (All Platforms)
+
 - Encrypted-file backend is default
 - No keychain daemon required
 - Files encrypted at rest (AES-256-GCM)
@@ -422,6 +444,7 @@ pnpm test -- keychain
 ### Test Coverage
 
 **Infrastructure Tests** (keychain.test.ts):
+
 - Backend detection (all platforms)
 - Store/retrieve/delete lifecycle
 - Migration from JSON files
@@ -430,6 +453,7 @@ pnpm test -- keychain
 - Cross-platform compatibility
 
 **CLI Command Tests** (keychain.test.ts):
+
 - Status command (5 tests)
 - Migrate command (7 tests)
 - List command (8 tests)
@@ -465,6 +489,7 @@ pnpm test -- keychain
 ## Related Priorities
 
 **Completed**:
+
 - Priority 3: Memory Storage Encryption ✅
 - Priority 4: Skill/Plugin Signing & Verification ✅
 - Priority 6: Immutable Audit Logging ✅
@@ -489,6 +514,7 @@ pnpm test -- keychain
 All deliverables implemented, tested, and documented. Native keychain integration with graceful fallback, ready for production use across all platforms.
 
 **Security Infrastructure Complete**: Priorities 3, 4, 6, and 7 provide comprehensive security coverage:
+
 - ✅ Encrypted storage at rest
 - ✅ Cryptographic skill verification
 - ✅ Immutable audit logging

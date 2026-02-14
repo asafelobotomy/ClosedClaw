@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { runExec } from "../process/exec.js";
 import { TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
+import { runExec } from "../process/exec.js";
 
 export async function movePathToTrash(targetPath: string): Promise<string> {
   try {

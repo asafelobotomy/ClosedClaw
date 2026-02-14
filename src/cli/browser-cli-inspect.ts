@@ -1,9 +1,9 @@
 import type { Command } from "commander";
 import type { SnapshotResult } from "../browser/client.js";
 import { loadConfig } from "../config/config.js";
+import { TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import { danger } from "../globals.js";
 import { defaultRuntime } from "../runtime.js";
-import { TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import { shortenHomePath } from "../utils.js";
 import { callBrowserRequest, type BrowserParentOpts } from "./browser-cli-shared.js";
 

@@ -9,14 +9,14 @@ Successfully relocated all skills from root `skills/` directory to `.github/skil
 
 ### 📊 Summary Statistics
 
-| Metric | Count |
-|--------|-------|
-| Skills migrated | 52 |
-| Files moved | 75 |
-| Previous location | `skills/` (root) |
-| New location | `.github/skills/` |
-| Existing skills in .github/skills/ | 8 + README |
-| Total skills now | 60 + README |
+| Metric                             | Count             |
+| ---------------------------------- | ----------------- |
+| Skills migrated                    | 52                |
+| Files moved                        | 75                |
+| Previous location                  | `skills/` (root)  |
+| New location                       | `.github/skills/` |
+| Existing skills in .github/skills/ | 8 + README        |
+| Total skills now                   | 60 + README       |
 
 ## 🗂️ Before & After
 
@@ -122,6 +122,7 @@ ClosedClaw/
 ## 📋 Skills Migrated (52)
 
 ### Productivity & Notes (7)
+
 - apple-notes
 - apple-reminders
 - bear-notes
@@ -131,12 +132,14 @@ ClosedClaw/
 - trello
 
 ### Messaging & Communication (4)
+
 - bluebubbles (iMessage proxy)
 - discord
 - imsg (iMessage CLI)
 - slack
 
 ### Media & Content (9)
+
 - blogwatcher
 - camsnap
 - canvas
@@ -148,6 +151,7 @@ ClosedClaw/
 - voice-call
 
 ### Development & Tools (10)
+
 - blucli
 - clawhub
 - coding-agent
@@ -160,38 +164,45 @@ ClosedClaw/
 - tmux
 
 ### Home & IoT (3)
+
 - openhue
 - sherpa-onnx-tts
 - sonoscli
 
 ### Location & Travel (3)
+
 - bird
 - goplaces
 - local-places
 
 ### Shopping & Orders (3)
+
 - food-order
 - gog
 - ordercli
 
 ### Audio & Music (3)
+
 - himalaya
 - nano-banana-pro
 - spotify-player
 
 ### Files & Storage (4)
+
 - 1password
 - nano-pdf
 - sag
 - wacli
 
 ### System & Monitoring (4)
+
 - model-usage
 - openai-whisper
 - openai-whisper-api
 - session-logs
 
 ### Utilities (2)
+
 - peekaboo
 - weather
 
@@ -205,6 +216,7 @@ rmdir skills/
 ```
 
 **Why Git?**
+
 - Preserves file history (75 files tracked as renames, not deletions+additions)
 - Maintains blame information for future reference
 - Clean git history with rename detection
@@ -250,7 +262,9 @@ All moves tracked as renames (R) in git, preserving history.
 ## 📝 Skill Categories
 
 ### Development Skills (8 - pre-existing)
+
 Created for ClosedClaw development workflow:
+
 - agent-tool-creator - Guide for implementing new agent tools
 - channel-plugin-creator - Guide for creating channel plugins
 - config-migrator - Help with config schema changes
@@ -261,7 +275,9 @@ Created for ClosedClaw development workflow:
 - test-runner - Efficient test execution patterns
 
 ### Tool Skills (52 - migrated)
+
 Third-party integrations and utilities:
+
 - **Messaging**: discord, slack, bluebubbles, imsg
 - **Productivity**: notion, obsidian, bear-notes, things-mac, trello
 - **Media**: canvas, video-frames, camsnap, gifgrep
@@ -277,6 +293,7 @@ Third-party integrations and utilities:
 From `.github/copilot-instructions.md`:
 
 > **Skill Locations**:
+>
 > - **Project**: `.github/skills/` (recommended) or `.claude/skills/` (legacy)
 > - **Personal**: `~/.copilot/skills/` or `~/.claude/skills/`
 > - **Custom**: Use `chat.agentSkillsLocations` setting for shared skill libraries
@@ -300,14 +317,15 @@ Per [VS Code documentation](https://code.visualstudio.com/docs/copilot/customiza
 ```markdown
 ## Agent Skills (Recommended)
 
-**Skills vs Instructions**: This file (`.github/copilot-instructions.md`) provides 
-always-on coding guidelines. **Agent Skills** (`.github/skills/`) are task-specific 
+**Skills vs Instructions**: This file (`.github/copilot-instructions.md`) provides
+always-on coding guidelines. **Agent Skills** (`.github/skills/`) are task-specific
 capabilities that load on-demand with scripts and resources.
 ```
 
 ### Skills Available
 
 GitHub Copilot can now discover all 60 skills via:
+
 1. **Level 1 (Discovery)**: Name/description in YAML frontmatter
 2. **Level 2 (Instructions)**: SKILL.md body loads when matched
 3. **Level 3 (Resources)**: Additional files load when referenced
@@ -327,18 +345,22 @@ GitHub Copilot can now discover all 60 skills via:
 ## 💡 Impact Assessment
 
 ### Changes
+
 - ✅ 52 skill directories moved
 - ✅ 75 files relocated (with git history)
 - ✅ Root `skills/` directory removed
 - ✅ `.github/skills/` now contains all skills
 
 ### No Breaking Changes
+
 - User workspace skills (`~/.ClosedClaw/workspace/skills/`) unaffected
 - Shared skills (`~/.ClosedClaw/skills/`) unaffected
 - Documentation referencing user skills remains valid
 
 ### Documentation References
+
 Most references to `skills/` in docs are for **user workspaces**, not the repo:
+
 - `~/.ClosedClaw/workspace/skills/` - Per-agent skills
 - `~/.ClosedClaw/skills/` - Shared skills across agents
 
@@ -347,6 +369,7 @@ These remain unchanged and valid.
 ## ✅ Validation
 
 ### Directory Structure
+
 ```bash
 $ ls -1 .github/skills/ | wc -l
 61  # 60 skills + README.md ✅
@@ -356,12 +379,14 @@ removed  # Old directory cleaned up ✅
 ```
 
 ### Git History
+
 ```bash
 $ git status --short | grep "^R.*skills" | wc -l
 75  # All files tracked as renames ✅
 ```
 
 ### Copilot Integration
+
 - ✅ Skills discoverable in VS Code
 - ✅ `.github/skills/` recognized by Copilot
 - ✅ Follows recommended project structure
@@ -369,12 +394,14 @@ $ git status --short | grep "^R.*skills" | wc -l
 ## 🚀 Next Steps
 
 ### Completed ✅
+
 - [x] Migrate all 52 skills to `.github/skills/`
 - [x] Remove old `skills/` directory
 - [x] Verify git history preserved
 - [x] Validate Copilot integration
 
 ### Future Recommendations
+
 - Add more development skills as needed (e.g., migration-helper, troubleshooting-guide)
 - Document skill creation process in contributing guide
 - Consider skill categories in README for easier discovery

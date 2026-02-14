@@ -5,6 +5,7 @@ ClosedClaw is a personal AI assistant gateway that connects multiple messaging c
 ## Quick Reference
 
 **Common Commands**:
+
 ```bash
 # Development
 pnpm closedclaw gateway --port 18789 --verbose  # Start gateway with logging
@@ -47,6 +48,7 @@ scripts/committer "msg" file1.ts file2.ts      # Scoped commit helper
 **Config Schema**: Config types in `src/config/types.*.ts`, Zod schemas in `src/config/zod-schema.ts`. Plugins can register `configSchema` (JSON Schema) + `uiHints` for form rendering. Breaking changes require migration in `src/config/legacy-migrate.ts`
 
 **Tool Implementation Pattern**: Tools use factory functions returning `AnyAgentTool`. Example:
+
 ```typescript
 import { type AnyAgentTool, jsonResult, readStringParam } from "./common.js";
 
@@ -65,6 +67,7 @@ export function createMyTool(options?: { config?: ClosedClawConfig }): AnyAgentT
   };
 }
 ```
+
 Register in `src/agents/openclaw-tools.ts` or `src/agents/bash-tools.ts`
 
 ## Development Workflow
@@ -83,6 +86,7 @@ pnpm gateway:watch    # Watch mode for gateway
 ```
 
 **Build process**: `pnpm build` runs:
+
 1. `canvas:a2ui:bundle` - Bundle Canvas A2UI components
 2. `tsc` - TypeScript compilation
 3. `canvas-a2ui-copy.ts` - Copy Canvas artifacts
@@ -103,6 +107,7 @@ pnpm test             # Vitest unit/integration tests (parallel split via script
 **Test parallelization**: `pnpm test` runs `scripts/test-parallel.mjs` which splits tests across three configs in parallel (unit, extensions, gateway) with adaptive worker allocation. Windows CI uses sharding + serial gateway tests to avoid flakes.
 
 **Five Vitest configs**:
+
 - **Unit** (`vitest.unit.config.ts`): `src/**/*.test.ts` excluding gateway - fast, deterministic, no real keys
 - **Extensions** (`vitest.extensions.config.ts`): `extensions/**/*.test.ts` - plugin tests isolated from core
 - **Gateway** (`vitest.gateway.config.ts`): `src/gateway/**/*.test.ts` - gateway control plane tests
@@ -110,6 +115,7 @@ pnpm test             # Vitest unit/integration tests (parallel split via script
 - **Live** (`vitest.live.config.ts`): `src/**/*.live.test.ts` - real provider/model tests (requires credentials)
 
 **Test commands**:
+
 - `pnpm test` - Default parallelized unit/extensions/gateway suite
 - `pnpm test -- path/to/file.test.ts` - Run specific test file
 - `pnpm test -- path/to/file.test.ts -t "test name"` - Run specific test case
@@ -119,6 +125,7 @@ pnpm test             # Vitest unit/integration tests (parallel split via script
 - `pnpm test:docker:*` - Full install/onboard/plugin tests in Docker isolation
 
 **Narrow test execution** (faster iteration):
+
 ```bash
 # Run single file
 pnpm test -- src/config/config.test.ts
@@ -166,6 +173,7 @@ See `docs/testing.md` for detailed test harness info, credential discovery, and 
 ## Channel Development
 
 When adding/modifying channels:
+
 1. Update **all** UI surfaces (macOS app, web UI, mobile if applicable)
 2. Update docs in `docs/channels/`
 3. Add matching status + configuration forms
@@ -182,12 +190,14 @@ When adding/modifying channels:
 ## Platform-Specific Notes
 
 ### macOS App
+
 - Build: `scripts/package-mac-app.sh` (defaults to current arch)
 - Restart: `scripts/restart-mac.sh` or via ClosedClaw Mac app (not ad-hoc tmux)
 - Logs: `./scripts/clawlog.sh` queries unified logs (ClosedClaw subsystem)
 - SwiftUI: Prefer `Observation` framework (`@Observable`, `@Bindable`) over `ObservableObject`
 
 ### Mobile (iOS/Android)
+
 - Before simulator use, check for connected real devices and prefer them
 - iOS build: `pnpm ios:build`, open Xcode: `pnpm ios:open`
 - Android build: `pnpm android:assemble`, install: `pnpm android:install`
@@ -195,6 +205,7 @@ When adding/modifying channels:
 ## Extension Development
 
 Extensions are workspace packages under `extensions/*`:
+
 - Plugin install: `npm install --omit=dev` in plugin dir
 - Runtime deps: must live in `dependencies` (not `devDependencies`)
 - Avoid `workspace:*` in `dependencies`; put `closedclaw` in `devDependencies` or `peerDependencies`
@@ -206,6 +217,7 @@ Extensions are workspace packages under `extensions/*`:
 - Config validation is strict: unknown keys in plugin config sections cause Gateway startup failure
 
 ### Minimal Plugin Template
+
 ```typescript
 // extensions/my-plugin/index.ts
 import type { ClosedClawPluginApi } from "closedclaw/plugin-sdk";
@@ -247,19 +259,19 @@ export function register(api: ClosedClawPluginApi) {
 ```json5
 // extensions/my-plugin/ClosedClaw.plugin.json
 {
-  "id": "my-plugin",
-  "version": "1.0.0",
-  "description": "Plugin description",
-  "configSchema": {
-    "type": "object",
-    "properties": {
-      "enabled": { "type": "boolean", "default": true },
-      "apiKey": { "type": "string" }
-    }
+  id: "my-plugin",
+  version: "1.0.0",
+  description: "Plugin description",
+  configSchema: {
+    type: "object",
+    properties: {
+      enabled: { type: "boolean", default: true },
+      apiKey: { type: "string" },
+    },
   },
-  "uiHints": {
-    "apiKey": { "sensitive": true, "label": "API Key" }
-  }
+  uiHints: {
+    apiKey: { sensitive: true, label: "API Key" },
+  },
 }
 ```
 
@@ -295,6 +307,7 @@ Switch channels: `closedclaw update --channel stable|beta|dev`
 ## Common Tasks
 
 ### Add a New Tool (Checklist)
+
 1. Create `src/agents/tools/my-tool.ts` with factory function
 2. Export tool factory from appropriate module (`openclaw-tools.ts` or `bash-tools.ts`)
 3. Add tool to assembly function (e.g., in `createClosedClawTools()`)
@@ -303,6 +316,7 @@ Switch channels: `closedclaw update --channel stable|beta|dev`
 6. Run `pnpm test -- src/agents/tools/my-tool.test.ts` to verify
 
 ### Add a New Channel (Checklist)
+
 1. Create extension: `extensions/my-channel/`
 2. Add `package.json` with `devDependencies: { "closedclaw": "workspace:*" }`
 3. Create `ClosedClaw.plugin.json` with `id` and `configSchema`
@@ -315,6 +329,7 @@ Switch channels: `closedclaw update --channel stable|beta|dev`
 10. Add tests in `extensions/my-channel/*.test.ts`
 
 ### Modify Config Schema (Workflow)
+
 1. Update types in `src/config/types.*.ts`
 2. Update Zod schema in `src/config/zod-schema.ts`
 3. If breaking: add migration in `src/config/legacy-migrate.ts`
@@ -323,6 +338,7 @@ Switch channels: `closedclaw update --channel stable|beta|dev`
 6. Run `closedclaw doctor` to catch issues
 
 ### Debug Gateway Issues
+
 ```bash
 pnpm gateway:watch               # Hot-reload for iterative debugging
 tail -f ~/.closedclaw/logs/*     # Watch logs
@@ -334,6 +350,7 @@ closedclaw gateway --reset       # Fresh start (careful: clears state)
 ## Troubleshooting Patterns
 
 ### Common Error Classes
+
 - **ConfigIncludeError** (`src/config/includes.ts`): Config file includes failed (circular/missing)
   - Fix: Check `~/.closedclaw/config.json5` for `$include` paths
 - **MediaFetchError** (`src/media/fetch.ts`): Failed to fetch/process media
@@ -346,6 +363,7 @@ closedclaw gateway --reset       # Fresh start (careful: clears state)
   - Fix: Ensure unique `agentDir` per agent in config
 
 ### Test Failures
+
 ```bash
 # Run failing test in isolation
 pnpm test -- path/to/failing.test.ts
@@ -359,6 +377,7 @@ pnpm test:coverage               # See what's not covered (need 70%)
 ```
 
 ### Build Failures
+
 ```bash
 # TypeScript errors
 pnpm build                       # Full type check
@@ -372,6 +391,7 @@ pnpm check                       # Lint + format issues
 ```
 
 ### Gateway Not Starting
+
 1. Check port in use: `lsof -i :18789` (default port)
 2. Check lock file: `rm ~/.closedclaw/gateway.lock` if stale
 3. Check config validity: `closedclaw doctor`
@@ -386,9 +406,10 @@ pnpm check                       # Lint + format issues
 
 **When editing `extensions/*/index.ts`**: Plugin `register()` function is entry point. Use `api.register*()` methods, never direct imports from core.
 
-**When editing `src/gateway/**/*.ts`**: Gateway tests go in separate config (`vitest.gateway.config.ts`). Be mindful of RPC/WebSocket state.
+**When editing `src/gateway/**/\*.ts`**: Gateway tests go in separate config (`vitest.gateway.config.ts`). Be mindful of RPC/WebSocket state.
 
 **When editing test files**: Use appropriate config:
+
 - `*.test.ts` → unit tests (fast, no network)
 - `*.e2e.test.ts` → e2e tests (networking, multi-instance)
 - `*.live.test.ts` → provider tests (requires credentials, costs money)
@@ -398,11 +419,13 @@ pnpm check                       # Lint + format issues
 **Skills vs Instructions**: This file (`.github/copilot-instructions.md`) provides always-on coding guidelines. **Agent Skills** (`.github/skills/`) are task-specific capabilities that load on-demand with scripts and resources. Skills are portable across VS Code, Copilot CLI, and coding agent.
 
 **How Skills Work**:
+
 - **Level 1 (Discovery)**: Copilot always knows available skills via `name`/`description` in YAML frontmatter
 - **Level 2 (Instructions)**: `SKILL.md` body loads when skill matches your request
 - **Level 3 (Resources)**: Additional files (scripts, examples) load only when referenced
 
 **Create a Skill**:
+
 ```bash
 mkdir -p .github/skills/my-skill
 cat > .github/skills/my-skill/SKILL.md << 'EOF'
@@ -432,23 +455,19 @@ EOF
 
 1. **`channel-plugin-creator`** - Guide for creating new messaging channel extensions
    - Template files, routing setup, CliDeps extension, test scaffolding
-   
 2. **`agent-tool-creator`** - Guide for implementing new agent tools
    - Tool factory pattern, parameter helpers, test structure, registration
-   
 3. **`gateway-debugger`** - Troubleshooting gateway issues
    - Log analysis, port checks, config validation, lock file cleanup
-   
 4. **`config-migrator`** - Help with config schema changes
    - Type updates, Zod schema sync, migration scripts, validation
-   
 5. **`test-runner`** - Efficient test execution patterns
    - Narrow execution, coverage checks, live test management
-   
 6. **`release-manager`** - Version bumping and release workflow
    - Changelog updates, version tagging, npm publishing
 
 **Skill Locations**:
+
 - **Project**: `.github/skills/` (recommended) or `.claude/skills/` (legacy)
 - **Personal**: `~/.copilot/skills/` or `~/.claude/skills/`
 - **Custom**: Use `chat.agentSkillsLocations` setting for shared skill libraries

@@ -6,14 +6,14 @@
 
 ## Summary
 
-| Severity | Count |
-|----------|-------|
-| **Critical** | 1 |
-| **High** | 6 |
-| **Medium** | 12 |
-| **Low** | 16 |
-| **Info / Cleanup** | 10 |
-| **Total** | **45** |
+| Severity           | Count  |
+| ------------------ | ------ |
+| **Critical**       | 1      |
+| **High**           | 6      |
+| **Medium**         | 12     |
+| **Low**            | 16     |
+| **Info / Cleanup** | 10     |
+| **Total**          | **45** |
 
 ---
 
@@ -136,35 +136,35 @@
 - **Category**: Code Quality / Maintainability
 - **Problem**: The project guideline is 500-700 LOC per file. 27 files exceed 700, with the top offenders:
 
-| File | LOC | Over by |
-|------|-----|---------|
-| `src/memory/manager.ts` | 2,396 | 3.4x |
-| `src/agents/bash-tools.exec.ts` | 1,628 | 2.3x |
-| `src/tts/tts.ts` | 1,579 | 2.3x |
-| `src/infra/exec-approvals.ts` | 1,351 | 1.9x |
-| `src/media-understanding/runner.ts` | 1,302 | 1.9x |
-| `src/cli/update-cli.ts` | 1,269 | 1.8x |
-| `src/node-host/runner.ts` | 1,189 | 1.7x |
-| `src/security/audit-extra.ts` | 1,064 | 1.5x |
-| `src/security/audit.ts` | 1,062 | 1.5x |
-| `src/config/schema.ts` | 1,032 | 1.5x |
-| `src/infra/outbound/message-action-runner.ts` | 1,016 | 1.5x |
-| `src/agents/clawtalk/claws-parser.ts` | 993 | 1.4x |
-| `src/infra/heartbeat-runner.ts` | 969 | 1.4x |
-| `src/gateway/server/ws-connection/message-handler.ts` | 956 | 1.4x |
-| `src/gateway/openresponses-http.ts` | 914 | 1.3x |
-| `src/infra/state-migrations.ts` | 897 | 1.3x |
-| `src/markdown/ir.ts` | 881 | 1.3x |
-| `src/agents/pi-embedded-runner/run/attempt.ts` | 867 | 1.2x |
-| `src/cli/hooks-cli.ts` | 861 | 1.2x |
-| `src/infra/update-runner.ts` | 839 | 1.2x |
-| `src/config/zod-schema.providers-core.ts` | 826 | 1.2x |
-| `src/browser/extension-relay.ts` | 790 | 1.1x |
-| `src/commands/health.ts` | 787 | 1.1x |
-| `src/agents/squad/spawner.ts` | 782 | 1.1x |
-| `src/agents/squad/coordinator.ts` | 749 | 1.1x |
-| `src/agents/tools/browser-tool.ts` | 724 | 1.0x |
-| `src/gateway/session-utils.ts` | 713 | 1.0x |
+| File                                                  | LOC   | Over by |
+| ----------------------------------------------------- | ----- | ------- |
+| `src/memory/manager.ts`                               | 2,396 | 3.4x    |
+| `src/agents/bash-tools.exec.ts`                       | 1,628 | 2.3x    |
+| `src/tts/tts.ts`                                      | 1,579 | 2.3x    |
+| `src/infra/exec-approvals.ts`                         | 1,351 | 1.9x    |
+| `src/media-understanding/runner.ts`                   | 1,302 | 1.9x    |
+| `src/cli/update-cli.ts`                               | 1,269 | 1.8x    |
+| `src/node-host/runner.ts`                             | 1,189 | 1.7x    |
+| `src/security/audit-extra.ts`                         | 1,064 | 1.5x    |
+| `src/security/audit.ts`                               | 1,062 | 1.5x    |
+| `src/config/schema.ts`                                | 1,032 | 1.5x    |
+| `src/infra/outbound/message-action-runner.ts`         | 1,016 | 1.5x    |
+| `src/agents/clawtalk/claws-parser.ts`                 | 993   | 1.4x    |
+| `src/infra/heartbeat-runner.ts`                       | 969   | 1.4x    |
+| `src/gateway/server/ws-connection/message-handler.ts` | 956   | 1.4x    |
+| `src/gateway/openresponses-http.ts`                   | 914   | 1.3x    |
+| `src/infra/state-migrations.ts`                       | 897   | 1.3x    |
+| `src/markdown/ir.ts`                                  | 881   | 1.3x    |
+| `src/agents/pi-embedded-runner/run/attempt.ts`        | 867   | 1.2x    |
+| `src/cli/hooks-cli.ts`                                | 861   | 1.2x    |
+| `src/infra/update-runner.ts`                          | 839   | 1.2x    |
+| `src/config/zod-schema.providers-core.ts`             | 826   | 1.2x    |
+| `src/browser/extension-relay.ts`                      | 790   | 1.1x    |
+| `src/commands/health.ts`                              | 787   | 1.1x    |
+| `src/agents/squad/spawner.ts`                         | 782   | 1.1x    |
+| `src/agents/squad/coordinator.ts`                     | 749   | 1.1x    |
+| `src/agents/tools/browser-tool.ts`                    | 724   | 1.0x    |
+| `src/gateway/session-utils.ts`                        | 713   | 1.0x    |
 
 - **Fix**: Prioritize splitting the top 5 (all >1,300 LOC). Extract logical submodules. E.g., `memory/manager.ts` could split into `memory/query.ts`, `memory/vector.ts`, `memory/schema.ts`, `memory/lifecycle.ts`.
 
@@ -237,7 +237,7 @@
 - **Severity**: Medium
 - **Category**: Security / Code Quality
 - **File**: `src/daemon/program-args.ts` (L154)
-- **Problem**: `` execSync(`${cmd} ${binary}`) `` uses string interpolation. Currently `cmd` is `"where"`/`"which"` and `binary` is `"bun"`/`"node"` (hardcoded), so no injection risk. But the pattern is fragile — a future change could introduce user input.
+- **Problem**: ``execSync(`${cmd} ${binary}`)`` uses string interpolation. Currently `cmd` is `"where"`/`"which"` and `binary` is `"bun"`/`"node"` (hardcoded), so no injection risk. But the pattern is fragile — a future change could introduce user input.
 - **Fix**: Replace with `execFileSync(cmd, [binary])` which uses argument arrays and avoids shell interpolation entirely.
 
 ---
@@ -279,7 +279,7 @@
 - **Severity**: Low
 - **Category**: Security / Code Quality
 - **File**: `src/memory/memory-schema.ts` (L85-L95)
-- **Problem**: `ensureColumn()` uses `` db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`) `` with string interpolation. All values are internal constants, but the pattern could become dangerous if extended.
+- **Problem**: `ensureColumn()` uses ``db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`)`` with string interpolation. All values are internal constants, but the pattern could become dangerous if extended.
 - **Fix**: Add a comment documenting that these values are internal-only. Optionally add a runtime assertion that table/column names match `^[a-zA-Z_][a-zA-Z0-9_]*$`.
 
 ---
@@ -590,7 +590,7 @@ Mark items as done with `[x]` as fixes are committed:
 - [x] LOW-05 — Migrated imports from deprecated `src/media/constants.ts` + deleted shim
 - [x] LOW-06 — Removed deprecated `buildMessageWithAttachments()`
 - [x] LOW-07 — Added `@removeBy 2026.4.0` to deprecated config type fields
-- [x] LOW-08 — Fixed archived extensions packaging (workspace:* → peerDeps)
+- [x] LOW-08 — Fixed archived extensions packaging (workspace:\* → peerDeps)
 - [x] LOW-09 — Hono triple-pin documented via `overrideComments`
 - [ ] LOW-10 — ES2024 lib/target upgrade (deferred — low risk, needs testing)
 - [ ] LOW-11 — (not in original audit)

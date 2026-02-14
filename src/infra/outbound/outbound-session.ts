@@ -1,8 +1,8 @@
 import type { MsgContext } from "../../auto-reply/templating.js";
-import { getChannelPlugin } from "../../channels/plugins/index.js";
 import type { ChannelId } from "../../channels/plugins/types.js";
 import type { ClosedClawConfig } from "../../config/config.js";
 import type { ResolvedMessagingTarget } from "./target-resolver.js";
+import { getChannelPlugin } from "../../channels/plugins/index.js";
 import { recordSessionMetaFromInbound, resolveStorePath } from "../../config/sessions.js";
 import {
   buildAgentSessionKey,

@@ -1,5 +1,5 @@
-import { randomBytes } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -180,7 +180,10 @@ interface ControlUiInjectionOpts {
   assistantAvatar?: string;
 }
 
-function injectControlUiConfig(html: string, opts: ControlUiInjectionOpts & { nonce?: string }): string {
+function injectControlUiConfig(
+  html: string,
+  opts: ControlUiInjectionOpts & { nonce?: string },
+): string {
   const { basePath, assistantName, assistantAvatar, nonce } = opts;
   const nonceAttr = nonce ? ` nonce="${nonce}"` : "";
   const script =

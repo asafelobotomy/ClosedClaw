@@ -5,11 +5,13 @@ This directory contains [Agent Skills](https://agentskills.io/) for GitHub Copil
 ## Available Skills
 
 ### [channel-plugin-creator](./channel-plugin-creator/)
+
 Guide for creating new messaging channel plugins/extensions. Use when adding support for new messaging platforms (e.g., Matrix, Teams, BlueBubbles).
 
 **When to use**: Creating channel extensions, understanding plugin architecture, setting up routing and dependency injection.
 
 **Covers**:
+
 - Extension structure and package.json setup
 - Plugin registration via `ClosedClawPluginApi`
 - CliDeps extension pattern
@@ -18,11 +20,13 @@ Guide for creating new messaging channel plugins/extensions. Use when adding sup
 - Documentation and UI updates
 
 ### [agent-tool-creator](./agent-tool-creator/)
+
 Guide for implementing new agent tools. Use when adding capabilities like web search, file operations, API integrations, or custom actions.
 
 **When to use**: Adding agent capabilities, implementing tool logic, understanding tool factory patterns.
 
 **Covers**:
+
 - Tool factory pattern with `AnyAgentTool`
 - Parameter validation helpers
 - Result formatting (json, text, image)
@@ -31,11 +35,13 @@ Guide for implementing new agent tools. Use when adding capabilities like web se
 - Config-based and action gating patterns
 
 ### [test-runner](./test-runner/)
+
 Efficient test execution patterns for ClosedClaw's multi-config architecture. Use when running tests, debugging failures, or checking coverage.
 
 **When to use**: Running tests locally or CI, debugging test failures, understanding test architecture.
 
 **Covers**:
+
 - Five Vitest configurations (unit, extensions, gateway, e2e, live)
 - Narrow test execution for faster iteration
 - Test parallelization with `test-parallel.mjs`
@@ -44,11 +50,13 @@ Efficient test execution patterns for ClosedClaw's multi-config architecture. Us
 - Debugging and troubleshooting patterns
 
 ### [gateway-debugger](./gateway-debugger/)
+
 Troubleshooting guide for gateway issues. Use when debugging gateway startup, WebSocket failures, channel disconnections, or performance problems.
 
 **When to use**: Gateway not starting, connection issues, channel problems, hot-reload failures.
 
 **Covers**:
+
 - Seven common gateway issues with diagnosis and solutions
 - Port conflicts, stale locks, config validation
 - WebSocket failures and channel disconnections
@@ -57,11 +65,13 @@ Troubleshooting guide for gateway issues. Use when debugging gateway startup, We
 - Recovery procedures (graceful and nuclear options)
 
 ### [config-migrator](./config-migrator/)
+
 Guide for config schema changes and migrations. Use when adding config fields, making breaking changes, or updating Zod schemas.
 
 **When to use**: Schema changes, breaking config updates, type/Zod synchronization, migrations.
 
 **Covers**:
+
 - Config architecture (types, Zod schemas, migrations)
 - Five common tasks with step-by-step examples
 - Schema design patterns (optional/required, enums, nested)
@@ -70,11 +80,13 @@ Guide for config schema changes and migrations. Use when adding config fields, m
 - Common pitfalls and prevention
 
 ### [release-manager](./release-manager/)
+
 Version bumping, changelog updates, and npm publishing workflow. Use when preparing releases, updating versions, or managing release channels.
 
 **When to use**: Preparing releases, version bumping, changelog updates, npm publishing, hotfixes.
 
 **Covers**:
+
 - Calendar versioning format (vYYYY.M.D)
 - Three release channels (stable, beta, dev)
 - Complete workflows for each release type
@@ -83,11 +95,13 @@ Version bumping, changelog updates, and npm publishing workflow. Use when prepar
 - Git tagging and GitHub release creation
 
 ### [e2e-test-writer](./e2e-test-writer/)
+
 Guide for writing e2e tests for gateway and channels. Use when testing multi-instance gateway behavior, WebSocket/HTTP surfaces, or node pairing.
 
 **When to use**: Testing gateway networking, multi-instance coordination, WebSocket/RPC methods.
 
 **Covers**:
+
 - Multi-instance gateway test patterns
 - Agent workflow tests with mock models
 - WebSocket RPC test examples
@@ -96,11 +110,13 @@ Guide for writing e2e tests for gateway and channels. Use when testing multi-ins
 - Common scenarios (pairing, sessions, RPC validation)
 
 ### [documentation-writer](./documentation-writer/)
+
 Guide for writing and maintaining ClosedClaw documentation. Use when creating docs for features, channels, tools, or updating existing documentation.
 
 **When to use**: Writing feature docs, channel guides, tool documentation, updating existing docs.
 
 **Covers**:
+
 - Documentation structure and file organization
 - Link conventions (root-relative without .md)
 - Heading rules (no em dashes or apostrophes)
@@ -121,6 +137,7 @@ Skills are **automatically activated** based on your prompts—you don't need to
 ## Using Skills
 
 Skills work across:
+
 - **VS Code**: Available in chat and agent mode
 - **Copilot CLI**: Accessible in terminal
 - **Copilot coding agent**: Used during automated tasks
@@ -128,6 +145,7 @@ Skills work across:
 Simply ask Copilot about tasks related to the skill, and it will load the relevant instructions automatically.
 
 **Examples**:
+
 - "Help me create a new channel plugin for Matrix"
 - "I need to implement a new tool for the agent"
 - "How do I run tests for a specific file?"
@@ -158,18 +176,21 @@ See [VS Code Agent Skills docs](https://code.visualstudio.com/docs/copilot/custo
 Based on review of [anthropics/skills](https://github.com/anthropics/skills) and [github/awesome-copilot](https://github.com/github/awesome-copilot):
 
 **From Anthropic's skills repository (65k+ stars):**
+
 - **skill-creator** - Meta-skill for generating new skills with templates
 - **api-design** - RESTful API design patterns and OpenAPI spec generation
 - **performance-optimizer** - Code performance analysis and optimization
 - Document creation skills (DOCX, PDF, PPTX, XLSX) - complex production skills
 
 **From GitHub's awesome-copilot (20k+ stars):**
+
 - **code-reviewer** - PR review checklist and common issue patterns
 - **security-auditor** - Security best practices and vulnerability scanning
 - **migration-helper** - Framework/library migration patterns
 - Custom agents for specialized workflows (DevOps, database, cloud)
 
 **ClosedClaw-specific opportunities:**
+
 - **provider-integrator** - Add new model provider (Anthropic, OpenAI, Google, etc.)
 - **security-reviewer** - Security patterns (allowlists, pairing, credentials)
 - **mobile-developer** - iOS/Android app development patterns

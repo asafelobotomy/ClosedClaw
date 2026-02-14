@@ -148,7 +148,9 @@ export async function getTrustedKey(keyId: string): Promise<TrustedKey | undefin
  */
 export async function isKeyTrusted(keyId: string): Promise<boolean> {
   const key = await getTrustedKey(keyId);
-  if (!key) {return false;}
+  if (!key) {
+    return false;
+  }
   return key.trustLevel === "full" || key.trustLevel === "marginal";
 }
 
@@ -190,7 +192,11 @@ export async function updateTrustLevel(keyId: string, trustLevel: TrustLevel): P
  */
 export async function getPublicKeyForVerification(keyId: string): Promise<string | null> {
   const key = await getTrustedKey(keyId);
-  if (!key) {return null;}
-  if (key.trustLevel === "none") {return null;}
+  if (!key) {
+    return null;
+  }
+  if (key.trustLevel === "none") {
+    return null;
+  }
   return key.publicKeyPem;
 }

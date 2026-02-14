@@ -1,11 +1,11 @@
 import type { ClosedClawConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
+import { TIMEOUT_TEST_SUITE_SHORT_MS, secondsToMs } from "../config/constants/index.js";
 import { buildGatewayConnectionDetails, callGateway } from "../gateway/call.js";
 import { collectChannelStatusIssues } from "../infra/channels-status-issues.js";
 import { note } from "../terminal/note.js";
 import { formatHealthCheckFailure } from "./health-format.js";
 import { healthCommand } from "./health.js";
-import { TIMEOUT_TEST_SUITE_SHORT_MS, secondsToMs } from "../config/constants/index.js";
 
 export async function checkGatewayHealth(params: {
   runtime: RuntimeEnv;
@@ -26,6 +26,16 @@ export async function checkGatewayHealth(params: {
       note(gatewayDetails.message, "Gateway connection");
     } else {
       params.runtime.error(formatHealthCheckFailure(err));
+      note(gatewayDetails.message, "Gateway connection");
+      try {
+        await callGateway({
+          method: "gateway.status",
+          params: {},
+          timeoutMs: secondsToMs(3),
+        });
+      } catch (probeErr) {
+        params.runtime.error(`Gateway status probe failed: ${String(probeErr)}`);
+      }
     }
   }
 

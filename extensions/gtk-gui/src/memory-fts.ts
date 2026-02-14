@@ -10,9 +10,9 @@
  */
 
 import { mkdirSync } from "node:fs";
-import { join } from "node:path";
-import { homedir } from "node:os";
 import { createRequire } from "node:module";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
 const require = createRequire(import.meta.url);
 
@@ -52,8 +52,12 @@ let _unavailable = false;
  * Returns null if node:sqlite is not available on this runtime.
  */
 export function getDatabase(): InstanceType<typeof import("node:sqlite").DatabaseSync> | null {
-  if (_db) {return _db;}
-  if (_unavailable) {return null;}
+  if (_db) {
+    return _db;
+  }
+  if (_unavailable) {
+    return null;
+  }
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -157,14 +161,7 @@ export function insertFact(
     INSERT INTO facts (type, content, entities, confidence, timestamp, day)
     VALUES (?, ?, ?, ?, ?, ?)
   `);
-  const result = stmt.run(
-    fact.type,
-    fact.content,
-    entitiesJson,
-    fact.confidence ?? null,
-    now,
-    day,
-  );
+  const result = stmt.run(fact.type, fact.content, entitiesJson, fact.confidence ?? null, now, day);
   return Number(result.lastInsertRowid);
 }
 
@@ -273,14 +270,16 @@ export function getFactsByEntity(
 export function getAllEntities(
   db: InstanceType<typeof import("node:sqlite").DatabaseSync>,
 ): string[] {
-  const rows = db
-    .prepare("SELECT DISTINCT entities FROM facts")
-    .all() as Array<{ entities: string }>;
+  const rows = db.prepare("SELECT DISTINCT entities FROM facts").all() as Array<{
+    entities: string;
+  }>;
   const entitySet = new Set<string>();
   for (const row of rows) {
     try {
       const arr = JSON.parse(row.entities) as string[];
-      for (const e of arr) {entitySet.add(e);}
+      for (const e of arr) {
+        entitySet.add(e);
+      }
     } catch {}
   }
   return [...entitySet].toSorted();
@@ -289,22 +288,26 @@ export function getAllEntities(
 /**
  * Get fact count and date range stats.
  */
-export function getStats(
-  db: InstanceType<typeof import("node:sqlite").DatabaseSync>,
-): { total: number; byType: Record<string, number>; earliest?: string; latest?: string } {
-  const total = (
-    db.prepare("SELECT COUNT(*) as cnt FROM facts").get() as { cnt: number }
-  ).cnt;
+export function getStats(db: InstanceType<typeof import("node:sqlite").DatabaseSync>): {
+  total: number;
+  byType: Record<string, number>;
+  earliest?: string;
+  latest?: string;
+} {
+  const total = (db.prepare("SELECT COUNT(*) as cnt FROM facts").get() as { cnt: number }).cnt;
 
   const byType: Record<string, number> = {};
   const typeRows = db
     .prepare("SELECT type, COUNT(*) as cnt FROM facts GROUP BY type")
     .all() as Array<{ type: string; cnt: number }>;
-  for (const r of typeRows) {byType[r.type] = r.cnt;}
+  for (const r of typeRows) {
+    byType[r.type] = r.cnt;
+  }
 
-  const range = db
-    .prepare("SELECT MIN(day) as earliest, MAX(day) as latest FROM facts")
-    .get() as { earliest: string | null; latest: string | null };
+  const range = db.prepare("SELECT MIN(day) as earliest, MAX(day) as latest FROM facts").get() as {
+    earliest: string | null;
+    latest: string | null;
+  };
 
   return {
     total,
@@ -335,9 +338,7 @@ export function importFromIndex(
   let imported = 0;
   let skipped = 0;
 
-  const checkStmt = db.prepare(
-    "SELECT id FROM facts WHERE content = ? AND timestamp = ?",
-  );
+  const checkStmt = db.prepare("SELECT id FROM facts WHERE content = ? AND timestamp = ?");
   const insertStmt = db.prepare(`
     INSERT INTO facts (type, content, entities, confidence, timestamp, day)
     VALUES (?, ?, ?, ?, ?, ?)

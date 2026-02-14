@@ -7,10 +7,7 @@
  */
 
 import { strict as assert } from "node:assert";
-import {
-  extractTags,
-  hasOrchestrationTags,
-} from "../extensions/gtk-gui/src/orchestration-tags.js";
+import { extractTags, hasOrchestrationTags } from "../extensions/gtk-gui/src/orchestration-tags.js";
 
 let passed = 0;
 let failed = 0;
@@ -105,8 +102,8 @@ test("hasOrchestrationTags — returns false for plain text", () => {
 test("extractTags — mix of thought, call, safety_block in one text", () => {
   const text = [
     "<thought>I need to check this file</thought>",
-    "Let me try: <call:read_file path=\"/etc/passwd\">read</call:read_file>",
-    "<safety_block violated_rule=\"sensitive_file\" risk_level=\"critical\">access denied</safety_block>",
+    'Let me try: <call:read_file path="/etc/passwd">read</call:read_file>',
+    '<safety_block violated_rule="sensitive_file" risk_level="critical">access denied</safety_block>',
   ].join("\n");
   const tags = extractTags(text);
   assert.equal(tags.length, 3);

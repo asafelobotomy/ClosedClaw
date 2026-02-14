@@ -14,9 +14,11 @@ This directory contains forward-looking research, active proposals for new featu
 ## Directory Structure
 
 ### [architecture/](architecture/)
+
 **Current implementation** documentation of OpenClaw and ClosedClaw systems.
 
 Includes:
+
 - [Request Lifecycle](architecture/request-lifecycle.md) - Complete request flow from user input to response
 - Gateway architecture, session management, agent runtime
 - Channel plugin system, routing layer, memory pipeline
@@ -26,9 +28,11 @@ Includes:
 ---
 
 ### [research/](research/)
+
 **Active research** exploring new concepts, evaluating alternatives, and documenting emerging patterns.
 
 Includes:
+
 - [Autonomous Evolution](research/autonomous-evolution.md) - Self-healing, Shadow Factory, Kernel Shield
 - [Scaling Memory](research/scaling-memory.md) - Beyond Markdown: vector DBs, knowledge graphs, SQLite
 - [Orchestration Dialect](research/orchestration-dialect.md) - Communication layers and protocols
@@ -39,9 +43,11 @@ Includes:
 ---
 
 ### [proposals/](proposals/)
+
 **Active proposals** for future features—polished specifications ready for community discussion and implementation.
 
 Includes:
+
 - [.claws File Format](proposals/claws-file-format.md) - Literate executables for autonomous tools
 - [ClawDense Notation](proposals/clawdense-notation.md) - Token-optimized communication protocol
 - [Model Configuration](proposals/model-config.md) - Model selection and routing
@@ -51,12 +57,15 @@ Includes:
 ---
 
 ### [plans/](plans/)
+
 **Concrete implementation plans** with specific tasks, timelines, and milestones.
 
 Includes:
+
 - OpenResponses gateway integration (complete)
 
 **Archived** (in `plans/archived/`):
+
 - Cron add hardening (complete)
 - Group policy hardening (complete)
 
@@ -65,18 +74,19 @@ Includes:
 ---
 
 ### [onboarding-config-protocol.md](onboarding-config-protocol.md)
+
 Onboarding configuration protocol specification.
 
 ---
 
 ## Content Types
 
-| Directory | Type | Status | Focus |
-|-----------|------|--------|-------|
-| **architecture/** | Documentation | Current | How it works now |
-| **research/** | Exploration | Active | What's possible |
-| **proposals/** | Specification | Active | What we'll build |
-| **plans/** | Implementation | Complete/Active | How we'll build it |
+| Directory         | Type           | Status          | Focus              |
+| ----------------- | -------------- | --------------- | ------------------ |
+| **architecture/** | Documentation  | Current         | How it works now   |
+| **research/**     | Exploration    | Active          | What's possible    |
+| **proposals/**    | Specification  | Active          | What we'll build   |
+| **plans/**        | Implementation | Complete/Active | How we'll build it |
 
 ## Document Lifecycle
 
@@ -109,6 +119,7 @@ Integrated into main docs (/)
 **Goal:** Explore possibilities, evaluate alternatives, document findings.
 
 **Process:**
+
 1. Identify problem or opportunity
 2. Survey existing solutions and academic literature
 3. Prototype and benchmark if applicable
@@ -116,6 +127,7 @@ Integrated into main docs (/)
 5. If promising, move to proposal stage
 
 **Best Practices:**
+
 - Compare alternatives fairly
 - Include benchmarks and references
 - Cite papers and prior art
@@ -128,6 +140,7 @@ Integrated into main docs (/)
 **Goal:** Specify solution for implementation.
 
 **Process:**
+
 1. Use proposal template (see `proposals/README.md`)
 2. Clearly define problem and solution
 3. Include implementation roadmap
@@ -135,6 +148,7 @@ Integrated into main docs (/)
 5. Open GitHub issue for discussion
 
 **Best Practices:**
+
 - Be prescriptive, not exploratory
 - Include code examples
 - Define success criteria
@@ -147,12 +161,14 @@ Integrated into main docs (/)
 **Goal:** Document current implementation.
 
 **Process:**
+
 1. Describe what IS, not what SHOULD BE
 2. Include diagrams and code examples
 3. Cross-reference source files
 4. Note version where features were added
 
 **Best Practices:**
+
 - Keep synchronized with code
 - Use diagrams for complex flows
 - Link to related docs
@@ -165,12 +181,14 @@ Integrated into main docs (/)
 **Goal:** Coordinate development work.
 
 **Process:**
+
 1. Break proposal into phases and tasks
 2. Assign owners and timelines
 3. Track progress and blockers
 4. Update as work progresses
 
 **Best Practices:**
+
 - Specific, measurable tasks
 - Realistic timelines
 - Clear dependencies
@@ -189,6 +207,7 @@ Integrated into main docs (/)
 ### Reorganization Complete
 
 Migrated content from `docs/research-9_2_26/` into proper structure:
+
 - Proposals now in `proposals/`
 - Research in `research/`
 - Architecture docs in `architecture/`
@@ -198,6 +217,7 @@ Migrated content from `docs/research-9_2_26/` into proper structure:
 ## Related Documentation
 
 ### Main Documentation
+
 - [Getting Started](/start/getting-started) - First-time setup
 - [Configuration](/configuration) - Config reference
 - [Channels](/channels) - Messaging platform integrations
@@ -205,11 +225,13 @@ Migrated content from `docs/research-9_2_26/` into proper structure:
 - [Security](/security) - Auth, pairing, encryption
 
 ### Development
+
 - [Development Guide](/.github/copilot-instructions.md) - Contributing workflow
 - [Testing Guide](/testing.md) - Test patterns and execution
 - [Release Process](/reference/RELEASING.md) - Version management
 
 ### Reference
+
 - [API Reference](/reference/) - Detailed specifications
 - [Agent Configuration](/reference/AGENTS.default.md) - Default behaviors
 - [Session Management](/reference/session-management-compaction.md) - Session lifecycle

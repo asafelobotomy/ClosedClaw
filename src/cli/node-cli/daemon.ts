@@ -5,9 +5,7 @@ import {
   isNodeDaemonRuntime,
 } from "../../commands/node-daemon-runtime.js";
 import { resolveIsNixMode } from "../../config/paths.js";
-import {
-  resolveNodeSystemdServiceName,
-} from "../../daemon/constants.js";
+import { resolveNodeSystemdServiceName } from "../../daemon/constants.js";
 import { resolveNodeService } from "../../daemon/node-service.js";
 import { renderSystemdUnavailableHints } from "../../daemon/systemd-hints.js";
 import { isSystemdUserServiceAvailable } from "../../daemon/systemd.js";

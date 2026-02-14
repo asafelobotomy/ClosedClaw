@@ -3,6 +3,8 @@
  */
 
 import { describe, it, expect } from "vitest";
+import type { AgentProfile, ProfileRegistryConfig } from "./types.js";
+import { AGENT_TEMPLATES, DEVOPS_TEMPLATE, RESEARCHER_TEMPLATE } from "../squad/templates.js";
 import {
   parseProfileMarkdown,
   parseSimpleYaml,
@@ -15,8 +17,6 @@ import {
   findProfilesByCapability,
   validateProfile,
 } from "./registry.js";
-import { AGENT_TEMPLATES, DEVOPS_TEMPLATE, RESEARCHER_TEMPLATE } from "../squad/templates.js";
-import type { AgentProfile, ProfileRegistryConfig } from "./types.js";
 
 // ─── parseSimpleYaml ────────────────────────────────────────────────────────
 

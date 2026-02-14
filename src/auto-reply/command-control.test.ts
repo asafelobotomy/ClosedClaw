@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { ClosedClawConfig } from "../config/config.js";
 import type { MsgContext } from "./templating.js";
-import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createTestRegistry } from "../../test/helpers/channel-plugins.js";
+import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { resolveCommandAuthorization } from "./command-auth.js";
 import { hasControlCommand, hasInlineCommandTokens } from "./command-detection.js";
 import { listChatCommands } from "./commands-registry.js";

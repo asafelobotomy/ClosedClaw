@@ -1,6 +1,6 @@
 /**
  * Practical Constants Usage Examples
- * 
+ *
  * Real-world scenarios demonstrating how the constants library simplifies
  * common ClosedClaw development tasks.
  */
@@ -10,22 +10,22 @@ import {
   ENV_CLOSEDCLAW_GATEWAY_PORT,
   ENV_CLOSEDCLAW_GATEWAY_TOKEN,
   ENV_ANTHROPIC_API_KEY,
-  
+
   // Default values
   DEFAULT_GATEWAY_PORT,
-  
+
   // URL builders
   buildGatewayHttpUrl,
   buildGatewayRpcUrl,
   buildGatewayStatusUrl,
-  
+
   // Platform detection
   isCI,
   isTest,
   isLiveTest,
   isWindows,
   getRunnerOS,
-  
+
   // Network constants
   HTTP_TIMEOUT_DEFAULT_MS,
   HTTP_TIMEOUT_LONG_MS,
@@ -39,20 +39,20 @@ export function createGatewayClient() {
   // Read gateway port from environment, fallback to default
   const port = parseInt(
     process.env[ENV_CLOSEDCLAW_GATEWAY_PORT] ?? String(DEFAULT_GATEWAY_PORT),
-    10
+    10,
   );
-  
+
   // Read optional gateway token
   const token = process.env[ENV_CLOSEDCLAW_GATEWAY_TOKEN];
-  
+
   // Build URLs using centralized builders
   const baseUrl = buildGatewayHttpUrl(port);
   const rpcUrl = buildGatewayRpcUrl(port);
   const statusUrl = buildGatewayStatusUrl(port);
-  
+
   // Use environment-aware timeout
   const timeout = isCI() ? HTTP_TIMEOUT_LONG_MS : HTTP_TIMEOUT_DEFAULT_MS;
-  
+
   return {
     baseUrl,
     rpcUrl,
@@ -78,28 +78,26 @@ export function getTestConfig() {
     isLive: isLiveTest(),
     os: getRunnerOS(),
   };
-  
+
   // Platform-specific settings
   const platformConfig = {
     shellPath: isWindows() ? "cmd.exe" : "/bin/bash",
     homeVar: isWindows() ? "USERPROFILE" : "HOME",
     pathSeparator: isWindows() ? ";" : ":",
   };
-  
+
   // Gateway configuration for tests
   const gateway = {
     port: DEFAULT_GATEWAY_PORT,
     url: buildGatewayHttpUrl(),
     rpcUrl: buildGatewayRpcUrl(),
   };
-  
+
   // API keys (mocked unless live test)
   const credentials = {
-    anthropic: environment.isLive 
-      ? process.env[ENV_ANTHROPIC_API_KEY]
-      : "sk-test-mock-key",
+    anthropic: environment.isLive ? process.env[ENV_ANTHROPIC_API_KEY] : "sk-test-mock-key",
   };
-  
+
   return {
     environment,
     platformConfig,
@@ -111,7 +109,7 @@ export function getTestConfig() {
 // Usage in test:
 // describe("integration tests", () => {
 //   const config = getTestConfig();
-//   
+//
 //   beforeAll(() => {
 //     if (config.environment.isCI) {
 //       // CI-specific setup
@@ -129,7 +127,7 @@ export function getProviderConfig() {
     isTest: isTest(),
     isLive: isLiveTest(),
   };
-  
+
   // Different configurations based on environment
   if (env.isLive) {
     // Live tests: use real credentials
@@ -140,7 +138,7 @@ export function getProviderConfig() {
       mockMode: false,
     };
   }
-  
+
   if (env.isCI) {
     // CI: strict timeouts, mocked providers
     return {
@@ -150,7 +148,7 @@ export function getProviderConfig() {
       mockMode: true,
     };
   }
-  
+
   // Development: relaxed timeouts, mocked providers
   return {
     anthropicKey: "sk-mock-dev-key",
@@ -174,19 +172,19 @@ export function getProviderConfig() {
 export function resolvePaths() {
   const homeVar = isWindows() ? "USERPROFILE" : "HOME";
   const homeDir = process.env[homeVar];
-  
+
   if (!homeDir) {
     throw new Error(`${homeVar} environment variable not set`);
   }
-  
+
   // Platform-aware path separator
   const pathSep = isWindows() ? "\\" : "/";
-  
+
   // Build platform-appropriate paths
   const stateDir = `${homeDir}${pathSep}.closedclaw`;
   const configFile = `${stateDir}${pathSep}config.json5`;
   const credentialsDir = `${stateDir}${pathSep}credentials`;
-  
+
   return {
     homeDir,
     stateDir,
@@ -208,9 +206,9 @@ export async function startGatewayForCI() {
   if (!isCI()) {
     throw new Error("This function is only for CI environments");
   }
-  
+
   const runnerOS = getRunnerOS();
-  
+
   // Platform-specific CI optimizations
   const config = {
     port: DEFAULT_GATEWAY_PORT,
@@ -219,12 +217,12 @@ export async function startGatewayForCI() {
     workers: runnerOS === "Windows" ? 1 : 2, // Windows CI is slower
     logLevel: "error" as const, // Reduce CI noise
   };
-  
+
   console.log(`Starting gateway for ${runnerOS} CI...`);
   console.log(`URL: ${buildGatewayHttpUrl(config.port, config.host)}`);
   console.log(`Timeout: ${config.timeout}ms`);
   console.log(`Workers: ${config.workers}`);
-  
+
   // Return config for further setup
   return config;
 }
@@ -275,27 +273,27 @@ export function generateDiagnostics() {
 
 /**
  * Benefits Demonstrated:
- * 
+ *
  * 1. Type Safety
  *    - Autocomplete for all constant names
  *    - Compile-time error detection
  *    - No typos in environment variable names
- * 
+ *
  * 2. Consistency
  *    - Single source of truth for ports/URLs
  *    - Uniform URL formatting across codebase
  *    - Platform-aware defaults
- * 
+ *
  * 3. Maintainability
  *    - Change port once, update everywhere
  *    - Easy to add new environment variables
  *    - Clear intent with named constants
- * 
+ *
  * 4. Testing
  *    - Environment-aware test configuration
  *    - Platform-specific CI optimizations
  *    - Easy mock/live switching
- * 
+ *
  * 5. Developer Experience
  *    - Self-documenting code
  *    - Reduced cognitive load

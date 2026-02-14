@@ -1,8 +1,8 @@
 import os from "node:os";
 import path from "node:path";
 import type { ClosedClawConfig } from "../config/config.js";
-import { resolveStateDir } from "../config/paths.js";
 import { getStateDir } from "../config/constants/index.js";
+import { resolveStateDir } from "../config/paths.js";
 import {
   DEFAULT_AGENT_ID,
   normalizeAgentId,

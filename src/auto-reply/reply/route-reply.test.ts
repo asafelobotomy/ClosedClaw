@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChannelOutboundAdapter, ChannelPlugin } from "../../channels/plugins/types.js";
 import type { ClosedClawConfig } from "../../config/config.js";
 import type { PluginRegistry } from "../../plugins/registry.js";
-import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import {
   createIMessageTestPlugin,
   createOutboundTestPlugin,
   createTestRegistry,
 } from "../../../test/helpers/channel-plugins.js";
+import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import { SILENT_REPLY_TOKEN } from "../tokens.js";
 
 /**
@@ -447,7 +447,11 @@ const defaultRegistry = createTestRegistry([
   },
   {
     pluginId: "slack",
-    plugin: createOutboundTestPlugin({ id: "slack", outbound: createChannelStubOutbound("slack"), label: "Slack" }),
+    plugin: createOutboundTestPlugin({
+      id: "slack",
+      outbound: createChannelStubOutbound("slack"),
+      label: "Slack",
+    }),
     source: "test",
   },
   {
@@ -470,7 +474,11 @@ const defaultRegistry = createTestRegistry([
   },
   {
     pluginId: "signal",
-    plugin: createOutboundTestPlugin({ id: "signal", outbound: createChannelStubOutbound("signal"), label: "Signal" }),
+    plugin: createOutboundTestPlugin({
+      id: "signal",
+      outbound: createChannelStubOutbound("signal"),
+      label: "Signal",
+    }),
     source: "test",
   },
   {

@@ -93,7 +93,9 @@ export class AuditLogger {
    * Initialize the logger (create directories, open file handle).
    */
   init(): void {
-    if (!this.config.enabled) return;
+    if (!this.config.enabled) {
+      return;
+    }
     fs.mkdirSync(this.logDir, { recursive: true, mode: 0o700 });
     this.rotateFileIfNeeded();
   }
@@ -189,12 +191,7 @@ export class AuditLogger {
   /**
    * Log a text fallback event (agent-to-agent message sent as text).
    */
-  logFallback(params: {
-    source?: string;
-    target?: string;
-    reason: string;
-    stack?: string;
-  }): void {
+  logFallback(params: { source?: string; target?: string; reason: string; stack?: string }): void {
     this.write({
       ts: new Date().toISOString(),
       event: "tpc.fallback",
@@ -210,10 +207,7 @@ export class AuditLogger {
   /**
    * Log a key rotation event.
    */
-  logKeyRotation(params: {
-    source: string;
-    details?: Record<string, unknown>;
-  }): void {
+  logKeyRotation(params: { source: string; details?: Record<string, unknown> }): void {
     this.write({
       ts: new Date().toISOString(),
       event: "tpc.key_rotation",
@@ -302,11 +296,15 @@ export class AuditLogger {
       }
     }
 
-    if (!this.config.enabled) return;
+    if (!this.config.enabled) {
+      return;
+    }
 
     this.rotateFileIfNeeded();
 
-    if (this.fd === null) return;
+    if (this.fd === null) {
+      return;
+    }
 
     try {
       const line = JSON.stringify(entry) + "\n";
@@ -347,17 +345,19 @@ export class AuditLogger {
     let suffix = 0;
     let filename: string;
     do {
-      filename = suffix === 0
-        ? `tpc-audit-${today}.jsonl`
-        : `tpc-audit-${today}.${suffix}.jsonl`;
+      filename = suffix === 0 ? `tpc-audit-${today}.jsonl` : `tpc-audit-${today}.${suffix}.jsonl`;
       this.currentFile = path.join(this.logDir, filename);
       suffix++;
 
-      if (!fs.existsSync(this.currentFile)) break;
+      if (!fs.existsSync(this.currentFile)) {
+        break;
+      }
 
       try {
         const stats = fs.statSync(this.currentFile);
-        if (stats.size < this.config.maxFileSizeBytes) break;
+        if (stats.size < this.config.maxFileSizeBytes) {
+          break;
+        }
       } catch {
         break;
       }

@@ -1,11 +1,11 @@
 import { createWriteStream } from "node:fs";
-import { TIMEOUT_HTTP_LONG_MS } from "../config/constants/index.js";
 import fs from "node:fs/promises";
 import { request } from "node:https";
 import os from "node:os";
 import path from "node:path";
 import { pipeline } from "node:stream/promises";
 import type { RuntimeEnv } from "../runtime.js";
+import { TIMEOUT_HTTP_LONG_MS } from "../config/constants/index.js";
 import { runCommandWithTimeout } from "../process/exec.js";
 import { CONFIG_DIR } from "../utils.js";
 
@@ -49,8 +49,6 @@ function pickAsset(assets: ReleaseAsset[], platform: NodeJS.Platform) {
       withName.find((asset) => looksLikeArchive(asset.name.toLowerCase()))
     );
   }
-
-
 
   return withName.find((asset) => looksLikeArchive(asset.name.toLowerCase()));
 }
@@ -101,8 +99,6 @@ async function findSignalCliBinary(root: string): Promise<string | null> {
 }
 
 export async function installSignalCli(runtime: RuntimeEnv): Promise<SignalInstallResult> {
-
-
   const apiUrl = "https://api.github.com/repos/AsamK/signal-cli/releases/latest";
   const response = await fetch(apiUrl, {
     headers: {

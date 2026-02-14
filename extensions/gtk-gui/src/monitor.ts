@@ -13,9 +13,10 @@
  * - Tools: read_file, run_command, list_directory, save_note, recall_notes, current_time
  */
 
-import crypto from "node:crypto";
 import type { ChannelAccountSnapshot, ClosedClawConfig } from "ClosedClaw/plugin-sdk";
+import crypto from "node:crypto";
 import type { GtkMessage } from "./ipc.js";
+import { routeWithClawTalk } from "./clawtalk-bridge.js";
 import { loadCoreAgentDeps, type CoreConfig } from "./core-bridge.js";
 import {
   getOllamaTools,
@@ -25,7 +26,6 @@ import {
   getNativeToolSystemPrompt,
   getPatternSystemPrompt,
 } from "./lite-tools.js";
-import { routeWithClawTalk } from "./clawtalk-bridge.js";
 import { hasOrchestrationTags, processOrchestrationTags } from "./orchestration-tags.js";
 
 /**
@@ -59,7 +59,11 @@ async function callOllamaWithTools(params: {
   maxIterations?: number;
   customSystemPrompt?: string;
   toolFilter?: string[];
-  log?: { debug?: (msg: string) => void; error?: (msg: string) => void; info?: (msg: string) => void };
+  log?: {
+    debug?: (msg: string) => void;
+    error?: (msg: string) => void;
+    info?: (msg: string) => void;
+  };
 }): Promise<string> {
   const { baseUrl, model, sessionKey, userMessage, agentName, enableTools, log } = params;
   const maxIterations = params.maxIterations ?? LITE_MODE_MAX_ITERATIONS;
@@ -94,7 +98,9 @@ async function callOllamaWithTools(params: {
   while (iteration < maxIterations) {
     iteration++;
     log?.info?.(`ReAct iteration ${iteration}/${maxIterations}`);
-    log?.debug?.(`Lite mode (tools): calling ${ollamaNativeUrl}/api/chat with ${history.length} messages`);
+    log?.debug?.(
+      `Lite mode (tools): calling ${ollamaNativeUrl}/api/chat with ${history.length} messages`,
+    );
 
     const requestBody: Record<string, unknown> = {
       model,
@@ -155,7 +161,9 @@ async function callOllamaWithTools(params: {
 
     // Check if model wants to call tools (continue ReAct loop)
     if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
-      log?.info?.(`Iteration ${iteration}: Model requested ${assistantMessage.tool_calls.length} tool call(s)`);
+      log?.info?.(
+        `Iteration ${iteration}: Model requested ${assistantMessage.tool_calls.length} tool call(s)`,
+      );
 
       // Add assistant message with tool calls to history
       history.push({
@@ -195,7 +203,10 @@ async function callOllamaWithTools(params: {
   if (lastContent) {
     history.push({ role: "assistant" as const, content: lastContent });
   }
-  return lastContent || "I apologize, but I ran into my iteration limit while processing your request. Please try a simpler query.";
+  return (
+    lastContent ||
+    "I apologize, but I ran into my iteration limit while processing your request. Please try a simpler query."
+  );
 }
 
 /**
@@ -270,7 +281,9 @@ async function callOllamaWithPatterns(params: {
  * Check if lite mode should be used based on config
  */
 function shouldUseLiteMode(cfg: CoreConfig): boolean {
-  const pluginConfig = (cfg as Record<string, unknown>).plugins as Record<string, unknown> | undefined;
+  const pluginConfig = (cfg as Record<string, unknown>).plugins as
+    | Record<string, unknown>
+    | undefined;
   const entries = pluginConfig?.entries as Record<string, unknown> | undefined;
   const gtkConfig = entries?.["gtk-gui"] as Record<string, unknown> | undefined;
   const config = gtkConfig?.config as Record<string, unknown> | undefined;
@@ -281,7 +294,9 @@ function shouldUseLiteMode(cfg: CoreConfig): boolean {
  * Check if lite mode tools are enabled
  */
 function areLiteModeToolsEnabled(cfg: CoreConfig): boolean {
-  const pluginConfig = (cfg as Record<string, unknown>).plugins as Record<string, unknown> | undefined;
+  const pluginConfig = (cfg as Record<string, unknown>).plugins as
+    | Record<string, unknown>
+    | undefined;
   const entries = pluginConfig?.entries as Record<string, unknown> | undefined;
   const gtkConfig = entries?.["gtk-gui"] as Record<string, unknown> | undefined;
   const config = gtkConfig?.config as Record<string, unknown> | undefined;
@@ -293,7 +308,9 @@ function areLiteModeToolsEnabled(cfg: CoreConfig): boolean {
  * Get max iterations for ReAct loop from config
  */
 function getLiteModeMaxIterations(cfg: CoreConfig): number {
-  const pluginConfig = (cfg as Record<string, unknown>).plugins as Record<string, unknown> | undefined;
+  const pluginConfig = (cfg as Record<string, unknown>).plugins as
+    | Record<string, unknown>
+    | undefined;
   const entries = pluginConfig?.entries as Record<string, unknown> | undefined;
   const gtkConfig = entries?.["gtk-gui"] as Record<string, unknown> | undefined;
   const config = gtkConfig?.config as Record<string, unknown> | undefined;
@@ -309,7 +326,9 @@ function getLiteModeMaxIterations(cfg: CoreConfig): number {
  * Get Ollama base URL from config
  */
 function getOllamaBaseUrl(cfg: CoreConfig): string | undefined {
-  const modelsConfig = (cfg as Record<string, unknown>).models as Record<string, unknown> | undefined;
+  const modelsConfig = (cfg as Record<string, unknown>).models as
+    | Record<string, unknown>
+    | undefined;
   const providers = modelsConfig?.providers as Record<string, unknown> | undefined;
   const ollama = providers?.ollama as Record<string, unknown> | undefined;
   return ollama?.baseUrl as string | undefined;
@@ -322,7 +341,9 @@ function getClawTalkConfig(cfg: CoreConfig): {
   escalationThreshold: number;
   escalationModel: string | undefined;
 } {
-  const pluginConfig = (cfg as Record<string, unknown>).plugins as Record<string, unknown> | undefined;
+  const pluginConfig = (cfg as Record<string, unknown>).plugins as
+    | Record<string, unknown>
+    | undefined;
   const entries = pluginConfig?.entries as Record<string, unknown> | undefined;
   const gtkConfig = entries?.["gtk-gui"] as Record<string, unknown> | undefined;
   const config = gtkConfig?.config as Record<string, unknown> | undefined;
@@ -421,11 +442,13 @@ export async function processGtkMessage(
   const sessionFile = deps.resolveSessionFilePath(sessionId, sessionEntry, { agentId });
 
   // Resolve model from config - check agents.defaults.model.primary first
-  const agentsConfig = (coreConfig as Record<string, unknown>).agents as Record<string, unknown> | undefined;
+  const agentsConfig = (coreConfig as Record<string, unknown>).agents as
+    | Record<string, unknown>
+    | undefined;
   const defaultsConfig = agentsConfig?.defaults as Record<string, unknown> | undefined;
   const modelConfig = defaultsConfig?.model as Record<string, unknown> | undefined;
   const primaryModel = modelConfig?.primary as string | undefined;
-  
+
   const modelRef = primaryModel?.trim() || `${deps.DEFAULT_PROVIDER}/${deps.DEFAULT_MODEL}`;
   const slashIndex = modelRef.indexOf("/");
   const provider = slashIndex === -1 ? deps.DEFAULT_PROVIDER : modelRef.slice(0, slashIndex);
@@ -466,9 +489,7 @@ export async function processGtkMessage(
         `[clawtalk-tpc] Transport: ${routing.tpc.active ? "TPC (acoustic)" : "TEXT fallback"}${routing.tpc.fallbackReason ? ` — ${routing.tpc.fallbackReason}` : ""}`,
       );
     }
-    log?.debug?.(
-      `[clawtalk] Wire: ${routing.wire}`,
-    );
+    log?.debug?.(`[clawtalk] Wire: ${routing.wire}`);
     log?.debug?.(
       `Using lite mode: model=${routing.model ?? model}, toolsEnabled=${toolsEnabled}, nativeTools=${supportsNativeTools}, maxIterations=${maxIterations}`,
     );
@@ -482,7 +503,9 @@ export async function processGtkMessage(
 
       if (toolsEnabled && supportsNativeTools) {
         // Use native tool calling with ClawTalk subagent routing
-        log?.debug?.(`Lite mode: ${routing.agentName} using native tool calling for ${effectiveModel}`);
+        log?.debug?.(
+          `Lite mode: ${routing.agentName} using native tool calling for ${effectiveModel}`,
+        );
         text = await callOllamaWithTools({
           baseUrl,
           model: effectiveModel,
@@ -508,7 +531,9 @@ export async function processGtkMessage(
         });
       } else {
         // Tools disabled, just chat with subagent's system prompt
-        log?.debug?.(`Lite mode: tools disabled, ${routing.agentName} plain chat for ${effectiveModel}`);
+        log?.debug?.(
+          `Lite mode: tools disabled, ${routing.agentName} plain chat for ${effectiveModel}`,
+        );
         text = await callOllamaWithTools({
           baseUrl,
           model: effectiveModel,
@@ -560,7 +585,7 @@ This is a direct conversation - no other channels are active.`;
 
   try {
     log?.debug?.(`Running agent with session ${sessionId}`);
-    
+
     const result = await deps.runEmbeddedPiAgent({
       sessionId,
       sessionKey,

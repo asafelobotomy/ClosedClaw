@@ -15,16 +15,16 @@ The DevOps subagent is a specialized AI agent that audits, maintains, and improv
 Or programmatically:
 
 ```typescript
-import { spawnSubagent } from './agents/subagent-spawn';
+import { spawnSubagent } from "./agents/subagent-spawn";
 
 const result = await spawnSubagent({
-  agentId: 'devops',
+  agentId: "devops",
   task: `Audit src/security/ for security vulnerabilities:
     - Check for hardcoded secrets or weak crypto parameters
     - Validate input sanitization
     - Review error handling for information leakage
     - Test coverage for edge cases`,
-  model: 'claude-opus-4.5', // Premium model for thorough analysis
+  model: "claude-opus-4.5", // Premium model for thorough analysis
   runTimeoutSeconds: 600, // 10 minutes for complex audit
 });
 
@@ -114,6 +114,7 @@ const task = `Documentation audit for src/gateway/:
 `~/.closedclaw/agents/devops.md`
 
 You can customize the DevOps agent's behavior by editing this file:
+
 - Add domain-specific security checks
 - Adjust severity thresholds
 - Include company-specific coding standards
@@ -140,9 +141,9 @@ Add to `~/.closedclaw/config.json5`:
         tools: {
           // DevOps agent needs these tools:
           allow: [
-            "read",           // Read source code
-            "exec",           // Run build/test commands
-            "grep_search",    // Pattern search
+            "read", // Read source code
+            "exec", // Run build/test commands
+            "grep_search", // Pattern search
             "semantic_search", // Conceptual search
             "list_code_usages", // Track API usage
           ],
@@ -224,6 +225,7 @@ Priority: Immediate | This Week | This Month | Backlog
 ### Example 1: Audit Encryption Code
 
 **Task:**
+
 ```
 Audit Priority 3 encryption implementation (src/security/crypto.ts, passphrase.ts, encrypted-store.ts):
 - Verify XChaCha20-Poly1305 implementation correctness
@@ -235,6 +237,7 @@ Audit Priority 3 encryption implementation (src/security/crypto.ts, passphrase.t
 ```
 
 **Expected Findings:**
+
 ```
 ✅ Summary: 0 critical, 2 high, 5 medium, 3 low
 
@@ -258,6 +261,7 @@ Priority: This Month
 ### Example 2: Find TODO Comments
 
 **Task:**
+
 ```
 Find all TODO/FIXME/HACK comments in src/. Categorize by:
 1. Critical (in security-sensitive code, blocks features)
@@ -267,13 +271,14 @@ Estimate effort for each.
 ```
 
 **Expected Output:**
+
 ```
 Found 47 TODO comments:
 
 CRITICAL (3):
 - src/security/audit.ts:45: "TODO: Implement rate limiting on audit log writes"
   Effort: Moderate (2-3hr), Priority: This Week
-  
+
 IMPORTANT (12):
 - src/agents/tools.ts:123: "FIXME: Handle timeout edge case in tool execution"
   Effort: Moderate (1hr), Priority: This Month
@@ -293,9 +298,10 @@ NICE-TO-HAVE (32):
 ### 2. Provide Context
 
 Include relevant background:
+
 ```
-Audit src/gateway/ws-handler.ts. 
-Context: We recently added rate limiting (commit abc123). 
+Audit src/gateway/ws-handler.ts.
+Context: We recently added rate limiting (commit abc123).
 Focus: Verify rate limit can't be bypassed, check for DoS vulnerabilities.
 ```
 
@@ -310,6 +316,7 @@ Focus: Verify rate limit can't be bypassed, check for DoS vulnerabilities.
 DevOps agent saves full analysis in `~/.closedclaw/sessions/agent:devops:subagent:*.json`
 
 Review transcripts to:
+
 - Understand reasoning behind findings
 - Check if agent missed anything
 - Improve future task descriptions
@@ -317,6 +324,7 @@ Review transcripts to:
 ### 5. Iterate on Findings
 
 After DevOps agent reports issues:
+
 1. Fix critical/high severity first
 2. Re-run audit to verify fixes
 3. Track medium/low issues in backlog
@@ -327,6 +335,7 @@ After DevOps agent reports issues:
 ### Agent Doesn't Find Issues
 
 **Possible causes:**
+
 - Task too vague (be more specific about what to check)
 - Timeout too short (complex analysis needs more time)
 - Wrong model (use Opus for thorough audits, not Haiku)
@@ -336,6 +345,7 @@ After DevOps agent reports issues:
 ### Too Many False Positives
 
 **Possible causes:**
+
 - Agent doesn't understand project conventions
 - Overly strict standards in agent profile
 
@@ -344,6 +354,7 @@ After DevOps agent reports issues:
 ### Agent Can't Access Code
 
 **Possible causes:**
+
 - Sandbox restrictions too tight
 - Missing tool permissions
 
@@ -358,8 +369,8 @@ Chain subagent calls for comprehensive review:
 ```typescript
 // Stage 1: Security audit
 const securityFindings = await spawnSubagent({
-  agentId: 'devops',
-  task: 'Security audit of src/security/*',
+  agentId: "devops",
+  task: "Security audit of src/security/*",
 });
 
 // Stage 2: Fix critical issues (human or coder subagent)
@@ -367,8 +378,8 @@ const securityFindings = await spawnSubagent({
 
 // Stage 3: Verify fixes
 const verifyFindings = await spawnSubagent({
-  agentId: 'devops',
-  task: 'Re-audit src/security/* to verify fixes applied correctly',
+  agentId: "devops",
+  task: "Re-audit src/security/* to verify fixes applied correctly",
 });
 ```
 
@@ -378,16 +389,22 @@ DevOps spots issues, Coder fixes them:
 
 ```typescript
 // DevOps audits
-const issues = await spawnSubagent({ agentId: 'devops', task: 'Find all magic strings in src/agents/' });
+const issues = await spawnSubagent({
+  agentId: "devops",
+  task: "Find all magic strings in src/agents/",
+});
 
 // Coder refactors
 const fixes = await spawnSubagent({
-  agentId: 'coder',
-  task: `Fix issues found by DevOps: ${issues.summary}. Move magic strings to src/constants/.`
+  agentId: "coder",
+  task: `Fix issues found by DevOps: ${issues.summary}. Move magic strings to src/constants/.`,
 });
 
 // DevOps verifies
-const verification = await spawnSubagent({ agentId: 'devops', task: 'Verify magic strings were moved to constants' });
+const verification = await spawnSubagent({
+  agentId: "devops",
+  task: "Verify magic strings were moved to constants",
+});
 ```
 
 ### Custom Analysis Scripts

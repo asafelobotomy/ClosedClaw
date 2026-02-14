@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { ClosedClawConfig } from "../../config/config.js";
 import type { ChannelOutboundAdapter } from "../../channels/plugins/types.js";
-import { setActivePluginRegistry } from "../../plugins/runtime.js";
+import type { ClosedClawConfig } from "../../config/config.js";
 import {
   createIMessageTestPlugin,
   createOutboundTestPlugin,
   createTestRegistry,
 } from "../../../test/helpers/channel-plugins.js";
+import { setActivePluginRegistry } from "../../plugins/runtime.js";
 
 /**
  * Lightweight outbound stubs for tests that delegate to per-channel deps
@@ -45,7 +45,13 @@ const createChannelStubOutbound = (
   chunker: opts?.chunker,
   chunkerMode: opts?.chunkerMode,
   textChunkLimit: opts?.textChunkLimit,
-  sendText: async ({ deps, to, text, accountId, gifPlayback }: {
+  sendText: async ({
+    deps,
+    to,
+    text,
+    accountId,
+    gifPlayback,
+  }: {
     deps?: Record<string, unknown>;
     to: string;
     text: string;
@@ -55,7 +61,13 @@ const createChannelStubOutbound = (
     const depsKey = CHANNEL_DEPS_MAP[channel];
     const send = depsKey ? deps?.[depsKey] : undefined;
     if (send) {
-      const result = await (send as (to: string, text: string, opts: Record<string, unknown>) => Promise<Record<string, unknown>>)(to, text, {
+      const result = await (
+        send as (
+          to: string,
+          text: string,
+          opts: Record<string, unknown>,
+        ) => Promise<Record<string, unknown>>
+      )(to, text, {
         verbose: false,
         accountId: accountId ?? undefined,
         gifPlayback,
@@ -64,7 +76,14 @@ const createChannelStubOutbound = (
     }
     return { channel, messageId: "test", to, text };
   },
-  sendMedia: async ({ deps, to, text, mediaUrl, accountId, gifPlayback }: {
+  sendMedia: async ({
+    deps,
+    to,
+    text,
+    mediaUrl,
+    accountId,
+    gifPlayback,
+  }: {
     deps?: Record<string, unknown>;
     to: string;
     text: string;
@@ -75,7 +94,13 @@ const createChannelStubOutbound = (
     const depsKey = CHANNEL_DEPS_MAP[channel];
     const send = depsKey ? deps?.[depsKey] : undefined;
     if (send) {
-      const result = await (send as (to: string, text: string, opts: Record<string, unknown>) => Promise<Record<string, unknown>>)(to, text, {
+      const result = await (
+        send as (
+          to: string,
+          text: string,
+          opts: Record<string, unknown>,
+        ) => Promise<Record<string, unknown>>
+      )(to, text, {
         verbose: false,
         mediaUrl,
         accountId: accountId ?? undefined,
@@ -129,9 +154,7 @@ describe("deliverOutboundPayloads", () => {
 
       expect(sendTelegram).toHaveBeenCalledTimes(2);
       for (const call of sendTelegram.mock.calls) {
-        expect(call[2]).toEqual(
-          expect.objectContaining({ accountId: undefined, verbose: false }),
-        );
+        expect(call[2]).toEqual(expect.objectContaining({ accountId: undefined, verbose: false }));
       }
       expect(results).toHaveLength(2);
       expect(results[0]).toMatchObject({ channel: "telegram", chatId: "c1" });

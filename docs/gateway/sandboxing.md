@@ -8,14 +8,14 @@ status: active
 # Sandboxing
 
 ClosedClaw runs **all tool execution inside Docker containers by default** to minimize security risks.
-This is controlled by configuration (`agents.defaults.sandbox` or `agents.list[].sandbox`). 
+This is controlled by configuration (`agents.defaults.sandbox` or `agents.list[].sandbox`).
 If sandboxing is explicitly disabled, tools run directly on the host.
 
 The Gateway process stays on the host; tool execution runs in an isolated sandbox
 when enabled (which is the default).
 
-**ClosedClaw vs OpenClaw**: Unlike OpenClaw (which defaults to sandboxing off), 
-ClosedClaw is **security-first by default**. All tool calls are sandboxed unless you 
+**ClosedClaw vs OpenClaw**: Unlike OpenClaw (which defaults to sandboxing off),
+ClosedClaw is **security-first by default**. All tool calls are sandboxed unless you
 explicitly opt out by setting `agents.defaults.sandbox.mode="off"` (not recommended).
 
 This is not a perfect security boundary, but it materially limits filesystem

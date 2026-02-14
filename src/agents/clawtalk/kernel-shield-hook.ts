@@ -15,12 +15,12 @@
  * Registration: called from src/plugins/loader.ts alongside the ClawTalk hook.
  */
 
+import type { KernelShieldConfig } from "../../config/types.security.js";
 import type {
   PluginHookBeforeToolCallEvent,
   PluginHookBeforeToolCallResult,
   PluginHookToolContext,
 } from "../../plugins/types.js";
-import type { KernelShieldConfig } from "../../config/types.security.js";
 import type {
   ClawsFile,
   ClawsManifest,
@@ -214,8 +214,9 @@ export function kernelShieldBeforeToolCallHandler(
   };
 
   const proof: ClawsVerificationProof | null = skill?.verification ?? null;
-  const fingerprint: ClawsNeuralFingerprint | null =
-    activeConfig.attestation.enabled ? (skill?.fingerprint ?? null) : null;
+  const fingerprint: ClawsNeuralFingerprint | null = activeConfig.attestation.enabled
+    ? (skill?.fingerprint ?? null)
+    : null;
 
   // Build context and evaluate
   const toolCtx = buildToolContext(event);

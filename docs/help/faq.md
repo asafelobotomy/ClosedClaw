@@ -1254,9 +1254,9 @@ Related: [Agent workspace](/concepts/agent-workspace), [Memory](/concepts/memory
 
 Everything lives under `$ClosedClaw_STATE_DIR` (default: `~/.ClosedClaw`):
 
-| Path                                                            | Purpose                                                      |
-| --------------------------------------------------------------- | ------------------------------------------------------------ |
-| `$ClosedClaw_STATE_DIR/ClosedClaw.json`                             | Main config (JSON5)                                          |
+| Path                                                              | Purpose                                                      |
+| ----------------------------------------------------------------- | ------------------------------------------------------------ |
+| `$ClosedClaw_STATE_DIR/ClosedClaw.json`                           | Main config (JSON5)                                          |
 | `$ClosedClaw_STATE_DIR/credentials/oauth.json`                    | Legacy OAuth import (copied into auth profiles on first use) |
 | `$ClosedClaw_STATE_DIR/agents/<agentId>/agent/auth-profiles.json` | Auth profiles (OAuth + API keys)                             |
 | `$ClosedClaw_STATE_DIR/agents/<agentId>/agent/auth.json`          | Runtime auth cache (managed automatically)                   |

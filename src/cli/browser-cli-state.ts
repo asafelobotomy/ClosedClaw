@@ -1,9 +1,9 @@
 import type { Command } from "commander";
+import { TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import { danger } from "../globals.js";
 import { defaultRuntime } from "../runtime.js";
 import { parseBooleanValue } from "../utils/boolean.js";
 import { callBrowserRequest, type BrowserParentOpts } from "./browser-cli-shared.js";
-import { TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import { registerBrowserCookiesAndStorageCommands } from "./browser-cli-state.cookies-storage.js";
 import { runCommandWithRuntime } from "./cli-utils.js";
 

@@ -9,9 +9,9 @@ import {
   listChannelPlugins,
   normalizeChannelId,
 } from "../../channels/plugins/index.js";
-import { filterChannelsForGtkOnlyMode } from "../../config/gtk-only-mode.js";
 import { buildChannelAccountSnapshot } from "../../channels/plugins/status.js";
 import { loadConfig, readConfigFileSnapshot } from "../../config/config.js";
+import { filterChannelsForGtkOnlyMode } from "../../config/gtk-only-mode.js";
 import { getChannelActivity } from "../../infra/channel-activity.js";
 import { DEFAULT_ACCOUNT_ID } from "../../routing/session-key.js";
 import { defaultRuntime } from "../../runtime.js";

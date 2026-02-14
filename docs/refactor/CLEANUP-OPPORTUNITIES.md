@@ -17,6 +17,7 @@ Analysis reveals **Phase 1 migration was incomplete** - the `scripts/` directory
 **Problem**: Phase 1 documentation claims 63 items migrated from `scripts/` to `tools/`, but the original `scripts/` folder was never removed.
 
 **Evidence**:
+
 ```bash
 $ du -sh scripts/ tools/
 320K    scripts/
@@ -27,6 +28,7 @@ $ diff -r scripts/ tools/ | grep "^Only in scripts:" | wc -l
 ```
 
 **Impact**:
+
 - Duplicated files waste space
 - Confusion about which version is authoritative
 - Broken migration narrative in Phase 1 documentation
@@ -34,6 +36,7 @@ $ diff -r scripts/ tools/ | grep "^Only in scripts:" | wc -l
 **Root Cause**: Files were copied to `tools/` but not removed from `scripts/` via `git mv` or `git rm`.
 
 **Affected Files** (sample):
+
 - `scripts/auth-monitor.sh` duplicated in `tools/dev/`
 - `scripts/bench-model.ts` duplicated in `tools/dev/`
 - `scripts/committer` duplicated in `tools/ci/`
@@ -67,12 +70,13 @@ make_appcast.sh
 
 **Files to Relocate**:
 
-| File | Current Location | Suggested Location | Reason |
-|------|------------------|-------------------|---------|
-| `docs.acp.md` | Root | `docs/reference/acp.md` | Documentation belongs in docs/ |
-| `.directory` | Root | Add to `.gitignore` | Desktop file, not version controlled |
+| File          | Current Location | Suggested Location      | Reason                               |
+| ------------- | ---------------- | ----------------------- | ------------------------------------ |
+| `docs.acp.md` | Root             | `docs/reference/acp.md` | Documentation belongs in docs/       |
+| `.directory`  | Root             | Add to `.gitignore`     | Desktop file, not version controlled |
 
 **Config Files** (optional consolidation):
+
 ```
 Root configs (OK to keep at root):
 ├── .oxlintrc.json
@@ -90,6 +94,7 @@ Root configs (OK to keep at root):
 **Location**: `/home/solon/Documents/ClosedClaw/.pi/` (48KB)
 
 **Contents**:
+
 ```
 .pi/
 ├── extensions/
@@ -102,11 +107,13 @@ Root configs (OK to keep at root):
 ```
 
 **Usage Analysis**:
+
 - Documentation references `~/.pi/` (user home directory for Pi agent)
 - Repo `.pi/` folder is NOT referenced in active code
 - Likely legacy or development artifacts
 
 **Recommendation**: **Archive or Remove**
+
 - These appear to be Pi agent extensions/utilities
 - If needed, should be in `src/pi/` or `extensions/pi-*`
 - If unused, move to `archive/.pi/` or delete
@@ -114,6 +121,7 @@ Root configs (OK to keep at root):
 ### 5. Archive Directory Content
 
 **Current State**:
+
 ```bash
 $ ls archive/
 update_clawdbot.md  # Only file (12KB)
@@ -122,6 +130,7 @@ update_clawdbot.md  # Only file (12KB)
 **Analysis**: Near-empty archive directory with single outdated document.
 
 **Options**:
+
 1. **Keep as-is** - Ready for future archived content
 2. **Move to docs/archive/** - Consolidate with documentation
 3. **Remove if truly obsolete** - Clean slate
@@ -137,11 +146,13 @@ update_clawdbot.md  # Only file (12KB)
 **Status**: **KEEP** - Active, documented, integrated
 
 **Evidence**:
+
 - Referenced in `docs/platforms/mac/voicewake.md`
 - Swift package with own README, tests, documentation
 - Part of voice wake-word functionality
 
 **Structure**:
+
 ```
 Swabble/
 ├── README.md
@@ -159,6 +170,7 @@ Swabble/
 **Status**: **KEEP** - Legitimate vendored dependency
 
 **Contents**:
+
 ```
 vendor/
 └── a2ui/  # Canvas A2UI components
@@ -169,6 +181,7 @@ Referenced in build process via `tools/build/bundle-a2ui.sh` and `canvas-a2ui-co
 ## 📊 Technical Debt Summary
 
 **Code Quality** (from grep analysis):
+
 ```bash
 # Very low technical debt!
 TODO/FIXME/XXX/HACK comments in src/: 2
@@ -182,12 +195,14 @@ Disabled/WIP files: 0
 ### Priority 1: Critical (Complete Phase 1)
 
 **Action 1.1**: Remove duplicate `scripts/` directory
+
 ```bash
 # After verifying tools/ is complete
 git rm -r scripts/
 ```
 
 **Action 1.2**: Fix package.json references
+
 ```json
 - "mac:package": "bash scripts/package-mac-app.sh",
 + "mac:package": "bash tools/platform/macos/package-mac-dist.sh",
@@ -197,6 +212,7 @@ git rm -r scripts/
 ```
 
 **Action 1.3**: Verify or create missing script
+
 ```bash
 # If restart-mac.sh is missing from tools/platform/macos/
 # Either copy from scripts/ or verify alternate naming
@@ -207,17 +223,20 @@ git rm -r scripts/
 ### Priority 2: Medium (Organization)
 
 **Action 2.1**: Relocate misplaced documentation
+
 ```bash
 git mv docs.acp.md docs/reference/acp.md
 ```
 
 **Action 2.2**: Add `.directory` to `.gitignore`
+
 ```bash
 echo ".directory" >> .gitignore
 git rm --cached .directory
 ```
 
 **Action 2.3**: Investigate `.pi/` directory
+
 ```bash
 # Option A: Archive if unused
 git mv .pi/ archive/.pi/
@@ -234,6 +253,7 @@ git mv .pi/ src/pi-legacy/
 ### Priority 3: Low (Optional)
 
 **Action 3.1**: Archive cleanup
+
 ```bash
 # If update_clawdbot.md is obsolete
 git rm archive/update_clawdbot.md
@@ -243,6 +263,7 @@ git mv archive/update_clawdbot.md docs/archive/
 ```
 
 **Action 3.2**: Add archive README
+
 ```bash
 # Document what belongs in archive/
 cat > archive/README.md << 'EOF'
@@ -265,9 +286,11 @@ EOF
 **File**: `docs/refactor/PHASE-1-COMPLETE.md`
 
 Current status claims:
+
 > ✅ Old directories removed (scripts/)
 
-**Correction needed**: 
+**Correction needed**:
+
 > ⚠️ **Note**: Initial Phase 1 left `scripts/` directory intact. Full cleanup completed in Phase 5 (February 9, 2026).
 
 **File**: `docs/refactor/REPOSITORY-REORGANIZATION-PROPOSAL.md`
@@ -277,6 +300,7 @@ Add note to Phase 1 section about follow-up cleanup.
 ## 🔍 Verification Commands
 
 Before removing `scripts/`:
+
 ```bash
 # 1. Verify all package.json references point to tools/
 grep -r "scripts/" package.json
@@ -294,17 +318,20 @@ du -sh scripts/ tools/
 ## 📈 Impact Assessment
 
 ### Disk Space Savings
+
 - Remove `scripts/`: **~320KB**
 - Remove `.pi/` (if obsolete): **~48KB**
 - Total: **~368KB** (minimal but reduces clutter)
 
 ### Developer Experience
+
 - ✅ Eliminates confusion about authoritative script location
 - ✅ Completes Phase 1 migration narrative
 - ✅ Cleaner root directory
 - ✅ Proper documentation organization
 
 ### Risk Level
+
 - **Low Risk**: Scripts in `scripts/` are duplicates of `tools/`
 - **Medium Risk**: Package.json references need careful verification
 - **Low Risk**: `.pi/` removal (appears unused)
@@ -314,6 +341,7 @@ du -sh scripts/ tools/
 ### Phase 5: Repository Cleanup (Est. 30 minutes)
 
 **Step 1**: Verify Migration (5 min)
+
 ```bash
 # Compare scripts/ and tools/ thoroughly
 diff -rq scripts/ tools/ > /tmp/scripts-diff.txt
@@ -321,6 +349,7 @@ diff -rq scripts/ tools/ > /tmp/scripts-diff.txt
 ```
 
 **Step 2**: Fix Package.json (5 min)
+
 ```bash
 # Update references
 # Test affected commands
@@ -328,12 +357,14 @@ pnpm mac:package  # Verify it works
 ```
 
 **Step 3**: Remove Duplicates (5 min)
+
 ```bash
 git rm -r scripts/
 git commit -m "Phase 5: Complete Phase 1 cleanup - remove duplicate scripts/ directory"
 ```
 
 **Step 4**: Organize Root (10 min)
+
 ```bash
 git mv docs.acp.md docs/reference/acp.md
 echo ".directory" >> .gitignore
@@ -342,6 +373,7 @@ git commit -m "Phase 5: Organize root directory - move docs, ignore desktop file
 ```
 
 **Step 5**: Address `.pi/` (5 min)
+
 ```bash
 # After verification of usage
 git mv .pi/ archive/.pi/
@@ -349,6 +381,7 @@ git commit -m "Phase 5: Archive unused .pi/ directory"
 ```
 
 **Step 6**: Documentation (5 min)
+
 - Update Phase 1 completion doc with note
 - Create Phase 5 completion doc
 - Update main proposal
@@ -356,6 +389,7 @@ git commit -m "Phase 5: Archive unused .pi/ directory"
 ## ✅ Success Criteria
 
 After Phase 5 completion:
+
 - [ ] `scripts/` directory removed
 - [ ] All package.json scripts reference `tools/`
 - [ ] All commands tested and working

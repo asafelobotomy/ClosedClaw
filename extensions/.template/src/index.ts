@@ -2,7 +2,7 @@ import type { ClosedClawPluginApi } from "closedclaw/plugin-sdk";
 
 /**
  * ClosedClaw Extension Template
- * 
+ *
  * This is a minimal extension that demonstrates the plugin registration pattern.
  * Replace this with your extension's actual implementation.
  */
@@ -11,7 +11,7 @@ export function register(api: ClosedClawPluginApi) {
   // Get extension configuration
   const config = api.getConfig();
   const extensionConfig = config.plugins?.["extension-template"] ?? {};
-  
+
   // Check if extension is enabled
   if (extensionConfig.enabled === false) {
     return;
@@ -31,7 +31,7 @@ export function register(api: ClosedClawPluginApi) {
       },
       handler: async (params) => {
         const input = params.input as string;
-        
+
         // Your tool logic here
         return {
           result: `Processed: ${input}`,
@@ -47,13 +47,13 @@ export function register(api: ClosedClawPluginApi) {
     handler: async (ctx, next) => {
       // Pre-process logic here
       console.log("[extension-template] Message received:", ctx.message);
-      
+
       // Call next hook in chain
       const result = await next();
-      
+
       // Post-process logic here
       console.log("[extension-template] Message processed");
-      
+
       return result;
     },
   });

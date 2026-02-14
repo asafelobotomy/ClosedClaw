@@ -5,11 +5,7 @@
  */
 
 import { describe, expect, it, beforeEach } from "vitest";
-import {
-  TaskQueue,
-  createTaskQueue,
-  type TaskInput,
-} from "./task-queue.js";
+import { TaskQueue, createTaskQueue, type TaskInput } from "./task-queue.js";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -60,9 +56,7 @@ describe("TaskQueue", () => {
     });
 
     it("should validate dependencies exist", () => {
-      expect(() =>
-        queue.enqueue(makeTask({ dependsOn: ["nonexistent"] })),
-      ).toThrow(/not found/);
+      expect(() => queue.enqueue(makeTask({ dependsOn: ["nonexistent"] }))).toThrow(/not found/);
     });
 
     it("should accept valid dependencies", () => {
@@ -117,14 +111,18 @@ describe("TaskQueue", () => {
     });
 
     it("should match required capabilities", () => {
-      queue.enqueue(makeTask({
-        id: "web-task",
-        requiredCapabilities: ["web_search"],
-      }));
-      queue.enqueue(makeTask({
-        id: "code-task",
-        requiredCapabilities: ["coding"],
-      }));
+      queue.enqueue(
+        makeTask({
+          id: "web-task",
+          requiredCapabilities: ["web_search"],
+        }),
+      );
+      queue.enqueue(
+        makeTask({
+          id: "code-task",
+          requiredCapabilities: ["coding"],
+        }),
+      );
 
       // Agent with only coding capability
       const task = queue.claim("coder", ["coding"]);
@@ -132,10 +130,12 @@ describe("TaskQueue", () => {
     });
 
     it("should skip tasks when agent lacks capabilities", () => {
-      queue.enqueue(makeTask({
-        id: "needs-search",
-        requiredCapabilities: ["web_search", "reading"],
-      }));
+      queue.enqueue(
+        makeTask({
+          id: "needs-search",
+          requiredCapabilities: ["web_search", "reading"],
+        }),
+      );
 
       // Agent has only reading
       expect(queue.claim("a1", ["reading"])).toBeNull();

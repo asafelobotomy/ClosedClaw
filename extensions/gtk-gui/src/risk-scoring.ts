@@ -90,17 +90,33 @@ const TOOL_PROFILES: Record<string, ToolRiskProfile> = {
  * Patterns in command arguments that increase data sensitivity.
  */
 const SENSITIVE_PATTERNS: Array<{ pattern: RegExp; boost: number; reason: string }> = [
-  { pattern: /\b(rm|rmdir|del)\b.*(-rf?|--force|--recursive)/i, boost: 0.4, reason: "destructive delete with force/recursive" },
+  {
+    pattern: /\b(rm|rmdir|del)\b.*(-rf?|--force|--recursive)/i,
+    boost: 0.4,
+    reason: "destructive delete with force/recursive",
+  },
   { pattern: /\brm\s+-/i, boost: 0.3, reason: "delete command with flags" },
   { pattern: /\b(sudo|doas)\b/i, boost: 0.3, reason: "elevated privilege command" },
-  { pattern: /\b(passwd|shadow|credential|secret|token|key|password)\b/i, boost: 0.3, reason: "accessing credentials/secrets" },
-  { pattern: /\b(curl|wget)\b.*\|\s*(sh|bash)/i, boost: 0.5, reason: "piping remote script to shell" },
+  {
+    pattern: /\b(passwd|shadow|credential|secret|token|key|password)\b/i,
+    boost: 0.3,
+    reason: "accessing credentials/secrets",
+  },
+  {
+    pattern: /\b(curl|wget)\b.*\|\s*(sh|bash)/i,
+    boost: 0.5,
+    reason: "piping remote script to shell",
+  },
   { pattern: /\/(etc|root|boot|sys|proc)\//i, boost: 0.2, reason: "accessing system directories" },
   { pattern: /\b(chmod|chown)\b/i, boost: 0.2, reason: "changing file permissions" },
   { pattern: /\b(kill|pkill|killall)\b/i, boost: 0.2, reason: "process termination" },
   { pattern: />\s*\/dev\/sd/i, boost: 0.5, reason: "writing to block device" },
   { pattern: /\bdd\b.*\bof=/i, boost: 0.4, reason: "raw disk write" },
-  { pattern: /\.(ssh|gpg|pem|key|crt|cert)/i, boost: 0.3, reason: "accessing cryptographic material" },
+  {
+    pattern: /\.(ssh|gpg|pem|key|crt|cert)/i,
+    boost: 0.3,
+    reason: "accessing cryptographic material",
+  },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -129,13 +145,19 @@ const trustStore: Map<string, ToolTrustRecord> = new Map();
  */
 export function getTrustScore(toolName: string): number {
   const record = trustStore.get(toolName);
-  if (!record) {return 0.0;} // Unknown tool — untrusted
+  if (!record) {
+    return 0.0;
+  } // Unknown tool — untrusted
 
   // Three consecutive failures → hard reset
-  if (record.consecutiveFailures >= 3) {return 0.0;}
+  if (record.consecutiveFailures >= 3) {
+    return 0.0;
+  }
 
   const total = record.successes + record.failures;
-  if (total === 0) {return 0.0;}
+  if (total === 0) {
+    return 0.0;
+  }
 
   // Tier-based ceiling from total execution count
   let tierFloor: number;
@@ -144,17 +166,25 @@ export function getTrustScore(toolName: string): number {
   let tierSpan: number;
 
   if (total <= 10) {
-    tierFloor = 0.0; tierCeiling = 0.2;
-    tierStart = 0; tierSpan = 10;
+    tierFloor = 0.0;
+    tierCeiling = 0.2;
+    tierStart = 0;
+    tierSpan = 10;
   } else if (total <= 50) {
-    tierFloor = 0.2; tierCeiling = 0.6;
-    tierStart = 10; tierSpan = 40;
+    tierFloor = 0.2;
+    tierCeiling = 0.6;
+    tierStart = 10;
+    tierSpan = 40;
   } else if (total <= 100) {
-    tierFloor = 0.6; tierCeiling = 0.8;
-    tierStart = 50; tierSpan = 50;
+    tierFloor = 0.6;
+    tierCeiling = 0.8;
+    tierStart = 50;
+    tierSpan = 50;
   } else {
-    tierFloor = 0.8; tierCeiling = 1.0;
-    tierStart = 100; tierSpan = 100; // reaches 1.0 at 200 executions
+    tierFloor = 0.8;
+    tierCeiling = 1.0;
+    tierStart = 100;
+    tierSpan = 100; // reaches 1.0 at 200 executions
   }
 
   // Linear interpolation within tier
@@ -171,7 +201,12 @@ export function getTrustScore(toolName: string): number {
  * Tracks consecutive failures for degradation (3 consecutive → reset to 0.0).
  */
 export function recordExecution(toolName: string, success: boolean): void {
-  const record = trustStore.get(toolName) ?? { successes: 0, failures: 0, consecutiveFailures: 0, lastUsed: 0 };
+  const record = trustStore.get(toolName) ?? {
+    successes: 0,
+    failures: 0,
+    consecutiveFailures: 0,
+    lastUsed: 0,
+  };
   if (success) {
     record.successes++;
     record.consecutiveFailures = 0; // Reset consecutive failure counter
@@ -201,10 +236,7 @@ export function resetTrust(toolName?: string): void {
 /**
  * Calculate the risk vector for a tool call.
  */
-export function calculateRisk(
-  toolName: string,
-  params?: Record<string, unknown>,
-): RiskVector {
+export function calculateRisk(toolName: string, params?: Record<string, unknown>): RiskVector {
   // Get base profile
   const profile = TOOL_PROFILES[toolName] ?? { pAccess: 0.3, sData: 0.3 };
   let pAccess = profile.pAccess;
@@ -241,13 +273,14 @@ export function calculateRisk(
   // Modified formula: weight trust penalty by inherent risk so zero-risk tools stay zero
   // V_r = (P_access × S_data) + max(P_access, S_data) × (1 - T_score)
   const inherentRisk = Math.max(pAccess, sData);
-  const vr = Math.min(2.0, (pAccess * sData) + inherentRisk * (1 - tScore));
+  const vr = Math.min(2.0, pAccess * sData + inherentRisk * (1 - tScore));
   const clampedVr = Math.min(1.0, vr);
   const tier: RiskTier = clampedVr <= 0.3 ? "low" : clampedVr <= 0.7 ? "medium" : "high";
 
-  const reason = reasons.length > 0
-    ? `${tier} risk (V_r=${clampedVr.toFixed(2)}): ${reasons.join(", ")}`
-    : `${tier} risk (V_r=${clampedVr.toFixed(2)})`;
+  const reason =
+    reasons.length > 0
+      ? `${tier} risk (V_r=${clampedVr.toFixed(2)}): ${reasons.join(", ")}`
+      : `${tier} risk (V_r=${clampedVr.toFixed(2)})`;
 
   return { vr: clampedVr, pAccess, sData, tScore, tier, reason };
 }
@@ -255,10 +288,7 @@ export function calculateRisk(
 /**
  * Assess whether a tool call should be allowed, logged, or confirmed.
  */
-export function assessRisk(
-  toolName: string,
-  params?: Record<string, unknown>,
-): RiskAssessment {
+export function assessRisk(toolName: string, params?: Record<string, unknown>): RiskAssessment {
   const vector = calculateRisk(toolName, params);
 
   let action: RiskAssessment["action"];

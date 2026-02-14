@@ -1,5 +1,4 @@
 import type { ClosedClawConfig } from "../../config/config.js";
-import { secondsToMs } from "../../config/constants/index.js";
 import type { SessionEntry, SessionScope } from "../../config/sessions.js";
 import type { MediaUnderstandingDecision } from "../../media-understanding/types.js";
 import type { ElevatedLevel, ReasoningLevel, ThinkLevel, VerboseLevel } from "../thinking.js";
@@ -22,6 +21,7 @@ import {
   resolveInternalSessionKey,
   resolveMainSessionAlias,
 } from "../../agents/tools/sessions-helpers.js";
+import { secondsToMs } from "../../config/constants/index.js";
 import { logVerbose } from "../../globals.js";
 import {
   formatUsageWindowSummary,

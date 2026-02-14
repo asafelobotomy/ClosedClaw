@@ -466,10 +466,7 @@ describe("dispatchReplyFromConfig", () => {
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({ Provider: "telegram", ChatType: "direct" });
 
-    const replyResolver = async (
-      _ctx: MsgContext,
-      opts: GetReplyOptions | undefined,
-    ) => {
+    const replyResolver = async (_ctx: MsgContext, opts: GetReplyOptions | undefined) => {
       await opts?.onToolResult?.({ text: "🔧 exec: ls" });
       return { text: "done" } satisfies ReplyPayload;
     };

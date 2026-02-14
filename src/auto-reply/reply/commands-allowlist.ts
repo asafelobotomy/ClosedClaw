@@ -317,9 +317,9 @@ export const handleAllowlistCommand: CommandHandler = async (params, allowTextCo
     // Generic allowFrom resolution via channel dock (channel-specific resolvers removed).
     const dock = getChannelDock(channelId);
     if (dock?.config?.resolveAllowFrom) {
-      dmAllowFrom = (
-        dock.config.resolveAllowFrom({ cfg: params.cfg, accountId }) ?? []
-      ).map(String);
+      dmAllowFrom = (dock.config.resolveAllowFrom({ cfg: params.cfg, accountId }) ?? []).map(
+        String,
+      );
     }
 
     const dmDisplay = normalizeAllowFrom({

@@ -3,14 +3,14 @@
  */
 
 import { describe, it, expect } from "vitest";
+import type { ProfileRegistrySnapshot } from "../profiles/types.js";
+import { builtinProfiles } from "../profiles/registry.js";
 import {
   analyzeTaskForSquad,
   buildSquadFromProfiles,
   formSquadForTask,
   buildComplexTask,
 } from "./integration.js";
-import { builtinProfiles } from "../profiles/registry.js";
-import type { ProfileRegistrySnapshot } from "../profiles/types.js";
 
 function makeRegistry(): ProfileRegistrySnapshot {
   return {
@@ -224,11 +224,7 @@ describe("formSquadForTask", () => {
   });
 
   it("respects strategy override", () => {
-    const result = formSquadForTask(
-      "Analyze the codebase",
-      registry,
-      { strategy: "map-reduce" },
-    );
+    const result = formSquadForTask("Analyze the codebase", registry, { strategy: "map-reduce" });
 
     expect(result.config.strategy).toBe("map-reduce");
   });

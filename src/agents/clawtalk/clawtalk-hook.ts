@@ -13,13 +13,6 @@
  * in the GTK extension's clawtalk-bridge.ts.
  */
 
-import { encode } from "./encoder.js";
-import { Directory, type RoutingDecision } from "./directory.js";
-import { shouldEscalate } from "./escalation.js";
-import type { ClawTalkConfig, EncodedMessage } from "./types.js";
-import { DEFAULT_CONFIG } from "./types.js";
-import { TPCRuntime } from "./tpc/index.js";
-import { logVerbose } from "../../globals.js";
 import type {
   PluginHookBeforeAgentStartEvent,
   PluginHookBeforeAgentStartResult,
@@ -28,6 +21,13 @@ import type {
   PluginHookMessageSendingEvent,
   PluginHookMessageSendingResult,
 } from "../../plugins/types.js";
+import type { ClawTalkConfig, EncodedMessage } from "./types.js";
+import { logVerbose } from "../../globals.js";
+import { Directory, type RoutingDecision } from "./directory.js";
+import { encode } from "./encoder.js";
+import { shouldEscalate } from "./escalation.js";
+import { TPCRuntime } from "./tpc/index.js";
+import { DEFAULT_CONFIG } from "./types.js";
 
 const ARTIFACT_PATTERNS: RegExp[] = [
   /^CT\/\d+\s+(REQ|RES|TASK|STATUS|NOOP|ERR|ACK|MULTI)\b.*$/gm,
@@ -125,12 +125,15 @@ async function getTpcRuntime(): Promise<TPCRuntime | null> {
     allowTextFallback: tpcConfig?.allowTextFallback ?? false,
   });
 
-  tpcInitPromise = tpcRuntime.initialize().catch((err) => {
-    logVerbose(`[clawtalk-tpc] TPC init failed: ${err}`);
-    tpcRuntime = null;
-  }).finally(() => {
-    tpcInitPromise = null;
-  });
+  tpcInitPromise = tpcRuntime
+    .initialize()
+    .catch((err) => {
+      logVerbose(`[clawtalk-tpc] TPC init failed: ${err}`);
+      tpcRuntime = null;
+    })
+    .finally(() => {
+      tpcInitPromise = null;
+    });
 
   await tpcInitPromise;
   return tpcRuntime;

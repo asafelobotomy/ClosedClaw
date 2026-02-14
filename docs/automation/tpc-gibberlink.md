@@ -33,12 +33,12 @@ Agent A                               Agent B
 
 ### Transport Modes
 
-| Mode | Carriers | Baud | Use Case |
-|------|----------|------|----------|
-| `ultrasonic` | 18/20 kHz | 150 | Inaudible; hardware-dependent |
-| `audible` | 1.2/2.4 kHz | 300 | Bell 202; works everywhere |
-| `file` | N/A | N/A | Dead-drop only; no audio I/O |
-| `auto` | Probe-selected | Varies | Hardware detection at startup |
+| Mode         | Carriers       | Baud   | Use Case                      |
+| ------------ | -------------- | ------ | ----------------------------- |
+| `ultrasonic` | 18/20 kHz      | 150    | Inaudible; hardware-dependent |
+| `audible`    | 1.2/2.4 kHz    | 300    | Bell 202; works everywhere    |
+| `file`       | N/A            | N/A    | Dead-drop only; no audio I/O  |
+| `auto`       | Probe-selected | Varies | Hardware detection at startup |
 
 ### Security Layers
 
@@ -57,16 +57,16 @@ Add TPC settings to your ClawTalk config:
 
 ```json5
 {
-  "clawtalk": {
-    "tpc": {
-      "enabled": true,
-      "mode": "auto",                    // "auto" | "ultrasonic" | "audible" | "file"
-      "enforceForAgentToAgent": true,     // Block agent-to-agent text; TPC only
-      "allowTextFallback": false,         // Global text fallback toggle
-      "deadDropPath": "~/.closedclaw/tpc/dead-drop",
-      "maxMessageAge": 300                // Seconds before envelope expires
-    }
-  }
+  clawtalk: {
+    tpc: {
+      enabled: true,
+      mode: "auto", // "auto" | "ultrasonic" | "audible" | "file"
+      enforceForAgentToAgent: true, // Block agent-to-agent text; TPC only
+      allowTextFallback: false, // Global text fallback toggle
+      deadDropPath: "~/.closedclaw/tpc/dead-drop",
+      maxMessageAge: 300, // Seconds before envelope expires
+    },
+  },
 }
 ```
 
@@ -76,14 +76,14 @@ Individual agent profiles can override the global setting:
 
 ```json5
 {
-  "agents": {
-    "conversation": {
-      "allowTextFallback": true    // Human-facing agent uses text
+  agents: {
+    conversation: {
+      allowTextFallback: true, // Human-facing agent uses text
     },
-    "research": {
-      "allowTextFallback": false   // Agent-to-agent: TPC only
-    }
-  }
+    research: {
+      allowTextFallback: false, // Agent-to-agent: TPC only
+    },
+  },
 }
 ```
 
@@ -99,11 +99,11 @@ On startup with `mode: "auto"`, TPC runs Python probes to detect audio hardware:
 
 ### Decision Thresholds
 
-| Condition | Mode Selected |
-|-----------|--------------|
-| SNR >= 20 dB AND PER <= 5% | `ultrasonic` |
-| SNR >= 10 dB AND PER <= 20% | `audible` |
-| Otherwise | `file` |
+| Condition                   | Mode Selected |
+| --------------------------- | ------------- |
+| SNR >= 20 dB AND PER <= 5%  | `ultrasonic`  |
+| SNR >= 10 dB AND PER <= 20% | `audible`     |
+| Otherwise                   | `file`        |
 
 Results are cached for 24 hours at `~/.closedclaw/tpc/hardware-profile.json`.
 

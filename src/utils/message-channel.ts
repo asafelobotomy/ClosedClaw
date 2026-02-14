@@ -17,11 +17,7 @@ import { getActivePluginRegistry } from "../plugins/runtime.js";
 export const INTERNAL_MESSAGE_CHANNEL = "webchat" as const;
 export type InternalMessageChannel = typeof INTERNAL_MESSAGE_CHANNEL;
 
-const MARKDOWN_CAPABLE_CHANNELS = new Set<string>([
-  "gtk-gui",
-  "tui",
-  INTERNAL_MESSAGE_CHANNEL,
-]);
+const MARKDOWN_CAPABLE_CHANNELS = new Set<string>(["gtk-gui", "tui", INTERNAL_MESSAGE_CHANNEL]);
 
 export { GATEWAY_CLIENT_NAMES, GATEWAY_CLIENT_MODES };
 export type { GatewayClientName, GatewayClientMode };

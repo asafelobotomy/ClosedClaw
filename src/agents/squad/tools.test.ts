@@ -120,10 +120,9 @@ describe("createDelegateToAgentTool", () => {
     const ctx = mockContext();
     const tool = createDelegateToAgentTool(ctx);
 
-    const result = parseResult(await tool.execute("test-call-id", { task_description: "Do something" })) as Record<
-      string,
-      unknown
-    >;
+    const result = parseResult(
+      await tool.execute("test-call-id", { task_description: "Do something" }),
+    ) as Record<string, unknown>;
 
     expect(result.priority).toBe("normal");
     const input = (ctx.taskQueue.enqueue as ReturnType<typeof vi.fn>).mock.calls[0][0];
@@ -135,7 +134,10 @@ describe("createDelegateToAgentTool", () => {
     const ctx = mockContext();
     const tool = createDelegateToAgentTool(ctx);
 
-    await tool.execute("test-call-id", { task_description: "Research topic", target_role: "researcher" });
+    await tool.execute("test-call-id", {
+      task_description: "Research topic",
+      target_role: "researcher",
+    });
 
     const input = (ctx.taskQueue.enqueue as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(input.requiredCapabilities).toEqual(["researcher"]);
@@ -146,7 +148,10 @@ describe("createDelegateToAgentTool", () => {
     const ctx = mockContext();
     const tool = createDelegateToAgentTool(ctx);
 
-    await tool.execute("test-call-id", { task_description: "Review code", target_agent_id: "agent-7" });
+    await tool.execute("test-call-id", {
+      task_description: "Review code",
+      target_agent_id: "agent-7",
+    });
 
     const input = (ctx.taskQueue.enqueue as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(input.metadata.targetAgentId).toBe("agent-7");
@@ -156,7 +161,10 @@ describe("createDelegateToAgentTool", () => {
     const ctx = mockContext();
     const tool = createDelegateToAgentTool(ctx);
 
-    await tool.execute("test-call-id", { task_description: "Process", input_data: '{"key":"val"}' });
+    await tool.execute("test-call-id", {
+      task_description: "Process",
+      input_data: '{"key":"val"}',
+    });
 
     const input = (ctx.taskQueue.enqueue as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(input.input).toEqual({ key: "val" });
@@ -189,7 +197,10 @@ describe("createSquadMemoryReadTool", () => {
     };
 
     expect(result.count).toBe(2);
-    expect(result.keys.map((k) => k.key).toSorted((a, b) => a.localeCompare(b))).toEqual(["key1", "key2"]);
+    expect(result.keys.map((k) => k.key).toSorted((a, b) => a.localeCompare(b))).toEqual([
+      "key1",
+      "key2",
+    ]);
   });
 
   it("reads a specific key", async () => {
@@ -197,7 +208,9 @@ describe("createSquadMemoryReadTool", () => {
     (ctx.sharedMemory.set as ReturnType<typeof vi.fn>)("mykey", "myval");
 
     const tool = createSquadMemoryReadTool(ctx);
-    const result = parseResult(await tool.execute("test-call-id", { action: "get", key: "mykey" })) as {
+    const result = parseResult(
+      await tool.execute("test-call-id", { action: "get", key: "mykey" }),
+    ) as {
       found: boolean;
       key: string;
       value: unknown;
@@ -212,7 +225,9 @@ describe("createSquadMemoryReadTool", () => {
     const ctx = mockContext();
 
     const tool = createSquadMemoryReadTool(ctx);
-    const result = parseResult(await tool.execute("test-call-id", { action: "get", key: "nope" })) as {
+    const result = parseResult(
+      await tool.execute("test-call-id", { action: "get", key: "nope" }),
+    ) as {
       found: boolean;
       value: unknown;
     };
@@ -224,7 +239,9 @@ describe("createSquadMemoryReadTool", () => {
   it("returns error when key missing for get action", async () => {
     const ctx = mockContext();
     const tool = createSquadMemoryReadTool(ctx);
-    const result = parseResult(await tool.execute("test-call-id", { action: "get" })) as { error: string };
+    const result = parseResult(await tool.execute("test-call-id", { action: "get" })) as {
+      error: string;
+    };
 
     expect(result.error).toContain("Key required");
   });
@@ -237,7 +254,9 @@ describe("createSquadMemoryWriteTool", () => {
     const ctx = mockContext();
     const tool = createSquadMemoryWriteTool(ctx);
 
-    const result = parseResult(await tool.execute("test-call-id", { key: "results", value: '"hello"' })) as {
+    const result = parseResult(
+      await tool.execute("test-call-id", { key: "results", value: '"hello"' }),
+    ) as {
       success: boolean;
       key: string;
       writtenBy: string;
@@ -254,7 +273,11 @@ describe("createSquadMemoryWriteTool", () => {
     const tool = createSquadMemoryWriteTool(ctx);
 
     const result = parseResult(
-      await tool.execute("test-call-id", { key: "findings", value: '"critical data"', important: "true" }),
+      await tool.execute("test-call-id", {
+        key: "findings",
+        value: '"critical data"',
+        important: "true",
+      }),
     ) as { important: boolean };
 
     expect(result.important).toBe(true);
@@ -305,7 +328,9 @@ describe("createSquadBroadcastTool", () => {
     const ctx = mockContext();
     const tool = createSquadBroadcastTool(ctx);
 
-    const result = parseResult(await tool.execute("test-call-id", { message: "status update" })) as {
+    const result = parseResult(
+      await tool.execute("test-call-id", { message: "status update" }),
+    ) as {
       type: string;
     };
 
@@ -393,7 +418,9 @@ describe("createWaitForTaskTool", () => {
     (ctx.taskQueue.getTask as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
 
     const tool = createWaitForTaskTool(ctx);
-    const result = parseResult(await tool.execute("test-call-id", { task_id: "task-999" })) as { error: string };
+    const result = parseResult(await tool.execute("test-call-id", { task_id: "task-999" })) as {
+      error: string;
+    };
 
     expect(result.error).toContain("not found");
   });

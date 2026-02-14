@@ -6,6 +6,7 @@
 ## Current Situation
 
 **Magic Numbers in Memory Architecture**:
+
 ```typescript
 // working-memory.ts
 constructor(private readonly maxSize: number = 10) // 10 = Miller's Law
@@ -26,7 +27,7 @@ Create **`src/constants/agents.ts`** following existing pattern:
 ```typescript
 /**
  * Agent and squad system constants.
- * 
+ *
  * Centralizes all configuration for:
  * - Memory systems (working, short-term, long-term)
  * - Squad coordination
@@ -48,70 +49,70 @@ export const MEMORY = {
   WORKING: {
     /** Max items in working memory (Miller's Law: 7±2) */
     DEFAULT_CAPACITY: 10,
-    
+
     /** Minimum allowed capacity */
     MIN_CAPACITY: 1,
-    
+
     /** Maximum allowed capacity (prevent memory abuse) */
     MAX_CAPACITY: 50,
   } as const,
-  
+
   /** Short-term memory (recent data cache) */
   SHORT_TERM: {
     /** Default TTL for entries (5 minutes) */
     DEFAULT_TTL_MS: 5 * MINUTE,
-    
+
     /** Maximum TTL to prevent unbounded growth (1 hour) */
     MAX_TTL_MS: 1 * HOUR,
-    
+
     /** Memory budget per squad */
     MAX_SIZE_BYTES: 10 * MB,
-    
+
     /** Access count threshold for consolidation */
     HOT_ENTRY_THRESHOLD: 5,
-    
+
     /** Consolidation check interval */
     CONSOLIDATION_INTERVAL_MS: 5 * MINUTE,
   } as const,
-  
+
   /** Long-term memory (persistent storage) */
   LONG_TERM: {
     /** Retention policy for episodic memories */
     RETENTION: {
       /** Keep successful task outcomes (days) */
       SUCCESS_DAYS: 90,
-      
+
       /** Keep failed task outcomes (days) */
       FAILURE_DAYS: 30,
-      
+
       /** Keep validated semantic facts (forever) */
       VALIDATED_FACTS_DAYS: Number.POSITIVE_INFINITY,
-      
+
       /** Keep unvalidated semantic facts (days) */
       UNVALIDATED_FACTS_DAYS: 30,
-      
+
       /** Keep procedures with success rate threshold */
       PROCEDURE_SUCCESS_RATE: 0.7,
-      
+
       /** Keep recently used procedures (days) */
       PROCEDURE_RECENT_DAYS: 60,
     } as const,
-    
+
     /** Cleanup schedule */
     CLEANUP_INTERVAL_MS: 1 * DAY,
-    
+
     /** Search result limits */
     MAX_SEARCH_RESULTS: 100,
   } as const,
-  
+
   /** Consolidation process configuration */
   CONSOLIDATION: {
     /** Run consolidation every N milliseconds */
     INTERVAL_MS: 5 * MINUTE,
-    
+
     /** Batch size for consolidation */
     BATCH_SIZE: 100,
-    
+
     /** Max time spent in consolidation per cycle */
     MAX_DURATION_MS: 30 * MS,
   } as const,
@@ -123,28 +124,28 @@ export const MEMORY = {
 export const SPAWNING = {
   /** Agent initialization timeout */
   INIT_TIMEOUT_MS: 30 * MS,
-  
+
   /** Heartbeat interval for health checks */
   HEARTBEAT_INTERVAL_MS: 10 * MS,
-  
+
   /** Max missed heartbeats before considering agent dead */
   MAX_MISSED_HEARTBEATS: 3,
-  
+
   /** Grace period for graceful shutdown */
   SHUTDOWN_GRACE_PERIOD_MS: 10 * MS,
-  
+
   /** Max agents per squad */
   MAX_AGENTS_PER_SQUAD: 10,
-  
+
   /** Max memory per agent (MB) */
   MAX_MEMORY_MB: 512,
-  
+
   /** Max token budget per agent per task */
   DEFAULT_TOKEN_BUDGET: 100_000,
-  
+
   /** Auto-restart on failure (max retries) */
   MAX_RESTART_ATTEMPTS: 3,
-  
+
   /** Backoff between restart attempts */
   RESTART_BACKOFF_MS: 5 * MS,
 } as const;
@@ -157,39 +158,39 @@ export const COORDINATION = {
   QUEUE: {
     /** Max tasks in queue per squad */
     MAX_SIZE: 1000,
-    
+
     /** Task claim timeout (ms) */
     CLAIM_TIMEOUT_MS: 5 * MINUTE,
-    
+
     /** Max task execution time */
     MAX_EXECUTION_MS: 30 * MINUTE,
-    
+
     /** Retry backoff (exponential) */
     RETRY_BASE_MS: 1 * MS,
     RETRY_MAX_MS: 1 * MINUTE,
     MAX_RETRIES: 3,
   } as const,
-  
+
   /** Coordination primitives timeouts */
   PRIMITIVES: {
     /** Lock timeout (prevent deadlock) */
     LOCK_TIMEOUT_MS: 30 * MS,
-    
+
     /** Barrier timeout (prevent infinite wait) */
     BARRIER_TIMEOUT_MS: 5 * MINUTE,
-    
+
     /** Event wait timeout */
     EVENT_WAIT_TIMEOUT_MS: 1 * MINUTE,
   } as const,
-  
+
   /** Squad lifecycle limits */
   SQUAD: {
     /** Max squad lifetime */
     MAX_LIFETIME_MS: 24 * HOUR,
-    
+
     /** Inactivity timeout (auto-terminate idle squads) */
     INACTIVITY_TIMEOUT_MS: 1 * HOUR,
-    
+
     /** Max squads per gateway */
     MAX_SQUADS: 50,
   } as const,
@@ -208,15 +209,17 @@ export const AGENTS = {
 ## Integration Plan
 
 ### Phase 1: Immediate (with Phase 1.2)
+
 1. Create `src/constants/agents.ts` with memory constants
 2. Update `src/constants/index.ts`:
    ```typescript
    export { AGENTS } from "./agents.js";
    ```
 3. Refactor `working-memory.ts` to use constants:
+
    ```typescript
    import { AGENTS } from "../../constants/index.js";
-   
+
    constructor(
      private readonly maxSize: number = AGENTS.MEMORY.WORKING.DEFAULT_CAPACITY
    ) {
@@ -227,11 +230,13 @@ export const AGENTS = {
    ```
 
 ### Phase 2: As We Build (Phases 1.2+)
+
 - Add constants as we implement each component
 - Update test files to use constants
 - Document rationale in JSDoc
 
 ### Phase 3: Audit & Test (End of MVP)
+
 - Comprehensive test in `src/constants/agents.test.ts`
 - Verify all magic numbers replaced
 - Document tuning guidance
@@ -239,17 +244,20 @@ export const AGENTS = {
 ## Benefits
 
 **For Current Work**:
+
 - Clear defaults for short-term/long-term memory
 - Consistent retention policies
 - Easy to tune without hunting code
 
 **For Future Growth**:
+
 - Single place to adjust all memory settings
 - Easy to add squad/spawning constants
 - Configuration drift prevention
 - Better security audits
 
 **For Testing**:
+
 - Mock constants in one place
 - Test different configurations easily
 - Document expected behavior
@@ -257,12 +265,14 @@ export const AGENTS = {
 ## Alternative: Configuration vs Constants
 
 **Constants (recommended)**:
+
 - Hardcoded defaults (can be overridden by config)
 - Type-safe, compile-time checked
 - Good for system limits (prevent abuse)
 - Example: `AGENTS.MEMORY.WORKING.DEFAULT_CAPACITY`
 
 **Configuration** (user-adjustable):
+
 - Runtime config in `~/.closedclaw/config.json5`
 - User can tune for their use case
 - Example: `agents.memory.workingCapacity`
@@ -271,12 +281,13 @@ export const AGENTS = {
 
 ```typescript
 // Constants define limits
-const userCapacity = config.agents?.memory?.workingCapacity ?? AGENTS.MEMORY.WORKING.DEFAULT_CAPACITY;
+const userCapacity =
+  config.agents?.memory?.workingCapacity ?? AGENTS.MEMORY.WORKING.DEFAULT_CAPACITY;
 
 // Enforce safety bounds
 const safeCapacity = Math.max(
   AGENTS.MEMORY.WORKING.MIN_CAPACITY,
-  Math.min(userCapacity, AGENTS.MEMORY.WORKING.MAX_CAPACITY)
+  Math.min(userCapacity, AGENTS.MEMORY.WORKING.MAX_CAPACITY),
 );
 ```
 
@@ -297,6 +308,7 @@ const safeCapacity = Math.max(
 ## Recommended Action
 
 ✅ **Create `src/constants/agents.ts` with Phase 1.2** because:
+
 - Prevents accumulating more magic numbers in upcoming code
 - Establishes pattern for Phase 2 components
 - Makes retention policies explicit and auditable

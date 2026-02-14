@@ -39,7 +39,8 @@ export type MyToolOptions = {
 export function createMyTool(options?: MyToolOptions): AnyAgentTool {
   return {
     name: "my_tool",
-    description: "Clear, concise description of what this tool does and when to use it. The AI uses this to decide when to invoke the tool.",
+    description:
+      "Clear, concise description of what this tool does and when to use it. The AI uses this to decide when to invoke the tool.",
     parameters: {
       input: {
         type: "string",
@@ -56,11 +57,11 @@ export function createMyTool(options?: MyToolOptions): AnyAgentTool {
       // Extract and validate parameters
       const input = readStringParam(params, "input", { required: true });
       const mode = readStringParam(params, "mode") ?? "default";
-      
+
       // Implement tool logic
       try {
         const result = await processInput(input, mode);
-        
+
         // Return result
         return jsonResult({
           success: true,
@@ -155,7 +156,7 @@ export function createClosedClawTools(options?: {
       agentDir: options?.agentDir,
     }),
   ];
-  
+
   return tools;
 }
 ```
@@ -187,12 +188,12 @@ import { createMyTool } from "./my-tool.js";
 describe("createMyTool", () => {
   it("processes input successfully", async () => {
     const tool = createMyTool();
-    
+
     const result = await tool.handler({
       input: "test input",
       mode: "fast",
     });
-    
+
     expect(result).toEqual({
       type: "json",
       json: {
@@ -204,20 +205,20 @@ describe("createMyTool", () => {
       },
     });
   });
-  
+
   it("requires input parameter", async () => {
     const tool = createMyTool();
-    
+
     await expect(tool.handler({})).rejects.toThrow(/input required/i);
   });
-  
+
   it("handles errors gracefully", async () => {
     const tool = createMyTool();
-    
+
     const result = await tool.handler({
       input: "invalid-input-that-causes-error",
     });
-    
+
     expect(result).toMatchObject({
       type: "json",
       json: {
@@ -226,12 +227,12 @@ describe("createMyTool", () => {
       },
     });
   });
-  
+
   it("uses default mode when not specified", async () => {
     const tool = createMyTool();
-    
+
     const result = await tool.handler({ input: "test" });
-    
+
     expect(result).toMatchObject({
       type: "json",
       json: {
@@ -269,14 +270,15 @@ const result = await tool.handler({ input: "test" });
 
 \`\`\`typescript
 const tool = createMyTool({
-  config: myConfig,
-  agentDir: "/path/to/agent",
+config: myConfig,
+agentDir: "/path/to/agent",
 });
 \`\`\`
 
 ## Configuration
 
 Respects these config options:
+
 - `myTool.enabled`: Enable/disable tool
 - `myTool.mode`: Default mode
 
@@ -285,8 +287,8 @@ Respects these config options:
 Returns errors in result object:
 \`\`\`json
 {
-  "success": false,
-  "error": "Error message"
+"success": false,
+"error": "Error message"
 }
 \`\`\`
 ```
@@ -314,12 +316,12 @@ pnpm build && pnpm check && pnpm test
 ```typescript
 export function createMyTool(options?: MyToolOptions): AnyAgentTool | null {
   const config = options?.config;
-  
+
   // Return null to disable tool
   if (!config?.myTool?.enabled) {
     return null;
   }
-  
+
   return {
     name: "my_tool",
     // ... tool implementation
@@ -335,7 +337,7 @@ import { createActionGate } from "./common.js";
 export function createMyTool(options?: MyToolOptions): AnyAgentTool {
   const actions = options?.config?.myTool?.actions;
   const can = createActionGate(actions);
-  
+
   return {
     name: "my_tool",
     handler: async (params) => {
@@ -372,7 +374,7 @@ const files = await fs.readdir(dirPath);
 ```typescript
 export function createMyTool(options?: MyToolOptions): AnyAgentTool {
   const sandboxed = options?.sandboxed ?? false;
-  
+
   return {
     name: "my_tool",
     handler: async (params) => {
@@ -392,7 +394,7 @@ export function createMyTool(options?: MyToolOptions): AnyAgentTool {
 // Use AbortSignal for cancellation
 handler: async (params, context) => {
   const controller = new AbortController();
-  
+
   try {
     const result = await fetch(url, { signal: controller.signal });
     return jsonResult({ data: await result.json() });
@@ -402,27 +404,31 @@ handler: async (params, context) => {
     }
     throw error;
   }
-}
+};
 ```
 
 ## Tool Types and Use Cases
 
 ### Information Retrieval
+
 - Web search, API queries, database lookups
 - Return `jsonResult()` with structured data
 - Example: `web-search.ts`, `web-fetch.ts`
 
 ### Action/Command
+
 - File operations, system commands, external services
 - Return `jsonResult()` with success/error status
 - Example: `bash-tools.exec.ts`, `message-tool.ts`
 
 ### Transformation
+
 - Data processing, format conversion, analysis
 - Return `jsonResult()` or `textResult()`
 - Example: `image-tool.ts`, `canvas-tool.ts`
 
 ### Session Management
+
 - Agent spawning, session control, state management
 - Return `jsonResult()` with session info
 - Example: `sessions-spawn-tool.ts`, `sessions-send-tool.ts`

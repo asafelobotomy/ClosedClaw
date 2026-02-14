@@ -5,6 +5,7 @@ This is a boilerplate template for creating new ClosedClaw extensions (plugins, 
 ## Quick Start
 
 1. **Copy this template**:
+
    ```bash
    cp -r extensions/.template extensions/my-ext extension-name
    ```
@@ -138,7 +139,7 @@ Once your extension is ready:
 ## Resources
 
 - [Plugin System Overview](../../docs/plugin.md)
-- [Creating Extensions Guide](../../docs/plugins/creating-extensions.md) *(coming soon)*
+- [Creating Extensions Guide](../../docs/plugins/creating-extensions.md) _(coming soon)_
 - [Example Extensions](../)
 - [Discord Community](https://discord.gg/clawd)
 

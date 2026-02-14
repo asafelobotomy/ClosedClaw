@@ -49,11 +49,7 @@ export { ShortTermMemory, createShortTermMemory } from "./short-term-memory.js";
 export type { ShortTermEntry } from "./short-term-memory.js";
 
 // Tier 3: Long-Term Memory
-export {
-  EpisodicStore,
-  LongTermMemory,
-  createLongTermMemory,
-} from "./long-term-memory.js";
+export { EpisodicStore, LongTermMemory, createLongTermMemory } from "./long-term-memory.js";
 export type {
   Episode,
   EpisodeOutcome,

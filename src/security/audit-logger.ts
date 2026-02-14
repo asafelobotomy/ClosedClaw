@@ -17,8 +17,8 @@
  */
 
 import crypto from "node:crypto";
-import fs from "node:fs/promises";
 import { createWriteStream, type WriteStream } from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
 import { getStateDir } from "../config/constants/index.js";
 
@@ -302,8 +302,11 @@ export class AuditLogger {
               return;
             }
             this.writeStream.write(line, (err) => {
-              if (err) {rej(err);}
-              else {res();}
+              if (err) {
+                rej(err);
+              } else {
+                res();
+              }
             });
           });
 
@@ -325,8 +328,11 @@ export class AuditLogger {
     if (this.writeStream) {
       await new Promise<void>((resolve, reject) => {
         this.writeStream!.end((err: Error | undefined) => {
-          if (err) {reject(err);}
-          else {resolve();}
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
         });
       });
       this.writeStream = null;
@@ -553,7 +559,16 @@ export function getAuditLogPath(stateDir?: string): string {
  * @returns CSV string
  */
 export function exportAuditLogAsCsv(entries: AuditEntry[]): string {
-  const headers = ["seq", "timestamp", "type", "severity", "summary", "actor", "session", "details"];
+  const headers = [
+    "seq",
+    "timestamp",
+    "type",
+    "severity",
+    "summary",
+    "actor",
+    "session",
+    "details",
+  ];
   const rows = entries.map((e) => [
     String(e.seq),
     e.ts,

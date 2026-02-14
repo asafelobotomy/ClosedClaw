@@ -17,7 +17,6 @@ import {
   resolveProfileUnusableUntilForDisplay,
 } from "../../agents/auth-profiles.js";
 import { resolveEnvApiKey } from "../../agents/model-auth.js";
-import { secondsToMs } from "../../config/constants/index.js";
 import {
   buildModelAliasIndex,
   parseModelRef,
@@ -28,6 +27,7 @@ import {
 import { formatCliCommand } from "../../cli/command-format.js";
 import { withProgressTotals } from "../../cli/progress.js";
 import { CONFIG_PATH, loadConfig } from "../../config/config.js";
+import { secondsToMs } from "../../config/constants/index.js";
 import {
   formatUsageWindowSummary,
   loadProviderUsageSummary,

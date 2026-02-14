@@ -2,14 +2,18 @@ import { describe, expect, it } from "vitest";
 import { TIMEOUT_TEST_SUITE_LONG_MS } from "../config/constants/index.js";
 
 describe("sandbox config merges", () => {
-  it("resolves sandbox scope deterministically", { timeout: TIMEOUT_TEST_SUITE_LONG_MS }, async () => {
-    const { resolveSandboxScope } = await import("./sandbox.js");
+  it(
+    "resolves sandbox scope deterministically",
+    { timeout: TIMEOUT_TEST_SUITE_LONG_MS },
+    async () => {
+      const { resolveSandboxScope } = await import("./sandbox.js");
 
-    expect(resolveSandboxScope({})).toBe("agent");
-    expect(resolveSandboxScope({ perSession: true })).toBe("session");
-    expect(resolveSandboxScope({ perSession: false })).toBe("shared");
-    expect(resolveSandboxScope({ perSession: true, scope: "agent" })).toBe("agent");
-  });
+      expect(resolveSandboxScope({})).toBe("agent");
+      expect(resolveSandboxScope({ perSession: true })).toBe("session");
+      expect(resolveSandboxScope({ perSession: false })).toBe("shared");
+      expect(resolveSandboxScope({ perSession: true, scope: "agent" })).toBe("agent");
+    },
+  );
 
   it("merges sandbox docker env and ulimits (agent wins)", async () => {
     const { resolveSandboxDockerConfig } = await import("./sandbox.js");

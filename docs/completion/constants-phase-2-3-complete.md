@@ -52,6 +52,7 @@
 ### Phase 2 Test Results
 
 **All 75 new tests passing** (100% coverage):
+
 - `timing-constants.test.ts`: 21 tests ✅
 - `path-constants.test.ts`: 27 tests ✅
 - `size-constants.test.ts`: 27 tests ✅
@@ -65,6 +66,7 @@
 ### Files Migrated (10+ files)
 
 #### Gateway Test Files
+
 1. **`src/gateway/test-helpers.e2e.ts`**
    - Migrated: `TIMEOUT_GATEWAY_CONNECT_MS` instead of hardcoded `10_000`
    - Impact: 1 timeout constant centralized
@@ -90,11 +92,13 @@
    - Impact: 1 path construction replaced
 
 #### CLI Command Files
+
 7. **`src/commands/agents.test.ts`**
    - Migrated: `getStateDir()` instead of `path.join(os.homedir(), ".ClosedClaw")`
    - Impact: 1 path construction replaced
 
 #### Media Files
+
 8. **`src/media/constants.ts`** (Complete refactor)
    - **Before**: 45 lines defining constants and functions
    - **After**: 20 lines re-exporting from centralized constants
@@ -105,6 +109,7 @@
 ### Migration Impact
 
 **Eliminated**:
+
 - ✅ 4 hardcoded gateway URLs (`http://127.0.0.1:18789`)
 - ✅ 6 env var string literals (`ClosedClaw_GATEWAY_PORT`, etc.)
 - ✅ 4 hardcoded path constructions (`path.join(os.homedir(), ".ClosedClaw", ...)`)
@@ -121,7 +126,7 @@
 
 **Phase 1**: 5 files created (env, network, index, 2 tests)  
 **Phase 2**: 6 files created (timing, path, size, 3 tests, index updated)  
-**Phase 3**: 8 files migrated (gateway tests, CLI tests, media re-export)  
+**Phase 3**: 8 files migrated (gateway tests, CLI tests, media re-export)
 
 **Total**: 19 files created/modified, ~2,000 lines of code
 
@@ -129,19 +134,19 @@
 
 **Phase 1 Tests**: 51 passing ✅  
 **Phase 2 Tests**: 75 passing ✅  
-**Migrated Files**: 7 passing ✅ (hooks-mapping + 6 others validated)  
+**Migrated Files**: 7 passing ✅ (hooks-mapping + 6 others validated)
 
 **Grand Total**: **133+ tests passing** ✅
 
 ### Constants Available
 
-| Category | Count | Examples |
-|----------|-------|----------|
-| Environment Variables | 50+ | `ENV_CLOSEDCLAW_GATEWAY_PORT`, `ENV_ANTHROPIC_API_KEY` |
-| Network | 30+ | `buildGatewayHttpUrl()`, `DEFAULT_GATEWAY_PORT` |
-| Timing | 40+ | `TIMEOUT_HTTP_DEFAULT_MS`, `TTL_SESSION_STALE_MS` |
-| Paths | 25+ | `getStateDir()`, `getSandboxesDir()` |
-| Sizes | 10+ | `MAX_IMAGE_BYTES`, `formatBytes()` |
+| Category              | Count | Examples                                               |
+| --------------------- | ----- | ------------------------------------------------------ |
+| Environment Variables | 50+   | `ENV_CLOSEDCLAW_GATEWAY_PORT`, `ENV_ANTHROPIC_API_KEY` |
+| Network               | 30+   | `buildGatewayHttpUrl()`, `DEFAULT_GATEWAY_PORT`        |
+| Timing                | 40+   | `TIMEOUT_HTTP_DEFAULT_MS`, `TTL_SESSION_STALE_MS`      |
+| Paths                 | 25+   | `getStateDir()`, `getSandboxesDir()`                   |
+| Sizes                 | 10+   | `MAX_IMAGE_BYTES`, `formatBytes()`                     |
 
 **Total**: **150+ constants and utilities**
 
@@ -150,24 +155,28 @@
 ## 🎁 Benefits Delivered
 
 ### Type Safety
+
 - ✅ Autocomplete for all constant names
 - ✅ Compile-time error detection
 - ✅ Literal types enforce exact values
 - ✅ No runtime typos possible
 
 ### Developer Experience
+
 - ✅ Single import point (`@/config/constants`)
 - ✅ Organized by domain (env, network, timing, path, size)
 - ✅ Helper functions reduce boilerplate
 - ✅ Self-documenting code with named constants
 
 ### Code Quality
+
 - ✅ DRY principle enforced (single source of truth)
 - ✅ Easier refactoring (change once, apply everywhere)
 - ✅ Reduced magic numbers/strings by ~100+
 - ✅ Consistent formatting across codebase
 
 ### Maintainability
+
 - ✅ Port changes: 30 seconds instead of 25 minutes
 - ✅ Env var renames: trivial instead of error-prone
 - ✅ Path restructuring: single function update
@@ -178,12 +187,14 @@
 ## 📊 Impact Analysis
 
 ### Before Constants Library
+
 - **100+ scattered constants**: 50+ env vars, 30+ ports/URLs, 20+ paths, 40+ timeouts, 10+ sizes
 - **No autocomplete**: Prone to typos (e.g., `ANTROPIC_API_KEY`)
 - **Duplication**: Same values repeated across files
 - **Magic numbers**: Timeouts like `30_000` without context
 
 ### After Constants Library (Phases 1-3)
+
 - ✅ **150+ centralized constants**: All searchable, documented, type-safe
 - ✅ **Full autocomplete**: Zero typos possible
 - ✅ **Single source of truth**: Change once, update everywhere
@@ -192,6 +203,7 @@
 ### Time Savings
 
 #### Per Developer Per Month
+
 - **5-10 min**: Looking up constant names
 - **10-15 min**: Debugging typos
 - **15-30 min**: Port/URL changes
@@ -202,16 +214,19 @@
 #### Example Scenarios
 
 **Scenario 1: Change Gateway Port**
+
 - **Before**: Find/replace "18789" across 30+ files (~25 minutes)
 - **After**: Change `DEFAULT_GATEWAY_PORT` once (~30 seconds)
 - **Saved**: 24.5 minutes
 
 **Scenario 2: Add New Timeout**
+
 - **Before**: Hardcode in file, copy-paste elsewhere (~5 minutes)
 - **After**: Add to timing-constants.ts, import (~2 minutes)
 - **Saved**: 3 minutes
 
 **Scenario 3: Refactor State Directory**
+
 - **Before**: Update 20+ `path.join(os.homedir(), ".ClosedClaw", ...)` lines (~30 minutes)
 - **After**: Update `getStateDir()` implementation (~2 minutes)
 - **Saved**: 28 minutes
@@ -225,21 +240,25 @@
 Can proceed gradually over weeks/months:
 
 **Priority 1**: Test files (demonstrate patterns)
+
 - Remaining e2e tests
 - Integration tests
 - Unit tests with hardcoded values
 
 **Priority 2**: Gateway files (high visibility)
+
 - Gateway server implementation
 - WebSocket handlers
 - RPC methods
 
 **Priority 3**: CLI commands (user-facing)
+
 - Command implementations
 - CLI utilities
 - Progress reporting
 
 **Priority 4**: Extensions (community patterns)
+
 - Channel plugins
 - Tool plugins
 - Integration plugins
@@ -247,6 +266,7 @@ Can proceed gradually over weeks/months:
 **Estimated Time**: 5-10 hours (can be spread over weeks)
 
 ### No Pressure
+
 - Migration is **100% optional**
 - All existing code continues to work
 - New code can use constants immediately
@@ -257,6 +277,7 @@ Can proceed gradually over weeks/months:
 ## 📚 Resources
 
 ### Documentation
+
 - **Phase 1 Report**: `docs/completion/constants-phase-1-complete.md`
 - **Phase 2+3 Report**: `docs/completion/constants-phase-2-3-complete.md` ← You are here
 - **Usage Guide**: `docs/development/using-constants.md`
@@ -264,6 +285,7 @@ Can proceed gradually over weeks/months:
 - **Full Analysis**: `CONSTANTS-ENHANCEMENT-ANALYSIS.md` (root)
 
 ### Implementation
+
 - **Environment Variables**: `src/config/constants/env-constants.ts`
 - **Network Constants**: `src/config/constants/network-constants.ts`
 - **Timing Constants**: `src/config/constants/timing-constants.ts`
@@ -272,6 +294,7 @@ Can proceed gradually over weeks/months:
 - **Barrel Export**: `src/config/constants/index.ts`
 
 ### Tests
+
 - **Env Tests**: `src/config/constants/env-constants.test.ts` (51 tests)
 - **Network Tests**: `src/config/constants/network-constants.test.ts` (30 tests)
 - **Timing Tests**: `src/config/constants/timing-constants.test.ts` (21 tests)
@@ -283,6 +306,7 @@ Can proceed gradually over weeks/months:
 ## ✨ Production Ready
 
 Phases 1-3 are **complete, tested, and ready for production**:
+
 - ✅ 133+ tests passing
 - ✅ Zero breaking changes
 - ✅ Comprehensive documentation
@@ -300,6 +324,6 @@ Phases 1-3 are **complete, tested, and ready for production**:
 **Test Results**: 133/133 passing ✅  
 **Migration Status**: 8 high-priority files ✅  
 **ROI**: 3-5 hours saved per developer per month  
-**Payback Period**: ~1 month for 3+ developers  
+**Payback Period**: ~1 month for 3+ developers
 
 🎉 **Phases 1-3 Complete! Ready for production use.**

@@ -29,18 +29,21 @@ This skill helps you manage the ClosedClaw release process, from version bumping
 ClosedClaw uses three release channels:
 
 ### Stable (latest)
+
 - **Version format**: `vYYYY.M.D` or `vYYYY.M.D-<patch>`
 - **NPM dist-tag**: `latest`
 - **Purpose**: Production-ready releases
 - **Example**: `v2026.2.9`, `v2026.2.9-hotfix.1`
 
 ### Beta (prerelease)
+
 - **Version format**: `vYYYY.M.D-beta.N`
 - **NPM dist-tag**: `beta`
 - **Purpose**: Testing releases before stable
 - **Example**: `v2026.2.9-beta.1`
 
 ### Dev (development)
+
 - **Version format**: No tag, just publish
 - **NPM dist-tag**: `dev`
 - **Purpose**: Development builds from `main`
@@ -49,11 +52,13 @@ ClosedClaw uses three release channels:
 ## Version Format
 
 ClosedClaw uses **calendar versioning**:
+
 - `YYYY` - Year (e.g., 2026)
 - `M` - Month (1-12, no leading zero)
 - `D` - Day (1-31, no leading zero)
 
 Examples:
+
 - `2026.2.9` - Release on February 9, 2026
 - `2026.2.9-beta.1` - First beta for Feb 9 release
 - `2026.2.9-hotfix.1` - First hotfix for Feb 9 release
@@ -91,29 +96,36 @@ npm version 2026.2.9 --no-git-tag-version
 ## [2026.2.9] - 2026-02-09
 
 ### Added
+
 - New feature description (#PR_NUMBER)
 - Another feature (@contributor)
 
 ### Changed
+
 - Modified behavior (#PR_NUMBER)
 
 ### Fixed
+
 - Bug fix description (#PR_NUMBER)
 - Security fix (@security-researcher)
 
 ### Breaking Changes
+
 - Breaking change description (migration guide in docs)
 
 ---
+
 **Thank you to all contributors**: @contributor1, @contributor2
 
 ---
 
 ## [2026.2.1] - 2026-02-01
+
 ...
 ```
 
 **Changelog Guidelines**:
+
 - Keep latest release at top (no `Unreleased` section)
 - Use semantic categories: Added, Changed, Fixed, Breaking Changes
 - Include PR numbers: `(#123)`
@@ -192,6 +204,7 @@ gh release create v2026.2.9 \
 ```
 
 **Release Notes Template**:
+
 ```markdown
 ## 🦞 ClosedClaw v2026.2.9
 
@@ -208,6 +221,7 @@ See [CHANGELOG.md](CHANGELOG.md) for full details.
 ### 🙏 Contributors
 
 Thank you to everyone who contributed to this release:
+
 - @contributor1
 - @contributor2
 
@@ -235,9 +249,11 @@ npm version 2026.2.9-beta.1 --no-git-tag-version
 Beta release for testing. Stable release planned for 2026-02-09.
 
 ### Added (beta)
+
 - Feature in testing
 
 ### Known Issues
+
 - Issue to address before stable
 ```
 
@@ -318,6 +334,7 @@ npm version 2026.2.9-hotfix.1 --no-git-tag-version
 ## [2026.2.9-hotfix.1] - 2026-02-10
 
 ### Fixed
+
 - **CRITICAL**: Security vulnerability in auth (#123)
 - Crash on startup with certain configs (#124)
 
@@ -569,6 +586,7 @@ echo "✅ Released v${VERSION}"
 ```
 
 Usage:
+
 ```bash
 ./scripts/release.sh 2026.2.9
 ```

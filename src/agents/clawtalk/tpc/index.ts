@@ -17,7 +17,6 @@ import type {
   TPCAuditEvent,
   SignedTPCEnvelope,
 } from "./types.js";
-import { DEFAULT_TPC_CONFIG } from "./types.js";
 import { compressWire, decompressWire } from "../compression.js";
 import {
   createEnvelope,
@@ -29,13 +28,12 @@ import {
   generateMessageId,
   type KeyPair,
 } from "./crypto-signer.js";
-import { getAFSKParamsForMode } from "./profile-selector.js";
-import { encodeToWav } from "./waveform-encoder.js";
-import { decodeFromWav, WaveformDecodeError } from "./waveform-decoder.js";
 import { DeadDropManager, type DeadDropConfig } from "./dead-drop.js";
 import { NonceStore, type NonceStoreConfig } from "./nonce-store.js";
-
-import type crypto from "node:crypto";
+import { getAFSKParamsForMode } from "./profile-selector.js";
+import { DEFAULT_TPC_CONFIG } from "./types.js";
+import { decodeFromWav, WaveformDecodeError } from "./waveform-decoder.js";
+import { encodeToWav } from "./waveform-encoder.js";
 
 // ---------------------------------------------------------------------------
 // TPC Runtime
@@ -66,7 +64,9 @@ export class TPCRuntime {
    * Initialize the TPC runtime: load keys, start dead-drop, open nonce store.
    */
   async initialize(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) {
+      return;
+    }
 
     const supportedModes = new Set(["file", "audible", "ultrasonic", "auto"]);
     if (!supportedModes.has(this.config.mode)) {
@@ -76,17 +76,14 @@ export class TPCRuntime {
     }
 
     // Load or generate Ed25519 keypair
-    this.keyPair = await loadOrCreateKeyPair(
-      this.config.keyPath,
-      this.config.publicKeyPath,
-    );
+    this.keyPair = await loadOrCreateKeyPair(this.config.keyPath, this.config.publicKeyPath);
 
     // Initialize dead-drop manager
     this.deadDrop = new DeadDropManager({
       basePath: this.config.deadDropPath,
       pollingInterval: this.config.pollingInterval,
       archiveTtlMs: 24 * 60 * 60 * 1000, // 24 hours
-      cleanupIntervalMs: 60 * 60 * 1000,   // 1 hour
+      cleanupIntervalMs: 60 * 60 * 1000, // 1 hour
     });
     await this.deadDrop.start();
 
@@ -191,11 +188,10 @@ export class TPCRuntime {
    * Encode a CT/1 message to a WAV buffer without writing to disk.
    * Useful for testing or custom transport.
    */
-  encodeToBuffer(params: {
-    payload: string;
-    sourceAgent: string;
-    targetAgent: string;
-  }): { wavData: Buffer; signed: SignedTPCEnvelope } {
+  encodeToBuffer(params: { payload: string; sourceAgent: string; targetAgent: string }): {
+    wavData: Buffer;
+    signed: SignedTPCEnvelope;
+  } {
     this.ensureReady();
 
     const afskParams = this.getAfskParams();
@@ -225,9 +221,7 @@ export class TPCRuntime {
    *
    * Returns the validated CT/1 payload or throws on failure.
    */
-  async decode(params: {
-    filePath: string;
-  }): Promise<TPCDecodeResult> {
+  async decode(params: { filePath: string }): Promise<TPCDecodeResult> {
     this.ensureReady();
     const start = performance.now();
 
@@ -408,9 +402,7 @@ export class TPCRuntime {
     wire?: string;
     allowTextFallback?: boolean;
   }): boolean {
-    const transportSupported = ["file", "audible", "ultrasonic", "auto"].includes(
-      this.config.mode,
-    );
+    const transportSupported = ["file", "audible", "ultrasonic", "auto"].includes(this.config.mode);
 
     // Enforced mode: do not permit text fallback for agent-to-agent traffic.
     if (params.isAgentToAgent && this.config.enforceForAgentToAgent) {
@@ -437,7 +429,9 @@ export class TPCRuntime {
     }
 
     // TPC disabled globally → always text
-    if (!this.config.enabled) return true;
+    if (!this.config.enabled) {
+      return true;
+    }
 
     // Unsupported transport → text fallback allowed for non-enforced paths
     if (!transportSupported) {
@@ -450,7 +444,9 @@ export class TPCRuntime {
     }
 
     // Human-facing → text (can't encode to acoustic for user readability)
-    if (!params.isAgentToAgent) return true;
+    if (!params.isAgentToAgent) {
+      return true;
+    }
 
     // TPC not initialized → emergency text fallback
     if (!this.initialized) {
@@ -528,9 +524,7 @@ export class TPCRuntime {
       );
     }
     if (!this.initialized) {
-      throw new TPCNotInitializedError(
-        "TPC runtime not initialized. Call initialize() first.",
-      );
+      throw new TPCNotInitializedError("TPC runtime not initialized. Call initialize() first.");
     }
   }
 
@@ -624,17 +618,10 @@ export {
 } from "./reed-solomon.js";
 
 // Dead-drop
-export {
-  DeadDropManager,
-  type DeadDropConfig,
-  type DeadDropMessage,
-} from "./dead-drop.js";
+export { DeadDropManager, type DeadDropConfig, type DeadDropMessage } from "./dead-drop.js";
 
 // Nonce store
-export {
-  NonceStore,
-  type NonceStoreConfig,
-} from "./nonce-store.js";
+export { NonceStore, type NonceStoreConfig } from "./nonce-store.js";
 
 // Profile selector (hardware probe + mode selection)
 export {
@@ -647,23 +634,13 @@ export {
 } from "./profile-selector.js";
 
 // Circuit breaker (dead-drop health monitoring)
-export {
-  CircuitBreaker,
-  type CircuitBreakerConfig,
-  type CircuitState,
-} from "./circuit-breaker.js";
+export { CircuitBreaker, type CircuitBreakerConfig, type CircuitState } from "./circuit-breaker.js";
 
 // Key rotation (scheduled key replacement with grace period)
-export {
-  KeyRotationManager,
-  type KeyRotationConfig,
-} from "./key-rotation.js";
+export { KeyRotationManager, type KeyRotationConfig } from "./key-rotation.js";
 
 // Rate limiter (per-agent sliding window)
-export {
-  RateLimiter,
-  type RateLimiterConfig,
-} from "./rate-limiter.js";
+export { RateLimiter, type RateLimiterConfig } from "./rate-limiter.js";
 
 // Audit logger (JSONL structured event logging)
 export {

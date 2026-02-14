@@ -39,16 +39,16 @@ Stay on file-based GGWave if PER is high; only enable ultrasonic if SNR/roll-off
 
 ### Plain English vs Acoustic Control (Theoretical)
 
-| Dimension | Plain English (.md) | Acoustic (GibberLink/GGWave) |
-| --- | --- | --- |
-| Injection surface | High; text goal hijacks easy | Lower; requires crafted modulated signal + valid signature |
-| Storage visibility | Cleartext on disk | Encoded WAV/PCM; opaque without demodulation |
-| Reasoning fidelity | Lossy summaries | Closer to raw intent tokens (small payloads) |
-| Throughput | High over IPC/HTTP | Low (tokens/commands only) |
-| Latency | API/IO-bound | Modulation/FFT adds 100s ms; still low for small packets |
-| Stealth | Readable by humans/tools | Non-text; ultrasonic optional (hardware-dependent) |
-| Robustness | Strong (if networked) | Susceptible to SNR, jamming; mitigated by FEC/signatures |
-| AuthN/Z | Depends on app | Mandatory signing/MAC recommended; A2A allowlist |
+| Dimension          | Plain English (.md)          | Acoustic (GibberLink/GGWave)                               |
+| ------------------ | ---------------------------- | ---------------------------------------------------------- |
+| Injection surface  | High; text goal hijacks easy | Lower; requires crafted modulated signal + valid signature |
+| Storage visibility | Cleartext on disk            | Encoded WAV/PCM; opaque without demodulation               |
+| Reasoning fidelity | Lossy summaries              | Closer to raw intent tokens (small payloads)               |
+| Throughput         | High over IPC/HTTP           | Low (tokens/commands only)                                 |
+| Latency            | API/IO-bound                 | Modulation/FFT adds 100s ms; still low for small packets   |
+| Stealth            | Readable by humans/tools     | Non-text; ultrasonic optional (hardware-dependent)         |
+| Robustness         | Strong (if networked)        | Susceptible to SNR, jamming; mitigated by FEC/signatures   |
+| AuthN/Z            | Depends on app               | Mandatory signing/MAC recommended; A2A allowlist           |
 
 ### Key Takeaways
 

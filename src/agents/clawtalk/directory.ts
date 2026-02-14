@@ -45,7 +45,15 @@ const SUBAGENT_PROFILES: SubagentProfile[] = [
       "Always confirm destructive operations. Show relevant output.",
       "Use list_directory before file operations to verify paths.",
     ].join("\n"),
-    tools: ["read_file", "write_file", "list_directory", "run_command", "current_time", "clipboard_read", "clipboard_write"],
+    tools: [
+      "read_file",
+      "write_file",
+      "list_directory",
+      "run_command",
+      "current_time",
+      "clipboard_read",
+      "clipboard_write",
+    ],
     priority: 10,
   },
   {
@@ -69,7 +77,8 @@ const SUBAGENT_PROFILES: SubagentProfile[] = [
   {
     id: "memory",
     name: "Memory Agent",
-    description: "Personal knowledge base — save, recall, and reflect on facts, preferences, and entities",
+    description:
+      "Personal knowledge base — save, recall, and reflect on facts, preferences, and entities",
     capabilities: ["remember", "recall"],
     systemPrompt: [
       "You are a knowledge management assistant. Your job is to:",
@@ -85,7 +94,8 @@ const SUBAGENT_PROFILES: SubagentProfile[] = [
   {
     id: "browser",
     name: "Browser Agent",
-    description: "Web page automation — navigation, screenshots, form filling, data extraction via Playwright",
+    description:
+      "Web page automation — navigation, screenshots, form filling, data extraction via Playwright",
     capabilities: ["browser_automate"],
     systemPrompt: [
       "You are a browser automation specialist. Your job is to:",
@@ -99,7 +109,14 @@ const SUBAGENT_PROFILES: SubagentProfile[] = [
       "Take screenshots to verify state before and after actions.",
       "Be cautious with form submissions — confirm before submitting.",
     ].join("\n"),
-    tools: ["browser", "screenshot", "screenshot_region", "screenshot_ocr", "web_search", "current_time"],
+    tools: [
+      "browser",
+      "screenshot",
+      "screenshot_region",
+      "screenshot_ocr",
+      "web_search",
+      "current_time",
+    ],
     priority: 10,
   },
   {

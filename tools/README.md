@@ -52,6 +52,7 @@ pnpm release:check        # Pre-release validation
 ## Organization
 
 ### build/
+
 Build-time utilities for compilation and asset bundling.
 
 - **bundle-a2ui.sh**: Bundle Canvas A2UI components (React subset for agent UIs)
@@ -63,6 +64,7 @@ Build-time utilities for compilation and asset bundling.
 **Invoked by**: `pnpm build` runs full sequence: `canvas:a2ui:bundle` → `tsc` → copy scripts
 
 ### ci/
+
 Continuous integration utilities for linting, formatting, and Git hooks.
 
 - **committer**: Scoped staging helper - `tools/ci/committer "msg" file1.ts file2.ts`
@@ -73,6 +75,7 @@ Continuous integration utilities for linting, formatting, and Git hooks.
 **Invoked by**: `postinstall` sets up hooks automatically
 
 **Usage**:
+
 ```bash
 # Scoped commit (safer than `git add .`)
 tools/ci/committer "fix: update config types" src/config/types.ts
@@ -82,6 +85,7 @@ node tools/ci/setup-git-hooks.js
 ```
 
 ### deployment/
+
 Cloud deployment configurations and systemd services.
 
 - **cloud/**: PaaS configs (Render, Railway, Northflank, Fly.io)
@@ -90,6 +94,7 @@ Cloud deployment configurations and systemd services.
 **Referenced by**: Deployment docs in [docs/](../docs/)
 
 ### dev/
+
 Development workflow utilities (hot-reload, debugging, post-install).
 
 - **run-node.mjs**: Development runner with tsx (TypeScript execution)
@@ -104,12 +109,14 @@ Development workflow utilities (hot-reload, debugging, post-install).
 - **fix-unused-vars.ts**: Auto-remove unused imports/variables
 
 **Invoked by**:
+
 - `pnpm dev` → `run-node.mjs`
 - `pnpm gateway:watch` → `watch-node.mjs`
 - `pnpm ui:build` / `pnpm ui:dev` → `ui.js`
 - `pnpm postinstall` → `postinstall.js` (auto-run after install)
 
 **Usage**:
+
 ```bash
 # Run specific command in dev mode
 pnpm dev gateway --verbose
@@ -127,6 +134,7 @@ bash tools/dev/claude-auth-status.sh
 ```
 
 ### docker/
+
 Docker setup scripts for sandbox environments and test isolation.
 
 - **sandbox-setup.sh**: Full sandbox environment (node pairing, security)
@@ -138,6 +146,7 @@ Docker setup scripts for sandbox environments and test isolation.
 **Invoked by**: Dockerfiles (`Dockerfile.sandbox`, `Dockerfile.sandbox-browser`)
 
 **Usage**:
+
 ```bash
 # Build sandbox image
 docker build -f Dockerfile.sandbox -t closedclaw-sandbox .
@@ -147,6 +156,7 @@ docker run --rm -it closedclaw-sandbox
 ```
 
 ### docs/
+
 Documentation generation and internationalization utilities.
 
 - **build-docs-list.mjs**: Generate structured docs inventory (JSON)
@@ -155,10 +165,12 @@ Documentation generation and internationalization utilities.
 - **i18n/**: Internationalization scripts (Chinese, etc.)
 
 **Invoked by**:
+
 - `pnpm docs:bin` → `build-docs-list.mjs`
 - `pnpm docs:list` → `docs-list.js`
 
 **Usage**:
+
 ```bash
 # Generate docs inventory
 pnpm docs:bin
@@ -171,6 +183,7 @@ pnpm docs:dev
 ```
 
 ### maintenance/
+
 Repository maintenance, migrations, and sync utilities.
 
 - **sync-plugin-versions.ts**: Sync version numbers across extensions
@@ -186,11 +199,13 @@ Repository maintenance, migrations, and sync utilities.
 - **readability-basic-compare.ts**: Compare readability parsers
 
 **Invoked by**:
+
 - `pnpm plugins:sync` → `sync-plugin-versions.ts`
 - `pnpm release:check` → `release-check.ts`
 - `pnpm protocol:gen` → `protocol-gen.ts`
 
 **Usage**:
+
 ```bash
 # Sync plugin versions before release
 pnpm plugins:sync
@@ -206,6 +221,7 @@ node --import tsx tools/maintenance/update-clawtributors.ts
 ```
 
 ### platform/
+
 Platform-specific build and deployment scripts.
 
 - **linux/**: Linux packaging and systemd setup
@@ -214,6 +230,7 @@ Platform-specific build and deployment scripts.
 **Invoked by**: Platform-specific npm scripts (`android:*`, `ios:*`)
 
 **Usage**:
+
 ```bash
 # Android
 pnpm android:assemble      # Build APK
@@ -226,6 +243,7 @@ pnpm ios:open             # Open in Xcode
 ```
 
 ### testing/
+
 Test execution, parallelization, Docker isolation, and E2E scenarios.
 
 - **test-parallel.mjs**: Parallel test runner (splits unit/extensions/gateway)
@@ -246,6 +264,7 @@ Test execution, parallelization, Docker isolation, and E2E scenarios.
 **Invoked by**: `pnpm test` → `test-parallel.mjs` (default)
 
 **Usage**:
+
 ```bash
 # Parallel test execution (default)
 pnpm test
@@ -312,11 +331,11 @@ Add inline comments and JSDoc:
 ```typescript
 /**
  * My Script - Brief description
- * 
+ *
  * Longer explanation of what this script does and when to use it.
- * 
+ *
  * Usage: pnpm my:command [options]
- * 
+ *
  * Environment Variables:
  * - MY_VAR: Description
  */
@@ -327,20 +346,21 @@ Update this README under appropriate category.
 ### 5. Error Handling
 
 Scripts should:
+
 - Exit with non-zero on failure
 - Print clear error messages
 - Support `--help` flag when arguments are expected
 
 ```typescript
-if (process.argv.includes('--help')) {
-  console.log('Usage: ...');
+if (process.argv.includes("--help")) {
+  console.log("Usage: ...");
   process.exit(0);
 }
 
 try {
   // Script logic
 } catch (err) {
-  console.error('Error:', err.message);
+  console.error("Error:", err.message);
   process.exit(1);
 }
 ```
@@ -356,6 +376,7 @@ node --import tsx tools/path/to/script.ts
 ```
 
 Or via package.json:
+
 ```json
 {
   "scripts": {
@@ -403,6 +424,7 @@ docker run --rm -e ClosedClaw_LIVE_TEST=1 test-image pnpm test:live
 ### Script Not Found
 
 Check that:
+
 1. Script exists at `tools/<category>/<script>`
 2. File is executable (chmod +x for `.sh`)
 3. npm script points to correct path
@@ -410,11 +432,13 @@ Check that:
 ### TypeScript Import Errors
 
 Use tsx loader:
+
 ```bash
 node --import tsx tools/script.ts
 ```
 
 Not:
+
 ```bash
 ts-node tools/script.ts  # Don't use ts-node
 ```
@@ -422,6 +446,7 @@ ts-node tools/script.ts  # Don't use ts-node
 ### Permission Denied
 
 Make shell scripts executable:
+
 ```bash
 chmod +x tools/**/*.sh
 ```
@@ -429,12 +454,14 @@ chmod +x tools/**/*.sh
 ### Docker Test Failures
 
 Clean up containers:
+
 ```bash
 pnpm test:docker:cleanup
 docker system prune -f
 ```
 
 Check Docker daemon:
+
 ```bash
 docker info
 ```

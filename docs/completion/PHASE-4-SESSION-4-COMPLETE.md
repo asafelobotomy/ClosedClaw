@@ -14,12 +14,12 @@ This session completed additional test file migrations and implementation consta
 
 ### Session 4 Summary
 
-| Batch | Focus | Files | Impact |
-|-------|-------|-------|--------|
-| 4A | Timing constants library | Constants | +2 constants (STANDARD, EXTENDED) |
-| 4B | Web test migrations | 1 | nowSeconds offset → constant |
-| 4C | Telegram test migrations | 2 | Platform-specific timeouts → constants |
-| 4D | Implementation constants | 2 | Hardcoded values → TIMEOUT_HTTP_DEFAULT_MS |
+| Batch | Focus                    | Files     | Impact                                     |
+| ----- | ------------------------ | --------- | ------------------------------------------ |
+| 4A    | Timing constants library | Constants | +2 constants (STANDARD, EXTENDED)          |
+| 4B    | Web test migrations      | 1         | nowSeconds offset → constant               |
+| 4C    | Telegram test migrations | 2         | Platform-specific timeouts → constants     |
+| 4D    | Implementation constants | 2         | Hardcoded values → TIMEOUT_HTTP_DEFAULT_MS |
 
 ---
 
@@ -37,6 +37,7 @@ export const TIMEOUT_TEST_SUITE_EXTENDED_MS = 45_000 as const; // 45 seconds
 **Purpose**: Fill gaps in test timeout spectrum for platform-specific testing (Windows often needs longer timeouts due to slower I/O).
 
 **Constants Hierarchy**:
+
 ```
 TIMEOUT_TEST_SUITE_SHORT_MS      =  5_000  (5s)
 TIMEOUT_TEST_SUITE_DEFAULT_MS    = 10_000  (10s)
@@ -47,6 +48,7 @@ TIMEOUT_TEST_SUITE_LONG_MS       = 60_000  (60s)
 ```
 
 **Tests**: ✅ Added tests for both new constants:
+
 ```typescript
 it("should define test suite timeouts for Vitest", () => {
   expect(TIMEOUT_TEST_SUITE_STANDARD_MS).toBe(20_000);
@@ -181,6 +183,7 @@ import { TIMEOUT_HTTP_DEFAULT_MS } from "../config/constants/index.js";
 ### Phase 1-4 Combined Test Sweep
 
 **Command**:
+
 ```bash
 npx vitest run \
   src/config/constants/ \
@@ -206,18 +209,18 @@ Regressions: 0
 
 ### Test Breakdown by Category
 
-| Category | Tests | Status |
-|----------|-------|--------|
-| Constants Library | 54 | ✅ (+6 from Session 4) |
-| Security (Keychain) | 55 | ✅ |
-| Security (Network) | 21 | ✅ |
-| Security (Audit) | 32 | ✅ |
-| Agent Sandbox | 11 | ✅ |
-| Agent Scope | 8 | ✅ |
-| Web Access Control | 2 | ✅ |
-| Telegram Media | 52 | ✅ (+50 from Session 4) |
-| Voice-Call Extension | 26 | ✅ |
-| **TOTAL** | **288** | **✅** |
+| Category             | Tests   | Status                  |
+| -------------------- | ------- | ----------------------- |
+| Constants Library    | 54      | ✅ (+6 from Session 4)  |
+| Security (Keychain)  | 55      | ✅                      |
+| Security (Network)   | 21      | ✅                      |
+| Security (Audit)     | 32      | ✅                      |
+| Agent Sandbox        | 11      | ✅                      |
+| Agent Scope          | 8       | ✅                      |
+| Web Access Control   | 2       | ✅                      |
+| Telegram Media       | 52      | ✅ (+50 from Session 4) |
+| Voice-Call Extension | 26      | ✅                      |
+| **TOTAL**            | **288** | **✅**                  |
 
 ---
 
@@ -225,22 +228,22 @@ Regressions: 0
 
 ### Sessions Summary
 
-| Session | Focus | Files | Constants | Tests | Duration |
-|---------|-------|-------|-----------|-------|----------|
-| **1** | Test timeouts + env vars | 7 | 15 constants | 158 tests | 1.5 hours |
-| **2** | Implementation timing | 7 | 6 constants | 126 tests | 0.75 hours |
-| **3** | Paths + extensions | 8 | SDK export | 184 tests | 1.5 hours |
-| **4** | Test migrations + impl | 5 | 2 constants | 288 tests | 1.0 hour |
-| **Cumulative** | **Extended migration** | **27 files** | **23 constants** | **288 tests** | **4.75 hours** |
+| Session        | Focus                    | Files        | Constants        | Tests         | Duration       |
+| -------------- | ------------------------ | ------------ | ---------------- | ------------- | -------------- |
+| **1**          | Test timeouts + env vars | 7            | 15 constants     | 158 tests     | 1.5 hours      |
+| **2**          | Implementation timing    | 7            | 6 constants      | 126 tests     | 0.75 hours     |
+| **3**          | Paths + extensions       | 8            | SDK export       | 184 tests     | 1.5 hours      |
+| **4**          | Test migrations + impl   | 5            | 2 constants      | 288 tests     | 1.0 hour       |
+| **Cumulative** | **Extended migration**   | **27 files** | **23 constants** | **288 tests** | **4.75 hours** |
 
 ### Coverage by Priority Level
 
-| Priority | Description | Files | Status |
-|----------|-------------|-------|--------|
-| 1 | Test files (easy wins) | 10/40 (25%) | 🔄 Session 4 added 3 |
-| 2 | Timing constants | 7/7 (100%) | ✅ **COMPLETE** |
-| 3 | Path migrations | 8/15 (53%) | 🔄 Session 3-4 added 2 |
-| 4 | Extension migrations | 2/4 (50%) | 🔄 Session 3 complete |
+| Priority             | Description            | Files           | Status                    |
+| -------------------- | ---------------------- | --------------- | ------------------------- |
+| 1                    | Test files (easy wins) | 10/40 (25%)     | 🔄 Session 4 added 3      |
+| 2                    | Timing constants       | 7/7 (100%)      | ✅ **COMPLETE**           |
+| 3                    | Path migrations        | 8/15 (53%)      | 🔄 Session 3-4 added 2    |
+| 4                    | Extension migrations   | 2/4 (50%)       | 🔄 Session 3 complete     |
 | **Total Completion** | **Extended migration** | **27/61 (44%)** | **🔄 ~34 files optional** |
 
 ---
@@ -250,19 +253,23 @@ Regressions: 0
 ### ✅ Platform-Specific Test Patterns
 
 **Before Session 4**:
+
 ```typescript
 // Hardcoded, duplicated across multiple files
 const timeout = process.platform === "win32" ? 60_000 : 45_000;
 ```
 
 **After Session 4**:
+
 ```typescript
 // Centralized, reusable, self-documenting
 import { TIMEOUT_TEST_SUITE_LONG_MS, TIMEOUT_TEST_SUITE_EXTENDED_MS } from "@/config/constants";
-const timeout = process.platform === "win32" ? TIMEOUT_TEST_SUITE_LONG_MS : TIMEOUT_TEST_SUITE_EXTENDED_MS;
+const timeout =
+  process.platform === "win32" ? TIMEOUT_TEST_SUITE_LONG_MS : TIMEOUT_TEST_SUITE_EXTENDED_MS;
 ```
 
 **Benefits**:
+
 - ✅ Single source of truth for timing values
 - ✅ Self-documenting intent (what timeout means)
 - ✅ Easy to adjust globally if needed
@@ -277,6 +284,7 @@ const timeout = process.platform === "win32" ? TIMEOUT_TEST_SUITE_LONG_MS : TIME
 ### ✅ Constants Library Growth
 
 **Total Constants**: 178 (up from 176 in Session 3)
+
 - Added `TIMEOUT_TEST_SUITE_STANDARD_MS` (20s)
 - Added `TIMEOUT_TEST_SUITE_EXTENDED_MS` (45s)
 
@@ -286,14 +294,16 @@ const timeout = process.platform === "win32" ? TIMEOUT_TEST_SUITE_LONG_MS : TIME
 **Constants Created**: 23 (21 from Sessions 1-3 + 2 from Session 4)  
 **Test Coverage**: 288/288 passing (100%)  
 **Breaking Changes**: 0  
-**Platform-Specific Patterns**: 4 files migrated (telegram + web)  
+**Platform-Specific Patterns**: 4 files migrated (telegram + web)
 
 ---
 
 ## Remaining Phase 4 Work (Optional)
 
 ### Priority 1 Remaining (~30 test files)
+
 **High-value targets**:
+
 - Signal monitor tests (platform-specific timeouts)
 - Media server tests (timing logic values)
 - Infra heartbeat tests (timer advancements)
@@ -302,6 +312,7 @@ const timeout = process.platform === "win32" ? TIMEOUT_TEST_SUITE_LONG_MS : TIME
 **Estimated time**: 2-3 hours
 
 ### Priority 3 Remaining (~7 path files)
+
 **Already mostly complete**: Most path migrations done in Sessions 2-3
 
 **Estimated time**: 0.5-1 hour
@@ -318,9 +329,10 @@ const timeout = process.platform === "win32" ? TIMEOUT_TEST_SUITE_LONG_MS : TIME
 // ✅ GOOD: Use centralized constants with clear intent
 import { TIMEOUT_TEST_SUITE_LONG_MS, TIMEOUT_TEST_SUITE_STANDARD_MS } from "@/config/constants";
 
-const timeout = process.platform === "win32" 
-  ? TIMEOUT_TEST_SUITE_LONG_MS       // Windows: slower I/O
-  : TIMEOUT_TEST_SUITE_STANDARD_MS;  // Unix: faster
+const timeout =
+  process.platform === "win32"
+    ? TIMEOUT_TEST_SUITE_LONG_MS // Windows: slower I/O
+    : TIMEOUT_TEST_SUITE_STANDARD_MS; // Unix: faster
 
 // ❌ AVOID: Hardcoded values without context
 const timeout = process.platform === "win32" ? 60_000 : 20_000;
@@ -363,9 +375,10 @@ const gracePeriod = 30_000;
 ✅ Migrated 2 implementation files to use centralized constants  
 ✅ Validated 288/288 tests passing (Phases 1-4)  
 ✅ Zero breaking changes or regressions  
-✅ Established pattern for platform-specific test timeouts  
+✅ Established pattern for platform-specific test timeouts
 
 **Phase 4 Total (Sessions 1-4)**:
+
 - 27 files migrated (44% of extended migration scope)
 - 23 new constants added
 - 178+ total constants in library
@@ -375,8 +388,8 @@ const gracePeriod = 30_000;
 ---
 
 **Next Steps**:
+
 1. ✅ Phase 4 Session 4 validation complete
 2. 🔄 Optional: Complete remaining Priority 1 test files (~30 files, ~2-3 hours)
 3. 🔄 Optional: Final Priority 3 path files (~7 files, ~0.5-1 hour)
 4. → Phase 5: New improvement initiative (env var normalization, config validation, etc.)
-

@@ -69,7 +69,9 @@ const TAG_REGEX =
 
 /** Parse attributes from a tag attribute string */
 function parseAttrs(attrStr: string | undefined): Record<string, string> {
-  if (!attrStr) {return {};}
+  if (!attrStr) {
+    return {};
+  }
   const attrs: Record<string, string> = {};
   const attrRegex = /(\w+)\s*=\s*"([^"]*)"/g;
   let match: RegExpExecArray | null;
@@ -188,7 +190,9 @@ export async function processOrchestrationTags(
           log?.info?.(`[orch] <call:${skill}> ${tag.content.slice(0, 80)}`);
           try {
             const callParams: Record<string, string> = { ...tag.attrs };
-            if (tag.content) {callParams.content = tag.content;}
+            if (tag.content) {
+              callParams.content = tag.content;
+            }
             delete callParams.skill; // Don't pass skill as param
             const result = await executeTool(skill, callParams);
             sideEffects.push(`call:${skill}: ${result.slice(0, 100)}`);

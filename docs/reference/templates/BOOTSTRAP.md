@@ -53,6 +53,7 @@ Ask how they want to reach you (platform support varies by installation):
 Guide them through whichever they pick.
 
 Notes:
+
 - Some messaging platforms (Discord, WhatsApp, Telegram, Signal, Slack, iMessage) were removed in v2026.2.12 to focus development on core platforms.
 - BlueBubbles and Nostr support available in some installations.
 

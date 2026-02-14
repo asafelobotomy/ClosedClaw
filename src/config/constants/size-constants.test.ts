@@ -196,10 +196,10 @@ describe("size-constants", () => {
       const mime = "image/png";
       const kind = mediaKindFromMime(mime);
       const limit = maxBytesForKind(kind);
-      
+
       expect(kind).toBe("image");
       expect(limit).toBe(MAX_IMAGE_BYTES);
-      
+
       const size = parseBytes("5MB");
       expect(isWithinLimit(size, limit)).toBe(true);
     });

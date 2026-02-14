@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
-import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import os from "node:os";
 import path from "node:path";
+import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_BROWSER_PAGE_MS } from "../config/constants/index.js";
 import { runExec } from "../process/exec.js";
 
 type Sharp = typeof import("sharp");

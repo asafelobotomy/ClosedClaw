@@ -7,7 +7,16 @@
 
 import type { ClawTalkMessage, ClawTalkVerb, ClawTalkVersion } from "./types.js";
 
-const VALID_VERBS = new Set<ClawTalkVerb>(["REQ", "RES", "TASK", "STATUS", "NOOP", "ERR", "ACK", "MULTI"]);
+const VALID_VERBS = new Set<ClawTalkVerb>([
+  "REQ",
+  "RES",
+  "TASK",
+  "STATUS",
+  "NOOP",
+  "ERR",
+  "ACK",
+  "MULTI",
+]);
 
 /** Parse error with context */
 export class ClawTalkParseError extends Error {
@@ -61,7 +70,10 @@ export function parse(input: string): ClawTalkMessage {
   const header = tokens[0];
   const versionMatch = header.match(/^CT\/(\d+)$/);
   if (!versionMatch) {
-    throw new ClawTalkParseError(`Invalid protocol header: "${header}" (expected CT/<version>)`, input);
+    throw new ClawTalkParseError(
+      `Invalid protocol header: "${header}" (expected CT/<version>)`,
+      input,
+    );
   }
   const parsedVersion = Number.parseInt(versionMatch[1], 10);
   if (parsedVersion !== 1) {
@@ -191,8 +203,12 @@ function parseValue(raw: string): string | number | boolean | string[] {
   }
 
   // Boolean
-  if (value === "true") {return true;}
-  if (value === "false") {return false;}
+  if (value === "true") {
+    return true;
+  }
+  if (value === "false") {
+    return false;
+  }
 
   // Number
   if (/^-?\d+(\.\d+)?$/.test(value)) {
@@ -200,10 +216,14 @@ function parseValue(raw: string): string | number | boolean | string[] {
   }
 
   // Duration suffix (30d, 24h, 1w) → keep as string
-  if (/^\d+[smhdwMy]$/.test(value)) {return value;}
+  if (/^\d+[smhdwMy]$/.test(value)) {
+    return value;
+  }
 
   // Token count suffix (4.2k, 12M) → keep as string
-  if (/^\d+(\.\d+)?[kKmM]$/.test(value)) {return value;}
+  if (/^\d+(\.\d+)?[kKmM]$/.test(value)) {
+    return value;
+  }
 
   // Comma-separated array
   if (value.includes(",") && !value.includes(" ")) {

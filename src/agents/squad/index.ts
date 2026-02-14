@@ -17,15 +17,9 @@
 
 // ─── Memory System ────────────────────────────────────────────────────────────
 
-export {
-  WorkingMemory,
-  type WorkingMemoryEntry,
-} from "./memory/working-memory.js";
+export { WorkingMemory, type WorkingMemoryEntry } from "./memory/working-memory.js";
 
-export {
-  ShortTermMemory,
-  type ShortTermEntry,
-} from "./memory/short-term-memory.js";
+export { ShortTermMemory, type ShortTermEntry } from "./memory/short-term-memory.js";
 
 export {
   EpisodicStore,

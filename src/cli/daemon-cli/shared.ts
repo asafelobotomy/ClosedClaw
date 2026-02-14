@@ -1,6 +1,4 @@
-import {
-  resolveGatewaySystemdServiceName,
-} from "../../daemon/constants.js";
+import { resolveGatewaySystemdServiceName } from "../../daemon/constants.js";
 import { getResolvedLoggerSettings } from "../../logging.js";
 import { formatCliCommand } from "../command-format.js";
 

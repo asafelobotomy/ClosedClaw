@@ -29,6 +29,7 @@ This skill helps you write end-to-end (e2e) tests for ClosedClaw. E2E tests vali
 ### Test Types
 
 ClosedClaw has **five Vitest configurations**:
+
 1. **Unit** (`vitest.unit.config.ts`): `src/**/*.test.ts` - Fast, no network
 2. **Extensions** (`vitest.extensions.config.ts`): `extensions/**/*.test.ts` - Plugin tests
 3. **Gateway** (`vitest.gateway.config.ts`): `src/gateway/**/*.test.ts` - Gateway control plane
@@ -153,7 +154,7 @@ const spawnGatewayInstance = async (name: string): Promise<GatewayInstance> => {
   await fs.mkdir(configDir, { recursive: true });
   const configPath = path.join(configDir, "ClosedClaw.json");
   const stateDir = path.join(configDir, "state");
-  
+
   const config = {
     gateway: { port, auth: { mode: "token", token: gatewayToken } },
     hooks: { enabled: true, token: hookToken, path: "/hooks" },
@@ -253,47 +254,51 @@ const stopGatewayInstance = async (inst: GatewayInstance) => {
 };
 
 describe("multi-instance gateway", () => {
-  it("pairs two gateway instances", async () => {
-    const primary = await spawnGatewayInstance("primary");
-    const secondary = await spawnGatewayInstance("secondary");
+  it(
+    "pairs two gateway instances",
+    async () => {
+      const primary = await spawnGatewayInstance("primary");
+      const secondary = await spawnGatewayInstance("secondary");
 
-    try {
-      // Connect clients
-      const primaryClient = new GatewayClient({
-        url: `ws://127.0.0.1:${primary.port}`,
-        token: primary.gatewayToken,
-      });
-      await primaryClient.connect();
+      try {
+        // Connect clients
+        const primaryClient = new GatewayClient({
+          url: `ws://127.0.0.1:${primary.port}`,
+          token: primary.gatewayToken,
+        });
+        await primaryClient.connect();
 
-      const secondaryClient = new GatewayClient({
-        url: `ws://127.0.0.1:${secondary.port}`,
-        token: secondary.gatewayToken,
-      });
-      await secondaryClient.connect();
+        const secondaryClient = new GatewayClient({
+          url: `ws://127.0.0.1:${secondary.port}`,
+          token: secondary.gatewayToken,
+        });
+        await secondaryClient.connect();
 
-      // Initiate pairing
-      const pairingCode = await primaryClient.call("node:generatePairingCode", {});
-      expect(pairingCode).toHaveProperty("code");
-      expect(pairingCode.code).toMatch(/^\d{6}$/);
+        // Initiate pairing
+        const pairingCode = await primaryClient.call("node:generatePairingCode", {});
+        expect(pairingCode).toHaveProperty("code");
+        expect(pairingCode.code).toMatch(/^\d{6}$/);
 
-      // Secondary pairs with primary
-      await secondaryClient.call("node:pair", { code: pairingCode.code });
+        // Secondary pairs with primary
+        await secondaryClient.call("node:pair", { code: pairingCode.code });
 
-      // Verify paired status
-      const primaryNodes = await primaryClient.call("node:list", {});
-      expect(primaryNodes.nodes).toHaveLength(1);
-      expect(primaryNodes.nodes[0]).toMatchObject({
-        connected: true,
-        paired: true,
-      });
+        // Verify paired status
+        const primaryNodes = await primaryClient.call("node:list", {});
+        expect(primaryNodes.nodes).toHaveLength(1);
+        expect(primaryNodes.nodes[0]).toMatchObject({
+          connected: true,
+          paired: true,
+        });
 
-      await primaryClient.disconnect();
-      await secondaryClient.disconnect();
-    } finally {
-      await stopGatewayInstance(primary);
-      await stopGatewayInstance(secondary);
-    }
-  }, E2E_TIMEOUT_MS);
+        await primaryClient.disconnect();
+        await secondaryClient.disconnect();
+      } finally {
+        await stopGatewayInstance(primary);
+        await stopGatewayInstance(secondary);
+      }
+    },
+    E2E_TIMEOUT_MS,
+  );
 });
 ```
 
@@ -363,12 +368,10 @@ describe("agent workflow", () => {
   it("processes message and calls runEmbeddedPiAgent", async () => {
     await withTempHome(async (home) => {
       const cfg = makeCfg(home);
-      
+
       // Mock agent run
       vi.mocked(runEmbeddedPiAgent).mockResolvedValueOnce({
-        blocks: [
-          { type: "text", text: "Hello from agent!" },
-        ],
+        blocks: [{ type: "text", text: "Hello from agent!" }],
         usage: { inputTokens: 100, outputTokens: 50 },
       });
 
@@ -452,7 +455,7 @@ await withTempHome(async (home) => {
   // home is a temp directory
   const configPath = join(home, ".ClosedClaw", "config.json");
   // ... test logic
-  
+
   // Cleanup happens automatically
 });
 ```
@@ -601,7 +604,7 @@ it("pairs successfully", async () => {
 
     // Generate pairing code
     const { code } = await primaryClient.call("node:generatePairingCode", {});
-    
+
     // Secondary pairs with code
     await secondaryClient.call("node:pair", { code });
 
@@ -629,10 +632,7 @@ it("creates agent session", async () => {
     const sessionStore = join(home, "sessions.json");
 
     // First message creates session
-    await getReplyFromConfig(
-      { channel: "whatsapp", peerId: "+1234", text: "Hello" },
-      cfg,
-    );
+    await getReplyFromConfig({ channel: "whatsapp", peerId: "+1234", text: "Hello" }, cfg);
 
     // Verify session created
     const sessions = JSON.parse(await fs.readFile(sessionStore, "utf8"));
@@ -658,14 +658,12 @@ it("validates RPC parameters", async () => {
     await client.connect();
 
     // Missing required parameter
-    await expect(
-      client.call("agent:send", {}),
-    ).rejects.toThrow("Missing required parameter");
+    await expect(client.call("agent:send", {})).rejects.toThrow("Missing required parameter");
 
     // Invalid parameter type
-    await expect(
-      client.call("agent:send", { message: 123 }),
-    ).rejects.toThrow("Invalid parameter type");
+    await expect(client.call("agent:send", { message: 123 })).rejects.toThrow(
+      "Invalid parameter type",
+    );
   } finally {
     await client.disconnect();
   }
@@ -681,9 +679,13 @@ const GATEWAY_START_TIMEOUT_MS = 45_000; // Gateway startup
 const E2E_TIMEOUT_MS = 120_000; // Entire test
 
 describe("slow test", () => {
-  it("completes within timeout", async () => {
-    // Test logic
-  }, E2E_TIMEOUT_MS); // Per-test timeout
+  it(
+    "completes within timeout",
+    async () => {
+      // Test logic
+    },
+    E2E_TIMEOUT_MS,
+  ); // Per-test timeout
 });
 ```
 
@@ -733,6 +735,7 @@ expect(runEmbeddedPiAgent).toHaveBeenCalledWith(
 **Symptom**: Test times out waiting for gateway
 
 **Diagnosis**:
+
 ```typescript
 // Check stdout/stderr in test output
 const { stdout, stderr } = inst;
@@ -741,6 +744,7 @@ console.log("Gateway stderr:", stderr.join(""));
 ```
 
 **Solutions**:
+
 - Check port already in use: `lsof -i :PORT`
 - Verify `dist/index.js` exists: `pnpm build`
 - Check environment variables in `spawnGatewayInstance`
@@ -750,6 +754,7 @@ console.log("Gateway stderr:", stderr.join(""));
 **Symptom**: `client.connect()` throws error
 
 **Diagnosis**:
+
 ```typescript
 client.on("error", (err) => {
   console.error("WebSocket error:", err);
@@ -757,6 +762,7 @@ client.on("error", (err) => {
 ```
 
 **Solutions**:
+
 - Verify gateway is listening: `nc -zv 127.0.0.1 PORT`
 - Check gateway token matches
 - Ensure gateway started successfully
@@ -766,6 +772,7 @@ client.on("error", (err) => {
 **Symptom**: Tests leave processes running
 
 **Solution**:
+
 ```typescript
 afterAll(async () => {
   // Always cleanup in afterAll
@@ -779,6 +786,7 @@ afterAll(async () => {
 **Symptom**: Real function called instead of mock
 
 **Solution**:
+
 ```typescript
 // Use vi.hoisted for top-level mocks
 const mocks = vi.hoisted(() => ({

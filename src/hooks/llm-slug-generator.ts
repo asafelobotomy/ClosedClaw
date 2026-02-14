@@ -3,7 +3,6 @@
  */
 
 import fs from "node:fs/promises";
-import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 import os from "node:os";
 import path from "node:path";
 import type { ClosedClawConfig } from "../config/config.js";
@@ -13,6 +12,7 @@ import {
   resolveAgentDir,
 } from "../agents/agent-scope.js";
 import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
+import { TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
 
 /**
  * Generate a short 1-2 word filename slug from session content using LLM
