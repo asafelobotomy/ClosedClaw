@@ -1,10 +1,16 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { DEFAULT_SANDBOX_IMAGE } from "../agents/sandbox.js";
 import type { ClosedClawConfig } from "../config/config.js";
 
-const note = vi.fn();
-const runExec = vi.fn();
-const runCommandWithTimeout = vi.fn();
+const { note, runExec, runCommandWithTimeout } = vi.hoisted(() => {
+  return {
+    note: vi.fn(),
+    runExec: vi.fn(),
+    runCommandWithTimeout: vi.fn(),
+  };
+});
 
 vi.mock("../terminal/note.js", () => ({ note }));
 vi.mock("../process/exec.js", () => ({ runExec, runCommandWithTimeout }));
@@ -65,7 +71,16 @@ describe("doctor sandbox image repair", () => {
       error: vi.fn(),
     } as unknown as Parameters<typeof maybeRepairSandboxImages>[1];
 
-    const next = await maybeRepairSandboxImages(cfg, runtime, prompter);
+    const scriptPath = path.join(process.cwd(), "scripts", "sandbox-setup.sh");
+    fs.mkdirSync(path.dirname(scriptPath), { recursive: true, mode: 0o755 });
+    fs.writeFileSync(scriptPath, "#!/usr/bin/env bash\nexit 0\n", { mode: 0o755 });
+
+    let next: ClosedClawConfig | undefined;
+    try {
+      next = await maybeRepairSandboxImages(cfg, runtime, prompter);
+    } finally {
+      fs.rmSync(scriptPath, { force: true });
+    }
 
     expect(runCommandWithTimeout).toHaveBeenCalled();
     const messages = note.mock.calls.map((c) => String(c[0]));

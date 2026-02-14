@@ -1,11 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ClosedClawConfig } from "../config/config.js";
 
-const note = vi.fn();
-const healthCommand = vi.fn();
-const callGateway = vi.fn();
-const formatHealthCheckFailure = vi.fn();
-const buildGatewayConnectionDetails = vi.fn();
+const { note, healthCommand, callGateway, formatHealthCheckFailure, buildGatewayConnectionDetails } = vi.hoisted(() => {
+  return {
+    note: vi.fn(),
+    healthCommand: vi.fn(),
+    callGateway: vi.fn(),
+    formatHealthCheckFailure: vi.fn(),
+    buildGatewayConnectionDetails: vi.fn(),
+  };
+});
 
 vi.mock("../terminal/note.js", () => ({ note }));
 vi.mock("./health.js", () => ({ healthCommand }));

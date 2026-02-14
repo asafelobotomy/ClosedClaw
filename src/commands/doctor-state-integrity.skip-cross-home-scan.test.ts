@@ -6,7 +6,7 @@ import type { ClosedClawConfig } from "../config/config.js";
 import { resolveStorePath } from "../config/sessions.js";
 import { noteStateIntegrity } from "./doctor-state-integrity.js";
 
-const note = vi.fn();
+const { note } = vi.hoisted(() => ({ note: vi.fn() }));
 vi.mock("../terminal/note.js", () => ({ note }));
 
 describe("doctor state integrity", () => {
