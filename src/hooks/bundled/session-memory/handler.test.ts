@@ -6,6 +6,9 @@ import { makeTempWorkspace, writeWorkspaceFile } from "../../../../test/helpers/
 import { createHookEvent } from "../../hooks.js";
 import handler from "./handler.js";
 
+// Ensure default provider auth for tests that invoke the LLM slug generator
+process.env.OLLAMA_API_KEY = process.env.OLLAMA_API_KEY || "test-ollama-key";
+
 /**
  * Create a mock session JSONL file with various entry types
  */

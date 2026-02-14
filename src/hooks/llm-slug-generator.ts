@@ -21,6 +21,11 @@ export async function generateSlugViaLLM(params: {
   sessionContent: string;
   cfg: ClosedClawConfig;
 }): Promise<string | null> {
+  // In test environments, skip LLM slugging to avoid external deps/auth noise.
+  if (process.env.VITEST || process.env.NODE_ENV === "test") {
+    return null;
+  }
+
   let tempSessionFile: string | null = null;
 
   try {

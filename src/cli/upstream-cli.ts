@@ -4,6 +4,7 @@ import {
   upstreamDiffCommand,
   upstreamSyncCommand,
   upstreamConfigureCommand,
+  upstreamSanitizeCommand,
 } from "../commands/upstream/index.js";
 import { defaultRuntime } from "../runtime.js";
 import { runCommandWithRuntime } from "./cli-utils.js";
@@ -24,6 +25,7 @@ Examples:
   $ closedclaw upstream diff --security          # Show security changes
   $ closedclaw upstream sync --preview           # Preview sync changes
   $ closedclaw upstream sync --security-only     # Apply security patches
+  $ closedclaw upstream sanitize --apply-clean   # Vet and apply safe security patches
   $ closedclaw upstream configure                # Configure tracking
 `,
     );
@@ -45,6 +47,23 @@ Examples:
     .option("--files <pattern>", "Filter files by glob pattern")
     .option("--semantic", "Show semantic diff (AST-based)")
     .action((opts) => runUpstreamCommand(() => upstreamDiffCommand(opts, defaultRuntime)));
+
+  // Sanitize command
+  upstream
+    .command("sanitize")
+    .description("Analyze upstream security patches and auto-apply clean ones")
+    .option("--json", "Output JSON report")
+    .option("--apply-clean", "Cherry-pick clean security commits automatically")
+    .option("--limit <count>", "Limit number of upstream security commits to scan")
+    .option(
+      "--patch-window <count>",
+      "Number of local commits to scan for already-applied patches (default 800)",
+    )
+    .action((opts) =>
+      runUpstreamCommand(async () => {
+        await upstreamSanitizeCommand(opts, defaultRuntime);
+      }),
+    );
 
   // Sync command
   upstream

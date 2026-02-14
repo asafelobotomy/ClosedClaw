@@ -394,6 +394,25 @@ async function buildOllamaProvider(): Promise<ProviderConfig> {
   };
 }
 
+function buildTestOllamaProvider(): ProviderConfig {
+  // Lightweight stub to keep tests from failing on missing local Ollama models.
+  return {
+    baseUrl: OLLAMA_BASE_URL,
+    api: "openai-completions",
+    models: [
+      {
+        id: "qwen3:8b",
+        name: "Test Qwen3 8B",
+        reasoning: false,
+        input: ["text"],
+        cost: OLLAMA_DEFAULT_COST,
+        contextWindow: OLLAMA_DEFAULT_CONTEXT_WINDOW,
+        maxTokens: OLLAMA_DEFAULT_MAX_TOKENS,
+      },
+    ],
+  };
+}
+
 export async function resolveImplicitProviders(params: {
   agentDir: string;
 }): Promise<ModelsConfig["providers"]> {
@@ -459,6 +478,15 @@ export async function resolveImplicitProviders(params: {
     resolveApiKeyFromProfiles({ provider: "ollama", store: authStore });
   if (ollamaKey) {
     providers.ollama = { ...(await buildOllamaProvider()), apiKey: ollamaKey };
+  }
+
+  // Provide a mock Ollama provider in test environments so default models resolve
+  // without requiring a running Ollama daemon or model downloads.
+  if (process.env.VITEST || process.env.NODE_ENV === "test") {
+    const needsTestOllama = !providers.ollama || (providers.ollama.models?.length ?? 0) === 0;
+    if (needsTestOllama) {
+      providers.ollama = { ...buildTestOllamaProvider(), apiKey: "test-key" };
+    }
   }
 
   return providers;

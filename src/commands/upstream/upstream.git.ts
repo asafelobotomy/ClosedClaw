@@ -138,6 +138,89 @@ export class GitService {
   }
 
   /**
+   * Get files changed in a commit
+   */
+  async getCommitFiles(commitSha: string): Promise<string[]> {
+    try {
+      const output = await this.exec([
+        "show",
+        "--name-only",
+        "--pretty=format:",
+        commitSha,
+      ]);
+      return output
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Compute a stable patch-id for a commit
+   */
+  async getPatchId(commitSha: string): Promise<string | null> {
+    try {
+      const patch = await this.exec(["show", "--no-color", commitSha]);
+      const output = await this.runGitWithInputAndCapture(["patch-id", "--stable"], patch);
+      const [patchId] = output.trim().split("\t");
+      return patchId || null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Collect patch-ids for recent commits on a ref
+   */
+  async getPatchIds(ref: string = "HEAD", maxCount: number = 800): Promise<Set<string>> {
+    const patchIds = new Set<string>();
+    try {
+      const output = await this.exec([
+        "log",
+        ref,
+        "--pretty=format:%H",
+        "-n",
+        String(maxCount),
+      ]);
+      const commits = output.split("\n").filter(Boolean);
+      for (const sha of commits) {
+        const patchId = await this.getPatchId(sha);
+        if (patchId) {
+          patchIds.add(patchId);
+        }
+      }
+    } catch {
+      return patchIds;
+    }
+
+    return patchIds;
+  }
+
+  /**
+   * Check if a commit applies cleanly without touching the working tree
+   */
+  async canApplyCommit(commitSha: string): Promise<
+    | { status: "clean" }
+    | { status: "missing"; detail: string }
+    | { status: "conflict"; detail: string }
+  > {
+    const patch = await this.exec(["show", "--no-color", commitSha]);
+
+    try {
+      await this.runGitWithInput(["apply", "--check", "--3way", "--whitespace=nowarn"], patch);
+      return { status: "clean" };
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      if (detail.includes("No such file") || detail.includes("did not match any file")) {
+        return { status: "missing", detail };
+      }
+      return { status: "conflict", detail };
+    }
+  }
+
+  /**
    * Apply a patch
    */
   async applyPatch(patchContent: string): Promise<void> {
@@ -172,6 +255,41 @@ export class GitService {
       });
 
       // Write input and close stdin
+      child.stdin.write(input);
+      child.stdin.end();
+    });
+  }
+
+  /**
+   * Run git with stdin input and capture stdout
+   */
+  private runGitWithInputAndCapture(args: string[], input: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const child = spawn("git", args, { cwd: this.repoPath });
+      let stderr = "";
+      let stdout = "";
+
+      child.stdout.on("data", (data) => {
+        stdout += data.toString();
+      });
+
+      child.stderr.on("data", (data) => {
+        stderr += data.toString();
+      });
+
+      child.on("error", (error) => {
+        reject(new Error(`Git command failed: ${error.message}`));
+      });
+
+      child.on("close", (code) => {
+        if (code === 0) {
+          resolve(stdout.trim());
+        } else {
+          const message = stderr.trim() || stdout.trim();
+          reject(new Error(`Git command failed with code ${code}: ${message}`));
+        }
+      });
+
       child.stdin.write(input);
       child.stdin.end();
     });

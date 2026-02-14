@@ -51,6 +51,59 @@ const WARNING_SUPPRESSION_FLAGS = [
   "--disable-warning=DEP0060",
 ];
 
+// If the user provided explicit test filters/paths, run a single Vitest config
+// instead of the full parallel matrix. This keeps `pnpm test -- <file>` scoped.
+const userArgs = process.argv.slice(2).filter((arg) => arg !== "--");
+const pickConfig = (args) => {
+  const has = (matcher) => args.some((arg) => matcher(arg));
+  if (has((arg) => arg.includes("extensions/"))) return "vitest.extensions.config.ts";
+  if (has((arg) => arg.includes("gateway/"))) return "vitest.gateway.config.ts";
+  if (has((arg) => /\.e2e\.test\.ts$/.test(arg))) return "vitest.e2e.config.ts";
+  if (has((arg) => /\.live\.test\.ts$/.test(arg))) return "vitest.live.config.ts";
+  return "vitest.unit.config.ts";
+};
+
+const splitArgs = (args) => {
+  const include = [];
+  const passthrough = [];
+  for (const arg of args) {
+    // Treat anything that looks like a path or explicit test file as an include filter.
+    if (arg.includes("/") || /\.test\.[cm]?tsx?$/.test(arg)) {
+      include.push(arg);
+    } else {
+      passthrough.push(arg);
+    }
+  }
+  return { include, passthrough };
+};
+
+if (userArgs.length > 0) {
+  const resolvedConfig = pickConfig(userArgs);
+  const custom = { name: "custom", args: ["run", "--config", resolvedConfig] };
+  const args = maxWorkers
+    ? [...custom.args, "--maxWorkers", String(maxWorkers), ...windowsCiArgs, ...userArgs]
+    : [...custom.args, ...windowsCiArgs, ...userArgs];
+  const nodeOptions = process.env.NODE_OPTIONS ?? "";
+  const nextNodeOptions = WARNING_SUPPRESSION_FLAGS.reduce(
+    (acc, flag) => (acc.includes(flag) ? acc : `${acc} ${flag}`.trim()),
+    nodeOptions,
+  );
+  const vitestBin = process.platform === "win32" ? "node_modules/.bin/vitest.cmd" : "node_modules/.bin/vitest";
+  const code = await new Promise((resolve) => {
+    const child = spawn(vitestBin, args, {
+      stdio: "inherit",
+      env: { ...process.env, VITEST_GROUP: custom.name, NODE_OPTIONS: nextNodeOptions },
+      shell: process.platform === "win32",
+    });
+    children.add(child);
+    child.on("exit", (code, signal) => {
+      children.delete(child);
+      resolve(code ?? (signal ? 1 : 0));
+    });
+  });
+  process.exit(code ?? 0);
+}
+
 const runOnce = (entry, extraArgs = []) =>
   new Promise((resolve) => {
     const args = maxWorkers

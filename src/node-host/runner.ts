@@ -40,6 +40,7 @@ import {
 } from "../infra/exec-host.js";
 import { getMachineDisplayName } from "../infra/machine-name.js";
 import { ensureClosedClawCliOnPath } from "../infra/path-env.js";
+import { assertSafeEnv, envSafety } from "../infra/env-safety.js";
 import { detectMime } from "../media/mime.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import { VERSION } from "../version.js";
@@ -151,17 +152,8 @@ const BROWSER_PROXY_MAX_FILE_BYTES = 10 * 1024 * 1024;
 const _execHostEnforced = process.env.ClosedClaw_NODE_EXEC_HOST?.trim().toLowerCase() === "app";
 const _execHostFallbackAllowed =
   process.env.ClosedClaw_NODE_EXEC_FALLBACK?.trim().toLowerCase() !== "0";
-
-const blockedEnvKeys = new Set([
-  "NODE_OPTIONS",
-  "PYTHONHOME",
-  "PYTHONPATH",
-  "PERL5LIB",
-  "PERL5OPT",
-  "RUBYOPT",
-]);
-
-const blockedEnvPrefixes = ["DYLD_", "LD_"];
+const blockedEnvKeys = envSafety.BLOCKED_ENV_KEYS;
+const blockedEnvPrefixes = envSafety.BLOCKED_ENV_PREFIXES;
 
 class SkillBinsCache {
   private bins = new Set<string>();
@@ -199,6 +191,7 @@ function sanitizeEnv(
   if (!overrides) {
     return undefined;
   }
+  assertSafeEnv(overrides);
   const merged = { ...process.env } as Record<string, string>;
   const basePath = process.env.PATH ?? DEFAULT_NODE_PATH;
   for (const [rawKey, value] of Object.entries(overrides)) {
