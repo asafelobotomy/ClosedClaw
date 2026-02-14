@@ -17,7 +17,7 @@ wizard, and let the agent bootstrap itself.
 1. Welcome + security notice
 2. **Gateway selection** (Local / Remote / Configure later)
 3. **Auth (Anthropic OAuth)** — local only
-4. **Setup Wizard** (Gateway‑driven)
+4. **Setup Wizard** (Gateway-driven; includes QuickStart/Express/Manual)
 5. **Permissions** (TCC prompts)
 6. **CLI** (optional)
 7. **Onboarding chat** (dedicated session)

@@ -25,6 +25,7 @@ export function registerSetupCommand(program: Command) {
     .option("--mode <mode>", "Wizard mode: local|remote")
     .option("--remote-url <url>", "Remote Gateway WebSocket URL")
     .option("--remote-token <token>", "Remote Gateway token (optional)")
+    .option("--dry-run", "Simulate onboarding wizard without writing config", false)
     .action(async (opts, command) => {
       await runCommandWithRuntime(defaultRuntime, async () => {
         const hasWizardFlags = hasExplicitOptions(command, [
@@ -39,6 +40,7 @@ export function registerSetupCommand(program: Command) {
             {
               workspace: opts.workspace as string | undefined,
               nonInteractive: Boolean(opts.nonInteractive),
+              dryRun: Boolean(opts.dryRun),
               mode: opts.mode as "local" | "remote" | undefined,
               remoteUrl: opts.remoteUrl as string | undefined,
               remoteToken: opts.remoteToken as string | undefined,

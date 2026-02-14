@@ -87,4 +87,85 @@ describe("doctor sandbox image repair", () => {
     expect(messages.some((m) => m.includes("Updated agents.defaults.sandbox.docker.image"))).toBe(true);
     expect(next.agents?.defaults?.sandbox?.docker?.image).toBe(DEFAULT_SANDBOX_IMAGE);
   });
+
+  it("skips sandbox checks when docker is unavailable", async () => {
+    runExec.mockImplementation(() => {
+      const err = new Error("no docker");
+      (err as Error & { stderr?: string }).stderr = "no docker";
+      throw err;
+    });
+
+    const cfg: ClosedClawConfig = {
+      agents: {
+        defaults: {
+          sandbox: {
+            mode: "docker",
+            docker: { image: DEFAULT_SANDBOX_IMAGE },
+          },
+        },
+      },
+    };
+
+    const prompter = {
+      confirmSkipInNonInteractive: vi.fn().mockResolvedValue(true),
+    } as unknown as Parameters<typeof maybeRepairSandboxImages>[2];
+
+    const runtime = {
+      log: vi.fn(),
+      error: vi.fn(),
+    } as unknown as Parameters<typeof maybeRepairSandboxImages>[1];
+
+    const next = await maybeRepairSandboxImages(cfg, runtime, prompter);
+
+    expect(next).toBe(cfg);
+    const messages = note.mock.calls.map((c) => String(c[0])).join("\n");
+    expect(messages).toContain("Docker not available; skipping sandbox image checks.");
+    expect(runCommandWithTimeout).not.toHaveBeenCalled();
+  });
+
+  it("logs browser image missing but does not build when declined", async () => {
+    runExec.mockImplementation((cmd: string, args: string[]) => {
+      if (cmd === "docker" && args[0] === "version") {
+        return { stdout: "25.0", stderr: "" };
+      }
+      if (cmd === "docker" && args[0] === "image" && args[1] === "inspect") {
+        const image = args[2];
+        if (image === DEFAULT_SANDBOX_IMAGE) {
+          return { stdout: "image ok", stderr: "" };
+        }
+        const err = new Error("No such image") as Error & { stderr?: string };
+        err.stderr = "Error: No such image";
+        throw err;
+      }
+      return { stdout: "", stderr: "" };
+    });
+
+    const cfg: ClosedClawConfig = {
+      agents: {
+        defaults: {
+          sandbox: {
+            mode: "docker",
+            docker: { image: DEFAULT_SANDBOX_IMAGE },
+            browser: { enabled: true, image: undefined },
+          },
+        },
+      },
+    };
+
+    const prompter = {
+      confirmSkipInNonInteractive: vi.fn().mockResolvedValue(false),
+    } as unknown as Parameters<typeof maybeRepairSandboxImages>[2];
+
+    const runtime = {
+      log: vi.fn(),
+      error: vi.fn(),
+    } as unknown as Parameters<typeof maybeRepairSandboxImages>[1];
+
+    const next = await maybeRepairSandboxImages(cfg, runtime, prompter);
+
+    const messages = note.mock.calls.map((c) => String(c[0])).join("\n");
+    expect(messages).toContain("Sandbox browser image missing");
+    expect(runCommandWithTimeout).not.toHaveBeenCalled();
+    expect(next.agents?.defaults?.sandbox?.browser?.image).toBeUndefined();
+  });
 });

@@ -8,6 +8,8 @@ export type AuthChoiceOption = {
 };
 
 export type AuthChoiceGroupId =
+  | "recommended"
+  | "popular"
   | "openai"
   | "anthropic"
   | "google"
@@ -36,6 +38,19 @@ const AUTH_CHOICE_GROUP_DEFS: {
   hint?: string;
   choices: AuthChoice[];
 }[] = [
+  {
+    value: "popular",
+    label: "Popular",
+    hint: "Common choices",
+    choices: [
+      "openai-codex",
+      "openai-api-key",
+      "token",
+      "apiKey",
+      "gemini-api-key",
+      "openrouter-api-key",
+    ],
+  },
   {
     value: "openai",
     label: "OpenAI",
@@ -121,6 +136,19 @@ const AUTH_CHOICE_GROUP_DEFS: {
     choices: ["venice-api-key"],
   },
 ];
+
+const RECOMMENDED_ENV_MAP: Partial<Record<AuthChoice, string[]>> = {
+  "apiKey": ["ANTHROPIC_API_KEY", "CLAUDE_API_KEY"],
+  "token": ["CLAUDE_SETUP_TOKEN"],
+  "openai-api-key": ["OPENAI_API_KEY"],
+  "openrouter-api-key": ["OPENROUTER_API_KEY"],
+  "gemini-api-key": ["GEMINI_API_KEY"],
+  "ai-gateway-api-key": ["VERCEL_AI_GATEWAY_API_KEY"],
+  "venice-api-key": ["VENICE_API_KEY"],
+  "zai-api-key": ["ZAI_API_KEY"],
+  "xiaomi-api-key": ["XIAOMI_API_KEY"],
+  "minimax-api": ["MINIMAX_API_KEY"],
+};
 
 export function buildAuthChoiceOptions(params: {
   store: AuthProfileStore;
@@ -218,12 +246,29 @@ export function buildAuthChoiceGroups(params: { store: AuthProfileStore; include
     options.map((opt) => [opt.value, opt]),
   );
 
-  const groups = AUTH_CHOICE_GROUP_DEFS.map((group) => ({
-    ...group,
-    options: group.choices
-      .map((choice) => optionByValue.get(choice))
-      .filter((opt): opt is AuthChoiceOption => Boolean(opt)),
-  }));
+  const recommendedOptions = options.filter((opt) => {
+    const envVars = RECOMMENDED_ENV_MAP[opt.value];
+    return envVars?.some((name) => Boolean(process.env[name]?.trim()));
+  });
+
+  const recommendedGroup: AuthChoiceGroup | null = recommendedOptions.length
+    ? {
+        value: "recommended",
+        label: "Recommended",
+        hint: "Detected credentials present",
+        options: recommendedOptions,
+      }
+    : null;
+
+  const groups = [
+    ...(recommendedGroup ? [recommendedGroup] : []),
+    ...AUTH_CHOICE_GROUP_DEFS.map((group) => ({
+      ...group,
+      options: group.choices
+        .map((choice) => optionByValue.get(choice))
+        .filter((opt): opt is AuthChoiceOption => Boolean(opt)),
+    })),
+  ];
 
   const skipOption = params.includeSkip
     ? ({ value: "skip", label: "Skip for now" } satisfies AuthChoiceOption)

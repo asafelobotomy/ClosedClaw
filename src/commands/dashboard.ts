@@ -23,7 +23,6 @@ export async function dashboardCommand(
   const bind = cfg.gateway?.bind ?? "loopback";
   const basePath = cfg.gateway?.controlUi?.basePath;
   const customBindHost = cfg.gateway?.customBindHost;
-  const token = cfg.gateway?.auth?.token ?? process.env.ClosedClaw_GATEWAY_TOKEN ?? "";
 
   const links = resolveControlUiLinks({
     port,
@@ -31,11 +30,14 @@ export async function dashboardCommand(
     customBindHost,
     basePath,
   });
-  const authedUrl = token ? `${links.httpUrl}?token=${encodeURIComponent(token)}` : links.httpUrl;
+  const dashboardUrl = links.httpUrl;
 
-  runtime.log(`Dashboard URL: ${authedUrl}`);
+  runtime.log(`Dashboard URL: ${dashboardUrl}`);
+  runtime.log(
+    "Auth required: paste your gateway token or password in Control UI settings (ClosedClaw_GATEWAY_TOKEN also works).",
+  );
 
-  const copied = await copyToClipboard(authedUrl).catch(() => false);
+  const copied = await copyToClipboard(dashboardUrl).catch(() => false);
   runtime.log(copied ? "Copied to clipboard." : "Copy to clipboard unavailable.");
 
   let opened = false;
@@ -43,13 +45,12 @@ export async function dashboardCommand(
   if (!options.noOpen) {
     const browserSupport = await detectBrowserOpenSupport();
     if (browserSupport.ok) {
-      opened = await openUrl(authedUrl);
+      opened = await openUrl(dashboardUrl);
     }
     if (!opened) {
       hint = formatControlUiSshHint({
         port,
         basePath,
-        token: token || undefined,
       });
     }
   } else {

@@ -7,11 +7,22 @@ import type {
   NodeManagerChoice,
   TailscaleMode,
 } from "../../commands/onboard-types.js";
+import type { AuthProfileStore } from "../../agents/auth-profiles.js";
+import { buildAuthChoiceOptions } from "../../commands/auth-choice-options.js";
 import { onboardCommand } from "../../commands/onboard.js";
 import { defaultRuntime } from "../../runtime.js";
 import { formatDocsLink } from "../../terminal/links.js";
 import { theme } from "../../terminal/theme.js";
 import { runCommandWithRuntime } from "../cli-utils.js";
+
+const AUTH_CHOICE_HELP = buildAuthChoiceOptions({
+  // Store is unused inside buildAuthChoiceOptions; cast to satisfy the signature.
+  store: undefined as unknown as AuthProfileStore,
+  includeSkip: false,
+})
+  .map((opt) => opt.value)
+  .sort()
+  .join("|");
 
 function resolveInstallDaemonFlag(
   command: unknown,
@@ -49,16 +60,17 @@ export function registerOnboardCommand(program: Command) {
     .option("--workspace <dir>", "Agent workspace directory (default: ~/.ClosedClaw/workspace)")
     .option("--reset", "Reset config + credentials + sessions + workspace before running wizard")
     .option("--non-interactive", "Run without prompts", false)
+      .option("--dry-run", "Simulate onboarding without writing config or installing anything", false)
     .option(
       "--accept-risk",
       "Acknowledge that agents are powerful and full system access is risky (required for --non-interactive)",
       false,
     )
-    .option("--flow <flow>", "Wizard flow: quickstart|advanced|manual")
+    .option("--flow <flow>", "Wizard flow: quickstart|express|advanced|manual")
     .option("--mode <mode>", "Wizard mode: local|remote")
     .option(
       "--auth-choice <choice>",
-      "Auth: setup-token|token|chutes|openai-codex|openai-api-key|openrouter-api-key|ai-gateway-api-key|moonshot-api-key|kimi-code-api-key|synthetic-api-key|venice-api-key|gemini-api-key|zai-api-key|xiaomi-api-key|apiKey|minimax-api|minimax-api-lightning|opencode-zen|skip",
+      `Auth: ${AUTH_CHOICE_HELP}|skip`,
     )
     .option(
       "--token-provider <id>",
@@ -113,8 +125,9 @@ export function registerOnboardCommand(program: Command) {
           {
             workspace: opts.workspace as string | undefined,
             nonInteractive: Boolean(opts.nonInteractive),
+              dryRun: Boolean(opts.dryRun),
             acceptRisk: Boolean(opts.acceptRisk),
-            flow: opts.flow as "quickstart" | "advanced" | "manual" | undefined,
+              flow: opts.flow as "quickstart" | "express" | "advanced" | "manual" | undefined,
             mode: opts.mode as "local" | "remote" | undefined,
             authChoice: opts.authChoice as AuthChoice | undefined,
             tokenProvider: opts.tokenProvider as string | undefined,

@@ -334,21 +334,21 @@ If you don’t have a global install yet, run it via `pnpm ClosedClaw onboard`.
 
 ### How do I open the dashboard after onboarding
 
-The wizard now opens your browser with a tokenized dashboard URL right after onboarding and also prints the full link (with token) in the summary. Keep that tab open; if it didn’t launch, copy/paste the printed URL on the same machine. Tokens stay local to your host-nothing is fetched from the browser.
+The wizard now opens your browser with the dashboard URL right after onboarding and prints the link in the summary. Keep that tab open; if it didn’t launch, copy/paste the printed URL on the same machine. Authenticate in the Control UI by pasting your gateway token or password; tokens stay local to your host—nothing is fetched from the browser.
 
 ### How do I authenticate the dashboard token on localhost vs remote
 
 **Localhost (same machine):**
 
 - Open `http://127.0.0.1:18789/`.
-- If it asks for auth, run `ClosedClaw dashboard` and use the tokenized link (`?token=...`).
+- If it asks for auth, run `ClosedClaw dashboard` to print the URL, then paste your token/password in the Control UI settings.
 - The token is the same value as `gateway.auth.token` (or `ClosedClaw_GATEWAY_TOKEN`) and is stored by the UI after first load.
 
 **Not on localhost:**
 
 - **Tailscale Serve** (recommended): keep bind loopback, run `ClosedClaw gateway --tailscale serve`, open `https://<magicdns>/`. If `gateway.auth.allowTailscale` is `true`, identity headers satisfy auth (no token).
 - **Tailnet bind**: run `ClosedClaw gateway --bind tailnet --token "<token>"`, open `http://<tailscale-ip>:18789/`, paste token in dashboard settings.
-- **SSH tunnel**: `ssh -N -L 18789:127.0.0.1:18789 user@host` then open `http://127.0.0.1:18789/?token=...` from `ClosedClaw dashboard`.
+- **SSH tunnel**: `ssh -N -L 18789:127.0.0.1:18789 user@host` then open `http://127.0.0.1:18789/` from `ClosedClaw dashboard` and paste your token/password in the Control UI.
 
 See [Dashboard](/web/dashboard) and [Web surfaces](/web) for bind modes and auth details.
 

@@ -46,6 +46,15 @@ type FinalizeOnboardingOptions = {
 
 export async function finalizeOnboardingWizard(options: FinalizeOnboardingOptions) {
   const { flow, opts, baseConfig, nextConfig, settings, prompter, runtime } = options;
+  const quickMode = flow === "quickstart" || flow === "express";
+
+  if (opts.dryRun) {
+    await prompter.note(
+      "Dry run: skipped daemon install/restart, health checks, Control UI/TUI, and hatching.",
+      "Dry run",
+    );
+    return;
+  }
 
   const withWizardProgress = async <T>(
     label: string,
@@ -90,7 +99,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     installDaemon = explicitInstallDaemon;
   } else if (process.platform === "linux" && !systemdAvailable) {
     installDaemon = false;
-  } else if (flow === "quickstart") {
+  } else if (quickMode) {
     installDaemon = true;
   } else {
     installDaemon = await prompter.confirm({
@@ -109,16 +118,16 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
 
   if (installDaemon) {
     const daemonRuntime =
-      flow === "quickstart"
+      quickMode
         ? DEFAULT_GATEWAY_DAEMON_RUNTIME
         : await prompter.select({
             message: "Gateway service runtime",
             options: GATEWAY_DAEMON_RUNTIME_OPTIONS,
             initialValue: opts.daemonRuntime ?? DEFAULT_GATEWAY_DAEMON_RUNTIME,
           });
-    if (flow === "quickstart") {
+    if (quickMode) {
       await prompter.note(
-        "QuickStart uses Node for the Gateway service (stable + supported).",
+        "Express/QuickStart uses Node for the Gateway service (stable + supported).",
         "Gateway service runtime",
       );
     }
@@ -230,16 +239,6 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     }
   }
 
-  await prompter.note(
-    [
-      "Add nodes for extra features:",
-      "- macOS app (system + notifications)",
-      "- iOS app (camera/canvas)",
-      "- Android app (camera/canvas)",
-    ].join("\n"),
-    "Optional apps",
-  );
-
   const controlUiBasePath =
     nextConfig.gateway?.controlUi?.basePath ?? baseConfig.gateway?.controlUi?.basePath;
   const links = resolveControlUiLinks({
@@ -248,11 +247,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     customBindHost: settings.customBindHost,
     basePath: controlUiBasePath,
   });
-  const tokenParam =
-    settings.authMode === "token" && settings.gatewayToken
-      ? `?token=${encodeURIComponent(settings.gatewayToken)}`
-      : "";
-  const authedUrl = `${links.httpUrl}${tokenParam}`;
+  const dashboardUrl = links.httpUrl;
   const gatewayProbe = await probeGatewayReachable({
     url: links.wsUrl,
     token: settings.authMode === "token" ? settings.gatewayToken : undefined,
@@ -273,7 +268,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
   await prompter.note(
     [
       `Web UI: ${links.httpUrl}`,
-      tokenParam ? `Web UI (with token): ${authedUrl}` : undefined,
+      "Auth required: paste your gateway token or password in Control UI settings.",
       `Gateway WS: ${links.wsUrl}`,
       gatewayStatusLine,
       "Docs: https://docs.OpenClaw.ai/web/control-ui",
@@ -305,8 +300,9 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       [
         "Gateway token: shared auth for the Gateway + Control UI.",
         "Stored in: ~/.ClosedClaw/ClosedClaw.json (gateway.auth.token) or ClosedClaw_GATEWAY_TOKEN.",
-        "Web UI stores a copy in this browser's localStorage (ClosedClaw.control.settings.v1).",
-        `Get the tokenized link anytime: ${formatCliCommand("ClosedClaw dashboard --no-open")}`,
+        "Control UI stores your token locally after you paste it once (ClosedClaw.control.settings.v1).",
+        `Dashboard URL (no token): ${links.httpUrl}`,
+        `Print URL again anytime: ${formatCliCommand("ClosedClaw dashboard --no-open")}`,
       ].join("\n"),
       "Token",
     );
@@ -330,41 +326,37 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
         deliver: false,
         message: hasBootstrap ? "Wake up, my friend!" : undefined,
       });
-      if (settings.authMode === "token" && settings.gatewayToken) {
-        seededInBackground = await openUrlInBackground(authedUrl);
-      }
+      seededInBackground = await openUrlInBackground(dashboardUrl);
       if (seededInBackground) {
         await prompter.note(
-          `Web UI seeded in the background. Open later with: ${formatCliCommand(
+          `Web UI opened in the background. Use ${formatCliCommand(
             "ClosedClaw dashboard --no-open",
-          )}`,
+          )} later if you need the URL again. Paste your token/password when prompted in the UI.`,
           "Web UI",
         );
       }
     } else if (hatchChoice === "web") {
       const browserSupport = await detectBrowserOpenSupport();
       if (browserSupport.ok) {
-        controlUiOpened = await openUrl(authedUrl);
+        controlUiOpened = await openUrl(dashboardUrl);
         if (!controlUiOpened) {
           controlUiOpenHint = formatControlUiSshHint({
             port: settings.port,
             basePath: controlUiBasePath,
-            token: settings.gatewayToken,
           });
         }
       } else {
         controlUiOpenHint = formatControlUiSshHint({
           port: settings.port,
           basePath: controlUiBasePath,
-          token: settings.gatewayToken,
         });
       }
       await prompter.note(
         [
-          `Dashboard link (with token): ${authedUrl}`,
+          `Dashboard link: ${dashboardUrl}`,
           controlUiOpened
-            ? "Opened in your browser. Keep that tab to control ClosedClaw."
-            : "Copy/paste this URL in a browser on this machine to control ClosedClaw.",
+            ? "Opened in your browser. Keep that tab to control ClosedClaw. Paste your token/password when prompted."
+            : "Copy/paste this URL in a browser on this machine to control ClosedClaw. Paste your token/password when prompted.",
           controlUiOpenHint,
         ]
           .filter(Boolean)
@@ -402,28 +394,26 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
   if (shouldOpenControlUi) {
     const browserSupport = await detectBrowserOpenSupport();
     if (browserSupport.ok) {
-      controlUiOpened = await openUrl(authedUrl);
+      controlUiOpened = await openUrl(dashboardUrl);
       if (!controlUiOpened) {
         controlUiOpenHint = formatControlUiSshHint({
           port: settings.port,
           basePath: controlUiBasePath,
-          token: settings.gatewayToken,
         });
       }
     } else {
       controlUiOpenHint = formatControlUiSshHint({
         port: settings.port,
         basePath: controlUiBasePath,
-        token: settings.gatewayToken,
       });
     }
 
     await prompter.note(
       [
-        `Dashboard link (with token): ${authedUrl}`,
+        `Dashboard link: ${dashboardUrl}`,
         controlUiOpened
-          ? "Opened in your browser. Keep that tab to control ClosedClaw."
-          : "Copy/paste this URL in a browser on this machine to control ClosedClaw.",
+          ? "Opened in your browser. Keep that tab to control ClosedClaw. Paste your token/password when prompted."
+          : "Copy/paste this URL in a browser on this machine to control ClosedClaw. Paste your token/password when prompted.",
         controlUiOpenHint,
       ]
         .filter(Boolean)
@@ -435,41 +425,31 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
   const webSearchKey = (nextConfig.tools?.web?.search?.apiKey ?? "").trim();
   const webSearchEnv = (process.env.BRAVE_API_KEY ?? "").trim();
   const hasWebSearchKey = Boolean(webSearchKey || webSearchEnv);
-  await prompter.note(
-    hasWebSearchKey
-      ? [
-          "Web search is enabled, so your agent can look things up online when needed.",
-          "",
-          webSearchKey
-            ? "API key: stored in config (tools.web.search.apiKey)."
-            : "API key: provided via BRAVE_API_KEY env var (Gateway environment).",
-          "Docs: https://docs.OpenClaw.ai/tools/web",
-        ].join("\n")
-      : [
-          "If you want your agent to be able to search the web, you’ll need an API key.",
-          "",
-          "ClosedClaw uses Brave Search for the `web_search` tool. Without a Brave Search API key, web search won’t work.",
-          "",
-          "Set it up interactively:",
-          `- Run: ${formatCliCommand("ClosedClaw configure --section web")}`,
-          "- Enable web_search and paste your Brave Search API key",
-          "",
-          "Alternative: set BRAVE_API_KEY in the Gateway environment (no config changes).",
-          "Docs: https://docs.OpenClaw.ai/tools/web",
-        ].join("\n"),
-    "Web search (optional)",
-  );
 
-  await prompter.note(
-    'What now: https://ClosedClaw.ai/showcase ("What People Are Building").',
-    "What now",
-  );
+  const nextSteps: string[] = [
+    "Add nodes for extra features: macOS/iOS/Android apps.",
+    "Back up your agent workspace (docs: https://docs.OpenClaw.ai/concepts/agent-workspace).",
+  ];
 
-  await prompter.outro(
+  if (!hasWebSearchKey) {
+    nextSteps.push(
+      "Enable web search: set BRAVE_API_KEY or run `ClosedClaw configure --section web` to store a Brave Search key.",
+    );
+  }
+
+  nextSteps.push('Showcase: https://ClosedClaw.ai/showcase ("What People Are Building").');
+
+  await prompter.note(nextSteps.join("\n"), "Next steps");
+
+  const outroBase =
     controlUiOpened
       ? "Onboarding complete. Dashboard opened with your token; keep that tab to control ClosedClaw."
       : seededInBackground
-        ? "Onboarding complete. Web UI seeded in the background; open it anytime with the tokenized link above."
-        : "Onboarding complete. Use the tokenized dashboard link above to control ClosedClaw.",
-  );
+          ? "Onboarding complete. Web UI opened in the background; you may need to paste your token/password on first load."
+          : "Onboarding complete. Use the dashboard link above and paste your token/password when prompted."
+
+  const securityOneLiner =
+    " Security: running agents is powerful and risky—harden your setup: https://docs.OpenClaw.ai/security";
+
+  await prompter.outro(`${outroBase}${securityOneLiner}`);
 }

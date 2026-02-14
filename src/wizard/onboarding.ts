@@ -44,6 +44,21 @@ import { finalizeOnboardingWizard } from "./onboarding.finalize.js";
 import { configureGatewayForOnboarding } from "./onboarding.gateway-config.js";
 import { WizardCancelledError, type WizardPrompter } from "./prompts.js";
 
+function createStepTracker(total: number) {
+  let current = 0;
+  let totalSteps = Math.max(total, 1);
+  return {
+    label(title: string) {
+      current += 1;
+      const percent = Math.min(100, Math.max(0, Math.round((current / totalSteps) * 100)));
+      return `[${current}/${totalSteps} · ${percent}%] ${title}`;
+    },
+    setTotal(nextTotal: number) {
+      totalSteps = Math.max(nextTotal, 1);
+    },
+  };
+}
+
 async function requireRiskAcknowledgement(params: {
   opts: OnboardOptions;
   prompter: WizardPrompter;
@@ -92,12 +107,15 @@ export async function runOnboardingWizard(
   runtime: RuntimeEnv = defaultRuntime,
   prompter: WizardPrompter,
 ) {
+  const isDryRun = Boolean(opts.dryRun);
   printWizardHeader(runtime);
   await prompter.intro("ClosedClaw onboarding");
   await requireRiskAcknowledgement({ opts, prompter });
 
   const snapshot = await readConfigFileSnapshot();
   let baseConfig: ClosedClawConfig = snapshot.valid ? snapshot.config : {};
+
+  const stepper = createStepTracker(8);
 
   if (snapshot.exists && !snapshot.valid) {
     await prompter.note(summarizeExistingConfig(baseConfig), "Invalid config");
@@ -120,11 +138,13 @@ export async function runOnboardingWizard(
 
   const quickstartHint = `Configure details later via ${formatCliCommand("ClosedClaw configure")}.`;
   const manualHint = "Configure port, network, Tailscale, and auth options.";
+  const expressHint = "Minimal prompts; keeps defaults; skips channels/skills/hooks/shell completion.";
   const explicitFlowRaw = opts.flow?.trim();
   const normalizedExplicitFlow = explicitFlowRaw === "manual" ? "advanced" : explicitFlowRaw;
   if (
     normalizedExplicitFlow &&
     normalizedExplicitFlow !== "quickstart" &&
+    normalizedExplicitFlow !== "express" &&
     normalizedExplicitFlow !== "advanced"
   ) {
     runtime.error("Invalid --flow (use quickstart, manual, or advanced).");
@@ -132,19 +152,31 @@ export async function runOnboardingWizard(
     return;
   }
   const explicitFlow: WizardFlow | undefined =
-    normalizedExplicitFlow === "quickstart" || normalizedExplicitFlow === "advanced"
+    normalizedExplicitFlow === "quickstart" ||
+    normalizedExplicitFlow === "express" ||
+    normalizedExplicitFlow === "advanced"
       ? normalizedExplicitFlow
       : undefined;
   let flow: WizardFlow =
     explicitFlow ??
     (await prompter.select({
-      message: "Onboarding mode",
+      message: stepper.label("Onboarding mode"),
       options: [
+        { value: "express", label: "Express", hint: expressHint },
         { value: "quickstart", label: "QuickStart", hint: quickstartHint },
         { value: "advanced", label: "Manual", hint: manualHint },
       ],
       initialValue: "quickstart",
     }));
+
+  // Calibrate step counter after flow selection.
+  if (flow === "express") {
+    stepper.setTotal(4);
+  } else if (flow === "advanced") {
+    stepper.setTotal(8);
+  } else {
+    stepper.setTotal(6);
+  }
 
   if (opts.mode === "remote" && flow === "quickstart") {
     await prompter.note(
@@ -158,7 +190,7 @@ export async function runOnboardingWizard(
     await prompter.note(summarizeExistingConfig(baseConfig), "Existing config detected");
 
     const action = await prompter.select({
-      message: "Config handling",
+      message: stepper.label("Config handling"),
       options: [
         { value: "keep", label: "Use existing values" },
         { value: "modify", label: "Update values" },
@@ -308,10 +340,10 @@ export async function runOnboardingWizard(
 
   const mode =
     opts.mode ??
-    (flow === "quickstart"
+    (flow === "quickstart" || flow === "express"
       ? "local"
       : ((await prompter.select({
-          message: "What do you want to set up?",
+          message: stepper.label("What do you want to set up?"),
           options: [
             {
               value: "local",
@@ -335,6 +367,12 @@ export async function runOnboardingWizard(
   if (mode === "remote") {
     let nextConfig = await promptRemoteGatewayConfig(baseConfig, prompter);
     nextConfig = applyWizardMetadata(nextConfig, { command: "onboard", mode });
+    if (isDryRun) {
+      await prompter.note("Dry run: remote gateway config collected; no files written.", "Dry run");
+      await prompter.outro("Dry run complete. No files changed.");
+      return;
+    }
+
     await writeConfigFile(nextConfig);
     logConfigUpdated(runtime);
     await prompter.outro("Remote gateway configured.");
@@ -343,10 +381,10 @@ export async function runOnboardingWizard(
 
   const workspaceInput =
     opts.workspace ??
-    (flow === "quickstart"
-      ? (baseConfig.agents?.defaults?.workspace ?? DEFAULT_WORKSPACE)
+    (flow === "quickstart" || flow === "express"
+      ? baseConfig.agents?.defaults?.workspace ?? DEFAULT_WORKSPACE
       : await prompter.text({
-          message: "Workspace directory",
+          message: stepper.label("Workspace directory"),
           initialValue: baseConfig.agents?.defaults?.workspace ?? DEFAULT_WORKSPACE,
         }));
 
@@ -377,6 +415,7 @@ export async function runOnboardingWizard(
       prompter,
       store: authStore,
       includeSkip: true,
+      message: stepper.label("Model/auth provider"),
     }));
 
   const authResult = await applyAuthChoice({
@@ -392,7 +431,9 @@ export async function runOnboardingWizard(
   });
   nextConfig = authResult.config;
 
-  if (authChoiceFromPrompt) {
+  const isExpress = flow === "express";
+
+  if (authChoiceFromPrompt && !isExpress) {
     const modelSelection = await promptDefaultModel({
       config: nextConfig,
       prompter,
@@ -419,7 +460,9 @@ export async function runOnboardingWizard(
   nextConfig = gateway.nextConfig;
   const settings = gateway.settings;
 
-  if (opts.skipChannels ?? opts.skipProviders) {
+  if (isDryRun) {
+    await prompter.note("Dry run: skipping channel setup.", "Channels");
+  } else if (isExpress || (opts.skipChannels ?? opts.skipProviders)) {
     await prompter.note("Skipping channel setup.", "Channels");
   } else {
     const quickstartAllowFromChannels =
@@ -437,23 +480,52 @@ export async function runOnboardingWizard(
     });
   }
 
-  await writeConfigFile(nextConfig);
-  logConfigUpdated(runtime);
-  await ensureWorkspaceAndSessions(workspaceDir, runtime, {
-    skipBootstrap: Boolean(nextConfig.agents?.defaults?.skipBootstrap),
-  });
+  if (!isDryRun) {
+    await ensureWorkspaceAndSessions(workspaceDir, runtime, {
+      skipBootstrap: Boolean(nextConfig.agents?.defaults?.skipBootstrap),
+    });
+  }
 
-  if (opts.skipSkills) {
+  if (isDryRun) {
+    await prompter.note("Dry run: skipping skills setup.", "Skills");
+  } else if (isExpress || opts.skipSkills) {
     await prompter.note("Skipping skills setup.", "Skills");
   } else {
     nextConfig = await setupSkills(nextConfig, workspaceDir, runtime, prompter);
   }
 
   // Setup hooks (session memory on /new)
-  nextConfig = await setupInternalHooks(nextConfig, runtime, prompter);
+  if (isDryRun) {
+    await prompter.note("Dry run: skipping hooks setup.", "Hooks");
+  } else if (isExpress) {
+    await prompter.note("Skipping hooks setup.", "Hooks");
+  } else {
+    nextConfig = await setupInternalHooks(nextConfig, runtime, prompter);
+  }
 
   nextConfig = applyWizardMetadata(nextConfig, { command: "onboard", mode });
+  if (isDryRun) {
+    const lines = [
+      `flow: ${flow}`,
+      `mode: ${mode}`,
+      `workspace: ${workspaceDir}`,
+      `authChoice: ${authChoice ?? "(none)"}`,
+      `gateway.port: ${settings.port}`,
+      `gateway.bind: ${settings.bind}`,
+      `gateway.auth: ${settings.authMode}`,
+      `tailscale: ${settings.tailscaleMode}`,
+      "Channels: skipped (dry run)",
+      "Skills: skipped (dry run)",
+      "Hooks: skipped (dry run)",
+      "Daemon/health/UI: skipped (dry run)",
+    ];
+    await prompter.note(lines.join("\n"), "Dry run summary");
+    await prompter.outro("Dry run complete. No files changed.");
+    return;
+  }
+
   await writeConfigFile(nextConfig);
+  logConfigUpdated(runtime);
 
   await finalizeOnboardingWizard({
     flow,
@@ -466,15 +538,17 @@ export async function runOnboardingWizard(
     runtime,
   });
 
-  const installShell = await prompter.confirm({
-    message: "Install shell completion script?",
-    initialValue: true,
-  });
+  if (!isExpress) {
+    const installShell = await prompter.confirm({
+      message: stepper.label("Install shell completion script?"),
+      initialValue: true,
+    });
 
-  if (installShell) {
-    const shell = process.env.SHELL?.split("/").pop() || "zsh";
-    // We pass 'yes=true' to skip any double-confirmation inside the helper,
-    // as the wizard prompt above serves as confirmation.
-    await installCompletion(shell, true);
+    if (installShell) {
+      const shell = process.env.SHELL?.split("/").pop() || "zsh";
+      // We pass 'yes=true' to skip any double-confirmation inside the helper,
+      // as the wizard prompt above serves as confirmation.
+      await installCompletion(shell, true);
+    }
   }
 }

@@ -170,15 +170,13 @@ export function formatControlUiSshHint(params: {
   const basePath = normalizeControlUiBasePath(params.basePath);
   const uiPath = basePath ? `${basePath}/` : "/";
   const localUrl = `http://localhost:${params.port}${uiPath}`;
-  const tokenParam = params.token ? `?token=${encodeURIComponent(params.token)}` : "";
-  const authedUrl = params.token ? `${localUrl}${tokenParam}` : undefined;
   const sshTarget = resolveSshTargetHint();
   return [
     "No GUI detected. Open from your computer:",
     `ssh -N -L ${params.port}:127.0.0.1:${params.port} ${sshTarget}`,
     "Then open:",
     localUrl,
-    authedUrl,
+    "Authenticate with your gateway token or password in Control UI settings.",
     "Docs:",
     "https://docs.OpenClaw.ai/gateway/remote",
     "https://docs.OpenClaw.ai/web/control-ui",

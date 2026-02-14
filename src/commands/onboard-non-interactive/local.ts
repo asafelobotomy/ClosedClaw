@@ -31,6 +31,7 @@ export async function runNonInteractiveOnboardingLocal(params: {
 }) {
   const { opts, runtime, baseConfig } = params;
   const mode = "local" as const;
+  const isDryRun = Boolean(opts.dryRun);
 
   const workspaceDir = resolveNonInteractiveWorkspaceDir({
     opts,
@@ -81,6 +82,24 @@ export async function runNonInteractiveOnboardingLocal(params: {
   nextConfig = applyNonInteractiveSkillsConfig({ nextConfig, opts, runtime });
 
   nextConfig = applyWizardMetadata(nextConfig, { command: "onboard", mode });
+  if (isDryRun) {
+    runtime.log(
+      [
+        "Dry run (non-interactive)",
+        `flow: ${opts.flow ?? "quickstart"}`,
+        `workspace: ${workspaceDir}`,
+        `authChoice: ${opts.authChoice ?? "(none)"}`,
+        `gateway.port: ${gatewayResult.port}`,
+        `gateway.bind: ${gatewayResult.bind}`,
+        `gateway.auth: ${gatewayResult.authMode}`,
+        `tailscale: ${gatewayResult.tailscaleMode}`,
+        "Channels/skills/hooks: skipped (dry run)",
+        "Daemon/health/UI: skipped (dry run)",
+      ].join("\n"),
+    );
+    return;
+  }
+
   await writeConfigFile(nextConfig);
   logConfigUpdated(runtime);
 

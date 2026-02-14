@@ -29,10 +29,11 @@ export async function configureGatewayForOnboarding(
   opts: ConfigureGatewayOptions,
 ): Promise<ConfigureGatewayResult> {
   const { flow, localPort, quickstartGateway, prompter } = opts;
+  const quickMode = flow === "quickstart" || flow === "express";
   let { nextConfig } = opts;
 
   const port =
-    flow === "quickstart"
+    quickMode
       ? quickstartGateway.port
       : Number.parseInt(
           String(
@@ -46,7 +47,7 @@ export async function configureGatewayForOnboarding(
         );
 
   let bind: GatewayWizardSettings["bind"] =
-    flow === "quickstart"
+    quickMode
       ? quickstartGateway.bind
       : await prompter.select<GatewayWizardSettings["bind"]>({
           message: "Gateway bind",
@@ -92,7 +93,7 @@ export async function configureGatewayForOnboarding(
   }
 
   let authMode =
-    flow === "quickstart"
+    quickMode
       ? quickstartGateway.authMode
       : ((await prompter.select({
           message: "Gateway auth",
@@ -108,7 +109,7 @@ export async function configureGatewayForOnboarding(
         })) as GatewayAuthChoice);
 
   const tailscaleMode: GatewayWizardSettings["tailscaleMode"] =
-    flow === "quickstart"
+    quickMode
       ? quickstartGateway.tailscaleMode
       : await prompter.select<GatewayWizardSettings["tailscaleMode"]>({
           message: "Tailscale exposure",
@@ -144,8 +145,8 @@ export async function configureGatewayForOnboarding(
     }
   }
 
-  let tailscaleResetOnExit = flow === "quickstart" ? quickstartGateway.tailscaleResetOnExit : false;
-  if (tailscaleMode !== "off" && flow !== "quickstart") {
+  let tailscaleResetOnExit = quickMode ? quickstartGateway.tailscaleResetOnExit : false;
+  if (tailscaleMode !== "off" && !quickMode) {
     await prompter.note(
       ["Docs:", "https://docs.OpenClaw.ai/gateway/tailscale", "https://docs.OpenClaw.ai/web"].join(
         "\n",
@@ -176,7 +177,7 @@ export async function configureGatewayForOnboarding(
 
   let gatewayToken: string | undefined;
   if (authMode === "token") {
-    if (flow === "quickstart") {
+    if (quickMode) {
       gatewayToken = quickstartGateway.token ?? randomToken();
     } else {
       const tokenInput = await prompter.text({

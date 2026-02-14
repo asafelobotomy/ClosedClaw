@@ -1,14 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ClosedClawConfig } from "../config/config.js";
 
-const note = vi.hoisted(() => vi.fn());
+const { note, listChannelPlugins } = vi.hoisted(() => ({
+  note: vi.fn(),
+  listChannelPlugins: vi.fn(() => []),
+}));
 
 vi.mock("../terminal/note.js", () => ({
   note,
 }));
 
 vi.mock("../channels/plugins/index.js", () => ({
-  listChannelPlugins: () => [],
+  listChannelPlugins,
 }));
 
 import { noteSecurityWarnings } from "./doctor-security.js";
@@ -82,5 +85,35 @@ describe("noteSecurityWarnings gateway exposure", () => {
     const message = lastMessage();
     expect(message).toContain("No channel security warnings detected");
     expect(message).not.toContain("Gateway bound");
+  });
+
+  it("prints info grouping when only info-level findings exist", async () => {
+    listChannelPlugins.mockReturnValue([
+      {
+        id: "test",
+        meta: { label: "Test" },
+        config: {
+          listAccountIds: () => ["default"],
+          resolveAccount: () => ({}),
+          isConfigured: () => true,
+        },
+        security: {
+          resolveDmPolicy: () => ({
+            policy: "disabled",
+            allowFrom: [],
+            allowFromPath: "channels.test.",
+            policyPath: "channels.test.dmPolicy",
+            approveHint: "",
+          }),
+        },
+      },
+    ]);
+
+    const cfg = { gateway: { bind: "loopback" } } as ClosedClawConfig;
+    await noteSecurityWarnings(cfg);
+
+    const message = lastMessage();
+    expect(message).toContain("Info:");
+    expect(message).toContain("DMs: disabled");
   });
 });
