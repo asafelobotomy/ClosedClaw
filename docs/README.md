@@ -104,27 +104,8 @@ closedclaw health
 
 ## 📱 Channels
 
-Platform-specific integration guides:
-
-### Built-in Channels
-
-- **[WhatsApp](channels/whatsapp/)** - WhatsApp Web integration
-- **[Telegram](channels/telegram.md)** - Telegram Bot API
-- **[Discord](channels/discord/)** - Discord bot integration
-- **[Slack](channels/slack/)** - Slack App integration
-- **[Signal](channels/signal/)** - Signal linked device
-- **[iMessage](channels/imessage/)** - macOS iMessage integration
-- **[Web Chat](web/)** - Browser-based interface
-
-### Extension Channels
-
-- **[Microsoft Teams](channels/)** - MS Teams connector (extension)
-- **[Google Chat](channels/)** - Google Chat integration (extension)
-- **[Matrix](channels/)** - Matrix protocol (extension)
-- **[BlueBubbles](channels/)** - iMessage proxy server (extension)
-- **[Zalo](channels/)** - Zalo messaging (extension)
-- **[More...](channels/)** - See all available channels
-
+GTKGUI
+Android (WIP)
 ---
 
 ## 🛠️ Development
