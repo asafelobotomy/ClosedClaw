@@ -90,7 +90,7 @@ Details:
   Source: ClosedClaw-bundled
   Path: /path/to/ClosedClaw/hooks/bundled/session-memory/HOOK.md
   Handler: /path/to/ClosedClaw/hooks/bundled/session-memory/handler.ts
-  Homepage: https://docs.OpenClaw.ai/hooks#session-memory
+  Homepage: https://docs.ClosedClaw.ai/hooks#session-memory
   Events: command:new
 
 Requirements:

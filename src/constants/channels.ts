@@ -175,7 +175,7 @@ export const CHANNELS_MINIMAX = {
  */
 export const CHANNELS_UPSTREAM = {
   /** Default upstream remote name */
-  REMOTE: "openclaw",
+  REMOTE: "closedclaw",
 
   /** Default upstream branch */
   BRANCH: "main",

@@ -26,6 +26,7 @@ import {
 } from "../utils.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import { VERSION } from "../version.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 
 export function guardCancel<T>(value: T | symbol, runtime: RuntimeEnv): T {
   if (isCancel(value)) {
@@ -83,7 +84,7 @@ export function printWizardHeader(runtime: RuntimeEnv) {
     "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██",
     "██░▀▀▀░██░█████░▀▀▀██░██▄░██░▀▀▄██░▀▀░█░██░██▄▀▄▀▄██",
     "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
-    "                  🦞 ClosedClaw 🦞                    ",
+    "                  🦀 ClosedClaw 🦀                    ",
     " ",
   ].join("\n");
   runtime.log(header);
@@ -178,8 +179,8 @@ export function formatControlUiSshHint(params: {
     localUrl,
     "Authenticate with your gateway token or password in Control UI settings.",
     "Docs:",
-    "https://docs.OpenClaw.ai/gateway/remote",
-    "https://docs.OpenClaw.ai/web/control-ui",
+    withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/remote"),
+    withOpenClawDisclaimer("https://docs.OpenClaw.ai/web/control-ui"),
   ]
     .filter(Boolean)
     .join("\n");

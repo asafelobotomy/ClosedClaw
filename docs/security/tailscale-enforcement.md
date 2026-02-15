@@ -166,7 +166,7 @@ systemctl --user start closedclaw-gateway
 
 # Or directly (after preflight)
 ./scripts/tailscale-preflight.sh check && \
-  node openclaw.mjs gateway
+  node closedclaw.mjs gateway
 ```
 
 ## Scripts Reference
@@ -433,7 +433,7 @@ sudo tailscale up
 # Create namespace with Mullvad routing
 sudo ./scripts/tailscale-mullvad.sh namespace-create
 sudo ip netns exec closedclaw-vpn mullvad connect
-sudo ip netns exec closedclaw-vpn node openclaw.mjs gateway
+sudo ip netns exec closedclaw-vpn node closedclaw.mjs gateway
 ```
 
 ### Script Reference: tailscale-mullvad.sh

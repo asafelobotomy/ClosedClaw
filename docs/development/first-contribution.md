@@ -533,7 +533,7 @@ Look for issues labeled:
 
 ---
 
-**Thank you for contributing to ClosedClaw!** Every contribution, no matter how small, makes a difference. We're excited to have you as part of the community! 🦞
+**Thank you for contributing to ClosedClaw!** Every contribution, no matter how small, makes a difference. We're excited to have you as part of the community! 🦀
 
 ---
 

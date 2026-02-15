@@ -1,7 +1,7 @@
 ---
 name: soul-jester
 description: "Swap SOUL.md with SOUL_JESTER.md during a playful window or by random chance"
-homepage: https://docs.OpenClaw.ai/hooks/soul-jester
+homepage: (NOT ASSOCIATED WITH CLOSEDCLAW - Keeping for posterity and future reference) https://docs.OpenClaw.ai/hooks/soul-jester
 metadata:
   {
     "ClosedClaw":

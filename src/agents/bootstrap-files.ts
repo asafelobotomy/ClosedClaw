@@ -1,6 +1,7 @@
 import type { ClosedClawConfig } from "../config/config.js";
 import type { EmbeddedContextFile } from "./pi-embedded-helpers.js";
 import { applyBootstrapHookOverrides } from "./bootstrap-hooks.js";
+import { getModelFamily } from "./model-family.js";
 import { buildBootstrapContextFiles, resolveBootstrapMaxChars } from "./pi-embedded-helpers.js";
 import {
   filterBootstrapFilesForSession,
@@ -46,14 +47,29 @@ export async function resolveBootstrapContextForRun(params: {
   sessionKey?: string;
   sessionId?: string;
   agentId?: string;
+  /** Provider for model-family-aware budget calculation. */
+  provider?: string;
+  /** Model id for model-family-aware budget calculation. */
+  modelId?: string;
+  /** Context window size for proportional budget calculation. */
+  contextWindow?: number;
   warn?: (message: string) => void;
 }): Promise<{
   bootstrapFiles: WorkspaceBootstrapFile[];
   contextFiles: EmbeddedContextFile[];
 }> {
   const bootstrapFiles = await resolveBootstrapFilesForRun(params);
+
+  // Calculate model-family-aware bootstrap budget when provider/model are known.
+  const modelFamily = params.provider || params.modelId
+    ? getModelFamily(params.provider ?? "", params.modelId ?? "")
+    : undefined;
+
   const contextFiles = buildBootstrapContextFiles(bootstrapFiles, {
-    maxChars: resolveBootstrapMaxChars(params.config),
+    maxChars: resolveBootstrapMaxChars(params.config, {
+      modelFamily,
+      contextWindow: params.contextWindow,
+    }),
     warn: params.warn,
   });
   return { bootstrapFiles, contextFiles };

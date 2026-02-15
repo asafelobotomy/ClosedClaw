@@ -85,7 +85,7 @@ export async function upstreamStatusCommand(
 
   // Pretty output
   console.log("");
-  console.log(chalk.bold("🦞 ClosedClaw Upstream Status"));
+  console.log(chalk.bold("🦀 ClosedClaw Upstream Status"));
   console.log("");
   console.log(`${chalk.dim("Fork point:")}     ${tracking.forkPoint}`);
   console.log(`${chalk.dim("Current branch:")} ${currentBranch}`);

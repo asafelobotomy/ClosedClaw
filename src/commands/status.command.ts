@@ -17,6 +17,7 @@ import {
   type Tone,
 } from "../memory/status-format.js";
 import { runSecurityAudit } from "../security/audit.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 import { renderTable } from "../terminal/table.js";
 import { theme } from "../terminal/theme.js";
 import { formatHealthChannelLines, type HealthSummary } from "./health.js";
@@ -599,8 +600,10 @@ export async function statusCommand(
   }
 
   runtime.log("");
-  runtime.log("FAQ: https://docs.OpenClaw.ai/faq");
-  runtime.log("Troubleshooting: https://docs.OpenClaw.ai/troubleshooting");
+  runtime.log(`FAQ: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/faq")}`);
+  runtime.log(
+    `Troubleshooting: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/troubleshooting")}`,
+  );
   runtime.log("");
   const updateHint = formatUpdateAvailableHint(update);
   if (updateHint) {

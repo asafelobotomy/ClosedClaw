@@ -39,7 +39,10 @@ describe("sandbox explain command", () => {
 
       const out = logs.join("");
       const parsed = JSON.parse(out);
-      expect(parsed).toHaveProperty("docsUrl", "https://docs.OpenClaw.ai/sandbox");
+      expect(parsed).toHaveProperty(
+        "docsUrl",
+        "(NOT ASSOCIATED WITH CLOSEDCLAW - Keeping for posterity and future reference) https://docs.OpenClaw.ai/sandbox",
+      );
       expect(parsed).toHaveProperty("sandbox.mode", "all");
       expect(parsed).toHaveProperty("sandbox.tools.sources.allow.source");
       expect(Array.isArray(parsed.fixIt)).toBe(true);

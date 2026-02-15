@@ -5,6 +5,7 @@ import { secondsToMs } from "../config/constants/index.js";
 import { discoverGatewayBeacons } from "../infra/bonjour-discovery.js";
 import { resolveWideAreaDiscoveryDomain } from "../infra/widearea-dns.js";
 import { detectBinary } from "./onboard-helpers.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 
 const DEFAULT_GATEWAY_URL = "ws://127.0.0.1:18789";
 
@@ -47,7 +48,7 @@ export async function promptRemoteGatewayConfig(
     await prompter.note(
       [
         "Bonjour discovery requires dns-sd (macOS) or avahi-browse (Linux).",
-        "Docs: https://docs.OpenClaw.ai/gateway/discovery",
+        `Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/discovery")}`,
       ].join("\n"),
       "Discovery",
     );
@@ -103,7 +104,7 @@ export async function promptRemoteGatewayConfig(
             `ssh -N -L 18789:127.0.0.1:18789 <user>@${host}${
               selectedBeacon.sshPort ? ` -p ${selectedBeacon.sshPort}` : ""
             }`,
-            "Docs: https://docs.OpenClaw.ai/gateway/remote",
+            `Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/remote")}`,
           ].join("\n"),
           "SSH tunnel",
         );

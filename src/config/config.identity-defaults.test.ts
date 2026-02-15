@@ -129,7 +129,7 @@ describe("config identity defaults", () => {
                   identity: {
                     name: "Samantha Sloth",
                     theme: "space lobster",
-                    emoji: "🦞",
+                    emoji: "🦀",
                   },
                   groupChat: { mentionPatterns: ["@ClosedClaw"] },
                 },
@@ -151,52 +151,6 @@ describe("config identity defaults", () => {
 
       expect(cfg.messages?.responsePrefix).toBe("✅");
       expect(cfg.agents?.list?.[0]?.groupChat?.mentionPatterns).toEqual(["@ClosedClaw"]);
-    });
-  });
-
-  it("supports provider textChunkLimit config", async () => {
-    await withTempHome(async (home) => {
-      const configDir = path.join(home, ".ClosedClaw");
-      await fs.mkdir(configDir, { recursive: true });
-      await fs.writeFile(
-        path.join(configDir, "ClosedClaw.json"),
-        JSON.stringify(
-          {
-            messages: {
-              messagePrefix: "[ClosedClaw]",
-              responsePrefix: "🦞",
-            },
-            channels: {
-              whatsapp: { allowFrom: ["+15555550123"], textChunkLimit: 4444 },
-              telegram: { enabled: true, textChunkLimit: 3333 },
-              discord: {
-                enabled: true,
-                textChunkLimit: 1999,
-                maxLinesPerMessage: 17,
-              },
-              signal: { enabled: true, textChunkLimit: 2222 },
-              imessage: { enabled: true, textChunkLimit: 1111 },
-            },
-          },
-          null,
-          2,
-        ),
-        "utf-8",
-      );
-
-      vi.resetModules();
-      const { loadConfig } = await import("./config.js");
-      const cfg = loadConfig();
-
-      expect(cfg.channels?.whatsapp?.textChunkLimit).toBe(4444);
-      expect(cfg.channels?.telegram?.textChunkLimit).toBe(3333);
-      expect(cfg.channels?.discord?.textChunkLimit).toBe(1999);
-      expect(cfg.channels?.discord?.maxLinesPerMessage).toBe(17);
-      expect(cfg.channels?.signal?.textChunkLimit).toBe(2222);
-      expect(cfg.channels?.imessage?.textChunkLimit).toBe(1111);
-
-      const legacy = (cfg.messages as unknown as Record<string, unknown>).textChunkLimit;
-      expect(legacy).toBeUndefined();
     });
   });
 
@@ -329,7 +283,7 @@ describe("config identity defaults", () => {
                   identity: {
                     name: "ClosedClaw",
                     theme: "space lobster",
-                    emoji: "🦞",
+                    emoji: "🦀",
                   },
                 },
               ],

@@ -202,7 +202,15 @@ export function buildSystemPrompt(params: {
   contextFiles?: EmbeddedContextFile[];
   modelDisplay: string;
   agentId?: string;
+  /** Provider id for model-family-aware prompt formatting. Defaults to extracting from modelDisplay. */
+  provider?: string;
+  /** Model id for model-family-aware prompt formatting. Defaults to extracting from modelDisplay. */
+  modelId?: string;
 }) {
+  // Extract provider/modelId from modelDisplay if not explicitly provided
+  const provider = params.provider ?? (params.modelDisplay.includes("/") ? params.modelDisplay.split("/")[0] : undefined);
+  const modelId = params.modelId ?? (params.modelDisplay.includes("/") ? params.modelDisplay.split("/").slice(1).join("/") : params.modelDisplay);
+
   const defaultModelRef = resolveDefaultModelForAgent({
     cfg: params.config ?? {},
     agentId: params.agentId,
@@ -225,6 +233,8 @@ export function buildSystemPrompt(params: {
   const ttsHint = params.config ? buildTtsSystemPromptHint(params.config) : undefined;
   return buildAgentSystemPrompt({
     workspaceDir: params.workspaceDir,
+    provider,
+    modelId,
     defaultThinkLevel: params.defaultThinkLevel,
     extraSystemPrompt: params.extraSystemPrompt,
     ownerNumbers: params.ownerNumbers,

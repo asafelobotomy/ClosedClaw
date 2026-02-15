@@ -1,6 +1,12 @@
 import type { ApplyAuthChoiceParams, ApplyAuthChoiceResult } from "./auth-choice.apply.js";
 import { githubCopilotLoginCommand } from "../providers/github-copilot-auth.js";
 import { applyAuthProfileConfig } from "./onboard-auth.js";
+import {
+  NOTE_TITLES,
+  NOTE_ICONS,
+  formatModelSummary,
+  formatNoteWithIcon,
+} from "../wizard/display-helpers.js";
 
 export async function applyAuthChoiceGitHubCopilot(
   params: ApplyAuthChoiceParams,
@@ -13,7 +19,7 @@ export async function applyAuthChoiceGitHubCopilot(
 
   await params.prompter.note(
     [
-      "This will open a GitHub device login to authorize Copilot.",
+      `${NOTE_ICONS.info} This will open a GitHub device login to authorize Copilot.`,
       "Requires an active GitHub Copilot subscription.",
     ].join("\n"),
     "GitHub Copilot",
@@ -21,8 +27,8 @@ export async function applyAuthChoiceGitHubCopilot(
 
   if (!process.stdin.isTTY) {
     await params.prompter.note(
-      "GitHub Copilot login requires an interactive TTY.",
-      "GitHub Copilot",
+      formatNoteWithIcon("warning", "GitHub Copilot login requires an interactive TTY."),
+      NOTE_TITLES.warning,
     );
     return { config: nextConfig };
   }
@@ -30,7 +36,10 @@ export async function applyAuthChoiceGitHubCopilot(
   try {
     await githubCopilotLoginCommand({ yes: true }, params.runtime);
   } catch (err) {
-    await params.prompter.note(`GitHub Copilot login failed: ${String(err)}`, "GitHub Copilot");
+    await params.prompter.note(
+      formatNoteWithIcon("error", `GitHub Copilot login failed: ${String(err)}`),
+      NOTE_TITLES.authFailed,
+    );
     return { config: nextConfig };
   }
 
@@ -57,7 +66,15 @@ export async function applyAuthChoiceGitHubCopilot(
         },
       },
     };
-    await params.prompter.note(`Default model set to ${model}`, "Model configured");
+    await params.prompter.note(
+      formatModelSummary({
+        provider: "GitHub Copilot",
+        models: ["gpt-4o"],
+        defaultModel: model,
+        isLocal: false,
+      }),
+      NOTE_TITLES.providerReady,
+    );
   }
 
   return { config: nextConfig };

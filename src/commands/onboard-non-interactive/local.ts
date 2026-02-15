@@ -23,6 +23,7 @@ import { applyNonInteractiveGatewayConfig } from "./local/gateway-config.js";
 import { logNonInteractiveOnboardingJson } from "./local/output.js";
 import { applyNonInteractiveSkillsConfig } from "./local/skills-config.js";
 import { resolveNonInteractiveWorkspaceDir } from "./local/workspace.js";
+import { withOpenClawDisclaimer } from "../../terminal/links.js";
 
 export async function runNonInteractiveOnboardingLocal(params: {
   opts: OnboardOptions;
@@ -151,7 +152,7 @@ export async function runNonInteractiveOnboardingLocal(params: {
 
   if (!opts.json) {
     runtime.log(
-      `Tip: run \`${formatCliCommand("ClosedClaw configure --section web")}\` to store your Brave API key for web_search. Docs: https://docs.OpenClaw.ai/tools/web`,
+      `Tip: run \`${formatCliCommand("ClosedClaw configure --section web")}\` to store your Brave API key for web_search. Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/tools/web")}`,
     );
   }
 }

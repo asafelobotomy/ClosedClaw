@@ -4,6 +4,11 @@ import { isRemoteEnvironment } from "./oauth-env.js";
 import { createVpsAwareOAuthHandlers } from "./oauth-flow.js";
 import { applyAuthProfileConfig, writeOAuthCredentials } from "./onboard-auth.js";
 import { openUrl } from "./onboard-helpers.js";
+import {
+  NOTE_TITLES,
+  NOTE_ICONS,
+  formatNoteWithIcon,
+} from "../wizard/display-helpers.js";
 
 export async function applyAuthChoiceOAuth(
   params: ApplyAuthChoiceParams,
@@ -28,14 +33,14 @@ export async function applyAuthChoiceOAuth(
     await params.prompter.note(
       isRemote
         ? [
-            "You are running in a remote/VPS environment.",
+            `${NOTE_ICONS.info} You are running in a remote/VPS environment.`,
             "A URL will be shown for you to open in your LOCAL browser.",
             "After signing in, paste the redirect URL back here.",
             "",
             `Redirect URI: ${redirectUri}`,
           ].join("\n")
         : [
-            "Browser will open for Chutes authentication.",
+            `${NOTE_ICONS.info} Browser will open for Chutes authentication.`,
             "If the callback doesn't auto-complete, paste the redirect URL.",
             "",
             `Redirect URI: ${redirectUri}`,
@@ -82,13 +87,16 @@ export async function applyAuthChoiceOAuth(
       spin.stop("Chutes OAuth failed");
       params.runtime.error(String(err));
       await params.prompter.note(
-        [
-          "Trouble with OAuth?",
-          "Verify CHUTES_CLIENT_ID (and CHUTES_CLIENT_SECRET if required).",
-          `Verify the OAuth app redirect URI includes: ${redirectUri}`,
-          "Chutes docs: https://chutes.ai/docs/sign-in-with-chutes/overview",
-        ].join("\n"),
-        "OAuth help",
+        formatNoteWithIcon(
+          "tip",
+          [
+            "Trouble with OAuth?",
+            "Verify CHUTES_CLIENT_ID (and CHUTES_CLIENT_SECRET if required).",
+            `Verify the OAuth app redirect URI includes: ${redirectUri}`,
+            "Chutes docs: https://chutes.ai/docs/sign-in-with-chutes/overview",
+          ].join("\n"),
+        ),
+        NOTE_TITLES.tip,
       );
     }
     return { config: nextConfig };

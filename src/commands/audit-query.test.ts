@@ -6,6 +6,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { stripAnsi } from "../terminal/ansi.js";
 import type { Runtime } from "../runtime.js";
 import { AuditLogger } from "../security/audit-logger.js";
 import {
@@ -267,7 +268,7 @@ describe("audit query commands", () => {
 
       await auditStatsCommand(runtime, {});
 
-      const output = logOutput.join("\n");
+      const output = stripAnsi(logOutput.join("\n"));
       expect(output).toMatch(/Total entries:\s+2/);
       expect(output).toMatch(/By Event Type/);
       expect(output).toMatch(/tool_exec/);

@@ -65,31 +65,15 @@ const QWEN_PORTAL_DEFAULT_COST = {
   cacheWrite: 0,
 };
 
-const OLLAMA_BASE_URL = "http://127.0.0.1:11434/v1";
-const OLLAMA_API_BASE_URL = "http://127.0.0.1:11434";
-const OLLAMA_DEFAULT_CONTEXT_WINDOW = 128000;
-const OLLAMA_DEFAULT_MAX_TOKENS = 8192;
-const OLLAMA_DEFAULT_COST = {
-  input: 0,
-  output: 0,
-  cacheRead: 0,
-  cacheWrite: 0,
-};
-
-interface OllamaModel {
-  name: string;
-  modified_at: string;
-  size: number;
-  digest: string;
-  details?: {
-    family?: string;
-    parameter_size?: string;
-  };
-}
-
-interface OllamaTagsResponse {
-  models: OllamaModel[];
-}
+import {
+  OLLAMA_BASE_URL,
+  OLLAMA_API_BASE_URL,
+  OLLAMA_DEFAULT_CONTEXT_WINDOW,
+  OLLAMA_DEFAULT_MAX_TOKENS,
+  OLLAMA_DEFAULT_COST,
+  type OllamaModel,
+  type OllamaTagsResponse,
+} from "../constants/ollama.js";
 
 async function discoverOllamaModels(): Promise<ModelDefinitionConfig[]> {
   // Skip Ollama discovery in test environments
@@ -482,7 +466,7 @@ export async function resolveImplicitProviders(params: {
 
   // Provide a mock Ollama provider in test environments so default models resolve
   // without requiring a running Ollama daemon or model downloads.
-  if (process.env.VITEST || process.env.NODE_ENV === "test") {
+  if ((process.env.VITEST || process.env.NODE_ENV === "test") && !process.env.CLOSEDCLAW_DISABLE_TEST_OLLAMA) {
     const needsTestOllama = !providers.ollama || (providers.ollama.models?.length ?? 0) === 0;
     if (needsTestOllama) {
       providers.ollama = { ...buildTestOllamaProvider(), apiKey: "test-key" };

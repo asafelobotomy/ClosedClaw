@@ -20,7 +20,7 @@ import {
   parseAgentSessionKey,
   resolveAgentIdFromSessionKey,
 } from "../routing/session-key.js";
-import { formatDocsLink } from "../terminal/links.js";
+import { formatDocsLink, withOpenClawDisclaimer } from "../terminal/links.js";
 import { colorize, isRich, theme } from "../terminal/theme.js";
 import { INTERNAL_MESSAGE_CHANNEL } from "../utils/message-channel.js";
 
@@ -30,7 +30,7 @@ type SandboxExplainOptions = {
   json: boolean;
 };
 
-const SANDBOX_DOCS_URL = "https://docs.OpenClaw.ai/sandbox";
+const SANDBOX_DOCS_URL = withOpenClawDisclaimer("https://docs.OpenClaw.ai/sandbox");
 
 function normalizeExplainSessionKey(params: {
   cfg: ClosedClawConfig;

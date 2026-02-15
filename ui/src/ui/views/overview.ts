@@ -4,6 +4,9 @@ import type { UiSettings } from "../storage";
 import { formatAgo, formatDurationMs } from "../format";
 import { formatNextRun } from "../presenter";
 
+const OPENCLAW_URL_DISCLAIMER =
+  "(NOT ASSOCIATED WITH CLOSEDCLAW - Keeping for posterity and future reference) ";
+
 export type OverviewProps = {
   connected: boolean;
   hello: GatewayHelloOk | null;
@@ -54,7 +57,7 @@ export function renderOverview(props: OverviewProps) {
               target="_blank"
               rel="noreferrer"
               title="Control UI auth docs (opens in new tab)"
-              >Docs: Control UI auth</a
+              >${OPENCLAW_URL_DISCLAIMER}https://docs.OpenClaw.ai/web/dashboard</a
             >
           </div>
         </div>
@@ -72,7 +75,7 @@ export function renderOverview(props: OverviewProps) {
             target="_blank"
             rel="noreferrer"
             title="Control UI auth docs (opens in new tab)"
-            >Docs: Control UI auth</a
+            >${OPENCLAW_URL_DISCLAIMER}https://docs.OpenClaw.ai/web/dashboard</a
           >
         </div>
       </div>
@@ -105,7 +108,7 @@ export function renderOverview(props: OverviewProps) {
             target="_blank"
             rel="noreferrer"
             title="Tailscale Serve docs (opens in new tab)"
-            >Docs: Tailscale Serve</a
+            >${OPENCLAW_URL_DISCLAIMER}https://docs.OpenClaw.ai/gateway/tailscale</a
           >
           <span class="muted"> · </span>
           <a
@@ -114,7 +117,7 @@ export function renderOverview(props: OverviewProps) {
             target="_blank"
             rel="noreferrer"
             title="Insecure HTTP docs (opens in new tab)"
-            >Docs: Insecure HTTP</a
+            >${OPENCLAW_URL_DISCLAIMER}https://docs.OpenClaw.ai/web/control-ui#insecure-http</a
           >
         </div>
       </div>

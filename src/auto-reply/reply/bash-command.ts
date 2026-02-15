@@ -217,7 +217,7 @@ export async function handleBashChatCommand(params: {
 }): Promise<ReplyPayload> {
   if (params.cfg.commands?.bash !== true) {
     return {
-      text: "⚠️ bash is disabled. Set commands.bash=true to enable. Docs: https://docs.OpenClaw.ai/tools/slash-commands#config",
+      text: "⚠️ bash is disabled. Set commands.bash=true to enable. Docs: (NOT ASSOCIATED WITH CLOSEDCLAW - Keeping for posterity and future reference) https://docs.OpenClaw.ai/tools/slash-commands#config",
     };
   }
 

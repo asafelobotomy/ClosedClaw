@@ -211,4 +211,4 @@ You are ClosedClaw. Check for OpenClaw updates daily.
 
 This is the first step toward making ClosedClaw not just a fork, but a **self-evolving fork** that learns from its upstream parent while maintaining its own identity.
 
-Let's build the AI that maintains itself. 🦞
+Let's build the AI that maintains itself. 🦀

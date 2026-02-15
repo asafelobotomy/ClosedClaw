@@ -96,7 +96,6 @@ export const SECURITY_PASSPHRASE = {
   WEAK_PATTERNS: [
     "password",
     "closedclaw",
-    "openclaw",
     "admin",
     "123456",
     "qwerty",

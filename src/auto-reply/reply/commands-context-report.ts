@@ -3,6 +3,7 @@ import type { ReplyPayload } from "../types.js";
 import type { HandleCommandsParams } from "./commands-types.js";
 import { resolveSessionAgentIds } from "../../agents/agent-scope.js";
 import { resolveBootstrapContextForRun } from "../../agents/bootstrap-files.js";
+import { getModelFamily } from "../../agents/model-family.js";
 import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
 import { resolveBootstrapMaxChars } from "../../agents/pi-embedded-helpers.js";
 import { createClosedClawCodingTools } from "../../agents/pi-tools.js";
@@ -58,7 +59,8 @@ async function resolveContextReport(
   }
 
   const workspaceDir = params.workspaceDir;
-  const bootstrapMaxChars = resolveBootstrapMaxChars(params.cfg);
+  const modelFamily = getModelFamily(params.provider, params.model);
+  const bootstrapMaxChars = resolveBootstrapMaxChars(params.cfg, { modelFamily });
   const { bootstrapFiles, contextFiles: injectedFiles } = await resolveBootstrapContextForRun({
     workspaceDir,
     config: params.cfg,
@@ -139,6 +141,8 @@ async function resolveContextReport(
 
   const systemPrompt = buildAgentSystemPrompt({
     workspaceDir,
+    provider: params.provider,
+    modelId: params.model,
     defaultThinkLevel: params.resolvedThinkLevel,
     reasoningLevel: params.resolvedReasoningLevel,
     extraSystemPrompt: undefined,

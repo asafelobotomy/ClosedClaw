@@ -3,6 +3,7 @@ import type { RuntimeEnv } from "../runtime.js";
 import { resolveGatewayPort } from "../config/config.js";
 import { findTailscaleBinary } from "../infra/tailscale.js";
 import { note } from "../terminal/note.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 import { buildGatewayAuthConfig } from "./configure.gateway-auth.js";
 import { confirm, select, text } from "./configure.shared.js";
 import { guardCancel, normalizeGatewayTokenInput, randomToken } from "./onboard-helpers.js";
@@ -144,9 +145,11 @@ export async function promptGatewayConfig(
   let tailscaleResetOnExit = false;
   if (tailscaleMode !== "off") {
     note(
-      ["Docs:", "https://docs.OpenClaw.ai/gateway/tailscale", "https://docs.OpenClaw.ai/web"].join(
-        "\n",
-      ),
+      [
+        "Docs:",
+        withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/tailscale"),
+        withOpenClawDisclaimer("https://docs.OpenClaw.ai/web"),
+      ].join("\n"),
       "Tailscale",
     );
     tailscaleResetOnExit = Boolean(

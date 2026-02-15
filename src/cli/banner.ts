@@ -39,8 +39,8 @@ export function formatCliBannerLine(version: string, options: BannerOptions = {}
   const commitLabel = commit ?? "unknown";
   const tagline = pickTagline(options);
   const rich = options.richTty ?? isRich();
-  const title = "🦞 ClosedClaw";
-  const prefix = "🦞 ";
+  const title = "🦀 ClosedClaw";
+  const prefix = "🦀 ";
   const columns = options.columns ?? process.stdout.columns ?? 120;
   const plainFullLine = `${title} ${version} (${commitLabel}) — ${tagline}`;
   const fitsOnOneLine = visibleWidth(plainFullLine) <= columns;
@@ -70,7 +70,7 @@ const LOBSTER_ASCII = [
   "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██",
   "██░▀▀▀░██░█████░▀▀▀██░██▄░██░▀▀▄██░▀▀░█░██░██▄▀▄▀▄██",
   "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
-  "                  🦞 ClosedClaw 🦞                    ",
+  "                  🦀 ClosedClaw 🦀                    ",
   " ",
 ];
 
@@ -97,9 +97,9 @@ export function formatCliBannerArt(options: BannerOptions = {}): string {
     if (line.includes("ClosedClaw")) {
       return (
         theme.muted("              ") +
-        theme.accent("🦞") +
+        theme.accent("🦀") +
         theme.info(" ClosedClaw ") +
-        theme.accent("🦞")
+        theme.accent("🦀")
       );
     }
     return splitGraphemes(line).map(colorChar).join("");

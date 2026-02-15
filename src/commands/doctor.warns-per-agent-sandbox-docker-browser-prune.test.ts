@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { stripAnsi } from "../terminal/ansi.js";
 import { TIMEOUT_HTTP_DEFAULT_MS } from "../config/constants/index.js";
 
 let originalIsTTY: boolean | undefined;
@@ -379,7 +380,7 @@ describe("doctor command", () => {
           if (title !== "Sandbox" || typeof message !== "string") {
             return false;
           }
-          const normalized = message.replace(/\s+/g, " ").trim();
+          const normalized = stripAnsi(message).replace(/\s+/g, " ").trim();
           return (
             normalized.includes('agents.list (id "work") sandbox docker') &&
             normalized.includes('scope resolves to "shared"')

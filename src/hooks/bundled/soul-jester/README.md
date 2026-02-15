@@ -2,7 +2,7 @@
 
 Small persona swap hook for ClosedClaw - test playful/mischievous personalities.
 
-Docs: https://docs.OpenClaw.ai/hooks/soul-jester
+Docs: (NOT ASSOCIATED WITH CLOSEDCLAW - Keeping for posterity and future reference) https://docs.OpenClaw.ai/hooks/soul-jester
 
 ## Setup
 

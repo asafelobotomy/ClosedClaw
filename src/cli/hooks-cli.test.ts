@@ -16,7 +16,8 @@ const report: HookStatusReport = {
       handlerPath: "/tmp/hooks/session-memory/handler.js",
       hookKey: "session-memory",
       emoji: "💾",
-      homepage: "https://docs.OpenClaw.ai/hooks#session-memory",
+      homepage:
+        "(NOT ASSOCIATED WITH CLOSEDCLAW - Keeping for posterity and future reference) https://docs.OpenClaw.ai/hooks#session-memory",
       events: ["command:new"],
       always: false,
       disabled: false,

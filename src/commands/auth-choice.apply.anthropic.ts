@@ -7,6 +7,11 @@ import {
 } from "./auth-choice.api-key.js";
 import { buildTokenProfileId, validateAnthropicSetupToken } from "./auth-token.js";
 import { applyAuthProfileConfig, setAnthropicApiKey } from "./onboard-auth.js";
+import {
+  NOTE_TITLES,
+  NOTE_ICONS,
+  formatNoteWithIcon,
+} from "../wizard/display-helpers.js";
 
 export async function applyAuthChoiceAnthropic(
   params: ApplyAuthChoiceParams,
@@ -18,10 +23,11 @@ export async function applyAuthChoiceAnthropic(
   ) {
     let nextConfig = params.config;
     await params.prompter.note(
-      ["Run `claude setup-token` in your terminal.", "Then paste the generated token below."].join(
-        "\n",
-      ),
-      "Anthropic setup-token",
+      [
+        `${NOTE_ICONS.info} Run \`claude setup-token\` in your terminal.`,
+        "Then paste the generated token below.",
+      ].join("\n"),
+      "Anthropic Setup Token",
     );
 
     const tokenRaw = await params.prompter.text({

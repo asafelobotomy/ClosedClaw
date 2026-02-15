@@ -2,10 +2,10 @@ import type { RuntimeEnv } from "../runtime.js";
 import { hasBinary } from "../agents/skills.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { runCommandWithTimeout } from "../process/exec.js";
-import { formatDocsLink } from "../terminal/links.js";
+import { formatDocsLink, withOpenClawDisclaimer } from "../terminal/links.js";
 import { isRich, theme } from "../terminal/theme.js";
 
-const SEARCH_TOOL = "https://docs.OpenClaw.ai/mcp.SearchClosedClaw";
+const SEARCH_TOOL = withOpenClawDisclaimer("https://docs.OpenClaw.ai/mcp.SearchClosedClaw");
 const SEARCH_TIMEOUT_MS = 30_000;
 const DEFAULT_SNIPPET_MAX = 220;
 
@@ -160,12 +160,15 @@ async function renderMarkdown(markdown: string, runtime: RuntimeEnv) {
 export async function docsSearchCommand(queryParts: string[], runtime: RuntimeEnv) {
   const query = queryParts.join(" ").trim();
   if (!query) {
-    const docs = formatDocsLink("/", "docs.OpenClaw.ai");
+    const docs = formatDocsLink(
+      "/",
+      withOpenClawDisclaimer("https://docs.OpenClaw.ai/"),
+    );
     if (isRich()) {
       runtime.log(`${theme.muted("Docs:")} ${docs}`);
       runtime.log(`${theme.muted("Search:")} ${formatCliCommand('ClosedClaw docs "your query"')}`);
     } else {
-      runtime.log("Docs: https://docs.OpenClaw.ai/");
+      runtime.log(`Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/")}`);
       runtime.log(`Search: ${formatCliCommand('ClosedClaw docs "your query"')}`);
     }
     return;

@@ -12,6 +12,12 @@ import { normalizeProviderId } from "../agents/model-selection.js";
 import { resolveDefaultAgentWorkspaceDir } from "../agents/workspace.js";
 import { enablePluginInConfig } from "../plugins/enable.js";
 import { resolvePluginProviders } from "../plugins/providers.js";
+import {
+  NOTE_TITLES,
+  NOTE_ICONS,
+  formatModelSummary,
+  formatNoteWithIcon,
+} from "../wizard/display-helpers.js";
 import { isRemoteEnvironment } from "./oauth-env.js";
 import { createVpsAwareOAuthHandlers } from "./oauth-flow.js";
 import { applyAuthProfileConfig } from "./onboard-auth.js";
@@ -109,8 +115,8 @@ export async function applyAuthChoicePluginProvider(
   let nextConfig = enableResult.config;
   if (!enableResult.enabled) {
     await params.prompter.note(
-      `${options.label} plugin is disabled (${enableResult.reason ?? "blocked"}).`,
-      options.label,
+      formatNoteWithIcon("warning", `${options.label} plugin is disabled (${enableResult.reason ?? "blocked"}).`),
+      NOTE_TITLES.warning,
     );
     return { config: nextConfig };
   }
@@ -129,15 +135,18 @@ export async function applyAuthChoicePluginProvider(
   const provider = resolveProviderMatch(providers, options.providerId);
   if (!provider) {
     await params.prompter.note(
-      `${options.label} auth plugin is not available. Enable it and re-run the wizard.`,
-      options.label,
+      formatNoteWithIcon("warning", `${options.label} auth plugin is not available. Enable it and re-run the wizard.`),
+      NOTE_TITLES.warning,
     );
     return { config: nextConfig };
   }
 
   const method = pickAuthMethod(provider, options.methodId) ?? provider.auth[0];
   if (!method) {
-    await params.prompter.note(`${options.label} auth method missing.`, options.label);
+    await params.prompter.note(
+      formatNoteWithIcon("error", `${options.label} auth method missing.`),
+      NOTE_TITLES.error,
+    );
     return { config: nextConfig };
   }
 
@@ -182,18 +191,26 @@ export async function applyAuthChoicePluginProvider(
   if (result.defaultModel) {
     if (params.setDefaultModel) {
       nextConfig = applyDefaultModel(nextConfig, result.defaultModel);
-      await params.prompter.note(`Default model set to ${result.defaultModel}`, "Model configured");
+      await params.prompter.note(
+        formatModelSummary({
+          provider: options.label,
+          models: [result.defaultModel],
+          defaultModel: result.defaultModel,
+          isLocal: false,
+        }),
+        NOTE_TITLES.providerReady,
+      );
     } else if (params.agentId) {
       agentModelOverride = result.defaultModel;
       await params.prompter.note(
-        `Default model set to ${result.defaultModel} for agent "${params.agentId}".`,
-        "Model configured",
+        `${NOTE_ICONS.success} Default model set to ${result.defaultModel} for agent "${params.agentId}".`,
+        NOTE_TITLES.modelConfigured,
       );
     }
   }
 
   if (result.notes && result.notes.length > 0) {
-    await params.prompter.note(result.notes.join("\n"), "Provider notes");
+    await params.prompter.note(result.notes.join("\n"), NOTE_TITLES.info);
   }
 
   return { config: nextConfig, agentModelOverride };

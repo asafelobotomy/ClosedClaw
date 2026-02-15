@@ -13,6 +13,7 @@ import { writeConfigFile } from "../config/config.js";
 import { logConfigUpdated } from "../config/logging.js";
 import { DEFAULT_AGENT_ID, normalizeAgentId } from "../routing/session-key.js";
 import { defaultRuntime } from "../runtime.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 import { resolveUserPath, shortenHomePath } from "../utils.js";
 import { createClackPrompter } from "../wizard/clack-prompter.js";
 import { WizardCancelledError } from "../wizard/prompts.js";
@@ -333,7 +334,7 @@ export async function agentsAddCommand(
         await prompter.note(
           [
             "Routing unchanged. Add bindings when you're ready.",
-            "Docs: https://docs.OpenClaw.ai/concepts/multi-agent",
+            `Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/concepts/multi-agent")}`,
           ].join("\n"),
           "Routing",
         );

@@ -5,6 +5,7 @@ import { formatCliCommand } from "../../cli/command-format.js";
 import { writeConfigFile } from "../../config/config.js";
 import { logConfigUpdated } from "../../config/logging.js";
 import { applyWizardMetadata } from "../onboard-helpers.js";
+import { withOpenClawDisclaimer } from "../../terminal/links.js";
 
 export async function runNonInteractiveOnboardingRemote(params: {
   opts: OnboardOptions;
@@ -47,7 +48,7 @@ export async function runNonInteractiveOnboardingRemote(params: {
     runtime.log(`Remote gateway: ${remoteUrl}`);
     runtime.log(`Auth: ${payload.auth}`);
     runtime.log(
-      `Tip: run \`${formatCliCommand("ClosedClaw configure --section web")}\` to store your Brave API key for web_search. Docs: https://docs.OpenClaw.ai/tools/web`,
+      `Tip: run \`${formatCliCommand("ClosedClaw configure --section web")}\` to store your Brave API key for web_search. Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/tools/web")}`,
     );
   }
 }

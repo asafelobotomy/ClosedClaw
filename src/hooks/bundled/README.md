@@ -39,7 +39,7 @@ Swaps injected `SOUL.md` content with `SOUL_JESTER.md` during a playful window o
 **Events**: `agent:bootstrap`
 **What it does**: Overrides the injected SOUL content before the system prompt is built for testing playful/mischievous personas.
 **Output**: No files written; swaps happen in-memory only.
-**Docs**: https://docs.OpenClaw.ai/hooks/soul-jester
+**Docs**: (NOT ASSOCIATED WITH CLOSEDCLAW - Keeping for posterity and future reference) https://docs.OpenClaw.ai/hooks/soul-jester
 
 **Enable**:
 
@@ -82,7 +82,7 @@ session-memory/
 ---
 name: my-hook
 description: "Short description"
-homepage: https://docs.OpenClaw.ai/hooks#my-hook
+homepage: (NOT ASSOCIATED WITH CLOSEDCLAW - Keeping for posterity and future reference) https://docs.OpenClaw.ai/hooks#my-hook
 metadata:
   { "ClosedClaw": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
@@ -221,4 +221,4 @@ Test your hooks by:
 
 ## Documentation
 
-Full documentation: https://docs.OpenClaw.ai/hooks
+Full documentation: (NOT ASSOCIATED WITH CLOSEDCLAW - Keeping for posterity and future reference) https://docs.OpenClaw.ai/hooks

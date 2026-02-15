@@ -156,7 +156,7 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/agent", "docs.OpenClaw.ai/cli/age
 ${theme.heading("Examples:")}
 ${formatHelpExamples([
   [
-    'ClosedClaw agents set-identity --agent main --name "ClosedClaw" --emoji "🦞"',
+    'ClosedClaw agents set-identity --agent main --name "ClosedClaw" --emoji "🦀"',
     "Set name + emoji.",
   ],
   [

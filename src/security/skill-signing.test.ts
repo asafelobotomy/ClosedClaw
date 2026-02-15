@@ -129,7 +129,7 @@ Do something useful.
   });
 
   it("handles unicode content", () => {
-    const unicode = "# 技能说明\n\n这是一个测试技能。🦞";
+    const unicode = "# 技能说明\n\n这是一个测试技能。🦀";
     const signature = signSkill(unicode, keyPair.privateKeyPem, signerInfo);
     const result = verifySkillSignature(unicode, signature, keyPair.publicKeyPem);
     expect(result.valid).toBe(true);

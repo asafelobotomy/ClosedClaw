@@ -51,7 +51,7 @@ ClosedClaw agents set-identity --workspace ~/.ClosedClaw/workspace --from-identi
 Override fields explicitly:
 
 ```bash
-ClosedClaw agents set-identity --agent main --name "ClosedClaw" --emoji "🦞" --avatar avatars/ClosedClaw.png
+ClosedClaw agents set-identity --agent main --name "ClosedClaw" --emoji "🦀" --avatar avatars/ClosedClaw.png
 ```
 
 Config sample:
@@ -65,7 +65,7 @@ Config sample:
         identity: {
           name: "ClosedClaw",
           theme: "space lobster",
-          emoji: "🦞",
+          emoji: "🦀",
           avatar: "avatars/ClosedClaw.png",
         },
       },

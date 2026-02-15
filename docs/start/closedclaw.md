@@ -1,3 +1,4 @@
+
 ---
 summary: "End-to-end guide for running ClosedClaw as a personal assistant with safety cautions"
 read_when:
@@ -180,17 +181,6 @@ Example:
 - Session metadata (token usage, last route, etc): `~/.ClosedClaw/agents/<agentId>/sessions/sessions.json` (legacy: `~/.ClosedClaw/sessions/sessions.json`)
 - `/new` or `/reset` starts a fresh session for that chat (configurable via `resetTriggers`). If sent alone, the agent replies with a short hello to confirm the reset.
 - `/compact [instructions]` compacts the session context and reports the remaining context budget.
-
-## Heartbeats (proactive mode)
-
-By default, ClosedClaw runs a heartbeat every 30 minutes with the prompt:
-`Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.`
-Set `agents.defaults.heartbeat.every: "0m"` to disable.
-
-- If `HEARTBEAT.md` exists but is effectively empty (only blank lines and markdown headers like `# Heading`), ClosedClaw skips the heartbeat run to save API calls.
-- If the file is missing, the heartbeat still runs and the model decides what to do.
-- If the agent replies with `HEARTBEAT_OK` (optionally with short padding; see `agents.defaults.heartbeat.ackMaxChars`), ClosedClaw suppresses outbound delivery for that heartbeat.
-- Heartbeats run full agent turns — shorter intervals burn more tokens.
 
 ```json5
 {

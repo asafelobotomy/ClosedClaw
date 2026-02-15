@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { stripAnsi } from "../terminal/ansi.js";
 import { TIMEOUT_HTTP_DEFAULT_MS } from "../config/constants/index.js";
 
 let originalIsTTY: boolean | undefined;
@@ -358,7 +359,7 @@ describe("doctor command", () => {
 
       const stateNote = note.mock.calls.find((call) => call[1] === "State integrity");
       expect(stateNote).toBeTruthy();
-      expect(String(stateNote?.[0])).toContain("CRITICAL");
+      expect(stripAnsi(String(stateNote?.[0]))).toContain("CRITICAL");
     },
     TIMEOUT_HTTP_DEFAULT_MS,
   );

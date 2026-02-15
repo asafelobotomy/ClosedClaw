@@ -6,7 +6,8 @@
   "license": "MIT",
   "author": "",
   "bin": {
-    "ClosedClaw": "ClosedClaw.mjs"
+    "ClosedClaw": "ClosedClaw.mjs",
+    "closedclaw": "ClosedClaw.mjs"
   },
   "files": [
     "CHANGELOG.md",

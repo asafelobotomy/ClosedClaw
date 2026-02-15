@@ -2,6 +2,18 @@
 
 Docs: https://docs.OpenClaw.ai
 
+## 2026.2.16
+
+### Model-Adaptive System Prompts & Ollama Onboarding
+
+- Added model family classification system (`src/agents/model-family.ts`) with tier-based prompt optimization
+- System prompts now adapt context file formatting (XML/markdown) based on model's preferred format
+- Added SOUL.md adherence hints calibrated per model tier (frontier vs mid vs small models)
+- Bootstrap file budgets dynamically adjust based on model family and context window
+- New onboarding flow: "Local vs Cloud" deployment choice with explanatory notes
+- Added Ollama auth choice with model picker and download assistance
+- When local is selected, onboarding checks Ollama status and guides users through model setup
+
 ## 2026.2.15
 
 ### TPC Waveform Transport & Token Optimizations

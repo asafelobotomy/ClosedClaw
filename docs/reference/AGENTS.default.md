@@ -88,7 +88,7 @@ git commit -m "Add Clawd workspace"
 
 ## What ClosedClaw Does
 
-- Runs WhatsApp gateway + Pi coding agent so the assistant can read/write chats, fetch context, and run skills via the host Mac.
+- Runs Pi coding agent so the assistant can read/write chats, fetch context, and run skills via the host Mac.
 - macOS app manages permissions (screen recording, notifications, microphone) and exposes the `ClosedClaw` CLI via its bundled binary.
 - Direct chats collapse into the agent's `main` session by default; groups stay isolated as `agent:<agentId>:<channel>:group:<id>` (rooms/channels: `agent:<agentId>:<channel>:channel:<id>`); heartbeats keep background tasks alive.
 
@@ -99,9 +99,7 @@ git commit -m "Add Clawd workspace"
 - **camsnap** — Capture frames, clips, or motion alerts from RTSP/ONVIF security cams.
 - **oracle** — OpenAI-ready agent CLI with session replay and browser control.
 - **eightctl** — Control your sleep, from the terminal.
-- **imsg** — Send, read, stream iMessage & SMS.
-- **wacli** — WhatsApp CLI: sync, search, send.
-- **discord** — Discord actions: react, stickers, polls. Use `user:<id>` or `channel:<id>` targets (bare numeric ids are ambiguous).
+- **slack-cli** — Slack actions: search channels, send messages, manage reactions.
 - **gog** — Google Suite CLI: Gmail, Calendar, Drive, Contacts.
 - **spotify-player** — Terminal Spotify client to search/queue/control playback.
 - **sag** — ElevenLabs speech with mac-style say UX; streams to speakers by default.

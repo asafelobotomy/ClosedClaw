@@ -1,7 +1,9 @@
 import type { ReasoningLevel, ThinkLevel } from "../auto-reply/thinking.js";
 import type { ResolvedTimeFormat } from "./date-time.js";
+import type { ModelFamilyInfo, PreferredFormat } from "./model-family.js";
 import type { EmbeddedContextFile } from "./pi-embedded-helpers.js";
 import { SILENT_REPLY_TOKEN } from "../auto-reply/tokens.js";
+import { getModelFamily } from "./model-family.js";
 import { listDeliverableMessageChannels } from "../utils/message-channel.js";
 
 /**
@@ -79,6 +81,33 @@ function buildSafetySection() {
   ];
 }
 
+/**
+ * Build a SOUL.md adherence hint calibrated to the model's persona capability.
+ * Frontier models get rich, detailed guidance; small models get a single directive.
+ */
+function buildSoulAdherenceHint(family: ModelFamilyInfo | undefined): string {
+  const adherence = family?.personaAdherence ?? 3;
+
+  if (adherence >= 4) {
+    return [
+      "SOUL.md defines your personality, tone, and behavioral identity.",
+      "Fully embody this persona: word choice, humor, emotional coloring, topic preferences.",
+      "Do NOT break character to explain you are an AI unless safety requires it.",
+      "When uncertain, default to the persona's most likely response style.",
+    ].join("\n");
+  }
+
+  if (adherence >= 3) {
+    return [
+      "SOUL.md is your personality. Follow its tone and style in every reply.",
+      "Stay in character. Keep responses consistent with the persona.",
+    ].join("\n");
+  }
+
+  // Small models: single, punchy directive.
+  return "IMPORTANT: Reply using the personality described in SOUL.md. Stay in character.";
+}
+
 function buildReplyTagsSection(isMinimal: boolean) {
   if (isMinimal) {
     return [];
@@ -151,7 +180,7 @@ function buildDocsSection(params: { docsPath?: string; isMinimal: boolean; readT
   return [
     "## Documentation",
     `ClosedClaw docs: ${docsPath}`,
-    "Mirror: https://docs.OpenClaw.ai",
+    "Mirror: (NOT ASSOCIATED WITH CLOSEDCLAW - Keeping for posterity and future reference) https://docs.OpenClaw.ai",
     "Source: https://github.com/ClosedClaw/ClosedClaw",
     "Community: https://discord.com/invite/clawd",
     "Find new skills: https://clawhub.com",
@@ -163,6 +192,10 @@ function buildDocsSection(params: { docsPath?: string; isMinimal: boolean; readT
 
 export function buildAgentSystemPrompt(params: {
   workspaceDir: string;
+  /** Provider id for model-family-aware prompt formatting. */
+  provider?: string;
+  /** Model id for model-family-aware prompt formatting. */
+  modelId?: string;
   defaultThinkLevel?: ThinkLevel;
   reasoningLevel?: ReasoningLevel;
   extraSystemPrompt?: string;
@@ -346,6 +379,13 @@ export function buildAgentSystemPrompt(params: {
   const messageChannelOptions = listDeliverableMessageChannels().join("|");
   const promptMode = params.promptMode ?? "full";
   const isMinimal = promptMode === "minimal" || promptMode === "none";
+
+  // Resolve model family for adaptive formatting.
+  const modelFamily: ModelFamilyInfo | undefined =
+    params.provider && params.modelId
+      ? getModelFamily(params.provider, params.modelId)
+      : undefined;
+
   const skillsSection = buildSkillsSection({
     skillsPrompt,
     isMinimal,
@@ -539,15 +579,40 @@ export function buildAgentSystemPrompt(params: {
       const baseName = normalizedPath.split("/").pop() ?? normalizedPath;
       return baseName.toLowerCase() === "soul.md";
     });
-    lines.push("# Project Context", "", "The following project context files have been loaded:");
+
+    const format: PreferredFormat = modelFamily?.preferredFormat ?? "markdown";
+
+    // Section header — adapted by format.
+    if (format === "xml") {
+      lines.push("<workspace_context>", "");
+    } else {
+      lines.push("# Project Context", "", "The following project context files have been loaded:");
+    }
+
+    // SOUL.md adherence hint — calibrated to model capability.
     if (hasSoulFile) {
-      lines.push(
-        "If SOUL.md is present, embody its persona and tone. Avoid stiff, generic replies; follow its guidance unless higher-priority instructions override it.",
-      );
+      lines.push(buildSoulAdherenceHint(modelFamily));
     }
     lines.push("");
+
+    // Inject each file with format-appropriate delimiters.
     for (const file of contextFiles) {
-      lines.push(`## ${file.path}`, "", file.content, "");
+      switch (format) {
+        case "xml":
+          lines.push(`<file name="${file.path}">`, file.content, "</file>", "");
+          break;
+        case "minimal-markdown":
+          lines.push(`--- ${file.path} ---`, file.content, "");
+          break;
+        case "markdown":
+        default:
+          lines.push(`## ${file.path}`, "", file.content, "");
+          break;
+      }
+    }
+
+    if (format === "xml") {
+      lines.push("</workspace_context>", "");
     }
   }
 

@@ -8,6 +8,7 @@ import type {
 import { formatCliCommand } from "../cli/command-format.js";
 import { readConfigFileSnapshot, resolveGatewayPort, writeConfigFile } from "../config/config.js";
 import { TIMEOUT_HTTP_SHORT_MS, TIMEOUT_TEST_SUITE_MEDIUM_MS } from "../config/constants/index.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 import { logConfigUpdated } from "../config/logging.js";
 import { ensureControlUiAssetsBuilt } from "../infra/control-ui-assets.js";
 import { defaultRuntime } from "../runtime.js";
@@ -101,7 +102,7 @@ async function promptWebToolsConfig(
     [
       "Web search lets your agent look things up online using the `web_search` tool.",
       "It requires a Brave Search API key (you can store it in the config or set BRAVE_API_KEY in the Gateway environment).",
-      "Docs: https://docs.OpenClaw.ai/tools/web",
+      `Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/tools/web")}`,
     ].join("\n"),
     "Web search",
   );
@@ -137,7 +138,7 @@ async function promptWebToolsConfig(
         [
           "No key stored yet, so web_search will stay unavailable.",
           "Store a key here or set BRAVE_API_KEY in the Gateway environment.",
-          "Docs: https://docs.OpenClaw.ai/tools/web",
+          `Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/tools/web")}`,
         ].join("\n"),
         "Web search",
       );
@@ -190,7 +191,7 @@ export async function runConfigureWizard(
           [
             ...snapshot.issues.map((iss) => `- ${iss.path}: ${iss.message}`),
             "",
-            "Docs: https://docs.OpenClaw.ai/gateway/configuration",
+            `Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/configuration")}`,
           ].join("\n"),
           "Config issues",
         );
@@ -394,8 +395,8 @@ export async function runConfigureWizard(
           note(
             [
               "Docs:",
-              "https://docs.OpenClaw.ai/gateway/health",
-              "https://docs.OpenClaw.ai/gateway/troubleshooting",
+              withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/health"),
+              withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/troubleshooting"),
             ].join("\n"),
             "Health check help",
           );
@@ -521,8 +522,8 @@ export async function runConfigureWizard(
             note(
               [
                 "Docs:",
-                "https://docs.OpenClaw.ai/gateway/health",
-                "https://docs.OpenClaw.ai/gateway/troubleshooting",
+                withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/health"),
+                withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/troubleshooting"),
               ].join("\n"),
               "Health check help",
             );
@@ -582,7 +583,7 @@ export async function runConfigureWizard(
         `Web UI: ${links.httpUrl}`,
         `Gateway WS: ${links.wsUrl}`,
         gatewayStatusLine,
-        "Docs: https://docs.OpenClaw.ai/web/control-ui",
+        `Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/web/control-ui")}`,
       ].join("\n"),
       "Control UI",
     );

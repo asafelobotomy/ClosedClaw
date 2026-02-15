@@ -323,7 +323,7 @@ describe("CHANNELS constants", () => {
 
   describe("upstream", () => {
     it("should have correct remote name", () => {
-      expect(CHANNELS.UPSTREAM.REMOTE).toBe("openclaw");
+      expect(CHANNELS.UPSTREAM.REMOTE).toBe("closedclaw");
     });
 
     it("should have correct branch", () => {

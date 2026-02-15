@@ -27,6 +27,7 @@ import {
 } from "../../channel-tools.js";
 import { resolveClosedClawDocsPath } from "../../docs-path.js";
 import { isTimeoutError } from "../../failover-error.js";
+import { getModelFamily } from "../../model-family.js";
 import { resolveModelAuthMode } from "../../model-auth.js";
 import { resolveDefaultModelForAgent } from "../../model-selection.js";
 import {
@@ -191,6 +192,9 @@ export async function runEmbeddedAttempt(
         config: params.config,
         sessionKey: params.sessionKey,
         sessionId: params.sessionId,
+        provider: params.provider,
+        modelId: params.modelId,
+        contextWindow: params.model?.contextWindow,
         warn: makeBootstrapWarn({ sessionLabel, warn: (message) => log.warn(message) }),
       });
     const workspaceNotes = hookAdjustedBootstrapFiles.some(
@@ -386,7 +390,10 @@ export async function runEmbeddedAttempt(
       provider: params.provider,
       model: params.modelId,
       workspaceDir: effectiveWorkspace,
-      bootstrapMaxChars: resolveBootstrapMaxChars(params.config),
+      bootstrapMaxChars: resolveBootstrapMaxChars(params.config, {
+        modelFamily: getModelFamily(params.provider, params.modelId),
+        contextWindow: params.model?.contextWindow,
+      }),
       sandbox: (() => {
         const runtime = resolveSandboxRuntimeStatus({
           cfg: params.config,

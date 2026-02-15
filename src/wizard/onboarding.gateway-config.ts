@@ -9,6 +9,7 @@ import type {
 import type { WizardPrompter } from "./prompts.js";
 import { normalizeGatewayTokenInput, randomToken } from "../commands/onboard-helpers.js";
 import { findTailscaleBinary } from "../infra/tailscale.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 
 type ConfigureGatewayOptions = {
   flow: WizardFlow;
@@ -144,9 +145,11 @@ export async function configureGatewayForOnboarding(
   let tailscaleResetOnExit = quickMode ? quickstartGateway.tailscaleResetOnExit : false;
   if (tailscaleMode !== "off" && !quickMode) {
     await prompter.note(
-      ["Docs:", "https://docs.OpenClaw.ai/gateway/tailscale", "https://docs.OpenClaw.ai/web"].join(
-        "\n",
-      ),
+      [
+        "Docs:",
+        withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/tailscale"),
+        withOpenClawDisclaimer("https://docs.OpenClaw.ai/web"),
+      ].join("\n"),
       "Tailscale",
     );
     tailscaleResetOnExit = Boolean(

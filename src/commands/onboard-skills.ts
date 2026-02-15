@@ -4,6 +4,7 @@ import type { WizardPrompter } from "../wizard/prompts.js";
 import { installSkill } from "../agents/skills-install.js";
 import { buildWorkspaceSkillStatus } from "../agents/skills-status.js";
 import { formatCliCommand } from "../cli/command-format.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 import { detectBinary, resolveNodeManagerOptions } from "./onboard-helpers.js";
 
 function summarizeInstallFailure(message: string): string | undefined {
@@ -169,7 +170,7 @@ export async function setupSkills(
         runtime.log(
           `Tip: run \`${formatCliCommand("ClosedClaw doctor")}\` to review skills + requirements.`,
         );
-        runtime.log("Docs: https://docs.OpenClaw.ai/skills");
+        runtime.log(`Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/skills")}`);
       }
     }
   }

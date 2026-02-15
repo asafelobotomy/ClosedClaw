@@ -54,6 +54,7 @@ describe("models-config", () => {
       const previousSynthetic = process.env.SYNTHETIC_API_KEY;
       const previousVenice = process.env.VENICE_API_KEY;
       const previousXiaomi = process.env.XIAOMI_API_KEY;
+      const previousDisableTestOllama = process.env.CLOSEDCLAW_DISABLE_TEST_OLLAMA;
       delete process.env.COPILOT_GITHUB_TOKEN;
       delete process.env.GH_TOKEN;
       delete process.env.GITHUB_TOKEN;
@@ -63,6 +64,7 @@ describe("models-config", () => {
       delete process.env.SYNTHETIC_API_KEY;
       delete process.env.VENICE_API_KEY;
       delete process.env.XIAOMI_API_KEY;
+      process.env.CLOSEDCLAW_DISABLE_TEST_OLLAMA = "1";
 
       try {
         vi.resetModules();
@@ -123,6 +125,11 @@ describe("models-config", () => {
           delete process.env.XIAOMI_API_KEY;
         } else {
           process.env.XIAOMI_API_KEY = previousXiaomi;
+        }
+        if (previousDisableTestOllama === undefined) {
+          delete process.env.CLOSEDCLAW_DISABLE_TEST_OLLAMA;
+        } else {
+          process.env.CLOSEDCLAW_DISABLE_TEST_OLLAMA = previousDisableTestOllama;
         }
       }
     });

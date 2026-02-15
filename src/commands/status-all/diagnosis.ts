@@ -7,6 +7,7 @@ import {
 } from "../../infra/restart-sentinel.js";
 import { formatAge, redactSecrets } from "./format.js";
 import { readFileTailLines, summarizeLogTail } from "./gateway.js";
+import { withOpenClawDisclaimer } from "../../terminal/links.js";
 
 type ConfigIssueLike = { path: string; message: string };
 type ConfigSnapshotLike = {
@@ -242,6 +243,8 @@ export async function appendStatusAllDiagnosis(params: {
 
   lines.push("");
   lines.push(muted("Pasteable debug report. Auth tokens redacted."));
-  lines.push("Troubleshooting: https://docs.OpenClaw.ai/troubleshooting");
+  lines.push(
+    `Troubleshooting: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/troubleshooting")}`,
+  );
   lines.push("");
 }

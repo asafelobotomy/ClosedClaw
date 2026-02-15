@@ -32,6 +32,7 @@ import { isSystemdUserServiceAvailable } from "../daemon/systemd.js";
 import { ensureControlUiAssetsBuilt } from "../infra/control-ui-assets.js";
 import { runTui } from "../tui/tui.js";
 import { resolveUserPath } from "../utils.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 
 type FinalizeOnboardingOptions = {
   flow: WizardFlow;
@@ -221,8 +222,8 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       await prompter.note(
         [
           "Docs:",
-          "https://docs.OpenClaw.ai/gateway/health",
-          "https://docs.OpenClaw.ai/gateway/troubleshooting",
+          withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/health"),
+          withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/troubleshooting"),
         ].join("\n"),
         "Health check help",
       );
@@ -270,7 +271,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       "Auth required: paste your gateway token or password in Control UI settings.",
       `Gateway WS: ${links.wsUrl}`,
       gatewayStatusLine,
-      "Docs: https://docs.OpenClaw.ai/web/control-ui",
+      `Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/web/control-ui")}`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -375,13 +376,13 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
   await prompter.note(
     [
       "Back up your agent workspace.",
-      "Docs: https://docs.OpenClaw.ai/concepts/agent-workspace",
+      `Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/concepts/agent-workspace")}`,
     ].join("\n"),
     "Workspace backup",
   );
 
   await prompter.note(
-    "Running agents on your computer is risky — harden your setup: https://docs.OpenClaw.ai/security",
+    `Running agents on your computer is risky — harden your setup: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/security")}`,
     "Security",
   );
 
@@ -427,7 +428,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
 
   const nextSteps: string[] = [
     "Add nodes for extra features: macOS/iOS/Android apps.",
-    "Back up your agent workspace (docs: https://docs.OpenClaw.ai/concepts/agent-workspace).",
+    `Back up your agent workspace (docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/concepts/agent-workspace")}).`,
   ];
 
   if (!hasWebSearchKey) {
@@ -447,7 +448,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       : "Onboarding complete. Use the dashboard link above and paste your token/password when prompted.";
 
   const securityOneLiner =
-    " Security: running agents is powerful and risky—harden your setup: https://docs.OpenClaw.ai/security";
+    ` Security: running agents is powerful and risky—harden your setup: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/security")}`;
 
   await prompter.outro(`${outroBase}${securityOneLiner}`);
 }

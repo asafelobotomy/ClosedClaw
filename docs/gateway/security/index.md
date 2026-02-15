@@ -302,7 +302,7 @@ Assume “compromised” means: someone got into a room that can trigger the bot
 
 ## Lessons Learned (The Hard Way)
 
-### The `find ~` Incident 🦞
+### The `find ~` Incident 🦀
 
 On Day 1, a friendly tester asked Clawd to run `find ~` and share the output. Clawd happily dumped the entire home directory structure to a group chat.
 
@@ -813,4 +813,4 @@ Found a vulnerability in ClosedClaw? Please report responsibly:
 
 _"Security is a process, not a product. Also, don't trust lobsters with shell access."_ — Someone wise, probably
 
-🦞🔐
+🦀🔐

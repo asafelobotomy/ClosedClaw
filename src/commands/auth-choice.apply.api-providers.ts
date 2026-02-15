@@ -50,6 +50,11 @@ import {
   ZAI_DEFAULT_MODEL_REF,
 } from "./onboard-auth.js";
 import { OPENCODE_ZEN_DEFAULT_MODEL } from "./opencode-zen-model-default.js";
+import {
+  NOTE_TITLES,
+  NOTE_ICONS,
+  formatModelSummary,
+} from "../wizard/display-helpers.js";
 
 export async function applyAuthChoiceApiProviders(
   params: ApplyAuthChoiceParams,
@@ -61,8 +66,8 @@ export async function applyAuthChoiceApiProviders(
       return;
     }
     await params.prompter.note(
-      `Default model set to ${model} for agent "${params.agentId}".`,
-      "Model configured",
+      `${NOTE_ICONS.success} Default model set to ${model} for agent "${params.agentId}".`,
+      NOTE_TITLES.modelConfigured,
     );
   };
 
@@ -291,7 +296,7 @@ export async function applyAuthChoiceApiProviders(
     if (!hasCredential) {
       await params.prompter.note(
         [
-          "Kimi Coding uses a dedicated endpoint and API key.",
+          `${NOTE_ICONS.info} Kimi Coding uses a dedicated endpoint and API key.`,
           "Get your API key at: https://www.kimi.com/code/en",
         ].join("\n"),
         "Kimi Coding",
@@ -373,8 +378,13 @@ export async function applyAuthChoiceApiProviders(
       nextConfig = applied.next;
       if (applied.changed) {
         await params.prompter.note(
-          `Default model set to ${GOOGLE_GEMINI_DEFAULT_MODEL}`,
-          "Model configured",
+          formatModelSummary({
+            provider: "Google Gemini",
+            models: [GOOGLE_GEMINI_DEFAULT_MODEL],
+            defaultModel: GOOGLE_GEMINI_DEFAULT_MODEL,
+            isLocal: false,
+          }),
+          NOTE_TITLES.providerReady,
         );
       }
     } else {
@@ -538,7 +548,7 @@ export async function applyAuthChoiceApiProviders(
     if (!hasCredential) {
       await params.prompter.note(
         [
-          "Venice AI provides privacy-focused inference with uncensored models.",
+          `${NOTE_ICONS.info} Venice AI provides privacy-focused inference with uncensored models.`,
           "Get your API key at: https://venice.ai/settings/api",
           "Supports 'private' (fully private) and 'anonymized' (proxy) modes.",
         ].join("\n"),
@@ -596,7 +606,7 @@ export async function applyAuthChoiceApiProviders(
     if (!hasCredential) {
       await params.prompter.note(
         [
-          "OpenCode Zen provides access to Claude, GPT, Gemini, and more models.",
+          `${NOTE_ICONS.info} OpenCode Zen provides access to Claude, GPT, Gemini, and more models.`,
           "Get your API key at: https://opencode.ai/auth",
           "Requires an active OpenCode Zen subscription.",
         ].join("\n"),

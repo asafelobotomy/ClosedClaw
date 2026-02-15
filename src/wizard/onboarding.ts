@@ -12,6 +12,7 @@ import { listChannelPlugins } from "../channels/plugins/index.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { installCompletion } from "../cli/completion-cli.js";
 import { promptAuthChoiceGrouped } from "../commands/auth-choice-prompt.js";
+import type { DeploymentType } from "../commands/auth-choice-options.js";
 import {
   applyAuthChoice,
   resolvePreferredProviderForAuthChoice,
@@ -19,6 +20,7 @@ import {
 } from "../commands/auth-choice.js";
 import { applyPrimaryModel, promptDefaultModel } from "../commands/model-picker.js";
 import { setupChannels } from "../commands/onboard-channels.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 import {
   applyWizardMetadata,
   DEFAULT_WORKSPACE,
@@ -88,7 +90,7 @@ async function requireRiskAcknowledgement(params: {
       "ClosedClaw security audit --deep",
       "ClosedClaw security audit --fix",
       "",
-      "Must read: https://docs.OpenClaw.ai/gateway/security",
+      `Must read: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/security")}`,
     ].join("\n"),
     "Security",
   );
@@ -124,7 +126,7 @@ export async function runOnboardingWizard(
         [
           ...snapshot.issues.map((iss) => `- ${iss.path}: ${iss.message}`),
           "",
-          "Docs: https://docs.OpenClaw.ai/gateway/configuration",
+          `Docs: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/gateway/configuration")}`,
         ].join("\n"),
         "Config issues",
       );
@@ -171,12 +173,13 @@ export async function runOnboardingWizard(
     }));
 
   // Calibrate step counter after flow selection.
+  // +1 for deployment type selection (local/cloud) in non-express flows.
   if (flow === "express") {
     stepper.setTotal(4);
   } else if (flow === "advanced") {
-    stepper.setTotal(8);
+    stepper.setTotal(9);
   } else {
-    stepper.setTotal(6);
+    stepper.setTotal(7);
   }
 
   if (opts.mode === "remote" && flow === "quickstart") {
@@ -409,15 +412,83 @@ export async function runOnboardingWizard(
   const authStore = ensureAuthProfileStore(undefined, {
     allowKeychainPrompt: false,
   });
+
+  // --- Deployment type: local open-source vs cloud proprietary ---
+  let deploymentFilter: DeploymentType | undefined;
   const authChoiceFromPrompt = opts.authChoice === undefined;
+  if (authChoiceFromPrompt && flow !== "express") {
+    const deploymentChoice = await prompter.select<"local" | "cloud" | "all">({
+      message: stepper.label("Where should your AI model run?"),
+      options: [
+        {
+          value: "local",
+          label: "Open Source Models (local)",
+          hint: "Run models on your own hardware via Ollama — free, private, no API keys",
+        },
+        {
+          value: "cloud",
+          label: "Proprietary Models (cloud)",
+          hint: "Use cloud providers (OpenAI, Anthropic, Google, etc.) — requires API keys",
+        },
+        {
+          value: "all",
+          label: "Show all providers",
+          hint: "Browse every available option",
+        },
+      ],
+      initialValue: "all",
+    });
+
+    if (deploymentChoice === "local" || deploymentChoice === "cloud") {
+      deploymentFilter = deploymentChoice;
+    }
+
+    // Show a brief explanation about model differences.
+    if (deploymentChoice === "local") {
+      await prompter.note(
+        [
+          "Local open-source models run directly on your machine via Ollama.",
+          "No API keys needed — just install Ollama and pull a model.",
+          "",
+          "Tradeoffs:",
+          "- Free and private: your data never leaves your machine.",
+          "- Smaller models (8B) are fast but have limited persona/context.",
+          "- Larger models (70B+) need significant RAM/VRAM but rival cloud quality.",
+          "- Onboarding adapts automatically to your model's capabilities.",
+          "",
+          "If you skip auth setup, ClosedClaw defaults to Ollama with Qwen3:8B.",
+        ].join("\n"),
+        "Local Models",
+      );
+    } else if (deploymentChoice === "cloud") {
+      await prompter.note(
+        [
+          "Cloud models are hosted by providers like OpenAI, Anthropic, and Google.",
+          "They require API keys or OAuth but offer the highest capabilities.",
+          "",
+          "Tradeoffs:",
+          "- Frontier models (Claude, GPT, Gemini) excel at persona, creativity, and long context.",
+          "- Costs vary — some providers offer free tiers or generous quotas.",
+          "- Your messages are sent to the provider's servers.",
+          "",
+          "ClosedClaw will tailor system prompts and onboarding to your chosen model's strengths.",
+        ].join("\n"),
+        "Cloud Models",
+      );
+    }
+  }
+
   const authChoice =
     opts.authChoice ??
-    (await promptAuthChoiceGrouped({
-      prompter,
-      store: authStore,
-      includeSkip: true,
-      message: stepper.label("Model/auth provider"),
-    }));
+    (deploymentFilter === "local"
+      ? ("ollama" as const)
+      : await promptAuthChoiceGrouped({
+          prompter,
+          store: authStore,
+          includeSkip: true,
+          message: stepper.label("Model/auth provider"),
+          deploymentFilter,
+        }));
 
   const authResult = await applyAuthChoice({
     authChoice,

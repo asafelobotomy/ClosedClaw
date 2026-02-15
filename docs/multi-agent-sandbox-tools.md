@@ -71,11 +71,11 @@ For debugging “why is this blocked?”, see [Sandbox vs Tool Policy vs Elevate
     {
       "agentId": "family",
       "match": {
-        "provider": "whatsapp",
+        "provider": "slack",
         "accountId": "*",
         "peer": {
-          "kind": "group",
-          "id": "120363424282127706@g.us"
+          "kind": "channel",
+          "id": "C0123456789"
         }
       }
     }
@@ -111,7 +111,7 @@ For debugging “why is this blocked?”, see [Sandbox vs Tool Policy vs Elevate
         },
         "tools": {
           "allow": ["read", "write", "apply_patch", "exec"],
-          "deny": ["browser", "gateway", "discord"]
+          "deny": ["browser", "gateway"]
         }
       }
     ]

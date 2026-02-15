@@ -73,7 +73,7 @@
 
 **Completed**: 2026-02-12 (Day 1)
 
-**Impact**: Right now Qwen3 can only chat. Enabling tools gives it browser control, file operations, shell execution, web search, memory, cron, and canvas — the full OpenClaw feature set.
+**Impact**: Right now Qwen3 can only chat. Enabling tools gives it browser control, file operations, shell execution, web search, memory, cron, and canvas — the full ClosedClaw feature set.
 
 **Current state**:
 
@@ -418,7 +418,7 @@
 
 ### 5.4 Upstream Sync Strategy
 
-- `closedclaw upstream` command suite exists for tracking OpenClaw
+- `closedclaw upstream` command suite exists for tracking upstream changes
 - Define merge policy: security patches yes, new channels no
 - Track divergence points for manual review
 

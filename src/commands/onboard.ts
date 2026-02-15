@@ -8,6 +8,7 @@ import { resolveUserPath } from "../utils.js";
 import { DEFAULT_WORKSPACE, handleReset } from "./onboard-helpers.js";
 import { runInteractiveOnboarding } from "./onboard-interactive.js";
 import { runNonInteractiveOnboarding } from "./onboard-non-interactive.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 
 export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv = defaultRuntime) {
   assertSupportedRuntime(runtime);
@@ -44,7 +45,7 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
     runtime.error(
       [
         "Non-interactive onboarding requires explicit risk acknowledgement.",
-        "Read: https://docs.OpenClaw.ai/security",
+        `Read: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/security")}`,
         `Re-run with: ${formatCliCommand("ClosedClaw onboard --non-interactive --accept-risk ...")}`,
       ].join("\n"),
     );

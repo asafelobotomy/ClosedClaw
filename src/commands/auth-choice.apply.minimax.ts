@@ -15,6 +15,10 @@ import {
   applyMinimaxProviderConfig,
   setMinimaxApiKey,
 } from "./onboard-auth.js";
+import {
+  NOTE_TITLES,
+  NOTE_ICONS,
+} from "../wizard/display-helpers.js";
 
 export async function applyAuthChoiceMiniMax(
   params: ApplyAuthChoiceParams,
@@ -26,8 +30,8 @@ export async function applyAuthChoiceMiniMax(
       return;
     }
     await params.prompter.note(
-      `Default model set to ${model} for agent "${params.agentId}".`,
-      "Model configured",
+      `${NOTE_ICONS.success} Default model set to ${model} for agent "${params.agentId}".`,
+      NOTE_TITLES.modelConfigured,
     );
   };
   if (params.authChoice === "minimax-portal") {

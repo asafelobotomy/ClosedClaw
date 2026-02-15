@@ -59,7 +59,6 @@ Per agent, on the Gateway host:
 
 - Store: `~/.ClosedClaw/agents/<agentId>/sessions/sessions.json`
 - Transcripts: `~/.ClosedClaw/agents/<agentId>/sessions/<sessionId>.jsonl`
-  - Telegram topic sessions: `.../<sessionId>-topic-<threadId>.jsonl`
 
 ClosedClaw resolves these via `src/config/sessions.ts`.
 

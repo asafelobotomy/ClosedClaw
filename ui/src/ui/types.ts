@@ -57,16 +57,7 @@ export type ChannelAccountSnapshot = {
 };
 
 /**
- * Removed platform status types (v2026.2 platform removal):
- * - WhatsAppSelf, WhatsAppDisconnect, WhatsAppStatus
- * - TelegramBot, TelegramWebhook, TelegramProbe, TelegramStatus
- * - DiscordBot, DiscordProbe, DiscordStatus
- * - SlackBot, SlackTeam, SlackProbe, SlackStatus
- * - SignalProbe, SignalStatus
- * - IMessageProbe, IMessageStatus
- * - GoogleChatProbe, GoogleChatStatus
- * - NostrProfile, NostrStatus
- * - MSTeamsProbe, MSTeamsStatus
+ * Removed platform status types (v2026.2 platform removal).
  */
 
 export type ConfigSnapshotIssue = {

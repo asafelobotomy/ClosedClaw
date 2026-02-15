@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { describe, expect, it, vi } from "vitest";
 import { TIMEOUT_HTTP_DEFAULT_MS } from "../config/constants/index.js";
+import { stripAnsi } from "../terminal/ansi.js";
 
 const callGateway = vi.fn(async () => ({ ok: true }));
 const startGatewayServer = vi.fn(async () => ({
@@ -206,7 +207,7 @@ describe("gateway-cli coverage", () => {
       from: "user",
     });
 
-    const out = runtimeLogs.join("\n");
+    const out = stripAnsi(runtimeLogs.join("\n"));
     expect(out).toContain("Gateway Discovery");
     expect(out).toContain("Found 1 gateway(s)");
     expect(out).toContain("- Studio ClosedClaw.internal.");

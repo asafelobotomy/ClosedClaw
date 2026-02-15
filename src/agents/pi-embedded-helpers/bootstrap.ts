@@ -2,6 +2,7 @@ import type { AgentMessage } from "@mariozechner/pi-agent-core";
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { ClosedClawConfig } from "../../config/config.js";
+import type { ModelFamilyInfo } from "../model-family.js";
 import type { WorkspaceBootstrapFile } from "../workspace.js";
 import type { EmbeddedContextFile } from "./types.js";
 
@@ -92,11 +93,37 @@ type TrimBootstrapResult = {
   originalLength: number;
 };
 
-export function resolveBootstrapMaxChars(cfg?: ClosedClawConfig): number {
+/**
+ * Resolve the maximum character budget for a single bootstrap context file.
+ *
+ * Priority:
+ * 1. Explicit `bootstrapMaxChars` from config (user override).
+ * 2. Model-family-aware budget: min(15% of context window, family soft cap).
+ * 3. Fallback to {@link DEFAULT_BOOTSTRAP_MAX_CHARS}.
+ */
+export function resolveBootstrapMaxChars(
+  cfg?: ClosedClawConfig,
+  opts?: { modelFamily?: ModelFamilyInfo; contextWindow?: number },
+): number {
+  // 1. Explicit user override wins.
   const raw = cfg?.agents?.defaults?.bootstrapMaxChars;
   if (typeof raw === "number" && Number.isFinite(raw) && raw > 0) {
     return Math.floor(raw);
   }
+
+  // 2. Model-family-aware budget.
+  const family = opts?.modelFamily;
+  if (family) {
+    const familyCap = family.maxUsefulSystemPromptChars;
+    const contextWindow = opts?.contextWindow;
+    if (contextWindow && contextWindow > 0) {
+      // Never use more than 15% of the context window for a single file.
+      const contextBudgetLimit = Math.floor(contextWindow * 0.15);
+      return Math.min(contextBudgetLimit, familyCap);
+    }
+    return familyCap;
+  }
+
   return DEFAULT_BOOTSTRAP_MAX_CHARS;
 }
 

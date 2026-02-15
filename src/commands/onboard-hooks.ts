@@ -4,6 +4,7 @@ import type { WizardPrompter } from "../wizard/prompts.js";
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { buildWorkspaceHookStatus } from "../hooks/hooks-status.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
 
 export async function setupInternalHooks(
   cfg: ClosedClawConfig,
@@ -15,7 +16,7 @@ export async function setupInternalHooks(
       "Hooks let you automate actions when agent commands are issued.",
       "Example: Save session context to memory when you issue /new.",
       "",
-      "Learn more: https://docs.OpenClaw.ai/hooks",
+      `Learn more: ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/hooks")}`,
     ].join("\n"),
     "Hooks",
   );

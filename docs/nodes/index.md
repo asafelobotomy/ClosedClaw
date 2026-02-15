@@ -18,7 +18,7 @@ macOS can also run in **node mode**: the menubar app connects to the Gateway’s
 Notes:
 
 - Nodes are **peripherals**, not gateways. They don’t run the gateway service.
-- Telegram/WhatsApp/etc. messages land on the **gateway**, not on nodes.
+- Channel messages land on the **gateway**, not on nodes.
 
 ## Pairing + status
 

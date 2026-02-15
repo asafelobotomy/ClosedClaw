@@ -301,7 +301,7 @@ describe("buildAgentSystemPrompt", () => {
     expect(prompt).toContain("Bravo");
   });
 
-  it("adds SOUL guidance when a soul file is present", () => {
+  it("includes SOUL.md adherence hint when SOUL.md present (default tier)", () => {
     const prompt = buildAgentSystemPrompt({
       workspaceDir: "/tmp/ClosedClaw",
       contextFiles: [
@@ -310,9 +310,22 @@ describe("buildAgentSystemPrompt", () => {
       ],
     });
 
-    expect(prompt).toContain(
-      "If SOUL.md is present, embody its persona and tone. Avoid stiff, generic replies; follow its guidance unless higher-priority instructions override it.",
-    );
+    // Without provider/modelId, falls back to default (adherence=3) hint.
+    expect(prompt).toContain("SOUL.md is your personality");
+    expect(prompt).toContain("Stay in character");
+  });
+
+  it("includes enriched SOUL.md hint for frontier models", () => {
+    const prompt = buildAgentSystemPrompt({
+      workspaceDir: "/tmp/ClosedClaw",
+      provider: "anthropic",
+      modelId: "claude-sonnet-4-5",
+      contextFiles: [{ path: "./SOUL.md", content: "Persona" }],
+    });
+
+    // Frontier models (adherence >= 4) get the detailed hint.
+    expect(prompt).toContain("SOUL.md defines your personality, tone, and behavioral identity");
+    expect(prompt).toContain("Do NOT break character");
   });
 
   it("summarizes the message tool when available", () => {

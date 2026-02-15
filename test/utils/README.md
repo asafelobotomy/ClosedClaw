@@ -44,7 +44,7 @@ Core testing utilities re-exported via barrel:
 
 Test doubles and stubs:
 
-- **baileys.ts**: WhatsApp Baileys library mock
+- **baileys.ts**: (legacy) WhatsApp Baileys library mock
 
 ### Fixtures (`test/fixtures/`)
 
@@ -77,7 +77,7 @@ const agentConfig = createTestAgentConfig("myagent", {
 });
 
 // Channel-specific config
-const channelConfig = createTestChannelConfig("telegram", {
+const channelConfig = createTestChannelConfig("slack", {
   token: "test-token",
 });
 
@@ -99,8 +99,8 @@ import {
 } from "../test/utils/index.js";
 
 // Create session key
-const key = createTestSessionKey("telegram", "dm", "user123");
-// => "agent:main:telegram:dm:user123"
+const key = createTestSessionKey("slack", "dm", "user123");
+// => "agent:main:slack:dm:user123"
 
 // Create session with defaults
 const session = createTestSession(key);

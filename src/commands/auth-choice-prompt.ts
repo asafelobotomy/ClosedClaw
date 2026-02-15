@@ -1,7 +1,7 @@
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 import type { AuthChoice } from "./onboard-types.js";
-import { buildAuthChoiceGroups } from "./auth-choice-options.js";
+import { type DeploymentType, buildAuthChoiceGroups } from "./auth-choice-options.js";
 
 const BACK_VALUE = "__back";
 
@@ -10,8 +10,12 @@ export async function promptAuthChoiceGrouped(params: {
   store: AuthProfileStore;
   includeSkip: boolean;
   message?: string;
+  deploymentFilter?: DeploymentType;
 }): Promise<AuthChoice> {
-  const { groups, skipOption } = buildAuthChoiceGroups(params);
+  const { groups, skipOption } = buildAuthChoiceGroups({
+    ...params,
+    deploymentFilter: params.deploymentFilter,
+  });
   const availableGroups = groups.filter((group) => group.options.length > 0);
 
   while (true) {

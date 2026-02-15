@@ -1624,4 +1624,4 @@ User reviews → Merge → Repeat
 
 **ClosedClaw is more than an AI assistant. It's the first assistant that maintains itself.**
 
-**Let's build the future of AI development. 🦞**
+**Let's build the future of AI development. 🦀**

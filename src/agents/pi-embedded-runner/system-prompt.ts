@@ -47,8 +47,16 @@ export function buildEmbeddedSystemPrompt(params: {
   userTimeFormat?: ResolvedTimeFormat;
   contextFiles?: EmbeddedContextFile[];
 }): string {
+  // Extract provider and model for model-family-aware prompt formatting
+  const provider = params.runtimeInfo.provider;
+  const modelId = params.runtimeInfo.model?.includes("/")
+    ? params.runtimeInfo.model.split("/").slice(1).join("/")
+    : params.runtimeInfo.model;
+
   return buildAgentSystemPrompt({
     workspaceDir: params.workspaceDir,
+    provider,
+    modelId,
     defaultThinkLevel: params.defaultThinkLevel,
     reasoningLevel: params.reasoningLevel,
     extraSystemPrompt: params.extraSystemPrompt,

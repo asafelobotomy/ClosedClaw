@@ -57,4 +57,51 @@ describe("resolveBootstrapContextForRun", () => {
 
     expect(extra?.content).toBe("extra");
   });
+
+  it("accepts provider and modelId for model-adaptive budget calculation", async () => {
+    const workspaceDir = await makeTempWorkspace("ClosedClaw-bootstrap-context-");
+
+    // With a small model, budget should be smaller
+    const resultSmall = await resolveBootstrapContextForRun({
+      workspaceDir,
+      provider: "ollama",
+      modelId: "qwen3:8b",
+    });
+
+    // With a large model, budget should be larger
+    const resultLarge = await resolveBootstrapContextForRun({
+      workspaceDir,
+      provider: "anthropic",
+      modelId: "claude-opus-4-5",
+    });
+
+    // The contextFiles should exist in both cases
+    expect(resultSmall.contextFiles).toBeDefined();
+    expect(resultLarge.contextFiles).toBeDefined();
+    // We can't easily test the exact budget, but at least verify it doesn't crash
+  });
+
+  it("accepts contextWindow override for custom context budgets", async () => {
+    const workspaceDir = await makeTempWorkspace("ClosedClaw-bootstrap-context-window-");
+
+    // With small context window
+    const resultSmall = await resolveBootstrapContextForRun({
+      workspaceDir,
+      provider: "ollama",
+      modelId: "custom-model",
+      contextWindow: 4096,
+    });
+
+    // With large context window
+    const resultLarge = await resolveBootstrapContextForRun({
+      workspaceDir,
+      provider: "ollama",
+      modelId: "custom-model",
+      contextWindow: 128000,
+    });
+
+    // Both should work without errors
+    expect(resultSmall.contextFiles).toBeDefined();
+    expect(resultLarge.contextFiles).toBeDefined();
+  });
 });

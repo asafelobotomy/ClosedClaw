@@ -5,7 +5,7 @@ read_when:
 title: "ClosedClaw"
 ---
 
-# ClosedClaw 🦞
+# ClosedClaw 🦀
 
 > _"EXFOLIATE! EXFOLIATE!"_ — A space lobster, probably
 
@@ -25,7 +25,7 @@ title: "ClosedClaw"
 </p>
 
 <p align="center">
-  <strong>Any OS + WhatsApp/Telegram/Discord/iMessage gateway for AI agents (Pi).</strong><br />
+  <strong>Any OS + Slack/Matrix/Microsoft Teams/Google Chat gateway for AI agents (Pi).</strong><br />
   Plugins add Mattermost and more.
   Send a message, get an agent response — from your pocket.
 </p>
@@ -37,7 +37,7 @@ title: "ClosedClaw"
   <a href="/start/ClosedClaw">ClosedClaw assistant setup</a>
 </p>
 
-ClosedClaw bridges WhatsApp (via WhatsApp Web / Baileys), Telegram (Bot API / grammY), Discord (Bot API / channels.discord.js), and iMessage (imsg CLI) to coding agents like [Pi](https://github.com/badlogic/pi-mono). Plugins add Mattermost (Bot API + WebSocket) and more.
+ClosedClaw bridges Slack, Matrix, Microsoft Teams, and Google Chat to coding agents like [Pi](https://github.com/badlogic/pi-mono). Plugins add Mattermost (Bot API + WebSocket) and more.
 ClosedClaw also powers the ClosedClaw assistant.
 
 ## Start here
@@ -56,13 +56,13 @@ Local default: http://127.0.0.1:18789/
 Remote access: [Web surfaces](/web) and [Tailscale](/gateway/tailscale)
 
 <p align="center">
-  <img src="whatsapp-ClosedClaw.jpg" alt="ClosedClaw" width="420" />
+  <img src="/assets/ClosedClaw-dashboard.png" alt="ClosedClaw dashboard" width="420" />
 </p>
 
 ## How it works
 
 ```
-WhatsApp / Telegram / Discord / iMessage (+ plugins)
+Slack / Matrix / Microsoft Teams / Google Chat (+ plugins)
         │
         ▼
   ┌───────────────────────────┐
@@ -84,7 +84,7 @@ Most operations flow through the **Gateway** (`ClosedClaw gateway`), a single lo
 
 ## Network model
 
-- **One Gateway per host (recommended)**: it is the only process allowed to own the WhatsApp Web session. If you need a rescue bot or strict isolation, run multiple gateways with isolated profiles and ports; see [Multiple gateways](/gateway/multiple-gateways).
+- **One Gateway per host (recommended)**: single owner of channel sessions. For isolation, run multiple gateways with isolated profiles and ports; see [Multiple gateways](/gateway/multiple-gateways).
 - **Loopback-first**: Gateway WS defaults to `ws://127.0.0.1:18789`.
   - The wizard now generates a gateway token by default (even for loopback).
   - For Tailnet access, run `ClosedClaw gateway --bind tailnet --token ...` (token is required for non-loopback binds).
@@ -94,13 +94,13 @@ Most operations flow through the **Gateway** (`ClosedClaw gateway`), a single lo
 
 ## Features (high level)
 
-- 📱 **WhatsApp Integration** — Uses Baileys for WhatsApp Web protocol
-- ✈️ **Telegram Bot** — DMs + groups via grammY
-- 🎮 **Discord Bot** — DMs + guild channels via channels.discord.js
+- 💼 **Slack** — Bot token + events
+- 🧭 **Matrix** — Homeserver + access token
+- 🏢 **Microsoft Teams** — Bot registration + credentials
+- 📣 **Google Chat** — Service account + webhook audience
 - 🧩 **Mattermost Bot (plugin)** — Bot token + WebSocket events
-- 💬 **iMessage** — Local imsg CLI integration (macOS)
 - 🤖 **Agent bridge** — Pi (RPC mode) with tool streaming
-- ⏱️ **Streaming + chunking** — Block streaming + Telegram draft streaming details ([/concepts/streaming](/concepts/streaming))
+- ⏱️ **Streaming + chunking** — Block streaming with draft streaming details ([/concepts/streaming](/concepts/streaming))
 - 🧠 **Multi-agent routing** — Route provider accounts/peers to isolated agents (workspace + per-agent sessions)
 - 🔐 **Subscription auth** — Anthropic (Claude Pro/Max) + OpenAI (ChatGPT/Codex) via OAuth
 - 💬 **Sessions** — Direct chats collapse into shared `main` (default); groups are isolated
@@ -124,9 +124,6 @@ npm install -g ClosedClaw@latest
 
 # Onboard + install the service (launchd/systemd user service)
 ClosedClaw onboard --install-daemon
-
-# Pair WhatsApp Web (shows QR)
-ClosedClaw channels login
 
 # Gateway runs via the service after onboarding; manual run is still possible:
 ClosedClaw gateway --port 18789
@@ -166,14 +163,14 @@ ClosedClaw message send --target +15555550123 --message "Hello from ClosedClaw"
 Config lives at `~/.ClosedClaw/ClosedClaw.json`.
 
 - If you **do nothing**, ClosedClaw uses the bundled Pi binary in RPC mode with per-sender sessions.
-- If you want to lock it down, start with `channels.whatsapp.allowFrom` and (for groups) mention rules.
+- If you want to lock it down, start with `channels.slack.allowFrom` and (for groups) mention rules.
 
 Example:
 
 ```json5
 {
   channels: {
-    whatsapp: {
+    slack: {
       allowFrom: ["+15555550123"],
       groups: { "*": { requireMention: true } },
     },
@@ -204,15 +201,15 @@ Example:
   - [Web surfaces (Control UI)](/web)
   - [Discovery + transports](/gateway/discovery)
   - [Remote access](/gateway/remote)
-- Providers and UX:
+ Providers and UX:
   - [WebChat](/web/webchat)
   - [Control UI (browser)](/web/control-ui)
-  - [Telegram](/channels/telegram)
-  - [Discord](/channels/discord)
+  - [Slack](/channels/slack)
+  - [Matrix](/channels/matrix)
+  - [Microsoft Teams](/channels/msteams)
+  - [Google Chat](/channels/googlechat)
   - [Mattermost (plugin)](/channels/mattermost)
-  - [iMessage](/channels/imessage)
   - [Groups](/concepts/groups)
-  - [WhatsApp group messages](/concepts/group-messages)
   - [Media: images](/nodes/images)
   - [Media: audio](/nodes/audio)
 - Companion apps:
@@ -246,11 +243,11 @@ _"We're all just playing with our own prompts."_ — an AI, probably high on tok
 ## Core Contributors
 
 - **Maxim Vovshin** (@Hyaxia, 36747317+Hyaxia@users.noreply.github.com) — Blogwatcher skill
-- **Nacho Iacovino** (@nachoiacovino, nacho.iacovino@gmail.com) — Location parsing (Telegram + WhatsApp)
+- **Nacho Iacovino** (@nachoiacovino, nacho.iacovino@gmail.com) — Location parsing
 
 ## License
 
-MIT — Free as a lobster in the ocean 🦞
+MIT — Free as a lobster in the ocean 🦀
 
 ---
 

@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { stripAnsi } from "../terminal/ansi.js";
 
 const getMemorySearchManager = vi.fn();
 const loadConfig = vi.fn(() => ({}));
@@ -61,13 +62,12 @@ describe("memory cli", () => {
     registerMemoryCli(program);
     await program.parseAsync(["memory", "status"], { from: "user" });
 
-    expect(log).toHaveBeenCalledWith(expect.stringContaining("Vector: ready"));
-    expect(log).toHaveBeenCalledWith(expect.stringContaining("Vector dims: 1024"));
-    expect(log).toHaveBeenCalledWith(expect.stringContaining("Vector path: /opt/sqlite-vec.dylib"));
-    expect(log).toHaveBeenCalledWith(expect.stringContaining("FTS: ready"));
-    expect(log).toHaveBeenCalledWith(
-      expect.stringContaining("Embedding cache: enabled (123 entries)"),
-    );
+    const output = stripAnsi(log.mock.calls.map((c) => String(c[0])).join("\n"));
+    expect(output).toContain("Vector: ready");
+    expect(output).toContain("Vector dims: 1024");
+    expect(output).toContain("Vector path: /opt/sqlite-vec.dylib");
+    expect(output).toContain("FTS: ready");
+    expect(output).toContain("Embedding cache: enabled (123 entries)");
     expect(close).toHaveBeenCalled();
   });
 
@@ -103,8 +103,9 @@ describe("memory cli", () => {
     registerMemoryCli(program);
     await program.parseAsync(["memory", "status", "--agent", "main"], { from: "user" });
 
-    expect(log).toHaveBeenCalledWith(expect.stringContaining("Vector: unavailable"));
-    expect(log).toHaveBeenCalledWith(expect.stringContaining("Vector error: load failed"));
+    const output = stripAnsi(log.mock.calls.map((c) => String(c[0])).join("\n"));
+    expect(output).toContain("Vector: unavailable");
+    expect(output).toContain("Vector error: load failed");
     expect(close).toHaveBeenCalled();
   });
 
@@ -139,7 +140,8 @@ describe("memory cli", () => {
     await program.parseAsync(["memory", "status", "--deep"], { from: "user" });
 
     expect(probeEmbeddingAvailability).toHaveBeenCalled();
-    expect(log).toHaveBeenCalledWith(expect.stringContaining("Embeddings: ready"));
+    const output = stripAnsi(log.mock.calls.map((c) => String(c[0])).join("\n"));
+    expect(output).toContain("Embeddings: ready");
     expect(close).toHaveBeenCalled();
   });
 

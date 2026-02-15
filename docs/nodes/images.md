@@ -7,7 +7,7 @@ title: "Image and Media Support"
 
 # Image & Media Support — 2025-12-05
 
-The WhatsApp channel runs via **Baileys Web**. This document captures the current media handling rules for send, gateway, and agent replies.
+This document captures the current media handling rules for send, gateway, and agent replies across supported messaging channels.
 
 ## Goals
 
@@ -21,14 +21,13 @@ The WhatsApp channel runs via **Baileys Web**. This document captures the curren
   - `--media` optional; caption can be empty for media-only sends.
   - `--dry-run` prints the resolved payload; `--json` emits `{ channel, to, messageId, mediaUrl, caption }`.
 
-## WhatsApp Web channel behavior
+## Channel pipeline
 
 - Input: local file path **or** HTTP(S) URL.
-- Flow: load into a Buffer, detect media kind, and build the correct payload:
+- Flow: load into a Buffer, detect media kind, and build the correct payload for the target channel.
   - **Images:** resize & recompress to JPEG (max side 2048px) targeting `agents.defaults.mediaMaxMb` (default 5 MB), capped at 6 MB.
-  - **Audio/Voice/Video:** pass-through up to 16 MB; audio is sent as a voice note (`ptt: true`).
+  - **Audio/Voice/Video:** pass-through up to 16 MB.
   - **Documents:** anything else, up to 100 MB, with filename preserved when available.
-- WhatsApp GIF-style playback: send an MP4 with `gifPlayback: true` (CLI: `--gif-playback`) so mobile clients loop inline.
 - MIME detection prefers magic bytes, then headers, then file extension.
 - Caption comes from `--message` or `reply.text`; empty caption is allowed.
 - Logging: non-verbose shows `↩️`/`✅`; verbose includes size and source path/URL.
@@ -52,7 +51,7 @@ The WhatsApp channel runs via **Baileys Web**. This document captures the curren
 
 ## Limits & Errors
 
-**Outbound send caps (WhatsApp web send)**
+**Outbound send caps**
 
 - Images: ~6 MB cap after recompression.
 - Audio/voice/video: 16 MB cap; documents: 100 MB cap.

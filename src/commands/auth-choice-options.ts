@@ -10,6 +10,7 @@ export type AuthChoiceOption = {
 export type AuthChoiceGroupId =
   | "recommended"
   | "popular"
+  | "ollama"
   | "openai"
   | "anthropic"
   | "google"
@@ -25,11 +26,20 @@ export type AuthChoiceGroupId =
   | "venice"
   | "qwen";
 
+/**
+ * Whether a provider group runs locally on the user's machine ("local")
+ * or is a cloud-hosted proprietary service ("cloud").
+ * Some providers can be both (e.g. OpenRouter routes to cloud models).
+ */
+export type DeploymentType = "local" | "cloud";
+
 export type AuthChoiceGroup = {
   value: AuthChoiceGroupId;
   label: string;
   hint?: string;
   options: AuthChoiceOption[];
+  /** Where the models in this group typically run. */
+  deployment?: DeploymentType;
 };
 
 const AUTH_CHOICE_GROUP_DEFS: {
@@ -37,7 +47,15 @@ const AUTH_CHOICE_GROUP_DEFS: {
   label: string;
   hint?: string;
   choices: AuthChoice[];
+  deployment?: DeploymentType;
 }[] = [
+  {
+    value: "ollama",
+    label: "Ollama (Local)",
+    hint: "Run models locally on your machine",
+    choices: ["ollama"],
+    deployment: "local",
+  },
   {
     value: "popular",
     label: "Popular",
@@ -50,90 +68,105 @@ const AUTH_CHOICE_GROUP_DEFS: {
       "gemini-api-key",
       "openrouter-api-key",
     ],
+    deployment: "cloud",
   },
   {
     value: "openai",
     label: "OpenAI",
     hint: "Codex OAuth + API key",
     choices: ["openai-codex", "openai-api-key"],
+    deployment: "cloud",
   },
   {
     value: "anthropic",
     label: "Anthropic",
     hint: "setup-token + API key",
     choices: ["token", "apiKey"],
+    deployment: "cloud",
   },
   {
     value: "minimax",
     label: "MiniMax",
     hint: "M2.1 (recommended)",
     choices: ["minimax-portal", "minimax-api", "minimax-api-lightning"],
+    deployment: "cloud",
   },
   {
     value: "moonshot",
     label: "Moonshot AI",
     hint: "Kimi K2 + Kimi Coding",
     choices: ["moonshot-api-key", "kimi-code-api-key"],
+    deployment: "cloud",
   },
   {
     value: "google",
     label: "Google",
     hint: "Gemini API key + OAuth",
     choices: ["gemini-api-key", "google-antigravity", "google-gemini-cli"],
+    deployment: "cloud",
   },
   {
     value: "openrouter",
     label: "OpenRouter",
     hint: "API key",
     choices: ["openrouter-api-key"],
+    deployment: "cloud",
   },
   {
     value: "qwen",
     label: "Qwen",
     hint: "OAuth",
     choices: ["qwen-portal"],
+    deployment: "cloud",
   },
   {
     value: "zai",
     label: "Z.AI (GLM 4.7)",
     hint: "API key",
     choices: ["zai-api-key"],
+    deployment: "cloud",
   },
   {
     value: "copilot",
     label: "Copilot",
     hint: "GitHub + local proxy",
     choices: ["github-copilot", "copilot-proxy"],
+    deployment: "cloud",
   },
   {
     value: "ai-gateway",
     label: "Vercel AI Gateway",
     hint: "API key",
     choices: ["ai-gateway-api-key"],
+    deployment: "cloud",
   },
   {
     value: "opencode-zen",
     label: "OpenCode Zen",
     hint: "API key",
     choices: ["opencode-zen"],
+    deployment: "cloud",
   },
   {
     value: "xiaomi",
     label: "Xiaomi",
     hint: "API key",
     choices: ["xiaomi-api-key"],
+    deployment: "cloud",
   },
   {
     value: "synthetic",
     label: "Synthetic",
     hint: "Anthropic-compatible (multi-model)",
     choices: ["synthetic-api-key"],
+    deployment: "cloud",
   },
   {
     value: "venice",
     label: "Venice AI",
     hint: "Privacy-focused (uncensored models)",
     choices: ["venice-api-key"],
+    deployment: "cloud",
   },
 ];
 
@@ -148,6 +181,7 @@ const RECOMMENDED_ENV_MAP: Partial<Record<AuthChoice, string[]>> = {
   "zai-api-key": ["ZAI_API_KEY"],
   "xiaomi-api-key": ["XIAOMI_API_KEY"],
   "minimax-api": ["MINIMAX_API_KEY"],
+  ollama: ["OLLAMA_API_KEY"],
 };
 
 export function buildAuthChoiceOptions(params: {
@@ -234,7 +268,11 @@ export function buildAuthChoiceOptions(params: {
   return options;
 }
 
-export function buildAuthChoiceGroups(params: { store: AuthProfileStore; includeSkip: boolean }): {
+export function buildAuthChoiceGroups(params: {
+  store: AuthProfileStore;
+  includeSkip: boolean;
+  deploymentFilter?: DeploymentType;
+}): {
   groups: AuthChoiceGroup[];
   skipOption?: AuthChoiceOption;
 } {
@@ -260,7 +298,7 @@ export function buildAuthChoiceGroups(params: { store: AuthProfileStore; include
       }
     : null;
 
-  const groups = [
+  const allGroups = [
     ...(recommendedGroup ? [recommendedGroup] : []),
     ...AUTH_CHOICE_GROUP_DEFS.map((group) => ({
       ...group,
@@ -269,6 +307,13 @@ export function buildAuthChoiceGroups(params: { store: AuthProfileStore; include
         .filter((opt): opt is AuthChoiceOption => Boolean(opt)),
     })),
   ];
+
+  // Apply deployment type filter when requested.
+  const groups = params.deploymentFilter
+    ? allGroups.filter(
+        (group) => !group.deployment || group.deployment === params.deploymentFilter,
+      )
+    : allGroups;
 
   const skipOption = params.includeSkip
     ? ({ value: "skip", label: "Skip for now" } satisfies AuthChoiceOption)

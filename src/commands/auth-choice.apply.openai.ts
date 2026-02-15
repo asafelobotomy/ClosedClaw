@@ -15,6 +15,13 @@ import {
   applyOpenAICodexModelDefault,
   OPENAI_CODEX_DEFAULT_MODEL,
 } from "./openai-codex-model-default.js";
+import { withOpenClawDisclaimer } from "../terminal/links.js";
+import {
+  NOTE_TITLES,
+  NOTE_ICONS,
+  formatModelSummary,
+  formatNoteWithIcon,
+} from "../wizard/display-helpers.js";
 
 export async function applyAuthChoiceOpenAI(
   params: ApplyAuthChoiceParams,
@@ -40,8 +47,8 @@ export async function applyAuthChoiceOpenAI(
           process.env.OPENAI_API_KEY = envKey.apiKey;
         }
         await params.prompter.note(
-          `Copied OPENAI_API_KEY to ${result.path} for launchd compatibility.`,
-          "OpenAI API key",
+          `${NOTE_ICONS.success} Copied OPENAI_API_KEY to ${result.path} for launchd compatibility.`,
+          "OpenAI API Key",
         );
         return { config: params.config };
       }
@@ -64,8 +71,8 @@ export async function applyAuthChoiceOpenAI(
     });
     process.env.OPENAI_API_KEY = trimmed;
     await params.prompter.note(
-      `Saved OPENAI_API_KEY to ${result.path} for launchd compatibility.`,
-      "OpenAI API key",
+      `${NOTE_ICONS.success} Saved OPENAI_API_KEY to ${result.path} for launchd compatibility.`,
+      "OpenAI API Key",
     );
     return { config: params.config };
   }
@@ -78,8 +85,8 @@ export async function applyAuthChoiceOpenAI(
         return;
       }
       await params.prompter.note(
-        `Default model set to ${model} for agent "${params.agentId}".`,
-        "Model configured",
+        `${NOTE_ICONS.success} Default model set to ${model} for agent "${params.agentId}".`,
+        NOTE_TITLES.modelConfigured,
       );
     };
 
@@ -87,12 +94,12 @@ export async function applyAuthChoiceOpenAI(
     await params.prompter.note(
       isRemote
         ? [
-            "You are running in a remote/VPS environment.",
+            `${NOTE_ICONS.info} You are running in a remote/VPS environment.`,
             "A URL will be shown for you to open in your LOCAL browser.",
             "After signing in, paste the redirect URL back here.",
           ].join("\n")
         : [
-            "Browser will open for OpenAI authentication.",
+            `${NOTE_ICONS.info} Browser will open for OpenAI authentication.`,
             "If the callback doesn't auto-complete, paste the redirect URL.",
             "OpenAI OAuth uses localhost:1455 for the callback.",
           ].join("\n"),
@@ -127,8 +134,13 @@ export async function applyAuthChoiceOpenAI(
           nextConfig = applied.next;
           if (applied.changed) {
             await params.prompter.note(
-              `Default model set to ${OPENAI_CODEX_DEFAULT_MODEL}`,
-              "Model configured",
+              formatModelSummary({
+                provider: "OpenAI Codex",
+                models: [OPENAI_CODEX_DEFAULT_MODEL],
+                defaultModel: OPENAI_CODEX_DEFAULT_MODEL,
+                isLocal: false,
+              }),
+              NOTE_TITLES.providerReady,
             );
           }
         } else {
@@ -140,8 +152,11 @@ export async function applyAuthChoiceOpenAI(
       spin.stop("OpenAI OAuth failed");
       params.runtime.error(String(err));
       await params.prompter.note(
-        "Trouble with OAuth? See https://docs.OpenClaw.ai/start/faq",
-        "OAuth help",
+        formatNoteWithIcon(
+          "tip",
+          `Trouble with OAuth? See ${withOpenClawDisclaimer("https://docs.OpenClaw.ai/start/faq")}`,
+        ),
+        NOTE_TITLES.tip,
       );
     }
     return { config: nextConfig, agentModelOverride };
