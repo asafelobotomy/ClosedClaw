@@ -9,6 +9,6 @@ export default defineConfig({
   test: {
     ...baseTest,
     include: ["extensions/**/*.test.ts"],
-    exclude,
+    exclude: [...exclude, "extensions/.template/**"],
   },
 });

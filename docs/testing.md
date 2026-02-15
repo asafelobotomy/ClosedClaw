@@ -9,7 +9,7 @@ title: "Testing"
 
 # Testing
 
-ClosedClaw has three Vitest suites (unit/integration, e2e, live) and a small set of Docker runners.
+ClosedClaw has three Vitest suites (unit/integration, e2e, live), a UI/browser suite, and a small set of Docker runners.
 
 This doc is a “how we test” guide:
 
@@ -28,10 +28,12 @@ When you touch tests or want extra confidence:
 
 - Coverage gate: `pnpm test:coverage`
 - E2E suite: `pnpm test:e2e`
+- UI suite (browser): `pnpm test:ui`
 
 When debugging real providers/models (requires real creds):
 
 - Live suite (models + gateway tool/image probes): `pnpm test:live`
+- UI suite: `pnpm test:ui`
 
 Tip: when you only need one failing case, prefer narrowing live tests via the allowlist env vars described below.
 
@@ -43,7 +45,7 @@ Think of the suites as “increasing realism” (and increasing flakiness/cost):
 
 - Command: `pnpm test`
 - Config: `vitest.config.ts`
-- Files: `src/**/*.test.ts`
+- Files: `src/**/*.test.ts`, `extensions/**/*.test.ts`, `test/**/*.test.ts` (excluding `*.e2e.test.ts` and `*.live.test.ts`)
 - Scope:
   - Pure unit tests
   - In-process integration tests (gateway auth, routing, tooling, parsing, config)
@@ -71,6 +73,13 @@ Think of the suites as “increasing realism” (and increasing flakiness/cost):
 - Command: `pnpm test:live`
 - Config: `vitest.live.config.ts`
 - Files: `src/**/*.live.test.ts`
+
+### UI / browser
+
+- Command: `pnpm test:ui`
+- Config: `ui/vitest.config.ts`
+- Files: `ui/src/**/*.test.ts`
+- Scope: browser-behavior and UI helpers (Playwright runner; headless chromium)
 - Default: **enabled** by `pnpm test:live` (sets `ClosedClaw_LIVE_TEST=1`)
 - Scope:
   - “Does this provider/model actually work _today_ with real creds?”
@@ -330,6 +339,10 @@ Useful env vars:
 ## Docs sanity
 
 Run docs checks after doc edits: `pnpm docs:list`.
+
+## Coverage exclude hygiene
+
+The main coverage run excludes hard-to-stub integration surfaces (gateway server methods, channel entrypoints, CLI wiring). Revisit the exclusions regularly to pull high-risk areas back under deterministic coverage when feasible.
 
 ## Offline regression (CI-safe)
 

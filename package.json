@@ -73,7 +73,7 @@
     "start": "node tools/dev/run-node.mjs",
     "status": "node tools/dev/run-node.mjs status",
     "test": "node tools/testing/test-parallel.mjs",
-    "test:all": "pnpm lint && pnpm build && pnpm test && pnpm test:e2e && pnpm test:live && pnpm test:docker:all",
+    "test:all": "pnpm lint && pnpm build && pnpm test && pnpm test:ui && pnpm test:e2e && pnpm test:live && pnpm test:docker:all",
     "test:changed": "vitest run --changed",
     "test:coverage": "vitest run --coverage",
     "test:docker:all": "pnpm test:docker:live-models && pnpm test:docker:live-gateway && pnpm test:docker:onboard && pnpm test:docker:gateway-network && pnpm test:docker:qr && pnpm test:docker:doctor-switch && pnpm test:docker:plugins && pnpm test:docker:cleanup",
