@@ -129,14 +129,11 @@ export async function maybeRepairUiProtocolFreshness(
         // Use scripts/ui.js to build, assuming node is available as we are running in it.
         // We use the same node executable to run the script.
         const uiScriptPath = path.join(root, "scripts/ui.js");
-        const buildResult = await runCommandWithTimeout(
-          [process.execPath, uiScriptPath, "build"],
-          {
-            cwd: root,
-            timeoutMs: minutesToMs(2),
-            env: { ...process.env, FORCE_COLOR: "1" },
-          },
-        );
+        const buildResult = await runCommandWithTimeout([process.execPath, uiScriptPath, "build"], {
+          cwd: root,
+          timeoutMs: minutesToMs(2),
+          env: { ...process.env, FORCE_COLOR: "1" },
+        });
         if (buildResult.code === 0) {
           note("UI rebuild complete.", "UI");
         } else {

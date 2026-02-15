@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { upstreamSanitizeCommand } from "./upstream.sanitize.js";
 import { GitService } from "./upstream.git.js";
+import { upstreamSanitizeCommand } from "./upstream.sanitize.js";
 import * as storage from "./upstream.storage.js";
 import { DEFAULT_UPSTREAM_TRACKING } from "./upstream.types.js";
 

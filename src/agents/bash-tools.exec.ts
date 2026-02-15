@@ -5,6 +5,7 @@ import crypto from "node:crypto";
 import path from "node:path";
 import type { BashSandboxConfig } from "./bash-tools.shared.js";
 import { TIMEOUT_HTTP_SHORT_MS } from "../config/constants/index.js";
+import { assertSafeEnv } from "../infra/env-safety.js";
 import {
   type ExecAsk,
   type ExecHost,
@@ -27,7 +28,6 @@ import {
   resolveShellEnvFallbackTimeoutMs,
 } from "../infra/shell-env.js";
 import { enqueueSystemEvent } from "../infra/system-events.js";
-import { assertSafeEnv } from "../infra/env-safety.js";
 import { logInfo, logWarn } from "../logger.js";
 import { formatSpawnError, spawnWithFallback } from "../process/spawn-utils.js";
 import { parseAgentSessionKey, resolveAgentIdFromSessionKey } from "../routing/session-key.js";

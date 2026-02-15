@@ -13,6 +13,7 @@ import { createBrowserRouteDispatcher } from "../browser/routes/dispatcher.js";
 import { loadConfig } from "../config/config.js";
 import { GatewayClient } from "../gateway/client.js";
 import { loadOrCreateDeviceIdentity } from "../infra/device-identity.js";
+import { assertSafeEnv, envSafety } from "../infra/env-safety.js";
 import {
   addAllowlistEntry,
   analyzeArgvCommand,
@@ -40,7 +41,6 @@ import {
 } from "../infra/exec-host.js";
 import { getMachineDisplayName } from "../infra/machine-name.js";
 import { ensureClosedClawCliOnPath } from "../infra/path-env.js";
-import { assertSafeEnv, envSafety } from "../infra/env-safety.js";
 import { detectMime } from "../media/mime.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import { VERSION } from "../version.js";

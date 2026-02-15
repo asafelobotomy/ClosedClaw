@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { DEFAULT_SANDBOX_IMAGE } from "../agents/sandbox.js";
 import type { ClosedClawConfig } from "../config/config.js";
+import { DEFAULT_SANDBOX_IMAGE } from "../agents/sandbox.js";
 
 const { note, runExec, runCommandWithTimeout } = vi.hoisted(() => {
   return {
@@ -47,7 +47,13 @@ describe("doctor sandbox image repair", () => {
       }
       return { stdout: "", stderr: "" };
     });
-    runCommandWithTimeout.mockResolvedValue({ stdout: "", stderr: "", code: 0, signal: null, killed: false });
+    runCommandWithTimeout.mockResolvedValue({
+      stdout: "",
+      stderr: "",
+      code: 0,
+      signal: null,
+      killed: false,
+    });
   });
 
   it("updates config after building a missing sandbox image", async () => {
@@ -84,7 +90,9 @@ describe("doctor sandbox image repair", () => {
 
     expect(runCommandWithTimeout).toHaveBeenCalled();
     const messages = note.mock.calls.map((c) => String(c[0]));
-    expect(messages.some((m) => m.includes("Updated agents.defaults.sandbox.docker.image"))).toBe(true);
+    expect(messages.some((m) => m.includes("Updated agents.defaults.sandbox.docker.image"))).toBe(
+      true,
+    );
     expect(next.agents?.defaults?.sandbox?.docker?.image).toBe(DEFAULT_SANDBOX_IMAGE);
   });
 

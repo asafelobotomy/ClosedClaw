@@ -138,8 +138,8 @@ const AUTH_CHOICE_GROUP_DEFS: {
 ];
 
 const RECOMMENDED_ENV_MAP: Partial<Record<AuthChoice, string[]>> = {
-  "apiKey": ["ANTHROPIC_API_KEY", "CLAUDE_API_KEY"],
-  "token": ["CLAUDE_SETUP_TOKEN"],
+  apiKey: ["ANTHROPIC_API_KEY", "CLAUDE_API_KEY"],
+  token: ["CLAUDE_SETUP_TOKEN"],
   "openai-api-key": ["OPENAI_API_KEY"],
   "openrouter-api-key": ["OPENROUTER_API_KEY"],
   "gemini-api-key": ["GEMINI_API_KEY"],

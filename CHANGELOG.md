@@ -2,6 +2,35 @@
 
 Docs: https://docs.OpenClaw.ai
 
+## 2026.2.15
+
+### TPC Waveform Transport & Token Optimizations
+
+- Added AFSK waveform encoder/decoder for TPC envelopes with Reed-Solomon error correction, probes, and audit logging
+- Introduced CT/1 token savings: compressed parameter names, structured tool params, response compression with lazy expansion, shared context pooling, and versioned envelopes
+- Expanded ClawTalk/TPC test suite (waveform, profile selector, security, fallback e2e) and documentation (ClawTalk 2.1 spec, TPC implementation diagrams)
+
+### ClawTalk Translation Device & Legacy Handling
+
+- Replaced the dormant orchestrator with a TranslationDevice middleware that cleans outbound ClawTalk artifacts and compiles `.claws` skills into prompts/tool schemas
+- Mapped deprecated ClawTalk compression modes to "off" in legacy migrations, removing hybrid/native code paths while keeping abbreviation/macro compatibility modules
+- Enabled WebSocket per-message deflate support for ClawTalk clients and refreshed GTK bridge handling
+
+### Upstream Sanitization CLI
+
+- Added `upstream sanitize` command for cleaning git remotes along with dedicated tests and env-safety hardening
+- Extended upstream tooling with slug safety checks and parallel test runner wiring
+
+### Onboarding Express & Dry-Run
+
+- Added onboarding dry-run mode and an express auth choice flow with improved wizard validation
+- Strengthened doctor probes (sandbox/state integrity, UI staleness, gateway health) and refreshed onboarding docs/UI hints
+
+### Defaults, Skills & Docs
+
+- Switched default model/provider to Ollama Qwen3 across agents and configs
+- Archived legacy channel extensions into `archive/attic/`, pruned outdated zh-CN documentation, and refreshed skill templates/guides
+
 ## 2026.2.12
 
 ### Platform Removal: GTK-GUI Focus

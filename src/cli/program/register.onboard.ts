@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import type { AuthProfileStore } from "../../agents/auth-profiles.js";
 import type { GatewayDaemonRuntime } from "../../commands/daemon-runtime.js";
 import type {
   AuthChoice,
@@ -7,7 +8,6 @@ import type {
   NodeManagerChoice,
   TailscaleMode,
 } from "../../commands/onboard-types.js";
-import type { AuthProfileStore } from "../../agents/auth-profiles.js";
 import { buildAuthChoiceOptions } from "../../commands/auth-choice-options.js";
 import { onboardCommand } from "../../commands/onboard.js";
 import { defaultRuntime } from "../../runtime.js";
@@ -21,7 +21,7 @@ const AUTH_CHOICE_HELP = buildAuthChoiceOptions({
   includeSkip: false,
 })
   .map((opt) => opt.value)
-  .sort()
+  .toSorted()
   .join("|");
 
 function resolveInstallDaemonFlag(
@@ -60,7 +60,7 @@ export function registerOnboardCommand(program: Command) {
     .option("--workspace <dir>", "Agent workspace directory (default: ~/.ClosedClaw/workspace)")
     .option("--reset", "Reset config + credentials + sessions + workspace before running wizard")
     .option("--non-interactive", "Run without prompts", false)
-      .option("--dry-run", "Simulate onboarding without writing config or installing anything", false)
+    .option("--dry-run", "Simulate onboarding without writing config or installing anything", false)
     .option(
       "--accept-risk",
       "Acknowledge that agents are powerful and full system access is risky (required for --non-interactive)",
@@ -68,10 +68,7 @@ export function registerOnboardCommand(program: Command) {
     )
     .option("--flow <flow>", "Wizard flow: quickstart|express|advanced|manual")
     .option("--mode <mode>", "Wizard mode: local|remote")
-    .option(
-      "--auth-choice <choice>",
-      `Auth: ${AUTH_CHOICE_HELP}|skip`,
-    )
+    .option("--auth-choice <choice>", `Auth: ${AUTH_CHOICE_HELP}|skip`)
     .option(
       "--token-provider <id>",
       "Token provider id (non-interactive; used with --auth-choice token)",
@@ -125,9 +122,9 @@ export function registerOnboardCommand(program: Command) {
           {
             workspace: opts.workspace as string | undefined,
             nonInteractive: Boolean(opts.nonInteractive),
-              dryRun: Boolean(opts.dryRun),
+            dryRun: Boolean(opts.dryRun),
             acceptRisk: Boolean(opts.acceptRisk),
-              flow: opts.flow as "quickstart" | "express" | "advanced" | "manual" | undefined,
+            flow: opts.flow as "quickstart" | "express" | "advanced" | "manual" | undefined,
             mode: opts.mode as "local" | "remote" | undefined,
             authChoice: opts.authChoice as AuthChoice | undefined,
             tokenProvider: opts.tokenProvider as string | undefined,

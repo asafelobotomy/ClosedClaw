@@ -56,25 +56,19 @@ const WARNING_SUPPRESSION_FLAGS = [
 const userArgs = process.argv.slice(2).filter((arg) => arg !== "--");
 const pickConfig = (args) => {
   const has = (matcher) => args.some((arg) => matcher(arg));
-  if (has((arg) => arg.includes("extensions/"))) return "vitest.extensions.config.ts";
-  if (has((arg) => arg.includes("gateway/"))) return "vitest.gateway.config.ts";
-  if (has((arg) => /\.e2e\.test\.ts$/.test(arg))) return "vitest.e2e.config.ts";
-  if (has((arg) => /\.live\.test\.ts$/.test(arg))) return "vitest.live.config.ts";
-  return "vitest.unit.config.ts";
-};
-
-const splitArgs = (args) => {
-  const include = [];
-  const passthrough = [];
-  for (const arg of args) {
-    // Treat anything that looks like a path or explicit test file as an include filter.
-    if (arg.includes("/") || /\.test\.[cm]?tsx?$/.test(arg)) {
-      include.push(arg);
-    } else {
-      passthrough.push(arg);
-    }
+  if (has((arg) => arg.includes("extensions/"))) {
+    return "vitest.extensions.config.ts";
   }
-  return { include, passthrough };
+  if (has((arg) => arg.includes("gateway/"))) {
+    return "vitest.gateway.config.ts";
+  }
+  if (has((arg) => arg.endsWith(".e2e.test.ts"))) {
+    return "vitest.e2e.config.ts";
+  }
+  if (has((arg) => arg.endsWith(".live.test.ts"))) {
+    return "vitest.live.config.ts";
+  }
+  return "vitest.unit.config.ts";
 };
 
 if (userArgs.length > 0) {
@@ -88,7 +82,8 @@ if (userArgs.length > 0) {
     (acc, flag) => (acc.includes(flag) ? acc : `${acc} ${flag}`.trim()),
     nodeOptions,
   );
-  const vitestBin = process.platform === "win32" ? "node_modules/.bin/vitest.cmd" : "node_modules/.bin/vitest";
+  const vitestBin =
+    process.platform === "win32" ? "node_modules/.bin/vitest.cmd" : "node_modules/.bin/vitest";
   const code = await new Promise((resolve) => {
     const child = spawn(vitestBin, args, {
       stdio: "inherit",

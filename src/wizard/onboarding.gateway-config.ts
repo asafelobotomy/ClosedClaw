@@ -32,33 +32,31 @@ export async function configureGatewayForOnboarding(
   const quickMode = flow === "quickstart" || flow === "express";
   let { nextConfig } = opts;
 
-  const port =
-    quickMode
-      ? quickstartGateway.port
-      : Number.parseInt(
-          String(
-            await prompter.text({
-              message: "Gateway port",
-              initialValue: String(localPort),
-              validate: (value) => (Number.isFinite(Number(value)) ? undefined : "Invalid port"),
-            }),
-          ),
-          10,
-        );
+  const port = quickMode
+    ? quickstartGateway.port
+    : Number.parseInt(
+        String(
+          await prompter.text({
+            message: "Gateway port",
+            initialValue: String(localPort),
+            validate: (value) => (Number.isFinite(Number(value)) ? undefined : "Invalid port"),
+          }),
+        ),
+        10,
+      );
 
-  let bind: GatewayWizardSettings["bind"] =
-    quickMode
-      ? quickstartGateway.bind
-      : await prompter.select<GatewayWizardSettings["bind"]>({
-          message: "Gateway bind",
-          options: [
-            { value: "loopback", label: "Loopback (127.0.0.1)" },
-            { value: "lan", label: "LAN (0.0.0.0)" },
-            { value: "tailnet", label: "Tailnet (Tailscale IP)" },
-            { value: "auto", label: "Auto (Loopback → LAN)" },
-            { value: "custom", label: "Custom IP" },
-          ],
-        });
+  let bind: GatewayWizardSettings["bind"] = quickMode
+    ? quickstartGateway.bind
+    : await prompter.select<GatewayWizardSettings["bind"]>({
+        message: "Gateway bind",
+        options: [
+          { value: "loopback", label: "Loopback (127.0.0.1)" },
+          { value: "lan", label: "LAN (0.0.0.0)" },
+          { value: "tailnet", label: "Tailnet (Tailscale IP)" },
+          { value: "auto", label: "Auto (Loopback → LAN)" },
+          { value: "custom", label: "Custom IP" },
+        ],
+      });
 
   let customBindHost = quickstartGateway.customBindHost;
   if (bind === "custom") {
@@ -92,41 +90,39 @@ export async function configureGatewayForOnboarding(
     }
   }
 
-  let authMode =
-    quickMode
-      ? quickstartGateway.authMode
-      : ((await prompter.select({
-          message: "Gateway auth",
-          options: [
-            {
-              value: "token",
-              label: "Token",
-              hint: "Recommended default (local + remote)",
-            },
-            { value: "password", label: "Password" },
-          ],
-          initialValue: "token",
-        })) as GatewayAuthChoice);
+  let authMode = quickMode
+    ? quickstartGateway.authMode
+    : ((await prompter.select({
+        message: "Gateway auth",
+        options: [
+          {
+            value: "token",
+            label: "Token",
+            hint: "Recommended default (local + remote)",
+          },
+          { value: "password", label: "Password" },
+        ],
+        initialValue: "token",
+      })) as GatewayAuthChoice);
 
-  const tailscaleMode: GatewayWizardSettings["tailscaleMode"] =
-    quickMode
-      ? quickstartGateway.tailscaleMode
-      : await prompter.select<GatewayWizardSettings["tailscaleMode"]>({
-          message: "Tailscale exposure",
-          options: [
-            { value: "off", label: "Off", hint: "No Tailscale exposure" },
-            {
-              value: "serve",
-              label: "Serve",
-              hint: "Private HTTPS for your tailnet (devices on Tailscale)",
-            },
-            {
-              value: "funnel",
-              label: "Funnel",
-              hint: "Public HTTPS via Tailscale Funnel (internet)",
-            },
-          ],
-        });
+  const tailscaleMode: GatewayWizardSettings["tailscaleMode"] = quickMode
+    ? quickstartGateway.tailscaleMode
+    : await prompter.select<GatewayWizardSettings["tailscaleMode"]>({
+        message: "Tailscale exposure",
+        options: [
+          { value: "off", label: "Off", hint: "No Tailscale exposure" },
+          {
+            value: "serve",
+            label: "Serve",
+            hint: "Private HTTPS for your tailnet (devices on Tailscale)",
+          },
+          {
+            value: "funnel",
+            label: "Funnel",
+            hint: "Public HTTPS via Tailscale Funnel (internet)",
+          },
+        ],
+      });
 
   // Detect Tailscale binary before proceeding with serve/funnel setup.
   if (tailscaleMode !== "off") {

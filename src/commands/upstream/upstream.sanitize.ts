@@ -35,7 +35,9 @@ export interface SanitizeReport {
 }
 
 function parsePositiveInt(value: string | undefined, fallback: number): number {
-  if (!value) return fallback;
+  if (!value) {
+    return fallback;
+  }
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
@@ -52,11 +54,21 @@ function summarize(commits: SanitizedCommit[], appliedNow: number) {
   };
 
   for (const commit of commits) {
-    if (commit.status === "applied") summary.applied++;
-    if (commit.status === "clean") summary.clean++;
-    if (commit.status === "conflict") summary.conflicts++;
-    if (commit.status === "obsolete") summary.obsolete++;
-    if (commit.status === "error") summary.errors++;
+    if (commit.status === "applied") {
+      summary.applied++;
+    }
+    if (commit.status === "clean") {
+      summary.clean++;
+    }
+    if (commit.status === "conflict") {
+      summary.conflicts++;
+    }
+    if (commit.status === "obsolete") {
+      summary.obsolete++;
+    }
+    if (commit.status === "error") {
+      summary.errors++;
+    }
   }
 
   return summary;
@@ -88,7 +100,9 @@ export async function upstreamSanitizeCommand(
   const patchWindow = parsePositiveInt(opts.patchWindow, 800);
 
   const commits = await git.getCommitsBetween("HEAD", upstreamRef);
-  const securityCommits = commits.filter((c) => classifyCommit(c) === "security").slice(0, commitLimit);
+  const securityCommits = commits
+    .filter((c) => classifyCommit(c) === "security")
+    .slice(0, commitLimit);
 
   if (securityCommits.length === 0) {
     console.log(chalk.green("✅ No upstream security commits to sanitize"));
@@ -198,7 +212,9 @@ export async function upstreamSanitizeCommand(
   if (summary.appliedNow > 0) {
     console.log(chalk.green(`✅ Applied ${summary.appliedNow} clean commits`));
   } else if (summary.clean > 0 && !opts.applyClean) {
-    console.log(chalk.yellow("💡 Run with --apply-clean to cherry-pick clean patches automatically"));
+    console.log(
+      chalk.yellow("💡 Run with --apply-clean to cherry-pick clean patches automatically"),
+    );
   }
 
   const conflicts = results.filter((c) => c.status === "conflict");
@@ -224,7 +240,9 @@ export async function upstreamSanitizeCommand(
 
   if (summary.errors > 0) {
     console.log("");
-    console.log(chalk.red(`⚠️  ${summary.errors} commits failed to analyze. Re-run with --json for details.`));
+    console.log(
+      chalk.red(`⚠️  ${summary.errors} commits failed to analyze. Re-run with --json for details.`),
+    );
   }
 
   console.log("");

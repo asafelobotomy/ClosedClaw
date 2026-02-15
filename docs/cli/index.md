@@ -21,6 +21,8 @@ This page describes the current CLI behavior. If commands change, update this do
 - [`reset`](/cli/reset)
 - [`uninstall`](/cli/uninstall)
 - [`update`](/cli/update)
+- [`completion`](/cli/completion)
+- [`upstream`](/cli/upstream)
 - [`message`](/cli/message)
 - [`agent`](/cli/agent)
 - [`agents`](/cli/agents)
@@ -35,6 +37,7 @@ This page describes the current CLI behavior. If commands change, update this do
 - [`memory`](/cli/memory)
 - [`nodes`](/cli/nodes)
 - [`devices`](/cli/devices)
+- [`directory`](/cli/directory)
 - [`node`](/cli/node)
 - [`approvals`](/cli/approvals)
 - [`sandbox`](/cli/sandbox)
@@ -59,6 +62,11 @@ This page describes the current CLI behavior. If commands change, update this do
 - `--no-color`: disable ANSI colors.
 - `--update`: shorthand for `ClosedClaw update` (source installs only).
 - `-V`, `--version`, `-v`: print version and exit.
+
+## Global behavior
+
+- Lazy subcommands: the CLI defers loading most subcommands to speed startup. Set `ClosedClaw_DISABLE_LAZY_SUBCOMMANDS=1` to eagerly register everything (useful for shell completions and exhaustive `--help` output).
+- Profile auto-injection: when `ClosedClaw_PROFILE=<name>` is set, the CLI automatically injects `--profile <name>` unless you explicitly pass `--profile` or `--dev`.
 
 ## Output styling
 
@@ -100,6 +108,13 @@ ClosedClaw [--dev] [--profile <name>] <command>
   reset
   uninstall
   update
+  completion
+  upstream
+    status
+    diff
+    sanitize
+    sync
+    configure
   channels
     list
     status
@@ -177,6 +192,12 @@ ClosedClaw [--dev] [--profile <name>] <command>
     run
   nodes
   devices
+  directory
+    self
+    peers
+      list
+    groups
+      list
   node
     run
     status

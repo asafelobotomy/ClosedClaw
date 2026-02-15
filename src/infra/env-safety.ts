@@ -39,7 +39,9 @@ export function assertSafeEnv(env: Record<string, string>, opts?: EnvSafetyOptio
       throw new Error(`Security Violation: Environment variable '${key}' is forbidden.`);
     }
     if (forbidPathOverride && upperKey === "PATH") {
-      throw new Error("Security Violation: Custom 'PATH' variable is forbidden during host execution.");
+      throw new Error(
+        "Security Violation: Custom 'PATH' variable is forbidden during host execution.",
+      );
     }
   }
 }

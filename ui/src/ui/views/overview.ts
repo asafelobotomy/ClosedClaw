@@ -63,7 +63,8 @@ export function renderOverview(props: OverviewProps) {
     return html`
       <div class="muted" style="margin-top: 8px">
         Auth failed. Open the dashboard URL with
-        <span class="mono">ClosedClaw dashboard --no-open</span>, then paste a valid token or password and click Connect.
+        <span class="mono">ClosedClaw dashboard --no-open</span>, then paste a valid token or password and
+        click Connect.
         <div style="margin-top: 6px">
           <a
             class="session-link"

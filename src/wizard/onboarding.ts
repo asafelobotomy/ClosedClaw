@@ -138,7 +138,8 @@ export async function runOnboardingWizard(
 
   const quickstartHint = `Configure details later via ${formatCliCommand("ClosedClaw configure")}.`;
   const manualHint = "Configure port, network, Tailscale, and auth options.";
-  const expressHint = "Minimal prompts; keeps defaults; skips channels/skills/hooks/shell completion.";
+  const expressHint =
+    "Minimal prompts; keeps defaults; skips channels/skills/hooks/shell completion.";
   const explicitFlowRaw = opts.flow?.trim();
   const normalizedExplicitFlow = explicitFlowRaw === "manual" ? "advanced" : explicitFlowRaw;
   if (
@@ -382,7 +383,7 @@ export async function runOnboardingWizard(
   const workspaceInput =
     opts.workspace ??
     (flow === "quickstart" || flow === "express"
-      ? baseConfig.agents?.defaults?.workspace ?? DEFAULT_WORKSPACE
+      ? (baseConfig.agents?.defaults?.workspace ?? DEFAULT_WORKSPACE)
       : await prompter.text({
           message: stepper.label("Workspace directory"),
           initialValue: baseConfig.agents?.defaults?.workspace ?? DEFAULT_WORKSPACE,

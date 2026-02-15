@@ -61,7 +61,7 @@ export async function noteSecurityWarnings(cfg: ClosedClawConfig) {
                 "ClosedClaw config set gateway.auth.mode token",
               )}`,
             ];
-        critical.push(
+      critical.push(
         `- CRITICAL: Gateway bound to ${bindDescriptor} without authentication.`,
         `  Anyone on your network (or internet if port-forwarded) can fully control your agent.`,
         `  Fix: ${formatCliCommand("ClosedClaw config set gateway.bind loopback")}`,

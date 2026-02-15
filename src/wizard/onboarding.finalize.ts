@@ -117,14 +117,13 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
   }
 
   if (installDaemon) {
-    const daemonRuntime =
-      quickMode
-        ? DEFAULT_GATEWAY_DAEMON_RUNTIME
-        : await prompter.select({
-            message: "Gateway service runtime",
-            options: GATEWAY_DAEMON_RUNTIME_OPTIONS,
-            initialValue: opts.daemonRuntime ?? DEFAULT_GATEWAY_DAEMON_RUNTIME,
-          });
+    const daemonRuntime = quickMode
+      ? DEFAULT_GATEWAY_DAEMON_RUNTIME
+      : await prompter.select({
+          message: "Gateway service runtime",
+          options: GATEWAY_DAEMON_RUNTIME_OPTIONS,
+          initialValue: opts.daemonRuntime ?? DEFAULT_GATEWAY_DAEMON_RUNTIME,
+        });
     if (quickMode) {
       await prompter.note(
         "Express/QuickStart uses Node for the Gateway service (stable + supported).",
@@ -441,12 +440,11 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
 
   await prompter.note(nextSteps.join("\n"), "Next steps");
 
-  const outroBase =
-    controlUiOpened
-      ? "Onboarding complete. Dashboard opened with your token; keep that tab to control ClosedClaw."
-      : seededInBackground
-          ? "Onboarding complete. Web UI opened in the background; you may need to paste your token/password on first load."
-          : "Onboarding complete. Use the dashboard link above and paste your token/password when prompted."
+  const outroBase = controlUiOpened
+    ? "Onboarding complete. Dashboard opened with your token; keep that tab to control ClosedClaw."
+    : seededInBackground
+      ? "Onboarding complete. Web UI opened in the background; you may need to paste your token/password on first load."
+      : "Onboarding complete. Use the dashboard link above and paste your token/password when prompted.";
 
   const securityOneLiner =
     " Security: running agents is powerful and risky—harden your setup: https://docs.OpenClaw.ai/security";

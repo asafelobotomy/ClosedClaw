@@ -142,12 +142,7 @@ export class GitService {
    */
   async getCommitFiles(commitSha: string): Promise<string[]> {
     try {
-      const output = await this.exec([
-        "show",
-        "--name-only",
-        "--pretty=format:",
-        commitSha,
-      ]);
+      const output = await this.exec(["show", "--name-only", "--pretty=format:", commitSha]);
       return output
         .split("\n")
         .map((line) => line.trim())
@@ -177,13 +172,7 @@ export class GitService {
   async getPatchIds(ref: string = "HEAD", maxCount: number = 800): Promise<Set<string>> {
     const patchIds = new Set<string>();
     try {
-      const output = await this.exec([
-        "log",
-        ref,
-        "--pretty=format:%H",
-        "-n",
-        String(maxCount),
-      ]);
+      const output = await this.exec(["log", ref, "--pretty=format:%H", "-n", String(maxCount)]);
       const commits = output.split("\n").filter(Boolean);
       for (const sha of commits) {
         const patchId = await this.getPatchId(sha);
@@ -201,7 +190,9 @@ export class GitService {
   /**
    * Check if a commit applies cleanly without touching the working tree
    */
-  async canApplyCommit(commitSha: string): Promise<
+  async canApplyCommit(
+    commitSha: string,
+  ): Promise<
     | { status: "clean" }
     | { status: "missing"; detail: string }
     | { status: "conflict"; detail: string }
