@@ -1,7 +1,6 @@
 ## How to Contribute
 
 1. **Bugs & small fixes** → Open a PR!
-2. **New features / architecture** → Start a [GitHub Discussion](https://github.com/ClosedClaw/ClosedClaw/discussions)
 
 ## Before You PR
 
