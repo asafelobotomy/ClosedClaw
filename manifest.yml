@@ -20,6 +20,7 @@ applications:
       CLOSEDCLAW_PREFER_PNPM: "1"
       CLOSEDCLAW_STATE_DIR: /home/vcap/app/data
       NODE_OPTIONS: --max-old-space-size=1536
+      BP_NODE_PACKAGE_MANAGER: pnpm
     
     # Services to bind (create these first with cf create-service)
     # services:

@@ -56,6 +56,8 @@ cf login -a https://api.YOUR_CF_DOMAIN
 
 The repository includes a `manifest.yml` file. Review and customize it:
 
+**Important:** ClosedClaw requires Node.js 22+. The Cloud Foundry Node.js buildpack will automatically detect the version from `package.json`, but if you encounter issues, you can explicitly specify it by adding a `.nvmrc` file or setting it in the buildpack environment.
+
 ```yaml
 applications:
   - name: closedclaw
@@ -115,13 +117,15 @@ cf push
 
 **First deploy process:**
 1. CF uploads your application code (excluding `.cfignore` files)
-2. Node.js buildpack detects `package.json`
-3. Runs `pnpm install --frozen-lockfile`
-4. Runs `pnpm build` (TypeScript compilation)
-5. Runs `pnpm ui:build` (web UI build)
+2. Node.js buildpack detects `package.json` and `.nvmrc` (Node 22+)
+3. Installs pnpm (via `corepack enable`)
+4. Runs `pnpm install --frozen-lockfile`
+5. Detects `prepack` script and runs it automatically (builds TypeScript and UI)
 6. Starts the application with the command from `manifest.yml`
 
 This takes ~3-5 minutes on first deploy. Subsequent deploys are faster.
+
+**Note:** Cloud Foundry automatically runs `npm install` or detects pnpm. If you encounter issues with pnpm, ensure your CF buildpack supports it, or set `BP_NODE_PACKAGE_MANAGER=pnpm` in the manifest environment variables.
 
 ## 4) Verify deployment
 
