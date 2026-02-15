@@ -3,6 +3,7 @@
 ClosedClaw currently requires manual coordination between gateway startup and GTK GUI launch. This plan delivers a one-click launch experience through phased improvements: first enhancing CLI commands for immediate usability, then packaging as a self-contained AppImage for desktop integration.
 
 **Key Decisions**:
+
 - Start with CLI enhancements (works with existing install, benefits everyone immediately)
 - Build toward AppImage distribution (native desktop app feel, no Node install requirement)
 - Leverage existing GTK launcher pattern from [apps/gtk-gui/launch.sh](apps/gtk-gui/launch.sh)
@@ -152,12 +153,14 @@ ClosedClaw currently requires manual coordination between gateway startup and GT
 ## Verification
 
 ### Phase 1 (CLI Enhancement)
+
 - `closedclaw launch` starts gateway + launches GTK GUI automatically
 - `closedclaw token get` shows current token
 - Gateway readiness polling succeeds within timeout
 - GTK GUI receives gateway connection details (URL, token, port)
 
 ### Phase 2 (Desktop Integration)
+
 - Desktop entry appears in application menu after `closedclaw desktop install`
 - Clicking launcher icon starts gateway and launches GTK GUI
 - GTK GUI connects to gateway automatically with generated token
@@ -165,6 +168,7 @@ ClosedClaw currently requires manual coordination between gateway startup and GT
 - Shell script handles cleanup properly
 
 ### Phase 3 (AppImage)
+
 - AppImage runs without Node pre-installed on system
 - Gateway starts with bundled Node runtime
 - GTK GUI launches automatically with valid token
@@ -173,6 +177,7 @@ ClosedClaw currently requires manual coordination between gateway startup and GT
 - AppImage integrates with desktop environment (icon, menu entry)
 
 ### Phase 4 (End-to-End)
+
 - Fresh Linux system: download AppImage, double-click, GTK GUI opens and connects
 - Fresh Linux system: `npm install -g closedclaw && closedclaw launch` opens GTK GUI
 - Developer: `pnpm launch` (alias to launch command) works in repo

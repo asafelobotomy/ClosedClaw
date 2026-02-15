@@ -11,6 +11,7 @@ import { registerConfigCli } from "../config-cli.js";
 import { registerMemoryCli, runMemoryStatus } from "../memory-cli.js";
 import { registerAgentCommands } from "./register.agent.js";
 import { registerConfigureCommand } from "./register.configure.js";
+import { registerLaunchCommands } from "./register.launch.js";
 import { registerMaintenanceCommands } from "./register.maintenance.js";
 import { registerMessageCommands } from "./register.message.js";
 import { registerOnboardCommand } from "./register.onboard.js";
@@ -132,6 +133,10 @@ export const commandRegistry: CommandRegistration[] = [
   {
     id: "maintenance",
     register: ({ program }) => registerMaintenanceCommands(program),
+  },
+  {
+    id: "launch",
+    register: ({ program }) => registerLaunchCommands(program),
   },
   {
     id: "message",

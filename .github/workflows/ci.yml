@@ -81,6 +81,9 @@ jobs:
             task: test
             command: pnpm canvas:a2ui:bundle && pnpm test
           - runtime: node
+            task: test-ui
+            command: pnpm canvas:a2ui:bundle && pnpm test:ui
+          - runtime: node
             task: protocol
             command: pnpm protocol:check
           - runtime: node

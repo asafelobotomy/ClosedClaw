@@ -16,10 +16,7 @@ const normalizeLabel = (label: string | undefined, url: string) => {
     return url;
   }
   if (label.includes("docs.OpenClaw.ai")) {
-    return label.replace(
-      "docs.OpenClaw.ai",
-      "github.com/asafelobotomy/ClosedClaw/blob/main/docs",
-    );
+    return label.replace("docs.OpenClaw.ai", "github.com/asafelobotomy/ClosedClaw/blob/main/docs");
   }
   return label;
 };

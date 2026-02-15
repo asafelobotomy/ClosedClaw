@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ClosedClaw
+GenericName=AI Messenger
+Comment=Personal AI assistant gateway with messaging channels
+Exec=closedclaw launch
+Icon=closedclaw
+Terminal=false
+Categories=Network;InstantMessaging;Chat;
+Keywords=AI;Chat;Messenger;WhatsApp;Telegram;Discord;
+StartupNotify=true
+StartupWMClass=closedclaw
