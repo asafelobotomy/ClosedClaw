@@ -1,0 +1,30 @@
+---
+# ClosedClaw Cloud Foundry deployment manifest
+# See https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html
+
+applications:
+  - name: closedclaw
+    memory: 2G
+    disk_quota: 1G
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    stack: cflinuxfs4
+    command: node dist/index.js gateway --allow-unconfigured --port $PORT --bind lan
+    health-check-type: http
+    health-check-http-endpoint: /health
+    timeout: 180
+    
+    env:
+      NODE_ENV: production
+      CLOSEDCLAW_PREFER_PNPM: "1"
+      CLOSEDCLAW_STATE_DIR: /home/vcap/app/data
+      NODE_OPTIONS: --max-old-space-size=1536
+      BP_NODE_PACKAGE_MANAGER: pnpm
+    
+    # Services to bind (create these first with cf create-service)
+    # services:
+    #   - closedclaw-storage
+    
+    routes:
+      - route: closedclaw.((domain))

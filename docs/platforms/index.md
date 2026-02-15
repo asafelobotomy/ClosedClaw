@@ -22,6 +22,7 @@ A companion app exists for Android. The Gateway is fully supported on Linux.
 
 - VPS hub: [VPS hosting](/vps)
 - Fly.io: [Fly.io](/platforms/fly)
+- Cloud Foundry: [Cloud Foundry](/platforms/cloud-foundry)
 - Hetzner (Docker): [Hetzner](/platforms/hetzner)
 - GCP (Compute Engine): [GCP](/platforms/gcp)
 - exe.dev (VM + HTTPS proxy): [exe.dev](/platforms/exe-dev)

@@ -20,6 +20,15 @@ ClosedClaw config set agents.list[0].tools.exec.node "node-id-or-name"
 ClosedClaw config unset tools.web.search.apiKey
 ```
 
+## Diff
+
+Compare your current config with ClosedClaw defaults.
+
+```bash
+ClosedClaw config diff           # human-readable summary
+ClosedClaw config diff --json    # machine-readable output
+```
+
 ## Paths
 
 Paths use dot or bracket notation:

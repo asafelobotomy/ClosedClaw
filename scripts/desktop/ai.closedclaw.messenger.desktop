@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=ClosedClaw
+Comment=AI assistant gateway with GTK desktop interface
+Exec=closedclaw launch
+Icon=utilities-terminal
+Terminal=false
+Type=Application
+Categories=Network;InstantMessaging;Chat;
+Keywords=ai;chat;messenger;closedclaw;assistant;gateway;
+StartupNotify=true
+StartupWMClass=closedclaw-messenger

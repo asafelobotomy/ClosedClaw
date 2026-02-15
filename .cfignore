@@ -1,0 +1,96 @@
+# Cloud Foundry ignore file
+# Excludes files/directories from CF push to reduce upload time and slug size
+
+# Node modules (installed by buildpack)
+node_modules/
+**/node_modules/
+
+# Build artifacts (rebuilt on deploy)
+dist/
+.next/
+out/
+
+# Development files
+.git/
+.github/
+.vscode/
+.idea/
+
+# Test files
+test/
+tests/
+**/*.test.ts
+**/*.test.js
+**/*.spec.ts
+**/*.spec.js
+*.test.ts
+*.test.js
+vitest*.config.ts
+coverage/
+
+# Documentation (not needed at runtime)
+docs/
+*.md
+!README.md
+
+# Development configs
+.env
+.env.*
+.nvmrc
+.pre-commit-config.yaml
+.secrets.baseline
+.detect-secrets.cfg
+.shellcheckrc
+.oxfmtrc.jsonc
+.oxlintrc.json
+tsconfig*.json
+vitest*.ts
+.dockerignore
+Dockerfile*
+docker-compose.yml
+
+# Archives and temp files
+archive/
+tmp/
+*.log
+*.tar.gz
+*.zip
+
+# Platform-specific configs
+fly.toml
+fly.private.toml
+render.yaml
+.directory
+
+# CI/CD
+.devcontainer/
+git-hooks/
+zizmor.yml
+
+# Vendor and tools (if not needed at runtime)
+vendor/
+tools/dev/
+tools/testing/
+tools/docs/
+tools/maintenance/
+
+# macOS and system files
+.DS_Store
+Thumbs.db
+
+# Patches (applied during build)
+patches/
+
+# UI source (built files are in dist)
+ui/src/
+ui/public/
+ui/*.json
+ui/*.config.*
+!ui/package.json
+
+# Large binaries or optional deps
+*.wasm
+*.node
+
+# Apps (not needed for gateway deployment)
+apps/

@@ -124,10 +124,10 @@ ClosedClaw currently requires manual coordination between gateway startup and GT
 ## Phase 4: Testing & Documentation
 
 16. **Add AppImage e2e tests** in [tools/testing/e2e/appimage-docker.sh](tools/testing/e2e/appimage-docker.sh)
-    - Docker container with minimal Linux (Ubuntu/Debian)
-    - Install AppImage, run it
-    - Verify gateway starts, UI accessible
-    - Test basic chat flow
+    - Docker container with minimal Linux (Ubuntu/Debian) + X11/Wayland
+    - Install AppImage, run it in headless mode (Xvfb)
+    - Verify gateway starts, GTK GUI launches
+    - Test basic chat flow via IPC bridge
     - Cleanup and exit
 
 17. **Document launch workflows** in [docs/start/launch.md](docs/start/launch.md)

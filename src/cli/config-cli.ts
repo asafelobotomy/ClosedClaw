@@ -1,6 +1,19 @@
 import type { Command } from "commander";
 import JSON5 from "json5";
-import { readConfigFileSnapshot, writeConfigFile } from "../config/config.js";
+import {
+  readConfigFileSnapshot,
+  writeConfigFile,
+} from "../config/config.js";
+import {
+  applyAgentDefaults,
+  applyCompactionDefaults,
+  applyContextPruningDefaults,
+  applyLoggingDefaults,
+  applyMessageDefaults,
+  applyModelDefaults,
+  applySessionDefaults,
+  applyTalkApiKey,
+} from "../config/defaults.js";
 import { danger, info } from "../globals.js";
 import { defaultRuntime } from "../runtime.js";
 import { formatDocsLink } from "../terminal/links.js";
@@ -9,6 +22,13 @@ import { shortenHomePath } from "../utils.js";
 import { formatCliCommand } from "./command-format.js";
 
 type PathSegment = string;
+
+type DiffEntry = {
+  path: string;
+  type: "added" | "removed" | "changed";
+  from?: unknown;
+  to?: unknown;
+};
 
 function isIndexSegment(raw: string): boolean {
   return /^[0-9]+$/.test(raw);
@@ -201,6 +221,66 @@ function unsetAtPath(root: Record<string, unknown>, path: PathSegment[]): boolea
   return true;
 }
 
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value) && typeof value === "object" && !Array.isArray(value);
+
+const buildDefaultConfig = (): Record<string, unknown> =>
+  applyTalkApiKey(
+    applyModelDefaults(
+      applyCompactionDefaults(
+        applyContextPruningDefaults(
+          applyAgentDefaults(applySessionDefaults(applyLoggingDefaults(applyMessageDefaults({})))),
+        ),
+      ),
+    ),
+  ) as Record<string, unknown>;
+
+const joinPath = (parent: string, key: string | number) =>
+  parent ? (typeof key === "number" ? `${parent}[${key}]` : `${parent}.${key}`) : String(key);
+
+const diffConfigs = (base: unknown, target: unknown, path = ""): DiffEntry[] => {
+  // Both undefined/null
+  if (base === undefined && target === undefined) {
+    return [];
+  }
+
+  // Added / removed
+  if (base === undefined) {
+    return [{ path, type: "added", to: target }];
+  }
+  if (target === undefined) {
+    return [{ path, type: "removed", from: base }];
+  }
+
+  // Primitive or direct diff
+  const bothObjects = isPlainObject(base) && isPlainObject(target);
+  const bothArrays = Array.isArray(base) && Array.isArray(target);
+  if (!bothObjects && !bothArrays) {
+    if (JSON.stringify(base) === JSON.stringify(target)) {
+      return [];
+    }
+    return [{ path, type: "changed", from: base, to: target }];
+  }
+
+  const entries: DiffEntry[] = [];
+  if (bothArrays) {
+    const max = Math.max(base.length, target.length);
+    for (let i = 0; i < max; i += 1) {
+      const childPath = joinPath(path, i);
+      entries.push(...diffConfigs(base[i], target[i], childPath));
+    }
+    return entries;
+  }
+
+  // Objects
+  const keys = new Set<string>([...Object.keys(base), ...Object.keys(target)]);
+  for (const key of keys) {
+    const childPath = joinPath(path, key);
+    entries.push(...diffConfigs((base as Record<string, unknown>)[key], (target as Record<string, unknown>)[key], childPath));
+  }
+  return entries;
+};
+
 async function loadValidConfig() {
   const snapshot = await readConfigFileSnapshot();
   if (snapshot.valid) {
@@ -341,4 +421,47 @@ export function registerConfigCli(program: Command) {
         defaultRuntime.exit(1);
       }
     });
+
+    cmd
+      .command("diff")
+      .description("Show differences between current config and defaults")
+      .option("--json", "Output JSON", false)
+      .action(async (opts) => {
+        const snapshot = await loadValidConfig();
+        const defaults = buildDefaultConfig();
+        const diffs = diffConfigs(defaults, snapshot.config);
+
+        if (opts.json) {
+          defaultRuntime.log(
+            JSON.stringify(
+              {
+                differences: diffs,
+              },
+              null,
+              2,
+            ),
+          );
+          return;
+        }
+
+        if (diffs.length === 0) {
+          defaultRuntime.log(theme.success("No differences from defaults."));
+          return;
+        }
+
+        for (const diff of diffs) {
+          const pathLabel = diff.path || "<root>";
+          if (diff.type === "added") {
+            defaultRuntime.log(`${theme.success("+")} ${theme.command(pathLabel)} → ${JSON.stringify(diff.to)}`);
+            continue;
+          }
+          if (diff.type === "removed") {
+            defaultRuntime.log(`${theme.warn("-")} ${theme.command(pathLabel)} (was ${JSON.stringify(diff.from)})`);
+            continue;
+          }
+          defaultRuntime.log(
+            `${theme.muted("~")} ${theme.command(pathLabel)}: ${JSON.stringify(diff.from)} → ${JSON.stringify(diff.to)}`,
+          );
+        }
+      });
 }
