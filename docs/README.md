@@ -140,11 +140,8 @@ Contributing to ClosedClaw:
 
 Platform-specific documentation:
 
-- **[macOS](platforms/mac/)** - Native macOS app, launchd, Keychain.app
-- **[iOS](platforms/ios/)** - iOS app and configuration
 - **[Android](platforms/android/)** - Android app setup
 - **[Linux](platforms/linux/)** - systemd, Secret Service
-- **[Windows WSL2](platforms/windows/)** - Windows Subsystem for Linux setup
 - **[Docker](install/docker.md)** - Container deployment
 - **[VPS Hosting](vps.md)** - Cloud deployment guides
 
@@ -159,7 +156,6 @@ Running ClosedClaw in production:
 - **[Render Guide](render.mdx)** - Deploy to Render
 - **[Northflank Guide](northflank.mdx)** - Deploy to Northflank
 - **[VPS Setup](vps.md)** - Self-hosted on VPS
-- **[Nix](https://github.com/ClosedClaw/nix-clawdbot)** - NixOS/Nix flakes
 
 ---
 
@@ -201,10 +197,7 @@ Detailed reports on completed development priorities:
 
 ### Getting Help
 
-- **[Discord Community](https://discord.gg/clawd)** - Real-time community support
 - **[GitHub Issues](https://github.com/ClosedClaw/ClosedClaw/issues)** - Bug reports and feature requests
-- **[FAQ](start/faq.md)** - Frequently asked questions
-- **[DeepWiki](https://deepwiki.com/ClosedClaw/ClosedClaw)** - Community wiki
 
 ---
 
@@ -249,10 +242,7 @@ Detailed reports on completed development priorities:
 
 ## 🔗 External Links
 
-- **[Website](https://ClosedClaw.ai)** - Official website
 - **[GitHub Repository](https://github.com/ClosedClaw/ClosedClaw)** - Source code
-- **[DeepWiki](https://deepwiki.com/ClosedClaw/ClosedClaw)** - Community-maintained wiki
-- **[Discord Server](https://discord.gg/clawd)** - Community chat
 - **[npm Package](https://www.npmjs.com/package/ClosedClaw)** - npm registry
 
 ---
@@ -261,15 +251,3 @@ Detailed reports on completed development priorities:
 
 - **Security**: Enterprise-grade (AES-256, Ed25519, SHA-256 chains)
 - **Test Coverage**: 70%+ (security: 90%+)
-- **Platforms**: macOS, iOS, Android, Linux, Windows (WSL2)
-- **Channels**: 10+ built-in, 20+ extension channels
-- **Documentation**: 778+ markdown files
-- **License**: MIT
-
----
-
-**Last Updated**: February 10, 2026  
-**Version**: 2026.2.1  
-**Status**: Production-ready with enterprise security ✅
-
-For the most up-to-date information, visit the [official website](https://ClosedClaw.ai) or join our [Discord community](https://discord.gg/clawd).
